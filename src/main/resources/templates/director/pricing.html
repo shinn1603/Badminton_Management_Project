@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phê duyệt chính sách giá & Khuyến mãi - UTE Sport</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+  <div class="layout-container">
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-header">
+        <div class="brand-icon">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>UTE SPORT</h2>
+          <span>Quản lý chuỗi sân</span>
+        </div>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="menu-title">Giám đốc điều hành</div>
+        
+        <a href="/director/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span class="menu-text">Doanh thu toàn chuỗi</span>
+        </a>
+
+        <a href="/director/dashboard#comparison-section" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+            <path d="M9 22v-4h6v4"></path>
+            <path d="M8 6h.01"></path>
+            <path d="M16 6h.01"></path>
+            <path d="M8 10h.01"></path>
+            <path d="M16 10h.01"></path>
+            <path d="M8 14h.01"></path>
+            <path d="M16 14h.01"></path>
+          </svg>
+          <span class="menu-text">So sánh chi nhánh</span>
+        </a>
+
+        <a href="/director/branches" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span class="menu-text">Quản lý chi nhánh</span>
+        </a>
+
+        <a href="/director/pricing" class="menu-item active">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          <span class="menu-text">Chính sách giá & KM</span>
+        </a>
+
+        <a href="/director/tournaments" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+            <path d="M4 22h16"></path>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+          </svg>
+          <span class="menu-text">Phê duyệt giải đấu</span>
+        </a>
+
+        <div class="menu-title" style="margin-top: 14px;">Nghiệp vụ quầy & Sân</div>
+
+        <a href="/booking/grid" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+            <line x1="10" y1="4" x2="10" y2="22"></line>
+          </svg>
+          <span class="menu-text">Lưới đặt sân</span>
+        </a>
+
+        <div class="menu-title" style="margin-top: 14px;">Quản trị hệ thống</div>
+
+        <a href="/admin/users" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span class="menu-text">Tài khoản & Phân quyền</span>
+        </a>
+
+        <a href="/admin/permissions" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span class="menu-text">Phạm vi dữ liệu chi nhánh</span>
+        </a>
+
+        <a href="/admin/settings" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span class="menu-text">Cấu hình thông số</span>
+        </a>
+
+        <a href="/admin/logs" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span class="menu-text">Nhật ký hoạt động</span>
+        </a>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="user-avatar">GD</div>
+        <div class="user-meta">
+          <span class="user-name">Võ Hoàng Nam</span>
+          <span class="user-title">Giám đốc điều hành</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-wrapper">
+      <header class="header-bar">
+        <div class="header-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="Thu gọn / Mở rộng">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="header-heading">
+            <h1>Phê duyệt chính sách giá & Khuyến mãi</h1>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <div class="search-box">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: var(--text-light);">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" placeholder="Tìm đề xuất, mã KM...">
+          </div>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div class="chart-tab-bar" style="margin-bottom: 18px;">
+          <button class="chart-tab-btn active" onclick="switchPricingTab(1)">Đề xuất bảng giá giờ chơi (3)</button>
+          <button class="chart-tab-btn" onclick="switchPricingTab(2)">Duyệt chương trình khuyến mãi & Voucher (2)</button>
+        </div>
+
+        <div id="pricingTabContent1">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Danh sách đề xuất điều chỉnh giá sân từ Quản lý chi nhánh</h2>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Mã ĐX</th>
+                    <th>Chi nhánh đề xuất</th>
+                    <th>Loại sân áp dụng</th>
+                    <th>Khung giờ áp dụng</th>
+                    <th>Mức giá hiện tại</th>
+                    <th>Mức giá đề xuất</th>
+                    <th>Lý do đề xuất</th>
+                    <th style="text-align: center;">Trạng thái</th>
+                    <th style="text-align: right;">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="priceRow1">
+                    <td style="font-weight: 700;">DX-G01</td>
+                    <td>
+                      <div style="font-weight: 600;">Chi nhánh 2 - Quận 9</div>
+                      <div style="font-size: 11px; color: var(--text-muted);">Trần Hữu Nam gửi</div>
+                    </td>
+                    <td>Sân VIP Yonex</td>
+                    <td>
+                      <span class="badge" style="background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa;">17:00 - 21:00 (Giờ vàng)</span>
+                    </td>
+                    <td style="color: var(--text-muted);">120.000 đ/h</td>
+                    <td style="font-weight: 700; color: var(--primary);">140.000 đ/h (+16%)</td>
+                    <td style="font-size: 12px; color: var(--text-muted); max-width: 200px;">Nhu cầu hội viên cao điểm quá tải, nâng cấp hệ thống đèn LED mới</td>
+                    <td style="text-align: center;" id="statusCell1">
+                      <span class="badge badge-warning">Chờ phê duyệt</span>
+                    </td>
+                    <td style="text-align: right;">
+                      <div style="display: flex; gap: 6px; justify-content: flex-end;" id="actionCell1">
+                        <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approvePricing('1')">Duyệt</button>
+                        <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444;" onclick="rejectPricing('1')">Từ chối</button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr id="priceRow2">
+                    <td style="font-weight: 700;">DX-G02</td>
+                    <td>
+                      <div style="font-weight: 600;">Chi nhánh 1 - Thủ Đức</div>
+                      <div style="font-size: 11px; color: var(--text-muted);">Nguyễn Văn Quản gửi</div>
+                    </td>
+                    <td>Sân Tiêu chuẩn</td>
+                    <td>
+                      <span class="badge" style="background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;">08:00 - 14:00 (Giờ thấp điểm)</span>
+                    </td>
+                    <td style="color: var(--text-muted);">80.000 đ/h</td>
+                    <td style="font-weight: 700; color: var(--primary);">60.000 đ/h (-25%)</td>
+                    <td style="font-size: 12px; color: var(--text-muted); max-width: 200px;">Kích cầu sinh viên UTE thuê sân buổi sáng các ngày trong tuần</td>
+                    <td style="text-align: center;" id="statusCell2">
+                      <span class="badge badge-warning">Chờ phê duyệt</span>
+                    </td>
+                    <td style="text-align: right;">
+                      <div style="display: flex; gap: 6px; justify-content: flex-end;" id="actionCell2">
+                        <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approvePricing('2')">Duyệt</button>
+                        <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444;" onclick="rejectPricing('2')">Từ chối</button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="font-weight: 700;">DX-G00</td>
+                    <td>
+                      <div style="font-weight: 600;">Chi nhánh 3 - Bình Thạnh</div>
+                      <div style="font-size: 11px; color: var(--text-muted);">Lê Hoàng Khang gửi</div>
+                    </td>
+                    <td>Sân Tiêu chuẩn</td>
+                    <td>06:00 - 08:00</td>
+                    <td style="color: var(--text-muted);">70.000 đ/h</td>
+                    <td style="font-weight: 700; color: var(--primary);">80.000 đ/h</td>
+                    <td style="font-size: 12px; color: var(--text-muted); max-width: 200px;">Đồng bộ mức giá sáng sớm toàn chuỗi</td>
+                    <td style="text-align: center;">
+                      <span class="badge badge-success">Đã phê duyệt</span>
+                    </td>
+                    <td style="text-align: right; color: var(--text-light); font-size: 11.5px;">
+                      Đã áp dụng
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="pricingTabContent2" style="display: none;">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Danh sách chiến dịch Khuyến mãi & Mã giảm giá toàn chuỗi</h2>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Mã KM</th>
+                    <th>Tên chiến dịch</th>
+                    <th>Mã Voucher</th>
+                    <th>Mức ưu đãi</th>
+                    <th>Phạm vi áp dụng</th>
+                    <th>Thời hạn</th>
+                    <th style="text-align: center;">Trạng thái</th>
+                    <th style="text-align: right;">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="promoRow1">
+                    <td style="font-weight: 700;">KM-2026-01</td>
+                    <td>
+                      <div style="font-weight: 600;">Chào đón Tân sinh viên HCM-UTE</div>
+                      <div style="font-size: 11px; color: var(--text-muted);">Ưu đãi khai giảng năm học mới</div>
+                    </td>
+                    <td><span style="font-family: monospace; font-weight: 700; color: var(--secondary); background: #eff6ff; padding: 2px 6px; border-radius: 4px;">UTEFRESH26</span></td>
+                    <td style="font-weight: 700; color: #ea580c;">Giảm 20%</td>
+                    <td>Toàn chuỗi (CN01, CN02, CN03)</td>
+                    <td>01/10 - 31/10/2026</td>
+                    <td style="text-align: center;" id="promoStatus1">
+                      <span class="badge badge-warning">Chờ phê duyệt</span>
+                    </td>
+                    <td style="text-align: right;">
+                      <div style="display: flex; gap: 6px; justify-content: flex-end;" id="promoAction1">
+                        <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approvePromo('1')">Kích hoạt</button>
+                        <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444;" onclick="rejectPromo('1')">Bác bỏ</button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="font-weight: 700;">KM-2026-00</td>
+                    <td>
+                      <div style="font-weight: 600;">Tri ân Hội viên Thân thiết Tháng 9</div>
+                      <div style="font-size: 11px; color: var(--text-muted);">Tặng giờ chơi thứ 3 trong tuần</div>
+                    </td>
+                    <td><span style="font-family: monospace; font-weight: 700; color: var(--secondary); background: #eff6ff; padding: 2px 6px; border-radius: 4px;">VIPMEMBER</span></td>
+                    <td style="font-weight: 700; color: #ea580c;">Giảm 15%</td>
+                    <td>Toàn chuỗi</td>
+                    <td>01/09 - 30/09/2026</td>
+                    <td style="text-align: center;">
+                      <span class="badge badge-success">Đang diễn ra</span>
+                    </td>
+                    <td style="text-align: right; color: var(--text-light); font-size: 11.5px;">
+                      Đã kích hoạt
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('appSidebar');
+      if (sidebar) sidebar.classList.toggle('collapsed');
+    }
+
+    function switchPricingTab(tabIndex) {
+      const btn1 = document.querySelectorAll('.chart-tab-btn')[0];
+      const btn2 = document.querySelectorAll('.chart-tab-btn')[1];
+      const c1 = document.getElementById('pricingTabContent1');
+      const c2 = document.getElementById('pricingTabContent2');
+
+      if (tabIndex === 1) {
+        btn1.classList.add('active');
+        btn2.classList.remove('active');
+        c1.style.display = 'block';
+        c2.style.display = 'none';
+      } else {
+        btn1.classList.remove('active');
+        btn2.classList.add('active');
+        c1.style.display = 'none';
+        c2.style.display = 'block';
+      }
+    }
+
+    function approvePricing(id) {
+      document.getElementById('statusCell' + id).innerHTML = '<span class="badge badge-success">Đã phê duyệt</span>';
+      document.getElementById('actionCell' + id).innerHTML = '<span style="color: var(--primary); font-size: 11.5px; font-weight: 600;">Đã duyệt thành công</span>';
+      alert('Đã phê duyệt chính sách giá đề xuất thành công!');
+    }
+
+    function rejectPricing(id) {
+      if (confirm('Bạn có chắc chắn muốn từ chối đề xuất này?')) {
+        document.getElementById('statusCell' + id).innerHTML = '<span class="badge badge-danger">Từ chối</span>';
+        document.getElementById('actionCell' + id).innerHTML = '<span style="color: #ef4444; font-size: 11.5px;">Đã từ chối</span>';
+      }
+    }
+
+    function approvePromo(id) {
+      document.getElementById('promoStatus' + id).innerHTML = '<span class="badge badge-success">Đã kích hoạt</span>';
+      document.getElementById('promoAction' + id).innerHTML = '<span style="color: var(--primary); font-size: 11.5px; font-weight: 600;">Đang chạy</span>';
+      alert('Đã phê duyệt và kích hoạt mã khuyến mãi toàn chuỗi!');
+    }
+
+    function rejectPromo(id) {
+      if (confirm('Bác bỏ chương trình khuyến mãi này?')) {
+        document.getElementById('promoStatus' + id).innerHTML = '<span class="badge badge-danger">Đã bác bỏ</span>';
+        document.getElementById('promoAction' + id).innerHTML = '<span style="color: #ef4444; font-size: 11.5px;">Bị từ chối</span>';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phê duyệt giải đấu & Thống kê hội viên - UTE Sport</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+  <div class="layout-container">
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-header">
+        <div class="brand-icon">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>UTE SPORT</h2>
+          <span>Quản lý chuỗi sân</span>
+        </div>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="menu-title">Giám đốc điều hành</div>
+        
+        <a href="/director/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span class="menu-text">Doanh thu toàn chuỗi</span>
+        </a>
+
+        <a href="/director/dashboard#comparison-section" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+            <path d="M9 22v-4h6v4"></path>
+            <path d="M8 6h.01"></path>
+            <path d="M16 6h.01"></path>
+            <path d="M8 10h.01"></path>
+            <path d="M16 10h.01"></path>
+            <path d="M8 14h.01"></path>
+            <path d="M16 14h.01"></path>
+          </svg>
+          <span class="menu-text">So sánh chi nhánh</span>
+        </a>
+
+        <a href="/director/branches" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span class="menu-text">Quản lý chi nhánh</span>
+        </a>
+
+        <a href="/director/pricing" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          <span class="menu-text">Chính sách giá & KM</span>
+        </a>
+
+        <a href="/director/tournaments" class="menu-item active">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+            <path d="M4 22h16"></path>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+          </svg>
+          <span class="menu-text">Phê duyệt giải đấu</span>
+        </a>
+
+        <div class="menu-title" style="margin-top: 14px;">Nghiệp vụ quầy & Sân</div>
+
+        <a href="/booking/grid" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+            <line x1="10" y1="4" x2="10" y2="22"></line>
+          </svg>
+          <span class="menu-text">Lưới đặt sân</span>
+        </a>
+
+        <div class="menu-title" style="margin-top: 14px;">Quản trị hệ thống</div>
+
+        <a href="/admin/users" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span class="menu-text">Tài khoản & Phân quyền</span>
+        </a>
+
+        <a href="/admin/permissions" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span class="menu-text">Phạm vi dữ liệu chi nhánh</span>
+        </a>
+
+        <a href="/admin/settings" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span class="menu-text">Cấu hình thông số</span>
+        </a>
+
+        <a href="/admin/logs" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span class="menu-text">Nhật ký hoạt động</span>
+        </a>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="user-avatar">GD</div>
+        <div class="user-meta">
+          <span class="user-name">Võ Hoàng Nam</span>
+          <span class="user-title">Giám đốc điều hành</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-wrapper">
+      <header class="header-bar">
+        <div class="header-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="Thu gọn / Mở rộng">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="header-heading">
+            <h1>Phê duyệt giải đấu & Thống kê hội viên</h1>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <div class="search-box">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: var(--text-light);">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" placeholder="Tìm tên giải đấu, hội viên...">
+          </div>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Phê duyệt kế hoạch tổ chức giải đấu liên chi nhánh</h2>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Quy định QĐ-GD02: Giám đốc duyệt địa điểm, thời gian khóa sân và ngân sách giải</div>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mã giải</th>
+                  <th>Tên giải đấu</th>
+                  <th>Địa điểm tổ chức</th>
+                  <th>Thời gian diễn ra</th>
+                  <th>Quy mô & Số sân</th>
+                  <th>Dự toán kinh phí</th>
+                  <th style="text-align: center;">Trạng thái</th>
+                  <th style="text-align: right;">Thao tác phê duyệt</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr id="tourRow1">
+                  <td style="font-weight: 700;">GD-2026-01</td>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Giải Cầu Lông Mở Rộng HCM-UTE Cup 2026</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Tranh tài Đôi Nam, Đôi Nữ và Đơn Nam toàn thành phố</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 600;">Chi nhánh 1 (Thủ Đức)</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Sân 01 đến Sân 06</div>
+                  </td>
+                  <td>
+                    <div>25/10/2026 - 27/10/2026</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">07:30 - 18:00 hàng ngày</div>
+                  </td>
+                  <td>32 cặp đấu (6 sân)</td>
+                  <td style="font-weight: 700; color: var(--text-dark);">35.000.000 đ</td>
+                  <td style="text-align: center;" id="tourStatus1">
+                    <span class="badge badge-warning">Chờ Giám đốc duyệt</span>
+                  </td>
+                  <td style="text-align: right;">
+                    <div style="display: flex; gap: 6px; justify-content: flex-end;" id="tourAction1">
+                      <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approveTour('1')">Phê duyệt</button>
+                      <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444;" onclick="rejectTour('1')">Từ chối</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="font-weight: 700;">GD-2026-00</td>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Giao hữu Nội bộ Khối Công nghệ Thông tin UTE</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Giải đấu giao lưu giảng viên và sinh viên</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 600;">Chi nhánh 2 (Quận 9)</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Sân 01 đến Sân 04</div>
+                  </td>
+                  <td>
+                    <div>12/09/2026</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">08:00 - 16:00</div>
+                  </td>
+                  <td>16 cặp đấu (4 sân)</td>
+                  <td style="font-weight: 700; color: var(--text-dark);">12.000.000 đ</td>
+                  <td style="text-align: center;">
+                    <span class="badge badge-success">Đã hoàn thành</span>
+                  </td>
+                  <td style="text-align: right; color: var(--text-light); font-size: 11.5px;">
+                    Đã nghiệm thu
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Thống kê xếp hạng & Phân loại Hội viên toàn chuỗi</h2>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Căn cứ tính điểm tích lũy, chính sách giảm giá và chiết khấu giờ thuê sân</div>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mã HV</th>
+                  <th>Họ và tên hội viên</th>
+                  <th>Số điện thoại & Email</th>
+                  <th style="text-align: center;">Hạng thành viên</th>
+                  <th style="text-align: center;">Điểm tích lũy</th>
+                  <th>Tổng giờ đã chơi</th>
+                  <th>Tổng chi tiêu</th>
+                  <th>Cơ sở thường xuyên</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: 700;">HV-0882</td>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Trần Quốc Bảo</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Tham gia từ 01/2025</div>
+                  </td>
+                  <td>
+                    <div>0903 888 999</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">bao.tq@gmail.com</div>
+                  </td>
+                  <td style="text-align: center;">
+                    <span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 700;">Kim Cương (-15%)</span>
+                  </td>
+                  <td style="text-align: center; font-weight: 700; color: var(--primary);">4.820 pts</td>
+                  <td>148 giờ</td>
+                  <td style="font-weight: 700;">18.450.000 đ</td>
+                  <td>Chi nhánh 1 (Thủ Đức)</td>
+                </tr>
+
+                <tr>
+                  <td style="font-weight: 700;">HV-0741</td>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Nguyễn Minh Trí</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Tham gia từ 03/2025</div>
+                  </td>
+                  <td>
+                    <div>0918 222 333</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">tri.nm@outlook.com</div>
+                  </td>
+                  <td style="text-align: center;">
+                    <span class="badge" style="background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; font-weight: 700;">Vàng (-10%)</span>
+                  </td>
+                  <td style="text-align: center; font-weight: 700; color: var(--primary);">2.450 pts</td>
+                  <td>86 giờ</td>
+                  <td style="font-weight: 700;">9.800.000 đ</td>
+                  <td>Chi nhánh 2 (Quận 9)</td>
+                </tr>
+
+                <tr>
+                  <td style="font-weight: 700;">HV-1029</td>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Lê Thị Thu Thảo</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Tham gia từ 06/2025</div>
+                  </td>
+                  <td>
+                    <div>0933 777 888</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">thao.le@ute.edu.vn</div>
+                  </td>
+                  <td style="text-align: center;">
+                    <span class="badge" style="background: #f4f4f5; color: #52525b; border: 1px solid #e4e4e7; font-weight: 600;">Bạc (-5%)</span>
+                  </td>
+                  <td style="text-align: center; font-weight: 700; color: var(--primary);">1.100 pts</td>
+                  <td>42 giờ</td>
+                  <td style="font-weight: 700;">4.400.000 đ</td>
+                  <td>Chi nhánh 3 (Bình Thạnh)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('appSidebar');
+      if (sidebar) sidebar.classList.toggle('collapsed');
+    }
+
+    function approveTour(id) {
+      document.getElementById('tourStatus' + id).innerHTML = '<span class="badge badge-success">Đã phê duyệt giải</span>';
+      document.getElementById('tourAction' + id).innerHTML = '<span style="color: var(--primary); font-size: 11.5px; font-weight: 600;">Đã phê duyệt</span>';
+      alert('Đã phê duyệt đề xuất giải đấu và cấp quyền khóa sân theo lịch thi đấu!');
+    }
+
+    function rejectTour(id) {
+      if (confirm('Bạn có chắc chắn từ chối đề xuất giải đấu này?')) {
+        document.getElementById('tourStatus' + id).innerHTML = '<span class="badge badge-danger">Từ chối tổ chức</span>';
+        document.getElementById('tourAction' + id).innerHTML = '<span style="color: #ef4444; font-size: 11.5px;">Bác bỏ</span>';
+      }
+    }
+  </script>
+</body>
+</html>

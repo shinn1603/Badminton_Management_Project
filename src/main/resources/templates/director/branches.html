@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý hệ thống chi nhánh - UTE Sport</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+  <div class="layout-container">
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-header">
+        <div class="brand-icon">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>UTE SPORT</h2>
+          <span>Quản lý chuỗi sân</span>
+        </div>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="menu-title">Giám đốc điều hành</div>
+        
+        <a href="/director/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span class="menu-text">Doanh thu toàn chuỗi</span>
+        </a>
+
+        <a href="/director/dashboard#comparison-section" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+            <path d="M9 22v-4h6v4"></path>
+            <path d="M8 6h.01"></path>
+            <path d="M16 6h.01"></path>
+            <path d="M8 10h.01"></path>
+            <path d="M16 10h.01"></path>
+            <path d="M8 14h.01"></path>
+            <path d="M16 14h.01"></path>
+          </svg>
+          <span class="menu-text">So sánh chi nhánh</span>
+        </a>
+
+        <a href="/director/branches" class="menu-item active">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span class="menu-text">Quản lý chi nhánh</span>
+        </a>
+
+        <a href="/director/pricing" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          <span class="menu-text">Chính sách giá & KM</span>
+        </a>
+
+        <a href="/director/tournaments" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+            <path d="M4 22h16"></path>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+          </svg>
+          <span class="menu-text">Phê duyệt giải đấu</span>
+        </a>
+
+        <div class="menu-title" style="margin-top: 14px;">Nghiệp vụ quầy & Sân</div>
+
+        <a href="/booking/grid" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+            <line x1="10" y1="4" x2="10" y2="22"></line>
+          </svg>
+          <span class="menu-text">Lưới đặt sân</span>
+        </a>
+
+        <div class="menu-title" style="margin-top: 14px;">Quản trị hệ thống</div>
+
+        <a href="/admin/users" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span class="menu-text">Tài khoản & Phân quyền</span>
+        </a>
+
+        <a href="/admin/permissions" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span class="menu-text">Phạm vi dữ liệu chi nhánh</span>
+        </a>
+
+        <a href="/admin/settings" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span class="menu-text">Cấu hình thông số</span>
+        </a>
+
+        <a href="/admin/logs" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span class="menu-text">Nhật ký hoạt động</span>
+        </a>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="user-avatar">GD</div>
+        <div class="user-meta">
+          <span class="user-name">Võ Hoàng Nam</span>
+          <span class="user-title">Giám đốc điều hành</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-wrapper">
+      <header class="header-bar">
+        <div class="header-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="Thu gọn / Mở rộng">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="header-heading">
+            <h1>Quản lý hệ thống chi nhánh</h1>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <div class="search-box">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: var(--text-light);">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="branchSearchInput" onkeyup="filterBranchTable()" placeholder="Tìm tên chi nhánh, địa chỉ...">
+          </div>
+
+          <button class="btn btn-primary" onclick="openBranchModal()">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Thêm chi nhánh mới</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="color: var(--primary);">
+              <svg class="svg-icon" viewBox="0 0 24 24">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+            </div>
+            <div class="kpi-label">Tổng số chi nhánh</div>
+            <div class="kpi-value">03</div>
+            <div class="kpi-subtext">Đang hoạt động 100%</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="color: var(--secondary);">
+              <svg class="svg-icon" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </div>
+            <div class="kpi-label">Tổng số sân thi đấu</div>
+            <div class="kpi-value">32 sân</div>
+            <div class="kpi-subtext">6 sân VIP, 26 sân Tiêu chuẩn</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="color: var(--accent);">
+              <svg class="svg-icon" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div class="kpi-label">Tỷ lệ lấp đầy bình quân</div>
+            <div class="kpi-value">78.5%</div>
+            <div class="kpi-subtext">Cao điểm đạt 94.2%</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="color: #059669;">
+              <svg class="svg-icon" viewBox="0 0 24 24">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </div>
+            <div class="kpi-label">Doanh thu trung bình/CN</div>
+            <div class="kpi-value">258.4 tr</div>
+            <div class="kpi-subtext">Tăng 8.2% so với tháng trước</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 18px;">
+          <div class="card-header">
+            <h2 class="card-title">Danh sách cơ sở chi nhánh chuỗi UTE Sport</h2>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table" id="branchTable">
+              <thead>
+                <tr>
+                  <th>Mã CN</th>
+                  <th>Tên chi nhánh</th>
+                  <th>Địa chỉ & Liên hệ</th>
+                  <th>Quản lý phụ trách</th>
+                  <th style="text-align: center;">Quy mô</th>
+                  <th>Giờ hoạt động</th>
+                  <th style="text-align: center;">Trạng thái</th>
+                  <th style="text-align: right;">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: 700;">CN01</td>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Chi nhánh 1 - Thủ Đức</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Sân trung tâm & Hội quán chính</div>
+                  </td>
+                  <td>
+                    <div>01 Võ Văn Ngân, P. Linh Chiểu, TP. Thủ Đức</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Hotline: 028 3896 8641</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 600;">Nguyễn Văn Quản</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">QL-01 • 0903 111 222</div>
+                  </td>
+                  <td style="text-align: center;">
+                    <span style="font-weight: 700; color: var(--text-dark);">10 sân</span>
+                    <div style="font-size: 11px; color: var(--text-muted);">(2 VIP, 8 Tiêu chuẩn)</div>
+                  </td>
+                  <td>05:30 - 23:00</td>
+                  <td style="text-align: center;">
+                    <span class="badge badge-success">Đang hoạt động</span>
+                  </td>
+                  <td style="text-align: right;">
+                    <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                      <a href="/booking/grid" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" title="Xem lưới sân">Lưới sân</a>
+                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="editBranch('CN01', 'Chi nhánh 1 - Thủ Đức', '01 Võ Văn Ngân, P. Linh Chiểu, TP. Thủ Đức', '028 3896 8641', 'Nguyễn Văn Quản', 10, '05:30', '23:00')">Sửa</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="font-weight: 700;">CN02</td>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Chi nhánh 2 - Quận 9</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Khu liên hợp thể thao Gia Hòa</div>
+                  </td>
+                  <td>
+                    <div>450 Đỗ Xuân Hợp, P. Phước Long B, TP. Thủ Đức</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Hotline: 028 3731 5566</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 600;">Trần Hữu Nam</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">QL-02 • 0918 333 444</div>
+                  </td>
+                  <td style="text-align: center;">
+                    <span style="font-weight: 700; color: var(--text-dark);">12 sân</span>
+                    <div style="font-size: 11px; color: var(--text-muted);">(2 VIP, 10 Tiêu chuẩn)</div>
+                  </td>
+                  <td>05:30 - 23:00</td>
+                  <td style="text-align: center;">
+                    <span class="badge badge-success">Đang hoạt động</span>
+                  </td>
+                  <td style="text-align: right;">
+                    <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                      <a href="/booking/grid" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" title="Xem lưới sân">Lưới sân</a>
+                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="editBranch('CN02', 'Chi nhánh 2 - Quận 9', '450 Đỗ Xuân Hợp, P. Phước Long B, TP. Thủ Đức', '028 3731 5566', 'Trần Hữu Nam', 12, '05:30', '23:00')">Sửa</button>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="font-weight: 700;">CN03</td>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Chi nhánh 3 - Bình Thạnh</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Khu vực Cầu Sài Gòn & Văn Thánh</div>
+                  </td>
+                  <td>
+                    <div>560 Điện Biên Phủ, Phường 22, Q. Bình Thạnh</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Hotline: 028 3512 8899</div>
+                  </td>
+                  <td>
+                    <div style="font-weight: 600;">Lê Hoàng Khang</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">QL-03 • 0988 555 777</div>
+                  </td>
+                  <td style="text-align: center;">
+                    <span style="font-weight: 700; color: var(--text-dark);">10 sân</span>
+                    <div style="font-size: 11px; color: var(--text-muted);">(2 VIP, 8 Tiêu chuẩn)</div>
+                  </td>
+                  <td>05:30 - 23:00</td>
+                  <td style="text-align: center;">
+                    <span class="badge badge-success">Đang hoạt động</span>
+                  </td>
+                  <td style="text-align: right;">
+                    <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                      <a href="/booking/grid" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" title="Xem lưới sân">Lưới sân</a>
+                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="editBranch('CN03', 'Chi nhánh 3 - Bình Thạnh', '560 Điện Biên Phủ, Phường 22, Q. Bình Thạnh', '028 3512 8899', 'Lê Hoàng Khang', 10, '05:30', '23:00')">Sửa</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="branchModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalBranchTitle">Thêm chi nhánh mới</h3>
+        <button class="modal-close-btn" onclick="closeBranchModal()">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Mã chi nhánh</label>
+            <input type="text" class="form-control" id="inpBranchCode" placeholder="ví dụ: CN04">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Số lượng sân</label>
+            <input type="number" class="form-control" id="inpCourtCount" value="8" min="1" max="30">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tên chi nhánh</label>
+          <input type="text" class="form-control" id="inpBranchName" placeholder="ví dụ: Chi nhánh 4 - Gò Vấp">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Địa chỉ cơ sở</label>
+          <input type="text" class="form-control" id="inpBranchAddress" placeholder="Số nhà, tên đường, phường, quận...">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Số điện thoại hotline</label>
+            <input type="text" class="form-control" id="inpBranchPhone" placeholder="028 xxxx xxxx">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quản lý phụ trách</label>
+            <select class="form-control" id="inpBranchManager">
+              <option value="Nguyễn Văn Quản">Nguyễn Văn Quản (QL-01)</option>
+              <option value="Trần Hữu Nam">Trần Hữu Nam (QL-02)</option>
+              <option value="Lê Hoàng Khang">Lê Hoàng Khang (QL-03)</option>
+              <option value="Phạm Minh Tuấn">Phạm Minh Tuấn (QL Mới)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Giờ mở cửa</label>
+            <input type="time" class="form-control" id="inpOpenTime" value="05:30">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Giờ đóng cửa</label>
+            <input type="time" class="form-control" id="inpCloseTime" value="23:00">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeBranchModal()">Hủy</button>
+        <button class="btn btn-primary" onclick="saveBranch()">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Lưu chi nhánh</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('appSidebar');
+      if (sidebar) sidebar.classList.toggle('collapsed');
+    }
+
+    function openBranchModal() {
+      document.getElementById('modalBranchTitle').textContent = 'Thêm chi nhánh mới';
+      document.getElementById('inpBranchCode').value = '';
+      document.getElementById('inpBranchName').value = '';
+      document.getElementById('inpBranchAddress').value = '';
+      document.getElementById('inpBranchPhone').value = '';
+      document.getElementById('branchModal').classList.add('active');
+    }
+
+    function editBranch(code, name, address, phone, manager, courts, openTime, closeTime) {
+      document.getElementById('modalBranchTitle').textContent = 'Chỉnh sửa thông tin chi nhánh ' + code;
+      document.getElementById('inpBranchCode').value = code;
+      document.getElementById('inpBranchName').value = name;
+      document.getElementById('inpBranchAddress').value = address;
+      document.getElementById('inpBranchPhone').value = phone;
+      document.getElementById('inpCourtCount').value = courts;
+      document.getElementById('inpOpenTime').value = openTime;
+      document.getElementById('inpCloseTime').value = closeTime;
+      document.getElementById('branchModal').classList.add('active');
+    }
+
+    function closeBranchModal() {
+      document.getElementById('branchModal').classList.remove('active');
+    }
+
+    function saveBranch() {
+      const name = document.getElementById('inpBranchName').value.trim();
+      if (!name) {
+        alert('Vui lòng nhập tên chi nhánh.');
+        return;
+      }
+      alert('Đã lưu thông tin chi nhánh thành công!');
+      closeBranchModal();
+    }
+
+    function filterBranchTable() {
+      const q = document.getElementById('branchSearchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#branchTable tbody tr');
+      rows.forEach(r => {
+        const txt = r.textContent.toLowerCase();
+        r.style.display = txt.includes(q) ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>
