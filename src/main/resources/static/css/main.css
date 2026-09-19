@@ -1,14 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* ==========================================================================
-   COLOR SCHEMES & THEMES
-   ========================================================================== */
-
-/* ==========================================================================
-   DEFAULT THEME: WARM ZINC & TEAL (TỐI GIẢN, ÊM MẮT, SANG TRỌNG)
-   ========================================================================== */
 :root {
-  --sidebar-bg: #18181b;        /* Zinc 900 - Đầm, êm mắt, chống lóa */
+  --sidebar-bg: #18181b;
   --sidebar-border: #27272a;
   --sidebar-text: #a1a1aa;
   --sidebar-text-hover: #ffffff;
@@ -16,12 +9,12 @@
   --sidebar-item-active: #0d9488;
   --sidebar-active-bg: rgba(13, 148, 136, 0.2);
 
-  --bg-page: #f4f4f5;           /* Zinc 100 - Nền êm dịu */
+  --bg-page: #f4f4f5;
   --surface: #ffffff;
   --border-subtle: #e4e4e7;
   --border-light: #fafafa;
 
-  --primary: #0d9488;           /* Modern Sports Teal */
+  --primary: #0d9488;
   --primary-hover: #0f766e;
   --primary-light: #f0fdfa;
   --primary-border: #99f6e4;
@@ -30,7 +23,7 @@
   --secondary-light: #eff6ff;
   --secondary-border: #bfdbfe;
 
-  --accent: #ea580c;           /* Burnt Orange Accent */
+  --accent: #ea580c;
   --accent-light: #fff7ed;
   --accent-border: #fed7aa;
 
@@ -40,10 +33,6 @@
   --text-light: #a1a1aa;
 }
 
-
-/* ==========================================================================
-   BASE & LAYOUT STYLES
-   ========================================================================== */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -65,7 +54,6 @@ body {
   width: 100%;
 }
 
-/* SIDEBAR */
 .sidebar {
   width: 255px;
   background-color: var(--sidebar-bg);
@@ -231,7 +219,6 @@ body {
   color: #94a3b8;
 }
 
-/* MAIN CONTENT */
 .main-wrapper {
   flex: 1;
   display: flex;
@@ -295,7 +282,6 @@ body {
   gap: 10px;
 }
 
-/* Theme Switcher Dropdown */
 .theme-selector-box {
   display: flex;
   align-items: center;
@@ -324,7 +310,6 @@ body {
   flex: 1;
 }
 
-/* FILTER PILLS STRIP */
 .filter-strip {
   background-color: var(--surface);
   border: 1px solid var(--border-subtle);
@@ -380,7 +365,6 @@ body {
   outline: none;
 }
 
-/* KPI CARDS */
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -441,7 +425,6 @@ body {
   color: var(--text-muted);
 }
 
-/* SECTION CARDS & TABS */
 .section-card {
   background-color: var(--surface);
   border: 1px solid var(--border-subtle);
@@ -516,7 +499,6 @@ body {
   display: block;
 }
 
-/* DATA TABLE */
 .table-container {
   width: 100%;
   overflow-x: auto;
@@ -557,7 +539,6 @@ body {
   background-color: var(--bg-page);
 }
 
-/* DRAWER CHILD ROW */
 .detail-drawer {
   display: none;
   background-color: var(--bg-page);
@@ -611,7 +592,6 @@ body {
   border-radius: 9999px;
 }
 
-/* BUTTONS */
 .btn-action {
   display: inline-flex;
   align-items: center;
