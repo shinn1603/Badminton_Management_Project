@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý tài khoản & Phân quyền - UTE Sport</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+  <div class="layout-container">
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-header">
+        <div class="brand-icon">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>UTE SPORT</h2>
+          <span>Quản lý chuỗi sân</span>
+        </div>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="menu-title">Giám đốc điều hành</div>
+        
+        <a href="/director/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span class="menu-text">Doanh thu toàn chuỗi</span>
+        </a>
+
+        <a href="/director/dashboard#comparison-section" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+            <path d="M9 22v-4h6v4"></path>
+            <path d="M8 6h.01"></path>
+            <path d="M16 6h.01"></path>
+            <path d="M8 10h.01"></path>
+            <path d="M16 10h.01"></path>
+            <path d="M8 14h.01"></path>
+            <path d="M16 14h.01"></path>
+          </svg>
+          <span class="menu-text">So sánh chi nhánh</span>
+        </a>
+
+        <a href="#branches" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span class="menu-text">Quản lý chi nhánh</span>
+        </a>
+
+        <a href="#prices" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          <span class="menu-text">Chính sách giá & KM</span>
+        </a>
+
+        <div class="menu-title" style="margin-top: 14px;">Quản lý sân & Quầy</div>
+
+        <a href="/booking/grid" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+            <line x1="10" y1="4" x2="10" y2="22"></line>
+          </svg>
+          <span class="menu-text">Lưới đặt sân</span>
+        </a>
+
+        <div class="menu-title" style="margin-top: 14px;">Quản trị hệ thống</div>
+
+        <a href="/admin/users" class="menu-item active">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span class="menu-text">Tài khoản & Phân quyền</span>
+        </a>
+
+        <a href="#logs" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span class="menu-text">Nhật ký hoạt động</span>
+        </a>
+
+        <a href="#settings" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span class="menu-text">Cấu hình hệ thống</span>
+        </a>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="user-avatar">AD</div>
+        <div class="user-meta">
+          <span class="user-name">Quản trị viên</span>
+          <span class="user-title">Quản trị hệ thống</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-wrapper">
+      <header class="header-bar">
+        <div class="header-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="Thu gọn / Mở rộng">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="header-heading">
+            <h1>Quản lý tài khoản & Phân quyền</h1>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="search-box">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--text-muted);">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" placeholder="Tìm tên hoặc tài khoản..." id="userSearchInput" onkeyup="filterUserTable()">
+          </div>
+
+          <button class="btn-action btn-primary-action" onclick="openUserModal()">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Cấp tài khoản mới</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <div class="kpi-row">
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Tổng tài khoản</span>
+              <span class="clean-kpi-badge badge-blue">Toàn hệ thống</span>
+            </div>
+            <div class="clean-kpi-value">142</div>
+            <div class="clean-kpi-caption">139 tài khoản đang hoạt động</div>
+          </div>
+
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Nhân sự chi nhánh</span>
+              <span class="clean-kpi-badge badge-green">28 người</span>
+            </div>
+            <div class="clean-kpi-value">24 NV / 4 QL</div>
+            <div class="clean-kpi-caption">Phân bổ tại 4 chi nhánh</div>
+          </div>
+
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Ban quản trị</span>
+              <span class="clean-kpi-badge badge-amber">6 người</span>
+            </div>
+            <div class="clean-kpi-value">4 GD / 2 QT</div>
+            <div class="clean-kpi-caption">Quyền truy cập toàn chuỗi</div>
+          </div>
+
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Khách hàng thành viên</span>
+              <span class="clean-kpi-badge badge-green">Trực tuyến</span>
+            </div>
+            <div class="clean-kpi-value">2.890</div>
+            <div class="clean-kpi-caption">Tài khoản đăng ký qua web</div>
+          </div>
+        </div>
+
+        <div class="filter-strip">
+          <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+            <div class="pill-group" id="rolePillGroup">
+              <button class="pill-btn active" onclick="filterByRole(this, 'ALL')">Tất cả</button>
+              <button class="pill-btn" onclick="filterByRole(this, 'Quản trị viên')">Quản trị viên</button>
+              <button class="pill-btn" onclick="filterByRole(this, 'Giám đốc')">Giám đốc</button>
+              <button class="pill-btn" onclick="filterByRole(this, 'Quản lý chi nhánh')">Quản lý chi nhánh</button>
+              <button class="pill-btn" onclick="filterByRole(this, 'Nhân viên quầy')">Nhân viên quầy</button>
+            </div>
+
+            <select class="branch-select" id="branchFilterSelect" onchange="filterTableByBranch(this.value)">
+              <option value="ALL">Tất cả chi nhánh</option>
+              <option value="Toàn chuỗi">Toàn chuỗi (Không giới hạn)</option>
+              <option value="Thủ Đức">Chi nhánh Thủ Đức</option>
+              <option value="Bình Thạnh">Chi nhánh Bình Thạnh</option>
+              <option value="Quận 9">Chi nhánh Quận 9</option>
+              <option value="Gò Vấp">Chi nhánh Gò Vấp</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header-tabs">
+            <div class="section-title">
+              <h3>Danh sách tài khoản người dùng nội bộ</h3>
+            </div>
+            <span style="font-size: 12px; color: var(--text-muted);">Hiển thị 6 tài khoản tiêu biểu</span>
+          </div>
+
+          <div class="table-container">
+            <table class="clean-table" id="userTable">
+              <thead>
+                <tr>
+                  <th style="width: 40px; text-align: center;">STT</th>
+                  <th>Tài khoản</th>
+                  <th>Họ và tên</th>
+                  <th>Vai trò</th>
+                  <th>Phạm vi chi nhánh</th>
+                  <th>Trạng thái</th>
+                  <th>Lần đăng nhập cuối</th>
+                  <th style="text-align: right;">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="text-align: center;">1</td>
+                  <td><strong>admin_system</strong></td>
+                  <td>Nguyễn Hoàng Long</td>
+                  <td><span class="clean-kpi-badge badge-blue">Quản trị hệ thống</span></td>
+                  <td>Toàn chuỗi</td>
+                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
+                  <td>19/09/2026 14:15</td>
+                  <td style="text-align: right;">
+                    <button class="btn-action btn-outline-action" onclick="openUserModal('admin_system', 'Nguyễn Hoàng Long', 'Quản trị viên', 'Toàn chuỗi')">Sửa</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="text-align: center;">2</td>
+                  <td><strong>tho.nguyen</strong></td>
+                  <td>Nguyễn Phước Thọ</td>
+                  <td><span class="clean-kpi-badge badge-amber">Giám đốc</span></td>
+                  <td>Toàn chuỗi</td>
+                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
+                  <td>19/09/2026 13:40</td>
+                  <td style="text-align: right;">
+                    <button class="btn-action btn-outline-action" onclick="openUserModal('tho.nguyen', 'Nguyễn Phước Thọ', 'Giám đốc', 'Toàn chuỗi')">Sửa</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="text-align: center;">3</td>
+                  <td><strong>tam.nguyen</strong></td>
+                  <td>Nguyễn Thanh Tâm</td>
+                  <td><span class="clean-kpi-badge badge-green">Quản lý chi nhánh</span></td>
+                  <td>Thủ Đức</td>
+                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
+                  <td>19/09/2026 11:20</td>
+                  <td style="text-align: right;">
+                    <button class="btn-action btn-outline-action" onclick="openUserModal('tam.nguyen', 'Nguyễn Thanh Tâm', 'Quản lý chi nhánh', 'Thủ Đức')">Sửa</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="text-align: center;">4</td>
+                  <td><strong>bao.tran</strong></td>
+                  <td>Trần Phúc Bảo</td>
+                  <td><span class="clean-kpi-badge badge-green">Quản lý chi nhánh</span></td>
+                  <td>Bình Thạnh</td>
+                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
+                  <td>19/09/2026 09:10</td>
+                  <td style="text-align: right;">
+                    <button class="btn-action btn-outline-action" onclick="openUserModal('bao.tran', 'Trần Phúc Bảo', 'Quản lý chi nhánh', 'Bình Thạnh')">Sửa</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="text-align: center;">5</td>
+                  <td><strong>huong.tran</strong></td>
+                  <td>Trần Biểu Hương</td>
+                  <td><span class="clean-kpi-badge badge-blue">Nhân viên quầy</span></td>
+                  <td>Quận 9</td>
+                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
+                  <td>19/09/2026 14:02</td>
+                  <td style="text-align: right;">
+                    <button class="btn-action btn-outline-action" onclick="openUserModal('huong.tran', 'Trần Biểu Hương', 'Nhân viên quầy', 'Quận 9')">Sửa</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="text-align: center;">6</td>
+                  <td><strong>staff.govap01</strong></td>
+                  <td>Lê Văn Hùng</td>
+                  <td><span class="clean-kpi-badge badge-blue">Nhân viên quầy</span></td>
+                  <td>Gò Vấp</td>
+                  <td><span class="clean-kpi-badge badge-amber">Đã khóa</span></td>
+                  <td>15/09/2026 18:30</td>
+                  <td style="text-align: right;">
+                    <button class="btn-action btn-outline-action" onclick="toggleUserStatus(this)">Mở khóa</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="userModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle">Cấp tài khoản người dùng mới</h3>
+        <button class="modal-close-btn" onclick="closeUserModal()">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="inpUsername">Tên đăng nhập</label>
+            <input type="text" class="form-control" id="inpUsername" placeholder="ví dụ: nv.thuduc01">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="inpPassword">Mật khẩu khởi tạo</label>
+            <input type="password" class="form-control" id="inpPassword" placeholder="••••••••">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="inpFullName">Họ và tên nhân sự</label>
+          <input type="text" class="form-control" id="inpFullName" placeholder="Nhập họ và tên đầy đủ">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="inpPhone">Số điện thoại</label>
+            <input type="text" class="form-control" id="inpPhone" placeholder="09xx.xxx.xxx">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="inpRole">Vai trò phân quyền</label>
+            <select class="form-control" id="inpRole" onchange="handleRoleChange(this.value)">
+              <option value="Nhân viên quầy">Nhân viên quầy</option>
+              <option value="Quản lý chi nhánh">Quản lý chi nhánh</option>
+              <option value="Giám đốc">Giám đốc</option>
+              <option value="Quản trị viên">Quản trị hệ thống</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" id="branchAssignGroup">
+          <label class="form-label" for="inpBranch">Phân công chi nhánh phụ trách</label>
+          <select class="form-control" id="inpBranch">
+            <option value="Thủ Đức">Chi nhánh 1 - TP. Thủ Đức</option>
+            <option value="Bình Thạnh">Chi nhánh 2 - Bình Thạnh</option>
+            <option value="Quận 9">Chi nhánh 3 - Quận 9</option>
+            <option value="Gò Vấp">Chi nhánh 4 - Gò Vấp</option>
+            <option value="Toàn chuỗi">Toàn chuỗi (Không giới hạn)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-action btn-outline-action" onclick="closeUserModal()">Hủy bỏ</button>
+        <button class="btn-action btn-primary-action" onclick="saveUser()">Lưu thông tin</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('appSidebar').classList.toggle('collapsed');
+    }
+
+    function openUserModal(username, fullname, role, branch) {
+      const modal = document.getElementById('userModal');
+      const title = document.getElementById('modalTitle');
+      if (username) {
+        title.innerText = 'Cập nhật tài khoản: ' + username;
+        document.getElementById('inpUsername').value = username;
+        document.getElementById('inpUsername').disabled = true;
+        document.getElementById('inpFullName').value = fullname || '';
+        document.getElementById('inpRole').value = role || 'Nhân viên quầy';
+        document.getElementById('inpBranch').value = branch || 'Thủ Đức';
+      } else {
+        title.innerText = 'Cấp tài khoản người dùng mới';
+        document.getElementById('inpUsername').value = '';
+        document.getElementById('inpUsername').disabled = false;
+        document.getElementById('inpPassword').value = '';
+        document.getElementById('inpFullName').value = '';
+      }
+      modal.classList.add('open');
+    }
+
+    function closeUserModal() {
+      document.getElementById('userModal').classList.remove('open');
+    }
+
+    function saveUser() {
+      const username = document.getElementById('inpUsername').value;
+      if (!username) {
+        alert('Vui lòng nhập tên đăng nhập.');
+        return;
+      }
+      alert('Đã lưu tài khoản ' + username + ' thành công.');
+      closeUserModal();
+    }
+
+    function toggleUserStatus(btn) {
+      if (btn.innerText === 'Khóa') {
+        btn.innerText = 'Mở khóa';
+        btn.closest('tr').children[5].innerHTML = '<span class="clean-kpi-badge badge-amber">Đã khóa</span>';
+      } else {
+        btn.innerText = 'Khóa';
+        btn.closest('tr').children[5].innerHTML = '<span class="clean-kpi-badge badge-green">Hoạt động</span>';
+      }
+    }
+
+    function handleRoleChange(role) {
+      const branchGroup = document.getElementById('branchAssignGroup');
+      const branchSelect = document.getElementById('inpBranch');
+      if (role === 'Giám đốc' || role === 'Quản trị viên') {
+        branchSelect.value = 'Toàn chuỗi';
+      }
+    }
+
+    function filterByRole(btn, role) {
+      document.querySelectorAll('#rolePillGroup .pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const rows = document.querySelectorAll('#userTable tbody tr');
+      rows.forEach(r => {
+        const rowRole = r.children[3].innerText.trim();
+        if (role === 'ALL' || rowRole.includes(role)) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
+    }
+
+    function filterTableByBranch(branch) {
+      const rows = document.querySelectorAll('#userTable tbody tr');
+      rows.forEach(r => {
+        const rowBranch = r.children[4].innerText.trim();
+        if (branch === 'ALL' || rowBranch.includes(branch)) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
+    }
+
+    function filterUserTable() {
+      const q = document.getElementById('userSearchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#userTable tbody tr');
+      rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        r.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+  </script>
+
+</body>
+</html>

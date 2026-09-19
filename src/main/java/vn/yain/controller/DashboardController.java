@@ -10,4 +10,15 @@ public class DashboardController {
     public String directorDashboard() {
         return "director-dashboard";
     }
+
+    @GetMapping("/admin/users")
+    public String adminUsers() {
+        return "admin-users";
+    }
+
+    @GetMapping("/booking/grid")
+    public String bookingGrid() {
+        return "booking-grid";
+    }
 }
+
