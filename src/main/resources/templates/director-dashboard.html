@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo cáo doanh thu toàn chuỗi - UTE Sport</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <div class="layout-container">
+    <!-- COLLAPSIBLE SIDEBAR -->
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-header">
+        <div class="brand-icon">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>UTE SPORT</h2>
+          <span>Quản lý chuỗi sân</span>
+        </div>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="menu-title">Giám đốc điều hành</div>
+        
+        <a href="/director/dashboard" class="menu-item active">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span class="menu-text">Doanh thu toàn chuỗi</span>
+          <span class="menu-tag">BM-GD01</span>
+        </a>
+
+        <a href="#comparison-section" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+            <path d="M9 22v-4h6v4"></path>
+            <path d="M8 6h.01"></path>
+            <path d="M16 6h.01"></path>
+            <path d="M8 10h.01"></path>
+            <path d="M16 10h.01"></path>
+          </svg>
+          <span class="menu-text">So sánh chi nhánh</span>
+          <span class="menu-tag">BM-GD02</span>
+        </a>
+
+        <a href="#branches" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span class="menu-text">Quản lý chi nhánh</span>
+        </a>
+
+        <a href="#prices" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          <span class="menu-text">Chính sách giá & KM</span>
+        </a>
+
+        <a href="#tournaments" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+            <path d="M4 22h16"></path>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+          </svg>
+          <span class="menu-text">Phê duyệt giải đấu</span>
+        </a>
+
+        <a href="#members" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span class="menu-text">Thống kê hội viên</span>
+        </a>
+
+        <div class="menu-title" style="margin-top: 14px;">Quản trị hệ thống</div>
+
+        <a href="#users" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span class="menu-text">Tài khoản & Phân quyền</span>
+        </a>
+
+        <a href="#logs" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          <span class="menu-text">Nhật ký hoạt động</span>
+        </a>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="user-avatar">GD</div>
+        <div class="user-meta">
+          <span class="user-name">Nguyễn Phước Thọ</span>
+          <span class="user-title">Giám đốc điều hành</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN BODY -->
+    <main class="main-wrapper">
+      <!-- HEADER -->
+      <header class="header-bar">
+        <div class="header-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="Thu gọn / Mở rộng thanh bên">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="header-heading">
+            <h1>Báo cáo doanh thu toàn chuỗi & So sánh chi nhánh</h1>
+            <p>Hệ thống giám sát dữ liệu tập trung chuỗi sân UTE Sport</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn-action btn-outline-action" onclick="window.print()">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            <span>In báo cáo</span>
+          </button>
+          <button class="btn-action btn-primary-action" onclick="alert('Đã kết xuất dữ liệu báo cáo sang file Excel.')">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Xuất Excel</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <!-- FILTER PILLS STRIP -->
+        <div class="filter-strip">
+          <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Kỳ báo cáo:</span>
+              <div class="pill-group" id="periodTabs">
+                <button class="pill-btn" onclick="selectPeriod(this, 'today')">Hôm nay</button>
+                <button class="pill-btn" onclick="selectPeriod(this, 'week')">Tuần này</button>
+                <button class="pill-btn active" onclick="selectPeriod(this, 'month')">Tháng 09/2026</button>
+                <button class="pill-btn" onclick="selectPeriod(this, 'quarter')">Quý 3</button>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Chi nhánh:</span>
+              <select class="branch-select" id="branchFilter">
+                <option value="ALL">Toàn hệ thống (4 chi nhánh)</option>
+                <option value="CN01">Cơ sở Thủ Đức (Trụ sở chính)</option>
+                <option value="CN02">Cơ sở Bình Thạnh</option>
+                <option value="CN03">Cơ sở Quận 9</option>
+                <option value="CN04">Cơ sở Gò Vấp</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="font-size: 11.5px; color: var(--primary); font-weight: 600; display: flex; align-items: center; gap: 5px;">
+            <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--primary); display: inline-block;"></span>
+            Cơ sở dữ liệu tập trung kết nối thời gian thực
+          </div>
+        </div>
+
+        <!-- 4 KPI STATS -->
+        <div class="kpi-row">
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Tổng doanh thu toàn chuỗi</span>
+              <span class="clean-kpi-badge badge-green">+14.2%</span>
+            </div>
+            <div class="clean-kpi-value">485.600.000 đ</div>
+            <div class="clean-kpi-caption">Tăng 60.200.000 đ so với tháng 08/2026</div>
+          </div>
+
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Tổng lượt đặt sân</span>
+              <span class="clean-kpi-badge badge-blue">+8.5%</span>
+            </div>
+            <div class="clean-kpi-value">3.842 lượt</div>
+            <div class="clean-kpi-caption">Lượt đặt qua cổng trực tuyến chiếm 64.8%</div>
+          </div>
+
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Tỷ lệ lấp đầy trung bình</span>
+              <span class="clean-kpi-badge badge-green">+5.1%</span>
+            </div>
+            <div class="clean-kpi-value">76.8%</div>
+            <div class="clean-kpi-caption">Công thức: Giờ đặt / Tổng giờ mở cửa</div>
+          </div>
+
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Hội viên mới đăng ký</span>
+              <span class="clean-kpi-badge badge-amber">+22.4%</span>
+            </div>
+            <div class="clean-kpi-value">412 hội viên</div>
+            <div class="clean-kpi-caption">Tổng thành viên toàn chuỗi: 2.890 người</div>
+          </div>
+        </div>
+
+        <!-- TABBED VISUALIZATION PANEL -->
+        <div class="section-card">
+          <div class="section-header-tabs">
+            <div class="section-title">
+              <h3>Phân tích dữ liệu kinh doanh</h3>
+              <p>Chuyển đổi giữa các biểu đồ chuyên đề để theo dõi số liệu</p>
+            </div>
+            <div style="font-size: 11.5px; color: var(--text-muted);">Biểu mẫu báo cáo: <strong>BM-GD01</strong></div>
+          </div>
+
+          <!-- TAB BUTTONS -->
+          <div class="tab-navigation">
+            <button class="nav-tab-btn active" onclick="switchTab('tab-monthly', this)">
+              <svg class="svg-icon" viewBox="0 0 24 24">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+              <span>Doanh thu 6 tháng theo chi nhánh</span>
+            </button>
+
+            <button class="nav-tab-btn" onclick="switchTab('tab-sources', this)">
+              <svg class="svg-icon" viewBox="0 0 24 24">
+                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+              </svg>
+              <span>Cơ cấu nguồn thu</span>
+            </button>
+
+            <button class="nav-tab-btn" onclick="switchTab('tab-occupancy', this)">
+              <svg class="svg-icon" viewBox="0 0 24 24">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+              </svg>
+              <span>Công suất lấp đầy các khung giờ</span>
+            </button>
+          </div>
+
+          <!-- TAB PANE 1 -->
+          <div class="tab-pane active" id="tab-monthly">
+            <div style="height: 280px; width: 100%;">
+              <canvas id="monthlyChart"></canvas>
+            </div>
+            <div style="margin-top: 14px; display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
+              <span>Chi nhánh Thủ Đức và Bình Thạnh duy trì mức tăng trưởng liên tục trên 10% mỗi tháng.</span>
+              <span>Đơn vị: Triệu VNĐ</span>
+            </div>
+          </div>
+
+          <!-- TAB PANE 2 -->
+          <div class="tab-pane" id="tab-sources">
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: center;">
+              <div style="height: 260px;">
+                <canvas id="sourcePieChart"></canvas>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12.5px;">
+                <div style="padding: 10px 14px; background: var(--bg-page); border-radius: 6px; border-left: 3px solid var(--primary);">
+                  <strong>Thuê sân trực tiếp & online:</strong> 68% (330.2 triệu đ)
+                </div>
+                <div style="padding: 10px 14px; background: var(--bg-page); border-radius: 6px; border-left: 3px solid var(--secondary);">
+                  <strong>Kinh doanh nước uống & giải khát:</strong> 15% (72.8 triệu đ)
+                </div>
+                <div style="padding: 10px 14px; background: var(--bg-page); border-radius: 6px; border-left: 3px solid var(--accent);">
+                  <strong>Thuê vợt & bán cầu lông phụ kiện:</strong> 12% (58.2 triệu đ)
+                </div>
+                <div style="padding: 10px 14px; background: var(--bg-page); border-radius: 6px; border-left: 3px solid #64748b;">
+                  <strong>Lệ phí tổ chức giải đấu phong trào:</strong> 5% (24.4 triệu đ)
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB PANE 3 -->
+          <div class="tab-pane" id="tab-occupancy">
+            <div style="height: 270px;">
+              <canvas id="occupancyChart"></canvas>
+            </div>
+            <div style="margin-top: 12px; font-size: 12px; color: var(--text-muted);">
+              Khung giờ cao điểm (17:00 - 22:00) đạt công suất lấp đầy trung bình 94.2% trên toàn bộ các chi nhánh.
+            </div>
+          </div>
+        </div>
+
+        <!-- EXPANDABLE ACCORDION DATA TABLE -->
+        <div class="section-card" id="comparison-section">
+          <div class="section-header-tabs">
+            <div class="section-title">
+              <h3>Báo cáo so sánh hiệu quả hoạt động các chi nhánh (BM-GD02)</h3>
+              <p>Nhấp vào từng dòng để mở ra / đóng lại xem chi tiết phân bổ doanh thu & thông tin vận hành cơ sở</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-action btn-outline-action" onclick="toggleAllDrawers()" id="btnToggleAll">
+                <span>Mở rộng tất cả chi tiết</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="clean-table" id="branchTable">
+              <thead>
+                <tr>
+                  <th style="width: 32px;"></th>
+                  <th style="width: 40px; text-align: center;">STT</th>
+                  <th>Mã CN</th>
+                  <th>Tên chi nhánh</th>
+                  <th>Địa chỉ</th>
+                  <th style="text-align: center;">Quy mô</th>
+                  <th style="text-align: center;">Số lượt đặt</th>
+                  <th style="text-align: right;">Doanh thu</th>
+                  <th>Tỷ lệ lấp đầy</th>
+                  <th style="text-align: center;">Đánh giá</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- ROW 1 -->
+                <tr class="main-row" onclick="toggleDrawer('drawer-1', this)">
+                  <td style="text-align: center;">
+                    <svg class="svg-icon chevron-icon" viewBox="0 0 24 24" style="transition: transform 0.2s;">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </td>
+                  <td style="text-align: center; font-weight: 600;">1</td>
+                  <td><strong>CN01</strong></td>
+                  <td><strong style="color: var(--text-dark);">Chi nhánh Thủ Đức (Trụ sở chính)</strong></td>
+                  <td>Số 1 Võ Văn Ngân, TP. Thủ Đức</td>
+                  <td style="text-align: center;"><span class="clean-kpi-badge badge-blue">10 sân</span></td>
+                  <td style="text-align: center; font-weight: 600;">1.420</td>
+                  <td style="text-align: right; font-weight: 700; color: var(--primary);">186.400.000 đ</td>
+                  <td>
+                    <div class="bar-track"><div class="bar-fill" style="width: 84.5%;"></div></div>
+                    <span>84.5%</span>
+                  </td>
+                  <td style="text-align: center;"><span class="clean-kpi-badge badge-green">Xuất sắc</span></td>
+                </tr>
+                <tr class="detail-drawer" id="drawer-1">
+                  <td colspan="10" style="padding: 0;">
+                    <div class="drawer-inner">
+                      <div class="drawer-item">
+                        <span class="label">Quản lý cơ sở:</span>
+                        <span class="value">Nguyễn Thanh Tâm (0903.112.334)</span>
+                      </div>
+                      <div class="drawer-item">
+                        <span class="label">Phân bổ doanh thu:</span>
+                        <span class="value">Sân: 126tr | Nước: 32tr | Dụng cụ: 28.4tr</span>
+                      </div>
+                      <div class="drawer-item">
+                        <span class="label">Tình trạng sân:</span>
+                        <span class="value">10/10 sân đang hoạt động bình thường</span>
+                      </div>
+                      <div class="drawer-item">
+                        <span class="label">Khung giờ đông nhất:</span>
+                        <span class="value">18:00 - 21:30 (Đạt 100% kín sân)</span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- ROW 2 -->
+                <tr class="main-row" onclick="toggleDrawer('drawer-2', this)">
+                  <td style="text-align: center;">
+                    <svg class="svg-icon chevron-icon" viewBox="0 0 24 24" style="transition: transform 0.2s;">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </td>
+                  <td style="text-align: center; font-weight: 600;">2</td>
+                  <td><strong>CN02</strong></td>
+                  <td><strong style="color: var(--text-dark);">Chi nhánh Bình Thạnh</strong></td>
+                  <td>45 Đường D2, Phường 25, Bình Thạnh</td>
+                  <td style="text-align: center;"><span class="clean-kpi-badge badge-blue">8 sân</span></td>
+                  <td style="text-align: center; font-weight: 600;">1.050</td>
+                  <td style="text-align: right; font-weight: 700; color: var(--primary);">134.800.000 đ</td>
+                  <td>
+                    <div class="bar-track"><div class="bar-fill" style="width: 78.2%;"></div></div>
+                    <span>78.2%</span>
+                  </td>
+                  <td style="text-align: center;"><span class="clean-kpi-badge badge-green">Tốt</span></td>
+                </tr>
+                <tr class="detail-drawer" id="drawer-2">
+                  <td colspan="10" style="padding: 0;">
+                    <div class="drawer-inner">
+                      <div class="drawer-item">
+                        <span class="label">Quản lý cơ sở:</span>
+                        <span class="value">Trần Phúc Bảo (0918.554.221)</span>
+                      </div>
+                      <div class="drawer-item">
+                        <span class="label">Phân bổ doanh thu:</span>
+                        <span class="value">Sân: 92tr | Nước: 24tr | Dụng cụ: 18.8tr</span>
+                      </div>
+                      <div class="drawer-item">
+                        <span class="label">Tình trạng sân:</span>
+                        <span class="value">8/8 sân đang hoạt động</span>
+                      </div>
+                      <div class="drawer-item">
+                        <span class="label">Khung giờ đông nhất:</span>
+                        <span class="value">17:30 - 21:00 (Đạt 96% kín sân)</span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- ROW 3 -->
+                <tr class="main-row" onclick="toggleDrawer('drawer-3', this)">
+                  <td style="text-align: center;">
+                    <svg class="svg-icon chevron-icon" viewBox="0 0 24 24" style="transition: transform 0.2s;">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </td>
+                  <td style="text-align: center; font-weight: 600;">3</td>
+                  <td><strong>CN03</strong></td>
+                  <td><strong style="color: var(--text-dark);">Chi nhánh Quận 9</strong></td>
+                  <td>120 Lê Văn Việt, P. Hiệp Phú</td>
+                  <td style="text-align: center;"><span class="clean-kpi-badge badge-blue">6 sân</span></td>
+                  <td style="text-align: center; font-weight: 600;">782</td>
+                  <td style="text-align: right; font-weight: 700; color: var(--primary);">96.500.000 đ</td>
+                  <td>
+                    <div class="bar-track"><div class="bar-fill" style="width: 71.0%;"></div></div>
+                    <span>71.0%</span>
+                  </td>
+                  <td style="text-align: center;"><span class="clean-kpi-badge badge-blue">Đạt chỉ tiêu</span></td>
+                </tr>
+                <tr class="detail-drawer" id="drawer-3">
+                  <td colspan="10" style="padding: 0;">
+                    <div class="drawer-inner">
+                      <div class="drawer-item">
+                        <span class="label">Quản lý cơ sở:</span>
+                        <span class="value">Trần Biểu Hương (0977.334.889)</span>
+                      </div>
+                      <div class="drawer-item">
+                        <span class="label">Phân bổ doanh thu:</span>
+                        <span class="value">Sân: 68tr | Nước: 16.5tr | Dụng cụ: 12tr</span>
+                      </div>
+                      <div class="drawer-item">
+                        <span class="label">Tình trạng sân:</span>
+                        <span class="value">6/6 sân hoạt động</span>
+                      </div>
+                      <div class="drawer-item">
+                        <span class="label">Khung giờ đông nhất:</span>
+                        <span class="value">18:00 - 21:00</span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- ROW 4 -->
+                <tr class="main-row" onclick="toggleDrawer('drawer-4', this)">
+                  <td style="text-align: center;">
+                    <svg class="svg-icon chevron-icon" viewBox="0 0 24 24" style="transition: transform 0.2s;">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </td>
+                  <td style="text-align: center; font-weight: 600;">4</td>
+                  <td><strong>CN04</strong></td>
+                  <td><strong style="color: var(--text-dark);">Chi nhánh Gò Vấp</strong></td>
+                  <td>88 Phan Văn Trị, Phường 10</td>
+                  <td style="text-align: center;"><span class="clean-kpi-badge badge-blue">5 sân</span></td>
+                  <td style="text-align: center; font-weight: 600;">590</td>
+                  <td style="text-align: right; font-weight: 700; color: var(--primary);">67.900.000 đ</td>
+                  <td>
+                    <div class="bar-track"><div class="bar-fill" style="width: 63.4%; background-color: var(--accent);"></div></div>
+                    <span>63.4%</span>
+                  </td>
+                  <td style="text-align: center;"><span class="clean-kpi-badge badge-amber">Cần đẩy mạnh</span></td>
+                </tr>
+                <tr class="detail-drawer" id="drawer-4">
+                  <td colspan="10" style="padding: 0;">
+                    <div class="drawer-inner">
+                      <div class="drawer-item">
+                        <span class="label">Quản lý cơ sở:</span>
+                        <span class="value">Lê Hoàng Nam (0933.882.119)</span>
+                      </div>
+                      <div class="drawer-item">
+                        <span class="label">Phân bổ doanh thu:</span>
+                        <span class="value">Sân: 48tr | Nước: 10.9tr | Dụng cụ: 9tr</span>
+                      </div>
+                      <div class="drawer-item">
+                        <span class="label">Tình trạng sân:</span>
+                        <span class="value">4/5 sân hoạt động, 1 sân đang bảo trì lưới</span>
+                      </div>
+                      <div class="drawer-item">
+                        <span class="label">Khuyến nghị điều hành:</span>
+                        <span class="value" style="color: var(--accent);">Áp dụng voucher giảm 20% khung 13h - 17h</span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot style="background-color: var(--bg-page); font-weight: 600;">
+                <tr>
+                  <td colspan="5" style="padding: 12px 16px;">TỔNG CỘNG HỆ THỐNG TOÀN CHUỖI (BM-GD01)</td>
+                  <td style="text-align: center;">29 sân</td>
+                  <td style="text-align: center;">3.842 lượt</td>
+                  <td style="text-align: right; color: var(--primary); font-size: 13.5px; font-weight: 700;">485.600.000 đ</td>
+                  <td colspan="2">Trung bình lấp đầy: <strong>76.8%</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // 1. Sidebar Collapse/Expand Toggle
+    function toggleSidebar() {
+      document.getElementById('appSidebar').classList.toggle('collapsed');
+    }
+
+    // 2. Tabs Switcher
+    function switchTab(paneId, btnElement) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab-btn').forEach(el => el.classList.remove('active'));
+
+      const target = document.getElementById(paneId);
+      if (target) {
+        target.classList.add('active');
+        btnElement.classList.add('active');
+      }
+    }
+
+    // 3. Period Filter Switcher
+    function selectPeriod(btn, period) {
+      document.querySelectorAll('#periodTabs .pill-btn').forEach(el => el.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    // 4. Accordion Table Rows
+    function toggleDrawer(drawerId, rowEl) {
+      const drawer = document.getElementById(drawerId);
+      const chevron = rowEl.querySelector('.chevron-icon');
+      if (drawer) {
+        const isShown = drawer.classList.toggle('show');
+        if (chevron) {
+          chevron.style.transform = isShown ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+      }
+    }
+
+    let allExpanded = false;
+    function toggleAllDrawers() {
+      allExpanded = !allExpanded;
+      const drawers = document.querySelectorAll('.detail-drawer');
+      const chevrons = document.querySelectorAll('.chevron-icon');
+      drawers.forEach(d => {
+        if (allExpanded) d.classList.add('show');
+        else d.classList.remove('show');
+      });
+      chevrons.forEach(c => {
+        c.style.transform = allExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+      });
+      document.getElementById('btnToggleAll').innerHTML = allExpanded ? '<span>Thu gọn tất cả</span>' : '<span>Mở rộng tất cả chi tiết</span>';
+    }
+
+    // 5. Initialize Charts (Warm Zinc & Teal Theme Palette)
+    document.addEventListener('DOMContentLoaded', () => {
+      const ctxMonthly = document.getElementById('monthlyChart').getContext('2d');
+      new Chart(ctxMonthly, {
+        type: 'bar',
+        data: {
+          labels: ['Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9'],
+          datasets: [
+            { label: 'Thủ Đức', data: [145, 158, 162, 175, 180, 186.4], backgroundColor: '#0d9488', borderRadius: 3 },
+            { label: 'Bình Thạnh', data: [110, 115, 120, 125, 130, 134.8], backgroundColor: '#2563eb', borderRadius: 3 },
+            { label: 'Quận 9', data: [78, 82, 85, 89, 92, 96.5], backgroundColor: '#ea580c', borderRadius: 3 },
+            { label: 'Gò Vấp', data: [50, 55, 58, 60, 64, 67.9], backgroundColor: '#71717a', borderRadius: 3 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } }
+          },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#e4e4e7' }, ticks: { font: { size: 11 } } },
+            x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+          }
+        }
+      });
+
+      const ctxSources = document.getElementById('sourcePieChart').getContext('2d');
+      new Chart(ctxSources, {
+        type: 'doughnut',
+        data: {
+          labels: ['Thuê sân', 'Nước uống', 'Thuê vợt & phụ kiện', 'Giải đấu'],
+          datasets: [{
+            data: [68, 15, 12, 5],
+            backgroundColor: ['#0d9488', '#2563eb', '#ea580c', '#71717a'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'Inter', size: 11 }, padding: 8 } }
+          },
+          cutout: '68%'
+        }
+      });
+
+      const ctxOcc = document.getElementById('occupancyChart').getContext('2d');
+      new Chart(ctxOcc, {
+        type: 'line',
+        data: {
+          labels: ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+          datasets: [
+            {
+              label: 'Thứ 2 - Thứ 6 (Giờ thường & Cao điểm)',
+              data: [42, 58, 35, 28, 40, 65, 96, 92, 55],
+              borderColor: '#0d9488',
+              backgroundColor: 'rgba(13, 148, 136, 0.08)',
+              tension: 0.35,
+              fill: true
+            },
+            {
+              label: 'Thứ 7 & Chủ Nhật (Cuối tuần)',
+              data: [68, 85, 82, 70, 75, 88, 98, 95, 70],
+              borderColor: '#2563eb',
+              borderDash: [4, 4],
+              tension: 0.35,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } }
+          },
+          scales: {
+            y: { min: 0, max: 100, ticks: { callback: v => v + '%' }, grid: { color: '#e4e4e7' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
