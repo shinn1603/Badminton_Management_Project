@@ -1,15 +1,10 @@
-# Huong dan phan he Quan ly Chi nhanh & Kho vat tu (Danh cho Thanh vien 3)
+- MH-QL01: Dashboard tổng quan chi nhánh
+- MH-QL02: Quản lý danh mục sân cầu lông
+- MH-QL03: Cấu hình khung giờ & Bảng giá sân
+- MH-QL04: Quản lý tồn kho dụng cụ & đồ uống
+- MH-QL05: Lập phiếu nhập kho
+- MH-QL06: Quản lý nhân viên chi nhánh & phân ca trực
+- MH-QL07: Báo cáo doanh thu & tỷ lệ lấp đầy chi nhánh
 
-Thu muc nay danh rieng cho Thanh vien 3 xay dung cac man hinh theo Chuong 5:
-- MH-QL01: So do tong the san tai chi nhanh & trang thai thuc te
-- MH-QL02: Quan ly lich bao duong luoi, tham va den chieu sang
-- MH-QL03: Quan ly kho vat tu (vot, cau, nuoc giai khat)
-- MH-QL04: Lap phieu nhap kho tu nha cung cap
-- MH-QL05: Lap phieu xuat kho noi bo / huy hong vat tu
-- MH-QL06: Phan ca truc & cham cong nhan vien chi nhanh
-- MH-QL07: Bao cao thong ke hoat dong & loi nhuan chi nhanh
 
-Cach thuc hien:
-1. Gan the CSS dung chung: `<link rel="stylesheet" href="/css/main.css">`
-2. Tham khao mau bang CRUD va Modal popup tai: `src/main/resources/templates/admin/users.html`
-3. Tham khao the KPI card va bieu do tai: `src/main/resources/templates/director/dashboard.html`
+(Chưa có kết nối database nha nên nó không cập nhật được:))) )

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lập phiếu nhập kho - UTE Sport</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    .split-layout { display: grid; grid-template-columns: 3fr 2fr; gap: 24px; }
+    .receipt-item-row { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr 30px; gap: 10px; margin-bottom: 10px; align-items: center; }
+    .totals-box { background-color: var(--bg-page); padding: 15px; border-radius: 8px; margin-top: 15px; text-align: right; }
+  </style>
+</head>
+<body>
+  <div class="layout-container">
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-header">
+        <div class="brand-icon">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"></circle></svg>
+        </div>
+        <div class="brand-text"><h2>UTE SPORT</h2><span>Quản lý chi nhánh</span></div>
+      </div>
+      <div class="sidebar-content">
+        <div class="menu-title">Quản lý chi nhánh</div>
+        
+        <a href="/manager/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+          </svg>
+          <span class="menu-text">Dashboard</span>
+        </a>
+        <a href="/manager/courts" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+          <span class="menu-text">Danh mục sân</span>
+        </a>
+        <a href="/manager/pricing" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          <span class="menu-text">Cấu hình giá</span>
+        </a>
+        <a href="/manager/inventory" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+          <span class="menu-text">Tồn kho</span>
+        </a>
+        <a href="/manager/receipts" class="menu-item active">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          </svg>
+          <span class="menu-text">Nhập kho</span>
+        </a>
+        <a href="/manager/staff" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          </svg>
+          <span class="menu-text">Nhân sự</span>
+        </a>
+        <a href="/manager/reports" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M18 20V10M12 20V4M6 20v-6"></path>
+          </svg>
+          <span class="menu-text">Báo cáo</span>
+        </a>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="user-avatar">QL</div>
+        <div class="user-meta"><span class="user-name">Trần Phúc Bảo</span><span class="user-title">Quản lý cơ sở Bình Thạnh</span></div>
+      </div>
+    </aside>
+
+    <main class="main-wrapper">
+      <header class="header-bar">
+        <div class="header-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()">
+            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="header-heading"><h1>Lập phiếu nhập kho & Lịch sử</h1></div>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <div class="split-layout">
+          
+          <!-- BÊN TRÁI: FORM LẬP PHIẾU NHẬP -->
+          <div class="section-card">
+            <div class="section-header-tabs">
+              <div class="section-title"><h3>Tạo phiếu nhập kho mới</h3></div>
+            </div>
+            <div style="padding: 20px;">
+              <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div class="form-group">
+                  <label class="form-label">Nhà cung cấp</label>
+                  <select class="form-control">
+                    <option>Đại lý Nước giải khát Tuấn Anh</option>
+                    <option>Công ty thể thao Yonex VN</option>
+                    <option>Khác (Nhập lẻ)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Ghi chú (Tùy chọn)</label>
+                  <input type="text" class="form-control" placeholder="Ví dụ: Bổ sung gấp hàng cho giải đấu cuối tuần">
+                </div>
+              </div>
+
+              <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                  <strong style="font-size: 14px;">Chi tiết mặt hàng nhập</strong>
+                  <button class="btn-action btn-outline-action" style="padding: 4px 10px;" onclick="addReceiptItem()">+ Thêm dòng</button>
+                </div>
+                
+                <div id="receiptItemsContainer">
+                  <div class="receipt-item-row">
+                    <select class="form-control"><option>Nước khoáng Aquafina 500ml</option><option>Ống cầu lông Yonex AS-40</option></select>
+                    <input type="number" class="form-control" placeholder="Số lượng" value="24">
+                    <input type="text" class="form-control" placeholder="ĐVT" value="Chai" disabled>
+                    <input type="number" class="form-control" placeholder="Đơn giá" value="4000">
+                    <button class="btn-action" style="color: var(--accent); padding: 0;" title="Xóa">X</button>
+                  </div>
+                  <div class="receipt-item-row">
+                    <select class="form-control"><option>Ống cầu lông Yonex AS-40</option><option>Nước khoáng Aquafina 500ml</option></select>
+                    <input type="number" class="form-control" placeholder="Số lượng" value="5">
+                    <input type="text" class="form-control" placeholder="ĐVT" value="Ống" disabled>
+                    <input type="number" class="form-control" placeholder="Đơn giá" value="380000">
+                    <button class="btn-action" style="color: var(--accent); padding: 0;" title="Xóa">X</button>
+                  </div>
+                </div>
+
+                <div class="totals-box">
+                  <span style="color: var(--text-muted); margin-right: 15px;">Tổng cộng:</span>
+                  <strong style="font-size: 18px; color: var(--primary);">1,996,000 đ</strong>
+                </div>
+              </div>
+
+              <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                <button class="btn-action btn-primary-action" onclick="submitReceipt()">Lưu & Hoàn tất phiếu nhập</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- BÊN PHẢI: LỊCH SỬ -->
+          <div class="section-card">
+            <div class="section-header-tabs">
+              <div class="section-title"><h3>Lịch sử nhập kho (Gần đây)</h3></div>
+            </div>
+            <div class="table-container">
+              <table class="clean-table" style="font-size: 13px;">
+                <thead>
+                  <tr>
+                    <th>Mã Phiếu</th>
+                    <th>Ngày nhập</th>
+                    <th style="text-align: right;">Tổng tiền</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>PN-0042</strong></td>
+                    <td>15/09/2026 09:30</td>
+                    <td style="text-align: right; font-weight: 600;">2,450,000 đ</td>
+                  </tr>
+                  <tr>
+                    <td colspan="3" style="border-bottom: 1px solid var(--border-color); padding-top: 0; color: var(--text-muted);">Đại lý thể thao VNB</td>
+                  </tr>
+                  <tr>
+                    <td><strong>PN-0041</strong></td>
+                    <td>01/09/2026 14:15</td>
+                    <td style="text-align: right; font-weight: 600;">1,200,000 đ</td>
+                  </tr>
+                  <tr>
+                    <td colspan="3" style="border-bottom: 1px solid var(--border-color); padding-top: 0; color: var(--text-muted);">Đại lý Nước giải khát Tuấn Anh</td>
+                  </tr>
+                  <tr>
+                    <td><strong>PN-0040</strong></td>
+                    <td>20/08/2026 10:00</td>
+                    <td style="text-align: right; font-weight: 600;">4,800,000 đ</td>
+                  </tr>
+                  <tr>
+                    <td colspan="3" style="border-bottom: 1px solid var(--border-color); padding-top: 0; color: var(--text-muted);">Công ty thể thao Yonex VN</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('collapsed'); }
+    function addReceiptItem() { alert('Chức năng thêm dòng đang trong chế độ demo'); }
+    function submitReceipt() { alert('Đã lưu Phiếu Nhập Kho thành công! Số lượng hàng hóa đã được cộng vào kho.'); }
+  </script>
+</body>
+</html>

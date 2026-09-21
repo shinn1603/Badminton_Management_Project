@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý danh mục sân - UTE Sport</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+  <div class="layout-container">
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-header">
+        <div class="brand-icon">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+            <circle cx="12" cy="12" r="10"></circle>
+          </svg>
+        </div>
+        <div class="brand-text"><h2>UTE SPORT</h2><span>Quản lý chi nhánh</span></div>
+      </div>
+      <div class="sidebar-content">
+        <div class="menu-title">Quản lý chi nhánh</div>
+        
+        <a href="/manager/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+          </svg>
+          <span class="menu-text">Dashboard</span>
+        </a>
+        <a href="/manager/courts" class="menu-item active">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+          <span class="menu-text">Danh mục sân</span>
+        </a>
+        <a href="/manager/pricing" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          <span class="menu-text">Cấu hình giá</span>
+        </a>
+        <a href="/manager/inventory" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+          <span class="menu-text">Tồn kho</span>
+        </a>
+        <a href="/manager/receipts" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          </svg>
+          <span class="menu-text">Nhập kho</span>
+        </a>
+        <a href="/manager/staff" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          </svg>
+          <span class="menu-text">Nhân sự</span>
+        </a>
+        <a href="/manager/reports" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M18 20V10M12 20V4M6 20v-6"></path>
+          </svg>
+          <span class="menu-text">Báo cáo</span>
+        </a>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="user-avatar">QL</div>
+        <div class="user-meta"><span class="user-name">Trần Phúc Bảo</span><span class="user-title">Quản lý cơ sở Bình Thạnh</span></div>
+      </div>
+    </aside>
+
+    <main class="main-wrapper">
+      <header class="header-bar">
+        <div class="header-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()">
+            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="header-heading"><h1>Quản lý danh mục sân cầu lông</h1></div>
+        </div>
+        <div class="header-actions">
+          <button class="btn-action btn-primary-action" onclick="openCourtModal()">
+            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Thêm sân mới</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <div class="kpi-row">
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Tổng số sân</span>
+              <span class="clean-kpi-badge badge-blue">Toàn chi nhánh</span>
+            </div>
+            <div class="clean-kpi-value">8 sân</div>
+            <div class="clean-kpi-caption">Chi nhánh Bình Thạnh</div>
+          </div>
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Đang hoạt động</span>
+              <span class="clean-kpi-badge badge-green">Hoạt động tốt</span>
+            </div>
+            <div class="clean-kpi-value">7 sân</div>
+            <div class="clean-kpi-caption">Sẵn sàng phục vụ</div>
+          </div>
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Bảo trì</span>
+              <span class="clean-kpi-badge badge-amber">Chú ý</span>
+            </div>
+            <div class="clean-kpi-value">1 sân</div>
+            <div class="clean-kpi-caption">Sân số 5 đang bảo trì lưới</div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header-tabs">
+            <div class="section-title">
+              <h3>Danh sách sân hiện tại</h3>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="clean-table" id="courtTable">
+              <thead>
+                <tr>
+                  <th style="width: 50px; text-align: center;">STT</th>
+                  <th>Số hiệu (Mã sân)</th>
+                  <th>Loại sân</th>
+                  <th>Bề mặt thảm</th>
+                  <th>Trạng thái</th>
+                  <th style="text-align: right;">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="text-align: center;">1</td>
+                  <td><strong>SAN-01</strong></td>
+                  <td>Đánh Đôi</td>
+                  <td>Thảm PVC Yonex</td>
+                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
+                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openCourtModal('SAN-01', 'Đánh Đôi', 'Hoạt động')">Cập nhật</button></td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">2</td>
+                  <td><strong>SAN-02</strong></td>
+                  <td>Đánh Đôi</td>
+                  <td>Thảm PVC Yonex</td>
+                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
+                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openCourtModal('SAN-02', 'Đánh Đôi', 'Hoạt động')">Cập nhật</button></td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">3</td>
+                  <td><strong>SAN-03</strong></td>
+                  <td>Đánh Đôi</td>
+                  <td>Thảm PVC Enlio</td>
+                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
+                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openCourtModal('SAN-03', 'Đánh Đôi', 'Hoạt động')">Cập nhật</button></td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">4</td>
+                  <td><strong>SAN-04</strong></td>
+                  <td>Đánh Đơn</td>
+                  <td>Thảm PVC Enlio</td>
+                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
+                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openCourtModal('SAN-04', 'Đánh Đơn', 'Hoạt động')">Cập nhật</button></td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">5</td>
+                  <td><strong>SAN-05 (VIP)</strong></td>
+                  <td>Đánh Đôi</td>
+                  <td>Thảm chuẩn Quốc tế</td>
+                  <td><span class="clean-kpi-badge badge-amber">Đang bảo trì</span></td>
+                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openCourtModal('SAN-05 (VIP)', 'Đánh Đôi', 'Đang bảo trì')">Cập nhật</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="courtModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle">Thêm sân mới</h3>
+        <button class="modal-close-btn" onclick="closeCourtModal()">X</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Số hiệu sân (Mã sân)</label>
+          <input type="text" class="form-control" id="inpCourtCode" placeholder="Ví dụ: SAN-06">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Loại sân</label>
+          <select class="form-control" id="inpCourtType">
+            <option value="Đánh Đôi">Đánh Đôi</option>
+            <option value="Đánh Đơn">Đánh Đơn</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bề mặt thảm</label>
+          <input type="text" class="form-control" id="inpSurface" placeholder="Ví dụ: Thảm PVC Yonex" value="Thảm PVC Yonex">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Trạng thái</label>
+          <select class="form-control" id="inpStatus">
+            <option value="Hoạt động">Đang hoạt động</option>
+            <option value="Đang bảo trì">Đang bảo trì</option>
+            <option value="Ngừng hoạt động">Ngừng hoạt động</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action btn-outline-action" onclick="closeCourtModal()">Hủy</button>
+        <button class="btn-action btn-primary-action" onclick="saveCourt()">Lưu thông tin</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('collapsed'); }
+    function openCourtModal(code, type, status) {
+      const modal = document.getElementById('courtModal');
+      if (code) {
+        document.getElementById('modalTitle').innerText = 'Cập nhật thông tin sân';
+        document.getElementById('inpCourtCode').value = code;
+        document.getElementById('inpCourtType').value = type;
+        document.getElementById('inpStatus').value = status;
+      } else {
+        document.getElementById('modalTitle').innerText = 'Thêm sân mới';
+        document.getElementById('inpCourtCode').value = '';
+      }
+      modal.classList.add('open');
+    }
+    function closeCourtModal() { document.getElementById('courtModal').classList.remove('open'); }
+    function saveCourt() { alert('Đã lưu thông tin sân thành công!'); closeCourtModal(); }
+  </script>
+</body>
+</html>
