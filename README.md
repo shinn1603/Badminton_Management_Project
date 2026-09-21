@@ -77,7 +77,7 @@ Hiện tại, dự án đang được cấu hình sử dụng **H2 Database** tr
    - Quản lý chi nhánh: `http://localhost:8080/manager/dashboard`
    - Quản trị viên: `http://localhost:8080/admin/users`
 
-### 3. Kết nối Database thật (SQL Server) - *Sắp tới*
+### 3. Kết nối Database (SQL Server)
 
 ---
 
