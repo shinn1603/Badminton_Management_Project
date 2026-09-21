@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cấu hình bảng giá - UTE Sport</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  </style>
+</head>
+<body>
+  <div class="layout-container">
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-header">
+        <div class="brand-icon">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"></circle></svg>
+        </div>
+        <div class="brand-text"><h2>UTE SPORT</h2><span>Quản lý chi nhánh</span></div>
+      </div>
+      <div class="sidebar-content">
+        <div class="menu-title">Quản lý chi nhánh</div>
+        
+        <a href="/manager/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+          </svg>
+          <span class="menu-text">Dashboard</span>
+        </a>
+        <a href="/manager/courts" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+          <span class="menu-text">Danh mục sân</span>
+        </a>
+        <a href="/manager/pricing" class="menu-item active">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          <span class="menu-text">Cấu hình giá</span>
+        </a>
+        <a href="/manager/inventory" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+          <span class="menu-text">Tồn kho</span>
+        </a>
+        <a href="/manager/receipts" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          </svg>
+          <span class="menu-text">Nhập kho</span>
+        </a>
+        <a href="/manager/staff" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          </svg>
+          <span class="menu-text">Nhân sự</span>
+        </a>
+        <a href="/manager/reports" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M18 20V10M12 20V4M6 20v-6"></path>
+          </svg>
+          <span class="menu-text">Báo cáo</span>
+        </a>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="user-avatar">QL</div>
+        <div class="user-meta"><span class="user-name">Trần Phúc Bảo</span><span class="user-title">Quản lý cơ sở Bình Thạnh</span></div>
+      </div>
+    </aside>
+
+    <main class="main-wrapper">
+      <header class="header-bar">
+        <div class="header-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()">
+            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="header-heading"><h1>Cấu hình khung giờ & Bảng giá sân</h1></div>
+        </div>
+      </header>
+
+      <div class="page-content">
+        
+        <div class="grid-2">
+          <!-- KHUNG GIỜ -->
+          <div class="section-card">
+            <div class="section-header-tabs">
+              <div class="section-title"><h3>Định nghĩa Khung giờ</h3></div>
+              <button class="btn-action btn-outline-action" style="padding: 4px 10px;" onclick="alert('Tính năng thêm đang phát triển')">+ Thêm</button>
+            </div>
+            <div class="table-container">
+              <table class="clean-table">
+                <thead>
+                  <tr>
+                    <th>Mã KG</th>
+                    <th>Tên khung giờ</th>
+                    <th>Thời gian</th>
+                    <th style="text-align: center;">Loại</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>KG-SANG</td>
+                    <td>Sáng sớm</td>
+                    <td>05:00 - 08:00</td>
+                    <td style="text-align: center;"><span class="clean-kpi-badge badge-blue">Thường</span></td>
+                  </tr>
+                  <tr>
+                    <td>KG-HANHCHINH</td>
+                    <td>Giờ hành chính</td>
+                    <td>08:00 - 17:00</td>
+                    <td style="text-align: center;"><span class="clean-kpi-badge badge-blue">Thường</span></td>
+                  </tr>
+                  <tr>
+                    <td>KG-CAODIEM</td>
+                    <td>Cao điểm tối</td>
+                    <td>17:00 - 22:00</td>
+                    <td style="text-align: center;"><span class="clean-kpi-badge badge-amber">Cao điểm</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- BẢNG GIÁ -->
+          <div class="section-card">
+            <div class="section-header-tabs">
+              <div class="section-title"><h3>Bảng giá theo Khung giờ & Loại ngày</h3></div>
+              <button class="btn-action btn-primary-action" style="padding: 4px 10px;" onclick="openPriceModal()">Cập nhật giá</button>
+            </div>
+            <div class="table-container">
+              <table class="clean-table">
+                <thead>
+                  <tr>
+                    <th>Khung giờ</th>
+                    <th>Loại ngày</th>
+                    <th style="text-align: right;">Đơn giá (VNĐ/Giờ)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Sáng sớm</td>
+                    <td>Ngày thường (T2-T6)</td>
+                    <td style="text-align: right; color: var(--primary); font-weight: 600;">60,000 đ</td>
+                  </tr>
+                  <tr>
+                    <td>Giờ hành chính</td>
+                    <td>Ngày thường (T2-T6)</td>
+                    <td style="text-align: right; color: var(--primary); font-weight: 600;">80,000 đ</td>
+                  </tr>
+                  <tr>
+                    <td>Cao điểm tối</td>
+                    <td>Ngày thường (T2-T6)</td>
+                    <td style="text-align: right; color: var(--primary); font-weight: 600;">120,000 đ</td>
+                  </tr>
+                  <tr>
+                    <td>Sáng sớm</td>
+                    <td>Cuối tuần (T7-CN)</td>
+                    <td style="text-align: right; color: var(--primary); font-weight: 600;">80,000 đ</td>
+                  </tr>
+                  <tr>
+                    <td>Giờ hành chính</td>
+                    <td>Cuối tuần (T7-CN)</td>
+                    <td style="text-align: right; color: var(--primary); font-weight: 600;">100,000 đ</td>
+                  </tr>
+                  <tr>
+                    <td>Cao điểm tối</td>
+                    <td>Cuối tuần (T7-CN)</td>
+                    <td style="text-align: right; color: var(--primary); font-weight: 600;">150,000 đ</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="priceModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle">Cập nhật đơn giá</h3>
+        <button class="modal-close-btn" onclick="closePriceModal()">X</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Chọn Khung giờ</label>
+          <select class="form-control">
+            <option>Sáng sớm (05:00 - 08:00)</option>
+            <option>Giờ hành chính (08:00 - 17:00)</option>
+            <option>Cao điểm tối (17:00 - 22:00)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Loại ngày</label>
+          <select class="form-control">
+            <option>Ngày thường (Thứ 2 - Thứ 6)</option>
+            <option>Cuối tuần (Thứ 7, Chủ Nhật, Lễ)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Đơn giá mới (VNĐ / 1 Giờ)</label>
+          <input type="number" class="form-control" placeholder="Ví dụ: 120000">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action btn-outline-action" onclick="closePriceModal()">Hủy</button>
+        <button class="btn-action btn-primary-action" onclick="savePrice()">Áp dụng giá mới</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('collapsed'); }
+    function openPriceModal() { document.getElementById('priceModal').classList.add('open'); }
+    function closePriceModal() { document.getElementById('priceModal').classList.remove('open'); }
+    function savePrice() { alert('Đã cập nhật bảng giá thành công!'); closePriceModal(); }
+  </script>
+</body>
+</html>

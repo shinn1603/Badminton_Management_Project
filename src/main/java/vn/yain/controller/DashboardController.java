@@ -50,5 +50,41 @@ public class DashboardController {
     public String bookingGrid() {
         return "pos/grid";
     }
+
+    // MANAGER ENDPOINTS
+    @GetMapping("/manager/dashboard")
+    public String managerDashboard() {
+        return "manager/dashboard";
+    }
+
+    @GetMapping("/manager/courts")
+    public String managerCourts() {
+        return "manager/courts";
+    }
+
+    @GetMapping("/manager/pricing")
+    public String managerPricing() {
+        return "manager/pricing";
+    }
+
+    @GetMapping("/manager/inventory")
+    public String managerInventory() {
+        return "manager/inventory";
+    }
+
+    @GetMapping("/manager/receipts")
+    public String managerReceipts() {
+        return "manager/receipts";
+    }
+
+    @GetMapping("/manager/staff")
+    public String managerStaff() {
+        return "manager/staff";
+    }
+
+    @GetMapping("/manager/reports")
+    public String managerReports() {
+        return "manager/reports";
+    }
 }
 

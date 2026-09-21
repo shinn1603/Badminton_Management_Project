@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý nhân sự & Phân ca - UTE Sport</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    .schedule-table th, .schedule-table td { border: 1px solid var(--border-color); padding: 12px; text-align: center; vertical-align: top; }
+    .schedule-table th { background-color: var(--bg-page); font-weight: 600; font-size: 13px; }
+    .schedule-cell { min-height: 80px; display: flex; flex-direction: column; gap: 8px; }
+    .staff-badge { background-color: rgba(37, 99, 235, 0.1); color: #2563eb; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer; border-left: 3px solid #2563eb; text-align: left; }
+    .staff-badge.shift-off { background-color: rgba(228, 228, 231, 0.5); color: #71717a; border-left: 3px solid #71717a; }
+  </style>
+</head>
+<body>
+  <div class="layout-container">
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-header">
+        <div class="brand-icon">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"></circle></svg>
+        </div>
+        <div class="brand-text"><h2>UTE SPORT</h2><span>Quản lý chi nhánh</span></div>
+      </div>
+      <div class="sidebar-content">
+        <div class="menu-title">Quản lý chi nhánh</div>
+        
+        <a href="/manager/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+          </svg>
+          <span class="menu-text">Dashboard</span>
+        </a>
+        <a href="/manager/courts" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+          <span class="menu-text">Danh mục sân</span>
+        </a>
+        <a href="/manager/pricing" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          <span class="menu-text">Cấu hình giá</span>
+        </a>
+        <a href="/manager/inventory" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+          <span class="menu-text">Tồn kho</span>
+        </a>
+        <a href="/manager/receipts" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          </svg>
+          <span class="menu-text">Nhập kho</span>
+        </a>
+        <a href="/manager/staff" class="menu-item active">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          </svg>
+          <span class="menu-text">Nhân sự</span>
+        </a>
+        <a href="/manager/reports" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M18 20V10M12 20V4M6 20v-6"></path>
+          </svg>
+          <span class="menu-text">Báo cáo</span>
+        </a>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="user-avatar">QL</div>
+        <div class="user-meta"><span class="user-name">Trần Phúc Bảo</span><span class="user-title">Quản lý cơ sở Bình Thạnh</span></div>
+      </div>
+    </aside>
+
+    <main class="main-wrapper">
+      <header class="header-bar">
+        <div class="header-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()">
+            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="header-heading"><h1>Quản lý nhân viên & Phân ca trực</h1></div>
+        </div>
+        <div class="header-actions">
+          <button class="btn-action btn-outline-action" onclick="openStaffModal()">
+            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M12 14c-6.1 0-8 4-8 4v2h16v-2s-1.9-4-8-4z"></path></svg>
+            <span>Thêm nhân sự</span>
+          </button>
+          <button class="btn-action btn-primary-action" onclick="alert('Tính năng xếp ca tự động đang được phát triển.')">
+            <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>Xếp ca tự động</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="page-content">
+        
+        <div class="section-card">
+          <div class="tab-navigation">
+            <button class="nav-tab-btn active" onclick="switchTab('tab-schedule', this)">
+              <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <span>Bảng phân ca hàng tuần</span>
+            </button>
+            <button class="nav-tab-btn" onclick="switchTab('tab-staff', this)">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              <span>Hồ sơ nhân viên chi nhánh</span>
+            </button>
+          </div>
+
+          <!-- TAB: LỊCH TRỰC -->
+          <div class="tab-pane active" id="tab-schedule">
+            <div style="padding: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <strong style="font-size: 16px;">Tuần hiện tại: 21/09 - 27/09/2026</strong>
+                <select class="form-control" style="width: auto;">
+                  <option>Tuần này (21/09 - 27/09)</option>
+                  <option>Tuần sau (28/09 - 04/10)</option>
+                </select>
+              </div>
+
+              <div style="overflow-x: auto;">
+                <table class="schedule-table" style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                    <tr>
+                      <th style="width: 120px;">Ca Làm Việc</th>
+                      <th>Thứ 2</th>
+                      <th>Thứ 3</th>
+                      <th>Thứ 4</th>
+                      <th>Thứ 5</th>
+                      <th>Thứ 6</th>
+                      <th>Thứ 7</th>
+                      <th>Chủ Nhật</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Ca Sáng -->
+                    <tr>
+                      <td style="font-weight: 600; text-align: center; vertical-align: middle;">
+                        Ca Sáng<br><span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">06:00 - 12:00</span>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Nguyễn Văn A</div>
+                          <div class="staff-badge">NV. Lê Thị C</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Trần Văn B</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Nguyễn Văn A</div>
+                          <div class="staff-badge">NV. Lê Thị C</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Trần Văn B</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Nguyễn Văn A</div>
+                          <div class="staff-badge">NV. Lê Thị C</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge shift-off">Trống ca</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Trần Văn B</div>
+                        </div>
+                      </td>
+                    </tr>
+                    <!-- Ca Chiều -->
+                    <tr>
+                      <td style="font-weight: 600; text-align: center; vertical-align: middle;">
+                        Ca Chiều<br><span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">12:00 - 17:30</span>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Trần Văn B</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Nguyễn Văn A</div>
+                          <div class="staff-badge">NV. Lê Thị C</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Trần Văn B</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Nguyễn Văn A</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Trần Văn B</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Lê Thị C</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Nguyễn Văn A</div>
+                        </div>
+                      </td>
+                    </tr>
+                    <!-- Ca Tối -->
+                    <tr>
+                      <td style="font-weight: 600; text-align: center; vertical-align: middle; border-left: 3px solid var(--accent);">
+                        Ca Tối<br><span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">17:30 - 22:30</span><br>
+                        <span class="clean-kpi-badge badge-amber" style="margin-top: 5px;">Cao điểm</span>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Đặng Thị D</div>
+                          <div class="staff-badge">NV. Phạm Văn E</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Đặng Thị D</div>
+                          <div class="staff-badge">NV. Phạm Văn E</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Đặng Thị D</div>
+                          <div class="staff-badge">NV. Phạm Văn E</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Đặng Thị D</div>
+                          <div class="staff-badge">NV. Phạm Văn E</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge">NV. Đặng Thị D</div>
+                          <div class="staff-badge">NV. Phạm Văn E</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge" style="border-left: 3px solid var(--accent);">NV. Đặng Thị D</div>
+                          <div class="staff-badge" style="border-left: 3px solid var(--accent);">NV. Phạm Văn E</div>
+                          <div class="staff-badge" style="border-left: 3px solid var(--accent);">NV. Trần Văn B</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="schedule-cell">
+                          <div class="staff-badge" style="border-left: 3px solid var(--accent);">NV. Đặng Thị D</div>
+                          <div class="staff-badge" style="border-left: 3px solid var(--accent);">NV. Phạm Văn E</div>
+                          <div class="staff-badge" style="border-left: 3px solid var(--accent);">NV. Lê Thị C</div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB: DANH SÁCH NHÂN VIÊN -->
+          <div class="tab-pane" id="tab-staff">
+            <div class="table-container">
+              <table class="clean-table">
+                <thead>
+                  <tr>
+                    <th>Mã NV</th>
+                    <th>Họ và tên</th>
+                    <th>Chức vụ</th>
+                    <th>Số điện thoại</th>
+                    <th>Ngày vào làm</th>
+                    <th>Trạng thái</th>
+                    <th style="text-align: right;">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>NV-012</strong></td>
+                    <td>Nguyễn Văn A</td>
+                    <td>Nhân viên quầy (Full-time)</td>
+                    <td>0901.234.567</td>
+                    <td>15/01/2025</td>
+                    <td><span class="clean-kpi-badge badge-green">Đang làm việc</span></td>
+                    <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openStaffModal('NV-012')">Hồ sơ</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>NV-018</strong></td>
+                    <td>Trần Văn B</td>
+                    <td>Nhân viên quầy (Part-time)</td>
+                    <td>0912.345.678</td>
+                    <td>20/06/2025</td>
+                    <td><span class="clean-kpi-badge badge-green">Đang làm việc</span></td>
+                    <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openStaffModal('NV-018')">Hồ sơ</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>NV-024</strong></td>
+                    <td>Lê Thị C</td>
+                    <td>Nhân viên quầy (Part-time)</td>
+                    <td>0923.456.789</td>
+                    <td>10/10/2025</td>
+                    <td><span class="clean-kpi-badge badge-green">Đang làm việc</span></td>
+                    <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openStaffModal('NV-024')">Hồ sơ</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>NV-030</strong></td>
+                    <td>Đặng Thị D</td>
+                    <td>Quản lý ca tối</td>
+                    <td>0934.567.890</td>
+                    <td>05/02/2026</td>
+                    <td><span class="clean-kpi-badge badge-green">Đang làm việc</span></td>
+                    <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openStaffModal('NV-030')">Hồ sơ</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>NV-031</strong></td>
+                    <td>Phạm Văn E</td>
+                    <td>Bảo vệ nội khu</td>
+                    <td>0945.678.901</td>
+                    <td>05/02/2026</td>
+                    <td><span class="clean-kpi-badge badge-green">Đang làm việc</span></td>
+                    <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openStaffModal('NV-031')">Hồ sơ</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: HỒ SƠ NHÂN VIÊN -->
+  <div class="modal-overlay" id="staffModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle">Thông tin hồ sơ nhân sự</h3>
+        <button class="modal-close-btn" onclick="closeStaffModal()">X</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div class="form-group">
+            <label class="form-label">Mã nhân viên</label>
+            <input type="text" class="form-control" id="inpStaffCode" placeholder="Tạo tự động" disabled>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Chức vụ</label>
+            <select class="form-control">
+              <option>Nhân viên quầy (Full-time)</option>
+              <option>Nhân viên quầy (Part-time)</option>
+              <option>Quản lý ca</option>
+              <option>Bảo vệ nội khu</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Họ và tên</label>
+          <input type="text" class="form-control" placeholder="Nhập họ và tên đầy đủ">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Số điện thoại liên hệ</label>
+          <input type="text" class="form-control" placeholder="09xx...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Trạng thái công việc</label>
+          <select class="form-control">
+            <option>Đang làm việc</option>
+            <option>Nghỉ phép</option>
+            <option>Đã nghỉ việc</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action btn-outline-action" onclick="closeStaffModal()">Hủy</button>
+        <button class="btn-action btn-primary-action" onclick="saveStaff()">Lưu hồ sơ</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('collapsed'); }
+    
+    function switchTab(paneId, btnElement) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(paneId).classList.add('active');
+      btnElement.classList.add('active');
+    }
+
+    function openStaffModal(id) {
+      const modal = document.getElementById('staffModal');
+      if (id) {
+        document.getElementById('modalTitle').innerText = 'Cập nhật hồ sơ: ' + id;
+        document.getElementById('inpStaffCode').value = id;
+      } else {
+        document.getElementById('modalTitle').innerText = 'Thêm nhân sự mới';
+        document.getElementById('inpStaffCode').value = '';
+      }
+      modal.classList.add('open');
+    }
+    
+    function closeStaffModal() { document.getElementById('staffModal').classList.remove('open'); }
+    function saveStaff() { alert('Đã lưu hồ sơ nhân viên thành công!'); closeStaffModal(); }
+  </script>
+</body>
+</html>
