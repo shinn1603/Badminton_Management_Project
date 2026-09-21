@@ -4,98 +4,208 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sơ đồ & Lưới đặt sân theo giờ - UTE Sport</title>
-  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    /* BẮT ĐẦU: GIỮ NGUYÊN 100% CSS CỦA NHÓM */
+    :root {
+      --primary: #16a34a; --primary-dark: #15803d; --accent: #f59e0b;
+      --bg-page: #f8fafc; --bg-card: #ffffff; --text-dark: #1e293b;
+      --text-muted: #64748b; --border-subtle: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg-page); color: var(--text-dark); display: flex; height: 100vh; overflow: hidden; }
+
+    .layout-container { display: flex; width: 100%; height: 100%; }
+    .sidebar { width: 260px; background-color: var(--bg-card); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; transition: width 0.3s; }
+    .sidebar.collapsed { width: 70px; }
+    .brand-header { padding: 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border-subtle); }
+    .brand-icon { width: 36px; height: 36px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; }
+    .brand-text h2 { font-size: 16px; font-weight: 700; color: var(--primary); }
+    .brand-text span { font-size: 11px; color: var(--text-muted); }
+    
+    .sidebar-content { padding: 12px; flex: 1; overflow-y: auto; }
+    .menu-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 10px 0 6px 8px; }
+    .menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: var(--text-dark); text-decoration: none; border-radius: 6px; font-size: 13.5px; font-weight: 500; margin-bottom: 4px; transition: background 0.2s; }
+    .menu-item:hover, .menu-item.active { background-color: #f0fdf4; color: var(--primary); }
+    .svg-icon { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    
+    .sidebar-bottom { padding: 14px; border-top: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; }
+    .user-avatar { width: 32px; height: 32px; background: #dcfce7; color: var(--primary); font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+    .user-meta .user-name { font-size: 13px; font-weight: 600; display: block; }
+    .user-meta .user-title { font-size: 11px; color: var(--text-muted); }
+
+    .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .header-bar { height: 60px; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .btn-sidebar-toggle { background: none; border: none; cursor: pointer; color: var(--text-muted); }
+    .header-heading h1 { font-size: 18px; font-weight: 700; }
+    
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    
+    .search-box { position: relative; display: flex; align-items: center; gap: 6px; background: var(--bg-page); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 6px 10px; }
+    .search-box input { border: none; background: none; outline: none; font-size: 13px; width: 220px; }
+    
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
+    .btn-primary { background-color: var(--primary); color: white; }
+    .btn-primary:hover { background-color: var(--primary-dark); }
+    .btn-outline { background-color: transparent; border: 1px solid var(--border-subtle); color: var(--text-dark); }
+
+    .main-content { padding: 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+    .grid-toolbar { background: var(--bg-card); padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .toolbar-controls { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .form-control { padding: 6px 10px; border: 1px solid var(--border-subtle); border-radius: 6px; font-size: 13px; outline: none; }
+    
+    .date-navigator { display: flex; align-items: center; gap: 6px; }
+    .date-nav-btn { background: none; border: 1px solid var(--border-subtle); border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .current-date-input { border: 1px solid var(--border-subtle); border-radius: 4px; padding: 4px 8px; font-size: 12px; font-weight: 600; }
+
+    .legend-group { display: flex; align-items: center; gap: 12px; font-size: 12px; font-weight: 500; }
+    .legend-item { display: flex; align-items: center; gap: 4px; }
+    .legend-indicator { width: 10px; height: 10px; border-radius: 50%; }
+    .legend-available { background: #22c55e; }
+    .legend-holding { background: #eab308; }
+    .legend-booked { background: #3b82f6; }
+    .legend-in-use { background: #ef4444; }
+    .legend-maintenance { background: #94a3b8; }
+
+    .matrix-container { background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-subtle); overflow: hidden; flex: 1; display: flex; flex-direction: column; }
+    .matrix-scroll { overflow: auto; flex: 1; }
+    .matrix-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .matrix-table th, .matrix-table td { border-bottom: 1px solid var(--border-subtle); border-right: 1px solid var(--border-subtle); padding: 8px; }
+    .matrix-th-corner { background: #f1f5f9; font-size: 12px; font-weight: 700; color: var(--text-muted); min-width: 130px; text-align: center; }
+    .matrix-th-time { background: #f1f5f9; font-size: 12px; font-weight: 600; text-align: center; min-width: 100px; }
+    .matrix-td-court { background: #f8fafc; font-weight: 600; font-size: 13px; text-align: center; }
+    .court-info .court-name { display: block; font-weight: 700; color: var(--text-dark); }
+    .court-info .court-type { font-size: 11px; color: var(--text-muted); }
+
+    .matrix-slot-cell { padding: 4px; height: 60px; vertical-align: middle; }
+    .slot-inner { border-radius: 6px; padding: 6px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s ease; }
+    .slot-inner:hover { transform: scale(0.98); }
+    
+    .slot-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; width: 100%; }
+    .slot-badge-status { font-size: 10px; padding: 1px 5px; border-radius: 4px; width: fit-content; font-weight: 600; margin-top: 2px; }
+    
+    .state-available { background-color: #f0fdf4; border: 1px dashed #4ade80; text-align: center; color: #15803d; }
+    .slot-action { display: flex; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 600; }
+    .slot-price { font-size: 10px; color: var(--text-muted); }
+
+    .state-booked { background-color: #eff6ff; border: 1px solid #93c5fd; color: #1e40af; }
+    .badge-booked { background-color: #dbeafe; color: #1d4ed8; }
+
+    .state-in-use { background-color: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; }
+    .badge-in-use { background-color: #fee2e2; color: #b91c1c; }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-overlay.active { display: flex; }
+    .modal-container { background: var(--bg-card); width: 100%; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; max-height: 95vh; display: flex; flex-direction: column; }
+    .modal-header { padding: 14px 18px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .modal-title { font-size: 15px; font-weight: 700; }
+    .modal-close-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); }
+    .modal-body { padding: 18px; overflow-y: auto; }
+    .modal-footer { padding: 12px 18px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: flex-end; gap: 8px; background: #f8fafc; }
+    
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+
+    .slot-dimmed { opacity: 0.25; filter: grayscale(100%); pointer-events: none; }
+    .slot-highlight { box-shadow: 0 0 0 3px var(--accent); transform: scale(1.05); z-index: 10; position: relative; }
+    
+    #loginScreen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: var(--bg-page); z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.3s ease;
+    }
+    .login-card {
+      background: var(--bg-card); padding: 40px 30px; border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 380px;
+    }
+    .login-logo { text-align: center; margin-bottom: 24px; }
+    .login-logo svg { width: 48px; height: 48px; color: var(--primary); margin-bottom: 10px; }
+    .login-logo h2 { color: var(--primary); font-size: 24px; font-weight: 700; }
+    .login-logo p { color: var(--text-muted); font-size: 13px; }
+    .login-btn { width: 100%; padding: 10px; font-size: 14px; margin-top: 10px; justify-content: center; }
+    .hidden { display: none !important; }
+
+    /* MENU TÌM KIẾM THẢ XUỐNG CẬP NHẬT */
+    .search-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0; width: 440px;
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      z-index: 1050; display: none; flex-direction: column; overflow: hidden;
+    }
+    .search-dropdown.active { display: flex; }
+    .search-dropdown-header { padding: 10px 14px; background: #f1f5f9; font-weight: 600; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border-subtle); }
+    .search-results-list { list-style: none; max-height: 350px; overflow-y: auto; }
+    .search-result-item { padding: 12px 14px; border-bottom: 1px solid var(--border-subtle); cursor: pointer; transition: background 0.2s; }
+    .search-result-item:hover { background: #f8fafc; }
+    .sri-name { font-weight: 700; font-size: 14px; color: var(--text-dark); margin-bottom: 4px; }
+    .sri-phone { font-size: 12px; font-weight: normal; color: var(--text-muted); }
+    .sri-details { font-size: 12px; display: flex; gap: 10px; color: var(--text-dark); margin-top: 6px; font-weight: 500;}
+  </style>
 </head>
 <body>
+
+  <!-- MÀN HÌNH ĐĂNG NHẬP -->
+  <div id="loginScreen">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path></svg>
+        <h2>UTE SPORT</h2>
+        <p>Hệ thống Quản lý Chuỗi Sân</p>
+      </div>
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label class="form-label">Tài khoản nhân viên</label>
+        <input type="text" id="loginUsername" class="form-control" placeholder="vd: VanA123">
+      </div>
+      <div class="form-group" style="margin-bottom: 24px;">
+        <label class="form-label">Mật khẩu</label>
+        <input type="password" id="loginPassword" class="form-control" placeholder="••••••••">
+      </div>
+      <button class="btn btn-primary login-btn" onclick="handleLogin()">Đăng nhập hệ thống</button>
+    </div>
+  </div>
 
   <div class="layout-container">
     <aside class="sidebar" id="appSidebar">
       <div class="brand-header">
         <div class="brand-icon">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
-            <path d="M2 12h20"></path>
-          </svg>
+          <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path></svg>
         </div>
         <div class="brand-text">
           <h2>UTE SPORT</h2>
           <span>Quản lý chuỗi sân</span>
         </div>
       </div>
-
       <div class="sidebar-content">
-        <div class="menu-title">Nghiệp vụ quầy & Sân</div>
-
-        <a href="/booking/grid" class="menu-item active">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-            <line x1="10" y1="4" x2="10" y2="22"></line>
-          </svg>
+        <div class="menu-title">NGHIỆP VỤ QUẦY & SÂN</div>
+        <a href="#" class="menu-item active">
+          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="10" x2="21" y2="10"></line></svg>
           <span class="menu-text">Lưới đặt sân</span>
         </a>
-
-        <a href="#pos" class="menu-item">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-            <line x1="8" y1="21" x2="16" y2="21"></line>
-            <line x1="12" y1="17" x2="12" y2="21"></line>
-          </svg>
+        <a href="#" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect></svg>
           <span class="menu-text">Thu ngân & POS</span>
         </a>
-
-        <a href="#customers" class="menu-item">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
+        <a href="#" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
           <span class="menu-text">Hội viên & Khách</span>
         </a>
 
-        <div class="menu-title" style="margin-top: 14px;">Giám đốc điều hành</div>
-        
-        <a href="/director/dashboard" class="menu-item">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <line x1="18" y1="20" x2="18" y2="10"></line>
-            <line x1="12" y1="20" x2="12" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="14"></line>
-          </svg>
+        <div class="menu-title" style="margin-top: 14px;">QUẢN LÝ & BÁO CÁO</div>
+        <a href="#" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
           <span class="menu-text">Doanh thu toàn chuỗi</span>
         </a>
-
-        <a href="/director/dashboard#comparison-section" class="menu-item">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
-            <path d="M9 22v-4h6v4"></path>
-            <path d="M8 6h.01"></path>
-            <path d="M16 6h.01"></path>
-            <path d="M8 10h.01"></path>
-            <path d="M16 10h.01"></path>
-            <path d="M8 14h.01"></path>
-            <path d="M16 14h.01"></path>
-          </svg>
-          <span class="menu-text">So sánh chi nhánh</span>
-        </a>
-
-        <div class="menu-title" style="margin-top: 14px;">Quản trị hệ thống</div>
-
-        <a href="/admin/users" class="menu-item">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          </svg>
+        <a href="#" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
           <span class="menu-text">Tài khoản & Phân quyền</span>
         </a>
       </div>
-
       <div class="sidebar-bottom">
-        <div class="user-avatar">TN</div>
+        <div class="user-avatar" id="sidebarAvatar">TN</div>
         <div class="user-meta">
-          <span class="user-name">Lê Thị Mai</span>
+          <span class="user-name" id="sidebarName">Nhân viên quầy</span>
           <span class="user-title">Thu ngân - CN Thủ Đức</span>
         </div>
       </div>
@@ -104,32 +214,23 @@
     <main class="main-wrapper">
       <header class="header-bar">
         <div class="header-left">
-          <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="Thu gọn / Mở rộng">
-            <svg class="svg-icon" viewBox="0 0 24 24">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-          <div class="header-heading">
-            <h1>Sơ đồ & Lưới đặt sân theo giờ</h1>
-          </div>
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()"><svg class="svg-icon" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line></svg></button>
+          <div class="header-heading"><h1>Sơ đồ sân trong ngày - Nhân viên quầy</h1></div>
         </div>
-
         <div class="header-right">
-          <div class="search-box">
-            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: var(--text-light);">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" placeholder="Tìm khách, SĐT...">
+          <!-- GIAO DIỆN TÌM KIẾM CÓ MENU DROPDOWN -->
+          <div class="search-box" id="searchContainer">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><circle cx="11" cy="11" r="8"></circle></svg>
+            <input type="text" id="searchInput" placeholder="Tìm khách, SĐT..." oninput="handleSearch()" autocomplete="off">
+            
+            <div id="searchResultsDropdown" class="search-dropdown">
+              <div class="search-dropdown-header">KẾT QUẢ TÌM KIẾM HỆ THỐNG</div>
+              <ul id="searchResultsList" class="search-results-list"></ul>
+            </div>
           </div>
 
           <button class="btn btn-primary" onclick="openCreateBookingModal()">
-            <svg class="svg-icon" viewBox="0 0 24 24">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
+            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             <span>Đặt sân nhanh</span>
           </button>
         </div>
@@ -140,50 +241,25 @@
           <div class="toolbar-controls">
             <div style="display: flex; align-items: center; gap: 8px;">
               <label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Chi nhánh:</label>
-              <select class="form-control" style="font-weight: 600; width: 220px;" id="branchFilter">
+              <select class="form-control" style="font-weight: 600; width: 280px;" id="branchFilter" onchange="changeBranch()">
                 <option value="CN01" selected>Chi nhánh 1 - Võ Văn Ngân, Thủ Đức</option>
                 <option value="CN02">Chi nhánh 2 - Đỗ Xuân Hợp, Quận 9</option>
                 <option value="CN03">Chi nhánh 3 - Điện Biên Phủ, Bình Thạnh</option>
               </select>
             </div>
-
             <div class="date-navigator">
-              <button class="date-nav-btn" onclick="shiftDate(-1)" title="Ngày trước">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-              </button>
-              <input type="date" class="current-date-input" id="gridDateInput" value="2026-09-19" onchange="onDateChange()">
-              <button class="date-nav-btn" onclick="shiftDate(1)" title="Ngày sau">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </button>
+              <button class="date-nav-btn" onclick="shiftDate(-1)"><svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+              <input type="date" class="current-date-input" id="gridDateInput">
+              <button class="date-nav-btn" onclick="shiftDate(1)"><svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
               <button class="btn btn-outline" style="padding: 3px 8px; font-size: 11.5px; height: 26px;" onclick="goToToday()">Hôm nay</button>
             </div>
           </div>
-
           <div class="legend-group">
-            <div class="legend-item">
-              <span class="legend-indicator legend-available"></span>
-              <span>Trống</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-indicator legend-holding"></span>
-              <span>Giữ chỗ (10p)</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-indicator legend-booked"></span>
-              <span>Đã đặt cọc</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-indicator legend-in-use"></span>
-              <span>Đang sử dụng</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-indicator legend-maintenance"></span>
-              <span>Bảo dưỡng</span>
-            </div>
+            <div class="legend-item"><span class="legend-indicator legend-available"></span><span>Trống</span></div>
+            <div class="legend-item"><span class="legend-indicator legend-holding"></span><span>Giữ chỗ</span></div>
+            <div class="legend-item"><span class="legend-indicator legend-booked"></span><span>Đã cọc</span></div>
+            <div class="legend-item"><span class="legend-indicator legend-in-use"></span><span>Đang chơi</span></div>
+            <div class="legend-item"><span class="legend-indicator legend-maintenance"></span><span>Bảo dưỡng</span></div>
           </div>
         </div>
 
@@ -197,758 +273,13 @@
                   <th class="matrix-th-time">07:00 - 08:00</th>
                   <th class="matrix-th-time">08:00 - 09:00</th>
                   <th class="matrix-th-time">09:00 - 10:00</th>
-                  <th class="matrix-th-time">10:00 - 11:00</th>
-                  <th class="matrix-th-time">14:00 - 15:00</th>
-                  <th class="matrix-th-time">15:00 - 16:00</th>
-                  <th class="matrix-th-time">16:00 - 17:00</th>
                   <th class="matrix-th-time">17:00 - 18:00</th>
                   <th class="matrix-th-time">18:00 - 19:00</th>
                   <th class="matrix-th-time">19:00 - 20:00</th>
-                  <th class="matrix-th-time">20:00 - 21:00</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td class="matrix-td-court">
-                    <div class="court-info">
-                      <span class="court-name">Sân 01</span>
-                      <span class="court-type">VIP - Thảm Yonex</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1082', 'Sân 01', '06:00 - 07:00', 'Nguyễn Văn Nam', '0901 882 123', 'Đã cọc 30%', '120.000 đ')">
-                      <span class="slot-title">Nguyễn Văn Nam</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1082', 'Sân 01', '07:00 - 08:00', 'Nguyễn Văn Nam', '0901 882 123', 'Đã cọc 30%', '120.000 đ')">
-                      <span class="slot-title">Nguyễn Văn Nam</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 01', '08:00', '09:00', 120000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">120.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 01', '09:00', '10:00', 120000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">120.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 01', '10:00', '11:00', 120000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">120.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-in-use" onclick="openDetailModal('BK-1090', 'Sân 01', '14:00 - 15:00', 'Trần Hữu Kiên', '0912 345 678', 'Đang nhận sân', '120.000 đ')">
-                      <span class="slot-title">Trần Hữu Kiên</span>
-                      <span class="slot-badge-status badge-in-use">Đang chơi</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-holding" onclick="openDetailModal('BK-1094', 'Sân 01', '15:00 - 16:00', 'Lâm Gia Bách', '0988 777 666', 'Chờ cọc (06:42)', '120.000 đ')">
-                      <span class="slot-title">Lâm Gia Bách</span>
-                      <span class="slot-badge-status badge-holding">Chờ cọc 06:42</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 01', '16:00', '17:00', 120000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">120.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1099', 'Sân 01', '17:00 - 18:00', 'CLB Tân Bình', '0933 111 222', 'Đã thanh toán', '120.000 đ')">
-                      <span class="slot-title">CLB Tân Bình</span>
-                      <span class="slot-badge-status badge-booked">Đã thanh toán</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1099', 'Sân 01', '18:00 - 19:00', 'CLB Tân Bình', '0933 111 222', 'Đã thanh toán', '120.000 đ')">
-                      <span class="slot-title">CLB Tân Bình</span>
-                      <span class="slot-badge-status badge-booked">Đã thanh toán</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1102', 'Sân 01', '19:00 - 20:00', 'Vũ Quốc Đạt', '0977 444 555', 'Đã cọc 30%', '120.000 đ')">
-                      <span class="slot-title">Vũ Quốc Đạt</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 01', '20:00', '21:00', 120000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">120.000 đ</span>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td class="matrix-td-court">
-                    <div class="court-info">
-                      <span class="court-name">Sân 02</span>
-                      <span class="court-type">VIP - Thảm Yonex</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 02', '06:00', '07:00', 120000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">120.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1085', 'Sân 02', '07:00 - 08:00', 'Đoàn Thanh Niên', '0944 555 666', 'Đã cọc 30%', '120.000 đ')">
-                      <span class="slot-title">Đoàn Thanh Niên</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 02', '08:00', '09:00', 120000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">120.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 02', '09:00', '10:00', 120000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">120.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 02', '10:00', '11:00', 120000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">120.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-in-use" onclick="openDetailModal('BK-1091', 'Sân 02', '14:00 - 15:00', 'Đặng Thùy Trang', '0918 999 111', 'Đang nhận sân', '120.000 đ')">
-                      <span class="slot-title">Đặng Thùy Trang</span>
-                      <span class="slot-badge-status badge-in-use">Đang chơi</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-in-use" onclick="openDetailModal('BK-1091', 'Sân 02', '15:00 - 16:00', 'Đặng Thùy Trang', '0918 999 111', 'Đang nhận sân', '120.000 đ')">
-                      <span class="slot-title">Đặng Thùy Trang</span>
-                      <span class="slot-badge-status badge-in-use">Đang chơi</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 02', '16:00', '17:00', 120000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">120.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1100', 'Sân 02', '17:00 - 18:00', 'Hoàng Minh Quân', '0903 222 444', 'Đã cọc 30%', '120.000 đ')">
-                      <span class="slot-title">Hoàng Minh Quân</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1100', 'Sân 02', '18:00 - 19:00', 'Hoàng Minh Quân', '0903 222 444', 'Đã cọc 30%', '120.000 đ')">
-                      <span class="slot-title">Hoàng Minh Quân</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1103', 'Sân 02', '19:00 - 20:00', 'Phạm Quốc Cường', '0981 123 789', 'Đã cọc 30%', '120.000 đ')">
-                      <span class="slot-title">Phạm Quốc Cường</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 02', '20:00', '21:00', 120000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">120.000 đ</span>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td class="matrix-td-court">
-                    <div class="court-info">
-                      <span class="court-name">Sân 03</span>
-                      <span class="court-type">Tiêu chuẩn</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1087', 'Sân 03', '06:00 - 07:00', 'CLB Buổi Sáng', '0938 123 456', 'Đã thanh toán', '80.000 đ')">
-                      <span class="slot-title">CLB Buổi Sáng</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 03', '07:00', '08:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 03', '08:00', '09:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 03', '09:00', '10:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 03', '10:00', '11:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 03', '14:00', '15:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 03', '15:00', '16:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-holding" onclick="openDetailModal('BK-1096', 'Sân 03', '16:00 - 17:00', 'Bùi Đức Anh', '0922 888 999', 'Chờ cọc (04:15)', '80.000 đ')">
-                      <span class="slot-title">Bùi Đức Anh</span>
-                      <span class="slot-badge-status badge-holding">Chờ cọc 04:15</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1105', 'Sân 03', '17:00 - 18:00', 'Nhóm IT UTE', '0909 333 777', 'Đã cọc 30%', '80.000 đ')">
-                      <span class="slot-title">Nhóm IT UTE</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1105', 'Sân 03', '18:00 - 19:00', 'Nhóm IT UTE', '0909 333 777', 'Đã cọc 30%', '80.000 đ')">
-                      <span class="slot-title">Nhóm IT UTE</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1108', 'Sân 03', '19:00 - 20:00', 'Đinh Trọng Phúc', '0966 222 111', 'Đã cọc 30%', '80.000 đ')">
-                      <span class="slot-title">Đinh Trọng Phúc</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1108', 'Sân 03', '20:00 - 21:00', 'Đinh Trọng Phúc', '0966 222 111', 'Đã cọc 30%', '80.000 đ')">
-                      <span class="slot-title">Đinh Trọng Phúc</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td class="matrix-td-court">
-                    <div class="court-info">
-                      <span class="court-name">Sân 04</span>
-                      <span class="court-type">Tiêu chuẩn</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-maintenance">
-                      <span class="slot-title" style="color: var(--text-muted); font-size: 11px;">Bảo dưỡng lưới</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-maintenance">
-                      <span class="slot-title" style="color: var(--text-muted); font-size: 11px;">Bảo dưỡng lưới</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 04', '08:00', '09:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 04', '09:00', '10:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 04', '10:00', '11:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-in-use" onclick="openDetailModal('BK-1092', 'Sân 04', '14:00 - 15:00', 'Lê Văn Hoàng', '0908 776 543', 'Đang nhận sân', '80.000 đ')">
-                      <span class="slot-title">Lê Văn Hoàng</span>
-                      <span class="slot-badge-status badge-in-use">Đang chơi</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 04', '15:00', '16:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 04', '16:00', '17:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1106', 'Sân 04', '17:00 - 18:00', 'Ngô Kiến Huy', '0935 999 888', 'Đã cọc 30%', '80.000 đ')">
-                      <span class="slot-title">Ngô Kiến Huy</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1106', 'Sân 04', '18:00 - 19:00', 'Ngô Kiến Huy', '0935 999 888', 'Đã cọc 30%', '80.000 đ')">
-                      <span class="slot-title">Ngô Kiến Huy</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1109', 'Sân 04', '19:00 - 20:00', 'Dương Triệu Vũ', '0902 444 333', 'Đã cọc 30%', '80.000 đ')">
-                      <span class="slot-title">Dương Triệu Vũ</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 04', '20:00', '21:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td class="matrix-td-court">
-                    <div class="court-info">
-                      <span class="court-name">Sân 05</span>
-                      <span class="court-type">Tiêu chuẩn</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 05', '06:00', '07:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 05', '07:00', '08:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 05', '08:00', '09:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 05', '09:00', '10:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 05', '10:00', '11:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 05', '14:00', '15:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 05', '15:00', '16:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 05', '16:00', '17:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1107', 'Sân 05', '17:00 - 18:00', 'CLB Sân Nhà', '0919 555 444', 'Đã cọc 30%', '80.000 đ')">
-                      <span class="slot-title">CLB Sân Nhà</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1107', 'Sân 05', '18:00 - 19:00', 'CLB Sân Nhà', '0919 555 444', 'Đã cọc 30%', '80.000 đ')">
-                      <span class="slot-title">CLB Sân Nhà</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 05', '19:00', '20:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 05', '20:00', '21:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td class="matrix-td-court">
-                    <div class="court-info">
-                      <span class="court-name">Sân 06</span>
-                      <span class="court-type">Tiêu chuẩn</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 06', '06:00', '07:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 06', '07:00', '08:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 06', '08:00', '09:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 06', '09:00', '10:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 06', '10:00', '11:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 06', '14:00', '15:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 06', '15:00', '16:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 06', '16:00', '17:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1110', 'Sân 06', '17:00 - 18:00', 'Trương Bá Chi', '0945 123 456', 'Đã cọc 30%', '80.000 đ')">
-                      <span class="slot-title">Trương Bá Chi</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-booked" onclick="openDetailModal('BK-1110', 'Sân 06', '18:00 - 19:00', 'Trương Bá Chi', '0945 123 456', 'Đã cọc 30%', '80.000 đ')">
-                      <span class="slot-title">Trương Bá Chi</span>
-                      <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 06', '19:00', '20:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                  <td class="matrix-slot-cell">
-                    <div class="slot-inner state-available" onclick="quickBookSlot('Sân 06', '20:00', '21:00', 80000)">
-                      <div class="slot-action">
-                        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
-                          <line x1="12" y1="5" x2="12" y2="19"></line>
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Đặt</span>
-                      </div>
-                      <span class="slot-price">80.000 đ</span>
-                    </div>
-                  </td>
-                </tr>
+              <tbody id="matrixGridBody">
+                <!-- Data đổ bằng JS -->
               </tbody>
             </table>
           </div>
@@ -957,305 +288,655 @@
     </main>
   </div>
 
+  <!-- MODAL ĐẶT SÂN NHANH -->
   <div class="modal-overlay" id="createBookingModal">
-    <div class="modal-container" style="max-width: 520px;">
+    <div class="modal-container" style="max-width: 500px;">
       <div class="modal-header">
         <h3 class="modal-title">Tạo đơn đặt sân mới</h3>
-        <button class="modal-close-btn" onclick="closeCreateBookingModal()">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
+        <button class="modal-close-btn" onclick="closeCreateBookingModal()">✕</button>
       </div>
-
       <div class="modal-body">
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Loại khách hàng</label>
-            <select class="form-control" id="customerTypeSelect" onchange="onCustomerTypeChange()">
-              <option value="WALK_IN">Khách vãng lai tại quầy</option>
-              <option value="MEMBER">Hội viên có thẻ tích điểm</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Sân được chọn</label>
+            <label class="form-label">Chọn Sân</label>
             <select class="form-control" id="bookingCourtSelect" onchange="recalculatePrice()">
               <option value="Sân 01" data-price="120000">Sân 01 (VIP - 120.000 đ/h)</option>
-              <option value="Sân 02" data-price="120000">Sân 02 (VIP - 120.000 đ/h)</option>
-              <option value="Sân 03" data-price="80000" selected>Sân 03 (Tiêu chuẩn - 80.000 đ/h)</option>
-              <option value="Sân 04" data-price="80000">Sân 04 (Tiêu chuẩn - 80.000 đ/h)</option>
-              <option value="Sân 05" data-price="80000">Sân 05 (Tiêu chuẩn - 80.000 đ/h)</option>
-              <option value="Sân 06" data-price="80000">Sân 06 (Tiêu chuẩn - 80.000 đ/h)</option>
+              <option value="Sân 02" data-price="80000">Sân 02 (Thường - 80.000 đ/h)</option>
+              <option value="Sân 03" data-price="80000">Sân 03 (Thường - 80.000 đ/h)</option>
+              <option value="Sân 04" data-price="80000">Sân 04 (Thường - 80.000 đ/h)</option>
+              <option value="Sân 05" data-price="80000">Sân 05 (Thường - 80.000 đ/h)</option>
             </select>
           </div>
-        </div>
-
-        <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Họ và tên khách</label>
-            <input type="text" class="form-control" id="bookingCustName" placeholder="Nhập tên khách hàng...">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Số điện thoại</label>
-            <input type="text" class="form-control" id="bookingCustPhone" placeholder="09xx xxx xxx">
+            <label class="form-label">Hình thức</label>
+            <select class="form-control"><option>Khách vãng lai tại quầy</option></select>
           </div>
         </div>
-
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Họ tên khách</label><input type="text" class="form-control" id="bookingCustName"></div>
+          <div class="form-group"><label class="form-label">Số điện thoại</label><input type="text" class="form-control" id="bookingCustPhone"></div>
+        </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Khung giờ bắt đầu</label>
+            <label class="form-label">Giờ bắt đầu</label>
             <select class="form-control" id="bookingStartTime" onchange="recalculatePrice()">
-              <option value="06:00">06:00</option>
-              <option value="07:00">07:00</option>
-              <option value="08:00" selected>08:00</option>
-              <option value="09:00">09:00</option>
-              <option value="10:00">10:00</option>
-              <option value="14:00">14:00</option>
-              <option value="15:00">15:00</option>
-              <option value="16:00">16:00</option>
-              <option value="17:00">17:00</option>
-              <option value="18:00">18:00</option>
-              <option value="19:00">19:00</option>
-              <option value="20:00">20:00</option>
+              <option value="06:00">06:00</option><option value="07:00">07:00</option><option value="08:00">08:00</option><option value="09:00">09:00</option>
+              <option value="17:00">17:00</option><option value="18:00">18:00</option><option value="19:00">19:00</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Khung giờ kết thúc</label>
+            <label class="form-label">Giờ kết thúc</label>
             <select class="form-control" id="bookingEndTime" onchange="recalculatePrice()">
-              <option value="07:00">07:00</option>
-              <option value="08:00">08:00</option>
-              <option value="09:00" selected>09:00</option>
-              <option value="10:00">10:00</option>
-              <option value="11:00">11:00</option>
-              <option value="15:00">15:00</option>
-              <option value="16:00">16:00</option>
-              <option value="17:00">17:00</option>
-              <option value="18:00">18:00</option>
-              <option value="19:00">19:00</option>
-              <option value="20:00">20:00</option>
-              <option value="21:00">21:00</option>
+              <option value="07:00">07:00</option><option value="08:00">08:00</option><option value="09:00">09:00</option><option value="10:00">10:00</option>
+              <option value="18:00">18:00</option><option value="19:00">19:00</option><option value="20:00">20:00</option>
             </select>
           </div>
         </div>
-
-        <div style="background-color: var(--bg-page); border-radius: 6px; padding: 12px 14px; margin-top: 4px; border: 1px solid var(--border-subtle);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="font-size: 12px; color: var(--text-muted);">Tổng tiền giờ thuê:</span>
-            <span style="font-size: 13px; font-weight: 700; color: var(--text-dark);" id="displayTotalRental">80.000 đ</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="font-size: 12px; color: var(--text-muted);">Mức đặt cọc tối thiểu (30%):</span>
-            <span style="font-size: 13px; font-weight: 700; color: var(--accent);" id="displayDepositRequired">24.000 đ</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 12px; color: var(--text-muted);">Hình thức thu:</span>
-            <select class="form-control" style="width: 170px; padding: 4px 8px; font-size: 12px;">
-              <option value="CASH">Tiền mặt tại quầy</option>
-              <option value="QR">Quét mã QR Ngân hàng</option>
-              <option value="MOMO">Ví MoMo</option>
-            </select>
-          </div>
+        <div style="background: #f1f5f9; padding: 10px; border-radius: 6px; font-size: 13px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Tổng tiền thuê:</span><strong id="displayTotalRental" style="color: var(--primary);">0 đ</strong></div>
+          <div style="display: flex; justify-content: space-between;"><span>Tiền cọc (30%):</span><strong id="displayDepositRequired" style="color: var(--accent);">0 đ</strong></div>
         </div>
       </div>
-
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeCreateBookingModal()">Đóng</button>
-        <button class="btn btn-primary" onclick="submitBookingForm()">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          <span>Xác nhận & Giữ chỗ</span>
-        </button>
+        <button class="btn btn-primary" onclick="submitBookingForm()">Xác nhận & Giữ chỗ</button>
       </div>
     </div>
   </div>
 
+  <!-- MODAL CHI TIẾT ĐƠN (CHECK-IN) -->
   <div class="modal-overlay" id="detailBookingModal">
-    <div class="modal-container" style="max-width: 480px;">
+    <div class="modal-container" style="max-width: 450px;">
       <div class="modal-header">
-        <h3 class="modal-title">Chi tiết phiếu đặt sân</h3>
-        <button class="modal-close-btn" onclick="closeDetailModal()">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
+        <h3 class="modal-title">Chi tiết đặt sân (Check-in)</h3>
+        <button class="modal-close-btn" onclick="closeDetailModal()">✕</button>
       </div>
-
-      <div class="modal-body">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle);">
-          <div>
-            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Mã phiếu đặt</div>
-            <div style="font-size: 16px; font-weight: 700; color: var(--text-dark);" id="detailBookingCode">BK-1082</div>
-          </div>
-          <div>
-            <span class="slot-badge-status badge-booked" id="detailStatusBadge" style="font-size: 11.5px; padding: 3px 8px;">Đã cọc 30%</span>
-          </div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
-          <div style="display: flex; justify-content: space-between;">
-            <span style="color: var(--text-muted);">Sân:</span>
-            <span style="font-weight: 600;" id="detailCourt">Sân 01</span>
-          </div>
-          <div style="display: flex; justify-content: space-between;">
-            <span style="color: var(--text-muted);">Thời gian:</span>
-            <span style="font-weight: 600;" id="detailTime">06:00 - 07:00 (19/09/2026)</span>
-          </div>
-          <div style="display: flex; justify-content: space-between;">
-            <span style="color: var(--text-muted);">Khách hàng:</span>
-            <span style="font-weight: 600;" id="detailCustomer">Nguyễn Văn Nam</span>
-          </div>
-          <div style="display: flex; justify-content: space-between;">
-            <span style="color: var(--text-muted);">Số điện thoại:</span>
-            <span style="font-weight: 600;" id="detailPhone">0901 882 123</span>
-          </div>
-          <div style="display: flex; justify-content: space-between;">
-            <span style="color: var(--text-muted);">Giá tiền theo giờ:</span>
-            <span style="font-weight: 700; color: var(--text-dark);" id="detailPrice">120.000 đ</span>
-          </div>
-        </div>
+      <div class="modal-body" style="font-size: 14px; line-height: 1.8;">
+        <p><strong>Khách hàng:</strong> <span id="detailCustomer"></span></p>
+        <p><strong>Số điện thoại:</strong> <span id="detailPhone"></span></p>
+        <p><strong>Sân & Giờ:</strong> <span id="detailCourt"></span> | <span id="detailTime"></span></p>
+        <p><strong>Trạng thái:</strong> <span id="detailStatusBadge" class="slot-badge-status badge-booked"></span></p>
       </div>
-
       <div class="modal-footer">
-        <button class="btn btn-outline" style="color: #ef4444; border-color: #fca5a5;" onclick="cancelBooking()">Hủy lịch</button>
         <button class="btn btn-outline" onclick="closeDetailModal()">Đóng</button>
-        <button class="btn btn-primary" onclick="checkInBooking()">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          <span>Nhận sân (Check-in)</span>
-        </button>
+        <button class="btn btn-primary" onclick="checkInBooking()">Nhận sân (Check-in)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL POS & THANH TOÁN -->
+  <div class="modal-overlay" id="checkoutModal">
+    <div class="modal-container" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Quầy Dịch Vụ & Lập Hóa Đơn</h3>
+        <button class="modal-close-btn" onclick="closeCheckoutModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: #f8fafc; padding: 12px; border: 1px solid var(--border-subtle); border-radius: 6px; margin-bottom: 16px;">
+          <label class="form-label" style="margin-bottom: 8px;">Thêm Dịch vụ / Dụng cụ</label>
+          <div style="display: flex; gap: 8px;">
+            <select id="posItemSelect" class="form-control" style="flex: 1;">
+              <option value="10000|Nước suối Aquafina">Nước suối Aquafina - 10.000đ</option>
+              <option value="15000|Nước Revive">Nước bù khoáng Revive - 15.000đ</option>
+              <option value="20000|Thuê Vợt Yonex">Thuê Vợt Yonex - 20.000đ</option>
+              <option value="180000|Ống cầu Hải Yến">Ống cầu lông Hải Yến - 180.000đ</option>
+            </select>
+            <input type="number" id="posQty" value="1" min="1" class="form-control" style="width: 70px; text-align: center;">
+            <button class="btn btn-primary" onclick="addPosItem()">Thêm</button>
+          </div>
+        </div>
+
+        <label class="form-label">Chi tiết Hóa Đơn</label>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px;">
+          <thead>
+            <tr>
+              <th style="padding: 8px; border-bottom: 1px solid var(--border-subtle); text-align: left; background: #f1f5f9;">Khoản mục</th>
+              <th style="padding: 8px; border-bottom: 1px solid var(--border-subtle); text-align: center; background: #f1f5f9;">SL</th>
+              <th style="padding: 8px; border-bottom: 1px solid var(--border-subtle); text-align: right; background: #f1f5f9;">Đơn giá</th>
+              <th style="padding: 8px; border-bottom: 1px solid var(--border-subtle); text-align: right; background: #f1f5f9;">Thành tiền</th>
+            </tr>
+          </thead>
+          <tbody id="invoiceBody"></tbody>
+        </table>
+
+        <div style="margin-top: 16px; border-top: 1px dashed var(--text-muted); padding-top: 12px; text-align: right; line-height: 1.8; font-size: 13px;">
+          <p>Cộng tiền hàng & sân: <span id="coSubtotal" style="display: inline-block; width: 100px; font-weight: bold;">0 đ</span></p>
+          <p>Trừ tiền cọc online: <span id="coDeposit" style="display: inline-block; width: 100px; color: #ef4444;">-0 đ</span></p>
+          <h3 style="font-size: 16px; margin-top: 8px; color: var(--text-dark);">TỔNG CẦN THU: <span id="coTotal" style="display: inline-block; width: 100px; color: var(--primary);">0 đ</span></h3>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeCheckoutModal()">Đóng</button>
+        <button class="btn btn-primary" onclick="submitCheckout()">Thanh toán & Trả sân</button>
       </div>
     </div>
   </div>
 
   <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById('appSidebar');
-      if (sidebar) {
-        sidebar.classList.toggle('collapsed');
+    let appData = {}; 
+    let currentBranch = 'CN01';
+    let currentDateStr = '';
+    let activeSlotCell = null; 
+    let posItems = [];         
+
+    const mockNames = ['Lê Bá Đạt', 'Trần Nam', 'Đoàn Thanh Niên', 'Vũ Quốc Cường', 'Nguyễn Hải', 'Nhóm IT UTE', 'CLB Tân Bình', 'Khách vãng lai', 'Chị Lan', 'Anh Hoàng Vũ'];
+    const mockPhones = ['0901234567', '0988777666', '0912345678', '0933444555', '0909888777'];
+    const timeSlots = ['06:00 - 07:00', '07:00 - 08:00', '08:00 - 09:00', '09:00 - 10:00', '17:00 - 18:00', '18:00 - 19:00', '19:00 - 20:00'];
+    const courtsList = ['Sân 01', 'Sân 02', 'Sân 03', 'Sân 04', 'Sân 05'];
+    const branchesList = ['CN01', 'CN02', 'CN03'];
+
+    // -----------------------------------------------------------------
+    // TÍNH NĂNG TÌM KIẾM QUÉT QUA TOÀN BỘ 3 CHI NHÁNH & CHỈ HIGHLIGHT SÂN ĐÃ CHỌN
+    // -----------------------------------------------------------------
+    
+    // Hàm phụ: Chỉ làm sáng đúng 1 ô Sân (Khác bị làm mờ)
+    function highlightExactSlot(targetCourt, targetTime) {
+      const slots = document.querySelectorAll('.slot-inner');
+      slots.forEach(slot => {
+        const c = slot.dataset.court;
+        const t = slot.dataset.time;
+        if (c === targetCourt && t === targetTime) {
+          slot.classList.remove('slot-dimmed');
+          slot.classList.add('slot-highlight');
+        } else {
+          slot.classList.add('slot-dimmed');
+          slot.classList.remove('slot-highlight');
+        }
+      });
+    }
+
+    // Hàm tra cứu chính
+    function handleSearch(exactCourt = null, exactTime = null) {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const dropdown = document.getElementById('searchResultsDropdown');
+      const resultList = document.getElementById('searchResultsList');
+      const slots = document.querySelectorAll('.slot-inner');
+
+      // 1. Highlight trên lưới trực tiếp đang xem
+      slots.forEach(slot => {
+        if (!query && !exactCourt) { 
+          slot.classList.remove('slot-dimmed', 'slot-highlight'); 
+          return; 
+        }
+        if (slot.classList.contains('state-available')) { 
+          slot.classList.add('slot-dimmed'); 
+          slot.classList.remove('slot-highlight'); 
+          return; 
+        }
+
+        if (exactCourt && exactTime) {
+          if (slot.dataset.court === exactCourt && slot.dataset.time === exactTime) {
+            slot.classList.remove('slot-dimmed');
+            slot.classList.add('slot-highlight');
+          } else {
+            slot.classList.add('slot-dimmed');
+            slot.classList.remove('slot-highlight');
+          }
+        } else {
+          const customer = (slot.dataset.customer || '').toLowerCase();
+          const phone = (slot.dataset.phone || '').toLowerCase();
+          if (customer.includes(query) || phone.includes(query)) {
+            slot.classList.remove('slot-dimmed');
+            slot.classList.add('slot-highlight');
+          } else {
+            slot.classList.add('slot-dimmed');
+            slot.classList.remove('slot-highlight');
+          }
+        }
+      });
+
+      // 2. Hiển thị Dropdown quét qua toàn bộ 3 Chi nhánh
+      if (!query || (exactCourt && exactTime)) {
+        dropdown.classList.remove('active');
+        return;
+      }
+
+      resultList.innerHTML = '';
+      let matchCount = 0;
+      
+      // Quét toàn bộ DB
+      for (let branch in appData) {
+        const branchData = appData[branch];
+        for(let date in branchData) {
+          for(let court in branchData[date]) {
+            for(let time in branchData[date][court]) {
+              const data = branchData[date][court][time];
+              if(data.state !== 'available') {
+                const cName = (data.customer || '').toLowerCase();
+                const cPhone = (data.phone || '').toLowerCase();
+                
+                if(cName.includes(query) || cPhone.includes(query)) {
+                  matchCount++;
+                  
+                  let statusHtml = '';
+                  if(data.state === 'in-use') statusHtml = '<span class="slot-badge-status badge-in-use">Đang chơi</span>';
+                  else if(data.state === 'booked') statusHtml = '<span class="slot-badge-status badge-booked">Đã đặt cọc</span>';
+                  else statusHtml = '<span class="slot-badge-status" style="background:#e2e8f0; color:#475569">Đã thanh toán</span>';
+
+                  const [y,m,d] = date.split('-');
+                  const displayDate = `${d}/${m}/${y}`;
+                  
+                  // Chuyển mã chi nhánh sang Tên dễ đọc
+                  let branchNameDisplay = branch === 'CN01' ? 'CN 1 (Thủ Đức)' : (branch === 'CN02' ? 'CN 2 (Quận 9)' : 'CN 3 (Bình Thạnh)');
+
+                  const li = document.createElement('li');
+                  li.className = 'search-result-item';
+                  li.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <div>
+                        <div class="sri-name">${data.customer} <span class="sri-phone">(${data.phone})</span></div>
+                        <div class="sri-details">
+                          <span>🏢 ${branchNameDisplay}</span>
+                          <span>📅 ${displayDate}</span>
+                          <span>🏸 ${court}</span>
+                          <span>⏰ ${time}</span>
+                        </div>
+                      </div>
+                      <div>${statusHtml}</div>
+                    </div>
+                  `;
+                  
+                  // Khi người dùng bấm vào 1 kết quả
+                  li.onclick = () => {
+                    // Đặt lại Tên vào ô Search để UI đẹp
+                    document.getElementById('searchInput').value = data.customer;
+                    // Tự động chuyển Select Chi nhánh
+                    document.getElementById('branchFilter').value = branch;
+                    currentBranch = branch;
+                    // Tự động chuyển Input Ngày
+                    document.getElementById('gridDateInput').value = date;
+                    
+                    // Vẽ lại toàn bộ lưới theo Chi Nhánh & Ngày mới
+                    renderGridForDate(date);
+                    
+                    // Ẩn Menu thả xuống
+                    dropdown.classList.remove('active');
+                    
+                    // Gọi hàm chỉ làm sáng ĐÚNG 1 Ô DUY NHẤT mà ta vừa bấm
+                    highlightExactSlot(court, time);
+                  };
+                  
+                  resultList.appendChild(li);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      if(matchCount === 0) {
+        resultList.innerHTML = '<li style="padding: 14px; text-align: center; color: var(--text-muted); font-size: 13px;">Không tìm thấy lịch đặt nào!</li>';
+      }
+      dropdown.classList.add('active');
+    }
+
+    // Đóng dropdown khi click ra ngoài
+    document.addEventListener('click', function(event) {
+      const container = document.getElementById('searchContainer');
+      if (container && !container.contains(event.target)) {
+        document.getElementById('searchResultsDropdown').classList.remove('active');
+      }
+    });
+
+    // ----------------------------------------------------
+    // CÁC CHỨC NĂNG CƠ BẢN (KHỞI TẠO, ĐIỀU HƯỚNG, POS)
+    // ----------------------------------------------------
+
+    function formatDate(dateObj) {
+      const yyyy = dateObj.getFullYear();
+      const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const dd = String(dateObj.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function initAppData() {
+      if (Object.keys(appData).length > 0) return;
+
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      
+      for(let i = -2; i <= 7; i++) {
+        let d = new Date(today);
+        d.setDate(d.getDate() + i);
+        let dateStr = formatDate(d);
+
+        branchesList.forEach(branch => {
+          if(!appData[branch]) appData[branch] = {};
+          if(!appData[branch][dateStr]) appData[branch][dateStr] = {};
+
+          courtsList.forEach(court => {
+            appData[branch][dateStr][court] = {};
+            let price = (court === 'Sân 01') ? 120000 : 80000;
+            let hasInUse = false;
+
+            timeSlots.forEach(time => {
+              let rand = Math.random();
+              let state = 'available';
+              let customer = '', phone = '';
+
+              if (i < 0) { 
+                state = rand > 0.4 ? 'booked' : 'available';
+              } else if (i > 0) { 
+                state = rand > 0.8 ? 'booked' : 'available';
+              } else { 
+                if (!hasInUse && rand < 0.2) {
+                  state = 'in-use';
+                  hasInUse = true; 
+                } else if (rand < 0.6) {
+                  state = 'booked';
+                }
+              }
+
+              if (state !== 'available') {
+                customer = mockNames[Math.floor(Math.random() * mockNames.length)];
+                phone = mockPhones[Math.floor(Math.random() * mockPhones.length)];
+              }
+
+              appData[branch][dateStr][court][time] = {
+                state: state, customer: customer, phone: phone, price: price, deposit: price * 0.3
+              };
+            });
+          });
+        });
       }
     }
 
-    function quickBookSlot(courtName, startTime, endTime, pricePerHour) {
-      const modal = document.getElementById('createBookingModal');
+    function handleLogin() {
+      const user = document.getElementById('loginUsername').value.trim();
+      const pass = document.getElementById('loginPassword').value;
+
+      if ((user === 'thanhtam1710' || user === 'phucbao2006') && pass === '12345678') {
+        document.getElementById('loginScreen').classList.add('hidden');
+        
+        const displayName = user === 'thanhtam1710' ? 'Nguyễn Thanh Tâm' : 'Trần Phúc Bảo';
+        const displayAvatar = user === 'thanhtam1710' ? 'TT' : 'PB';
+        document.getElementById('sidebarName').textContent = displayName;
+        document.getElementById('sidebarAvatar').textContent = displayAvatar;
+
+        initAppData();
+        goToToday();
+      } else {
+        alert('Sai tài khoản hoặc mật khẩu! Vui lòng thử lại.');
+      }
+    }
+
+    document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') handleLogin();
+    });
+
+    function updateDataStore(court, time, updateObj) {
+      if (!appData[currentBranch][currentDateStr][court]) appData[currentBranch][currentDateStr][court] = {};
+      if (!appData[currentBranch][currentDateStr][court][time]) appData[currentBranch][currentDateStr][court][time] = { price: (court === 'Sân 01' ? 120000 : 80000) };
+      Object.assign(appData[currentBranch][currentDateStr][court][time], updateObj);
+    }
+
+    function renderGridForDate(dateStr) {
+      currentDateStr = dateStr;
+      currentBranch = document.getElementById('branchFilter').value;
+      const tbody = document.getElementById('matrixGridBody');
+      tbody.innerHTML = ''; 
+      
+      let gridState = (appData[currentBranch] && appData[currentBranch][dateStr]) ? appData[currentBranch][dateStr] : null;
+
+      courtsList.forEach(court => {
+        const isVip = court === 'Sân 01';
+        const defaultPrice = isVip ? 120000 : 80000;
+        
+        let rowHtml = `
+          <tr>
+            <td class="matrix-td-court">
+              <div class="court-info">
+                <span class="court-name">${court}</span>
+                <span class="court-type">${isVip ? 'VIP - Thảm Yonex' : 'Thường - Thảm Yonex'}</span>
+              </div>
+            </td>`;
+
+        timeSlots.forEach(timeObj => {
+          const [startTime, endTime] = timeObj.split(' - ');
+          let cellData = gridState ? gridState[court][timeObj] : { state: 'available', price: defaultPrice, customer: '', phone: '', deposit: 0 };
+          
+          rowHtml += `<td class="matrix-slot-cell">`;
+          if (cellData.state === 'available') {
+            rowHtml += `
+              <div class="slot-inner state-available" data-court="${court}" data-time="${timeObj}" onclick="quickBookSlot(this, '${court}', '${startTime}', '${endTime}', ${cellData.price})">
+                <div class="slot-action"><svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span>Đặt</span></div>
+                <span class="slot-price">${cellData.price.toLocaleString('vi-VN')} đ</span>
+              </div>`;
+          } else if (cellData.state === 'booked') {
+            rowHtml += `
+              <div class="slot-inner state-booked" data-price="${cellData.price}" data-deposit="${cellData.deposit}" data-customer="${cellData.customer}" data-phone="${cellData.phone}" data-court="${court}" data-time="${timeObj}" onclick="openDetailModal(this, 'BK-10X', '${court}', '${timeObj}', '${cellData.customer}', '${cellData.phone}', 'Đã cọc 30%', ${cellData.price}, ${cellData.deposit})">
+                <span class="slot-title">${cellData.customer}</span><span class="slot-badge-status badge-booked">Đã cọc 30%</span>
+              </div>`;
+          } else if (cellData.state === 'in-use') {
+            rowHtml += `
+              <div class="slot-inner state-in-use" data-price="${cellData.price}" data-deposit="${cellData.deposit}" data-customer="${cellData.customer}" data-phone="${cellData.phone}" data-court="${court}" data-time="${timeObj}" onclick="openCheckoutModal(this)">
+                <span class="slot-title">${cellData.customer}</span><span class="slot-badge-status badge-in-use">Đang chơi</span>
+              </div>`;
+          }
+          rowHtml += `</td>`;
+        });
+        rowHtml += `</tr>`;
+        tbody.innerHTML += rowHtml;
+      });
+
+      // Nếu đang trong chế độ tìm kiếm, render xong phải đánh dấu lại
+      handleSearch();
+    }
+
+    function goToToday() {
+      const dateInput = document.getElementById('gridDateInput');
+      if (dateInput) {
+        dateInput.value = formatDate(new Date());
+        renderGridForDate(dateInput.value);
+        document.getElementById('searchInput').value = '';
+        handleSearch();
+      }
+    }
+
+    function changeBranch() {
+      renderGridForDate(document.getElementById('gridDateInput').value);
+      document.getElementById('searchInput').value = '';
+      handleSearch();
+    }
+
+    function shiftDate(offset) {
+      const dateInput = document.getElementById('gridDateInput');
+      if (!dateInput) return;
+      const curDate = new Date(dateInput.value);
+      if (isNaN(curDate)) return;
+      curDate.setDate(curDate.getDate() + offset);
+      
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const minDate = new Date(today); minDate.setDate(today.getDate() - 2);
+      const maxDate = new Date(today); maxDate.setDate(today.getDate() + 7);
+
+      if(curDate < minDate) { alert('Hệ thống chỉ lưu trữ dữ liệu từ 2 ngày trước!'); return; }
+      if(curDate > maxDate) { alert('Hệ thống chỉ hỗ trợ đặt lịch trước tối đa 7 ngày!'); return; }
+      
+      dateInput.value = formatDate(curDate);
+      renderGridForDate(dateInput.value);
+      document.getElementById('searchInput').value = '';
+      handleSearch();
+    }
+
+    document.getElementById('gridDateInput').addEventListener('change', function(e) {
+      renderGridForDate(e.target.value);
+      document.getElementById('searchInput').value = '';
+      handleSearch();
+    });
+
+    function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('collapsed'); }
+
+    function quickBookSlot(element, courtName, startTime, endTime, pricePerHour) {
+      activeSlotCell = element; 
+      activeSlotCell.dataset.court = courtName;
+      activeSlotCell.dataset.time = `${startTime} - ${endTime}`;
+
       const courtSelect = document.getElementById('bookingCourtSelect');
       const startSelect = document.getElementById('bookingStartTime');
       const endSelect = document.getElementById('bookingEndTime');
-      
       if (courtSelect) {
         for (let i = 0; i < courtSelect.options.length; i++) {
-          if (courtSelect.options[i].value === courtName) {
-            courtSelect.selectedIndex = i;
-            break;
-          }
+          if (courtSelect.options[i].value === courtName) { courtSelect.selectedIndex = i; break; }
         }
       }
       if (startSelect) startSelect.value = startTime;
       if (endSelect) endSelect.value = endTime;
 
       recalculatePrice();
-      if (modal) modal.classList.add('active');
+      document.getElementById('createBookingModal').classList.add('active');
     }
 
     function openCreateBookingModal() {
-      const modal = document.getElementById('createBookingModal');
-      recalculatePrice();
-      if (modal) modal.classList.add('active');
-    }
-
-    function closeCreateBookingModal() {
-      const modal = document.getElementById('createBookingModal');
-      if (modal) modal.classList.remove('active');
+      activeSlotCell = null; 
+      document.getElementById('bookingCustName').value=''; 
+      document.getElementById('bookingCustPhone').value=''; 
+      document.getElementById('createBookingModal').classList.add('active');
     }
 
     function recalculatePrice() {
       const courtSelect = document.getElementById('bookingCourtSelect');
       const startSelect = document.getElementById('bookingStartTime');
       const endSelect = document.getElementById('bookingEndTime');
-      
-      const totalDisplay = document.getElementById('displayTotalRental');
-      const depositDisplay = document.getElementById('displayDepositRequired');
-
       if (!courtSelect || !startSelect || !endSelect) return;
 
-      const opt = courtSelect.options[courtSelect.selectedIndex];
-      const rate = parseInt(opt.getAttribute('data-price') || '80000', 10);
-
-      const startH = parseInt(startSelect.value.split(':')[0], 10);
-      const endH = parseInt(endSelect.value.split(':')[0], 10);
-
-      let duration = endH - startH;
-      if (duration <= 0) duration = 1;
-
-      const total = rate * duration;
+      const selected = courtSelect.options[courtSelect.selectedIndex];
+      const rate = Number(selected.getAttribute('data-price') || 120000);
+      const duration = Number(endSelect.value.split(':')[0]) - Number(startSelect.value.split(':')[0]);
+      
+      const total = rate * (duration > 0 ? duration : 1);
       const deposit = Math.round(total * 0.3);
 
-      if (totalDisplay) totalDisplay.textContent = total.toLocaleString('vi-VN') + ' đ';
-      if (depositDisplay) depositDisplay.textContent = deposit.toLocaleString('vi-VN') + ' đ';
+      document.getElementById('displayTotalRental').textContent = total.toLocaleString('vi-VN') + ' đ';
+      document.getElementById('displayDepositRequired').textContent = deposit.toLocaleString('vi-VN') + ' đ';
     }
 
     function submitBookingForm() {
       const name = document.getElementById('bookingCustName').value.trim();
       const phone = document.getElementById('bookingCustPhone').value.trim();
-      if (!name || !phone) {
-        alert('Vui lòng nhập họ tên và số điện thoại khách hàng.');
-        return;
+      if (!name || !phone) return alert('Vui lòng nhập họ tên và số điện thoại.');
+
+      if (activeSlotCell) {
+        const court = activeSlotCell.dataset.court;
+        const timeObj = activeSlotCell.dataset.time;
+        const total = document.getElementById('displayTotalRental').textContent.replace(/\D/g,'');
+        const deposit = document.getElementById('displayDepositRequired').textContent.replace(/\D/g,'');
+
+        updateDataStore(court, timeObj, {
+            state: 'booked', customer: name, phone: phone, price: Number(total), deposit: Number(deposit)
+        });
+        
+        renderGridForDate(currentDateStr);
+      } else {
+        alert('Đã tạo đơn đặt sân thành công (Khách: ' + name + ')');
       }
       closeCreateBookingModal();
-      alert('Đã tạo đơn đặt sân thành công!');
     }
 
-    function openDetailModal(code, court, time, customer, phone, status, price) {
-      const modal = document.getElementById('detailBookingModal');
-      document.getElementById('detailBookingCode').textContent = code;
+    function openDetailModal(element, code, court, time, customer, phone, status, price, deposit = 0) {
+      activeSlotCell = element;
+      activeSlotCell.dataset.price = price;
+      activeSlotCell.dataset.deposit = deposit || Math.round(price * 0.3);
+      activeSlotCell.dataset.customer = customer;
+      activeSlotCell.dataset.phone = phone;
+      activeSlotCell.dataset.court = court;
+      activeSlotCell.dataset.time = time;
+
       document.getElementById('detailCourt').textContent = court;
       document.getElementById('detailTime').textContent = time;
       document.getElementById('detailCustomer').textContent = customer;
       document.getElementById('detailPhone').textContent = phone;
-      document.getElementById('detailPrice').textContent = price;
-
-      const badge = document.getElementById('detailStatusBadge');
-      badge.textContent = status;
-      badge.className = 'slot-badge-status ' + (status.includes('chơi') || status.includes('nhận') ? 'badge-in-use' : (status.includes('cọc 0') ? 'badge-holding' : 'badge-booked'));
-
-      if (modal) modal.classList.add('active');
-    }
-
-    function closeDetailModal() {
-      const modal = document.getElementById('detailBookingModal');
-      if (modal) modal.classList.remove('active');
+      document.getElementById('detailStatusBadge').textContent = status;
+      document.getElementById('detailBookingModal').classList.add('active');
     }
 
     function checkInBooking() {
-      alert('Đã xác nhận nhận sân (Check-in) thành công!');
+      if (activeSlotCell) {
+        const court = activeSlotCell.dataset.court;
+        const timeObj = activeSlotCell.dataset.time;
+        
+        updateDataStore(court, timeObj, { state: 'in-use' });
+        renderGridForDate(currentDateStr);
+      }
       closeDetailModal();
     }
 
-    function cancelBooking() {
-      if (confirm('Bạn có chắc chắn muốn hủy phiếu đặt này không?')) {
-        alert('Đã hủy phiếu đặt sân.');
-        closeDetailModal();
+    function openCheckoutModal(element) {
+      activeSlotCell = element;
+      currentBasePrice = Number(activeSlotCell.dataset.price) || 120000;
+      currentDeposit = Number(activeSlotCell.dataset.deposit) || 36000;
+      posItems = []; 
+      
+      renderInvoice();
+      document.getElementById('checkoutModal').classList.add('active');
+    }
+
+    function addPosItem() {
+      const select = document.getElementById('posItemSelect').value;
+      const qty = parseInt(document.getElementById('posQty').value);
+      const [priceStr, name] = select.split('|');
+      const price = parseInt(priceStr);
+
+      const existingItem = posItems.find(i => i.name === name);
+      if (existingItem) existingItem.qty += qty;
+      else posItems.push({ name, price, qty });
+      
+      document.getElementById('posQty').value = 1;
+      renderInvoice();
+    }
+
+    function renderInvoice() {
+      const tbody = document.getElementById('invoiceBody');
+      tbody.innerHTML = '';
+      let subtotal = 0;
+
+      tbody.innerHTML += `
+        <tr>
+          <td>Tiền thuê sân (${activeSlotCell?.dataset?.time || '1 giờ'})</td>
+          <td style="text-align: center;">1</td>
+          <td style="text-align: right;">${currentBasePrice.toLocaleString('vi-VN')} đ</td>
+          <td style="text-align: right; font-weight: bold;">${currentBasePrice.toLocaleString('vi-VN')} đ</td>
+        </tr>
+      `;
+      subtotal += currentBasePrice;
+
+      posItems.forEach(item => {
+        const lineTotal = item.price * item.qty;
+        subtotal += lineTotal;
+        tbody.innerHTML += `
+          <tr>
+            <td>${item.name}</td>
+            <td style="text-align: center;">${item.qty}</td>
+            <td style="text-align: right;">${item.price.toLocaleString('vi-VN')} đ</td>
+            <td style="text-align: right; font-weight: bold;">${lineTotal.toLocaleString('vi-VN')} đ</td>
+          </tr>
+        `;
+      });
+
+      const finalTotal = subtotal - currentDeposit;
+      document.getElementById('coSubtotal').innerText = subtotal.toLocaleString('vi-VN') + ' đ';
+      document.getElementById('coDeposit').innerText = '- ' + currentDeposit.toLocaleString('vi-VN') + ' đ';
+      document.getElementById('coTotal').innerText = Math.max(0, finalTotal).toLocaleString('vi-VN') + ' đ';
+    }
+
+    function submitCheckout() {
+      alert("Đã xuất Hóa đơn và thanh toán thành công!");
+      if(activeSlotCell) {
+        const court = activeSlotCell.dataset.court;
+        const timeObj = activeSlotCell.dataset.time;
+        
+        updateDataStore(court, timeObj, { 
+            state: 'available', customer: '', phone: '', deposit: 0 
+        });
+        renderGridForDate(currentDateStr);
       }
+      closeCheckoutModal();
     }
 
-    function shiftDate(offset) {
-      const dateInput = document.getElementById('gridDateInput');
-      if (!dateInput) return;
-      const cur = new Date(dateInput.value || '2026-09-19');
-      cur.setDate(cur.getDate() + offset);
-      dateInput.value = cur.toISOString().split('T')[0];
-    }
-
-    function goToToday() {
-      const dateInput = document.getElementById('gridDateInput');
-      if (dateInput) dateInput.value = '2026-09-19';
-    }
-
-    function onDateChange() {}
-    function onCustomerTypeChange() {}
+    function closeCreateBookingModal() { document.getElementById('createBookingModal').classList.remove('active'); }
+    function closeDetailModal() { document.getElementById('detailBookingModal').classList.remove('active'); }
+    function closeCheckoutModal() { document.getElementById('checkoutModal').classList.remove('active'); }
   </script>
 </body>
 </html>
