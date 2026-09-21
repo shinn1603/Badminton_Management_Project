@@ -6,6 +6,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class DashboardController {
 
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
+    @GetMapping({"/customer/home", "/customer"})
+    public String customerHome() {
+        return "customer/home";
+    }
+
+
     @GetMapping({"/", "/director/dashboard"})
     public String directorDashboard() {
         return "director/dashboard";
