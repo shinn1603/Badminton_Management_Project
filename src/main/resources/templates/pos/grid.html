@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sơ đồ & Lưới đặt sân theo giờ - UTE Sport</title>
   <style>
-    /* BẮT ĐẦU: GIỮ NGUYÊN 100% CSS CỦA NHÓM */
     :root {
       --primary: #16a34a; --primary-dark: #15803d; --accent: #f59e0b;
       --bg-page: #f8fafc; --bg-card: #ffffff; --text-dark: #1e293b;
@@ -259,7 +258,8 @@
             <div class="legend-item"><span class="legend-indicator legend-holding"></span><span>Giữ chỗ</span></div>
             <div class="legend-item"><span class="legend-indicator legend-booked"></span><span>Đã cọc</span></div>
             <div class="legend-item"><span class="legend-indicator legend-in-use"></span><span>Đang chơi</span></div>
-            <div class="legend-item"><span class="legend-indicator legend-maintenance"></span><span>Bảo dưỡng</span></div>
+            <div class="legend-item"><span class="legend-indicator" style="background: #475569;"></span><span>Đã thanh toán</span></div>
+            <div class="legend-item"><span class="legend-indicator legend-maintenance"></span><span>Không được sử dụng</span></div>
           </div>
         </div>
 
@@ -412,7 +412,7 @@
     </div>
   </div>
 
-  <script>
+<script>
     let appData = {}; 
     let currentBranch = 'CN01';
     let currentDateStr = '';
@@ -425,11 +425,217 @@
     const courtsList = ['Sân 01', 'Sân 02', 'Sân 03', 'Sân 04', 'Sân 05'];
     const branchesList = ['CN01', 'CN02', 'CN03'];
 
-    // -----------------------------------------------------------------
-    // TÍNH NĂNG TÌM KIẾM QUÉT QUA TOÀN BỘ 3 CHI NHÁNH & CHỈ HIGHLIGHT SÂN ĐÃ CHỌN
-    // -----------------------------------------------------------------
-    
-    // Hàm phụ: Chỉ làm sáng đúng 1 ô Sân (Khác bị làm mờ)
+    function formatDate(dateObj) {
+      const yyyy = dateObj.getFullYear();
+      const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const dd = String(dateObj.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    // HÀM MỚI: Tự động khởi tạo dữ liệu logic cho BẤT KỲ ngày nào được truy cập
+    function ensureDataForDate(dateStr) {
+      const todayStr = formatDate(new Date());
+
+      branchesList.forEach(branch => {
+        if (!appData[branch]) appData[branch] = {};
+        if (!appData[branch][dateStr]) {
+          appData[branch][dateStr] = {};
+          
+          courtsList.forEach(court => {
+            appData[branch][dateStr][court] = {};
+            let price = (court === 'Sân 01') ? 120000 : 80000;
+            let hasInUse = false;
+
+            timeSlots.forEach(time => {
+              let rand = Math.random();
+              let state = 'available';
+              let customer = '', phone = '';
+
+              // LOGIC THỜI GIAN THỰC TẾ
+              if (dateStr < todayStr) {
+                  // Quá khứ: Chỉ có Đã thanh toán hoặc Trống (Không có đang chơi / đã cọc)
+                  state = rand > 0.6 ? 'completed' : 'available';
+              } else if (dateStr === todayStr) {
+                  // Hôm nay: Có thể Đang chơi, Đã cọc hoặc Trống
+                  if (!hasInUse && rand < 0.15) {
+                      state = 'in-use';
+                      hasInUse = true;
+                  } else if (rand < 0.4) {
+                      state = 'booked';
+                  }
+              } else {
+                  // Tương lai: Chỉ có Đã cọc hoặc Trống
+                  state = rand > 0.7 ? 'booked' : 'available';
+              }
+
+              if (state !== 'available') {
+                  customer = mockNames[Math.floor(Math.random() * mockNames.length)];
+                  phone = mockPhones[Math.floor(Math.random() * mockPhones.length)];
+              }
+
+              appData[branch][dateStr][court][time] = {
+                  state: state, customer: customer, phone: phone, price: price, deposit: price * 0.3, posItems: []
+              };
+            });
+          });
+        }
+      });
+    }
+
+    function initAppData() {
+      if (appData['CN01'] && Object.keys(appData['CN01']).length > 0) return;
+      
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      
+      // Khởi tạo sẵn một khoản thời gian (-30 đến +30 ngày) để Thanh tìm kiếm có thể quét ra lịch sử
+      for(let i = -30; i <= 30; i++) {
+        let d = new Date(today);
+        d.setDate(d.getDate() + i);
+        ensureDataForDate(formatDate(d));
+      }
+    }
+
+    function updateDataStore(court, time, updateObj) {
+      if (!appData[currentBranch][currentDateStr][court]) appData[currentBranch][currentDateStr][court] = {};
+      if (!appData[currentBranch][currentDateStr][court][time]) appData[currentBranch][currentDateStr][court][time] = { price: (court === 'Sân 01' ? 120000 : 80000) };
+      Object.assign(appData[currentBranch][currentDateStr][court][time], updateObj);
+    }
+
+    function renderGridForDate(dateStr) {
+      ensureDataForDate(dateStr); 
+      currentDateStr = dateStr;
+      currentBranch = document.getElementById('branchFilter').value;
+      const tbody = document.getElementById('matrixGridBody');
+      tbody.innerHTML = ''; 
+      
+      let gridState = appData[currentBranch][dateStr];
+      const todayStr = formatDate(new Date()); // Lấy ngày hôm nay để so sánh
+
+      courtsList.forEach(court => {
+        const isVip = court === 'Sân 01';
+        const defaultPrice = isVip ? 120000 : 80000;
+        
+        let rowHtml = `
+          <tr>
+            <td class="matrix-td-court">
+              <div class="court-info">
+                <span class="court-name">${court}</span>
+                <span class="court-type">${isVip ? 'VIP - Thảm Yonex' : 'Thường - Thảm Yonex'}</span>
+              </div>
+            </td>`;
+
+        timeSlots.forEach(timeObj => {
+          const [startTime, endTime] = timeObj.split(' - ');
+          let cellData = gridState[court][timeObj];
+          
+          rowHtml += `<td class="matrix-slot-cell">`;
+          if (cellData.state === 'available') {
+            // NẾU LÀ NGÀY QUÁ KHỨ -> Ô trống bị vô hiệu hóa (Chìm hẳn vào nền)
+            if (dateStr < todayStr) {
+                rowHtml += `
+                  <div class="slot-inner" style="background-color: #f8fafc; border: 1px dashed #e2e8f0; color: #cbd5e1; cursor: not-allowed;" onclick="alert('Không thể đặt sân cho các ngày trong quá khứ!')">
+                    <span class="slot-title" style="font-weight: 500;">Sân trống</span>
+                  </div>`;
+            } else {
+                // NẾU LÀ TƯƠNG LAI HOẶC HÔM NAY -> Hiện màu xanh lá để mời đặt sân
+                rowHtml += `
+                  <div class="slot-inner state-available" data-court="${court}" data-time="${timeObj}" onclick="quickBookSlot(this, '${court}', '${startTime}', '${endTime}', ${cellData.price})">
+                    <div class="slot-action"><svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span>Đặt</span></div>
+                    <span class="slot-price">${cellData.price.toLocaleString('vi-VN')} đ</span>
+                  </div>`;
+            }
+          } else if (cellData.state === 'booked') {
+            rowHtml += `
+              <div class="slot-inner state-booked" data-price="${cellData.price}" data-deposit="${cellData.deposit}" data-customer="${cellData.customer}" data-phone="${cellData.phone}" data-court="${court}" data-time="${timeObj}" onclick="openDetailModal(this, 'BK-10X', '${court}', '${timeObj}', '${cellData.customer}', '${cellData.phone}', 'Đã cọc 30%', ${cellData.price}, ${cellData.deposit})">
+                <span class="slot-title">${cellData.customer}</span><span class="slot-badge-status badge-booked">Đã cọc 30%</span>
+              </div>`;
+          } else if (cellData.state === 'in-use') {
+            rowHtml += `
+              <div class="slot-inner state-in-use" data-price="${cellData.price}" data-deposit="${cellData.deposit}" data-customer="${cellData.customer}" data-phone="${cellData.phone}" data-court="${court}" data-time="${timeObj}" onclick="openCheckoutModal(this)">
+                <span class="slot-title">${cellData.customer}</span><span class="slot-badge-status badge-in-use">Đang chơi</span>
+              </div>`;
+          } else if (cellData.state === 'completed') {
+            // UI MỚI CHO TRẠNG THÁI ĐÃ THANH TOÁN: Nền xám tro, viền liền cứng cáp, badge nổi bật
+            rowHtml += `
+              <div class="slot-inner" style="background-color: #e2e8f0; border: 1px solid #94a3b8; color: #0f172a;" data-court="${court}" data-time="${timeObj}">
+                <span class="slot-title" style="font-weight: 700;">${cellData.customer}</span>
+                <span class="slot-badge-status" style="background-color: #475569; color: #ffffff;">Đã thanh toán</span>
+              </div>`;
+          }
+          rowHtml += `</td>`;
+        });
+        rowHtml += `</tr>`;
+        tbody.innerHTML += rowHtml;
+      });
+
+      handleSearch();
+    }
+
+    // Đã gỡ bỏ toàn bộ giới hạn (-2 ngày / +7 ngày)
+    function shiftDate(offset) {
+      const dateInput = document.getElementById('gridDateInput');
+      if (!dateInput) return;
+      const curDate = new Date(dateInput.value);
+      if (isNaN(curDate)) return;
+      curDate.setDate(curDate.getDate() + offset);
+      
+      dateInput.value = formatDate(curDate);
+      renderGridForDate(dateInput.value);
+      document.getElementById('searchInput').value = '';
+      handleSearch();
+    }
+
+    function goToToday() {
+      const dateInput = document.getElementById('gridDateInput');
+      if (dateInput) {
+        dateInput.value = formatDate(new Date());
+        renderGridForDate(dateInput.value);
+        document.getElementById('searchInput').value = '';
+        handleSearch();
+      }
+    }
+
+    function changeBranch() {
+      renderGridForDate(document.getElementById('gridDateInput').value);
+      document.getElementById('searchInput').value = '';
+      handleSearch();
+    }
+
+    document.getElementById('gridDateInput').addEventListener('change', function(e) {
+      renderGridForDate(e.target.value);
+      document.getElementById('searchInput').value = '';
+      handleSearch();
+    });
+
+    function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('collapsed'); }
+
+    function handleLogin() {
+      const user = document.getElementById('loginUsername').value.trim();
+      const pass = document.getElementById('loginPassword').value;
+
+      if ((user === 'thanhtam1710' || user === 'phucbao2006') && pass === '12345678') {
+        document.getElementById('loginScreen').classList.add('hidden');
+        
+        const displayName = user === 'thanhtam1710' ? 'Nguyễn Thanh Tâm' : 'Trần Phúc Bảo';
+        const displayAvatar = user === 'thanhtam1710' ? 'TT' : 'PB';
+        document.getElementById('sidebarName').textContent = displayName;
+        document.getElementById('sidebarAvatar').textContent = displayAvatar;
+
+        initAppData();
+        goToToday();
+      } else {
+        alert('Sai tài khoản hoặc mật khẩu! Vui lòng thử lại.');
+      }
+    }
+
+    document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') handleLogin();
+    });
+
+    // ----------------------------------------------------
+    // SEARCH & HIGHLIGHT
+    // ----------------------------------------------------
     function highlightExactSlot(targetCourt, targetTime) {
       const slots = document.querySelectorAll('.slot-inner');
       slots.forEach(slot => {
@@ -445,14 +651,12 @@
       });
     }
 
-    // Hàm tra cứu chính
     function handleSearch(exactCourt = null, exactTime = null) {
       const query = document.getElementById('searchInput').value.toLowerCase().trim();
       const dropdown = document.getElementById('searchResultsDropdown');
       const resultList = document.getElementById('searchResultsList');
       const slots = document.querySelectorAll('.slot-inner');
 
-      // 1. Highlight trên lưới trực tiếp đang xem
       slots.forEach(slot => {
         if (!query && !exactCourt) { 
           slot.classList.remove('slot-dimmed', 'slot-highlight'); 
@@ -485,7 +689,6 @@
         }
       });
 
-      // 2. Hiển thị Dropdown quét qua toàn bộ 3 Chi nhánh
       if (!query || (exactCourt && exactTime)) {
         dropdown.classList.remove('active');
         return;
@@ -494,7 +697,6 @@
       resultList.innerHTML = '';
       let matchCount = 0;
       
-      // Quét toàn bộ DB
       for (let branch in appData) {
         const branchData = appData[branch];
         for(let date in branchData) {
@@ -515,8 +717,6 @@
 
                   const [y,m,d] = date.split('-');
                   const displayDate = `${d}/${m}/${y}`;
-                  
-                  // Chuyển mã chi nhánh sang Tên dễ đọc
                   let branchNameDisplay = branch === 'CN01' ? 'CN 1 (Thủ Đức)' : (branch === 'CN02' ? 'CN 2 (Quận 9)' : 'CN 3 (Bình Thạnh)');
 
                   const li = document.createElement('li');
@@ -536,26 +736,16 @@
                     </div>
                   `;
                   
-                  // Khi người dùng bấm vào 1 kết quả
                   li.onclick = () => {
-                    // Đặt lại Tên vào ô Search để UI đẹp
                     document.getElementById('searchInput').value = data.customer;
-                    // Tự động chuyển Select Chi nhánh
                     document.getElementById('branchFilter').value = branch;
                     currentBranch = branch;
-                    // Tự động chuyển Input Ngày
                     document.getElementById('gridDateInput').value = date;
                     
-                    // Vẽ lại toàn bộ lưới theo Chi Nhánh & Ngày mới
                     renderGridForDate(date);
-                    
-                    // Ẩn Menu thả xuống
                     dropdown.classList.remove('active');
-                    
-                    // Gọi hàm chỉ làm sáng ĐÚNG 1 Ô DUY NHẤT mà ta vừa bấm
                     highlightExactSlot(court, time);
                   };
-                  
                   resultList.appendChild(li);
                 }
               }
@@ -570,7 +760,6 @@
       dropdown.classList.add('active');
     }
 
-    // Đóng dropdown khi click ra ngoài
     document.addEventListener('click', function(event) {
       const container = document.getElementById('searchContainer');
       if (container && !container.contains(event.target)) {
@@ -579,195 +768,8 @@
     });
 
     // ----------------------------------------------------
-    // CÁC CHỨC NĂNG CƠ BẢN (KHỞI TẠO, ĐIỀU HƯỚNG, POS)
+    // NGHIỆP VỤ POS & ĐẶT SÂN
     // ----------------------------------------------------
-
-    function formatDate(dateObj) {
-      const yyyy = dateObj.getFullYear();
-      const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const dd = String(dateObj.getDate()).padStart(2, '0');
-      return `${yyyy}-${mm}-${dd}`;
-    }
-
-    function initAppData() {
-      if (Object.keys(appData).length > 0) return;
-
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      
-      for(let i = -2; i <= 7; i++) {
-        let d = new Date(today);
-        d.setDate(d.getDate() + i);
-        let dateStr = formatDate(d);
-
-        branchesList.forEach(branch => {
-          if(!appData[branch]) appData[branch] = {};
-          if(!appData[branch][dateStr]) appData[branch][dateStr] = {};
-
-          courtsList.forEach(court => {
-            appData[branch][dateStr][court] = {};
-            let price = (court === 'Sân 01') ? 120000 : 80000;
-            let hasInUse = false;
-
-            timeSlots.forEach(time => {
-              let rand = Math.random();
-              let state = 'available';
-              let customer = '', phone = '';
-
-              if (i < 0) { 
-                state = rand > 0.4 ? 'booked' : 'available';
-              } else if (i > 0) { 
-                state = rand > 0.8 ? 'booked' : 'available';
-              } else { 
-                if (!hasInUse && rand < 0.2) {
-                  state = 'in-use';
-                  hasInUse = true; 
-                } else if (rand < 0.6) {
-                  state = 'booked';
-                }
-              }
-
-              if (state !== 'available') {
-                customer = mockNames[Math.floor(Math.random() * mockNames.length)];
-                phone = mockPhones[Math.floor(Math.random() * mockPhones.length)];
-              }
-
-              appData[branch][dateStr][court][time] = {
-                state: state, customer: customer, phone: phone, price: price, deposit: price * 0.3
-              };
-            });
-          });
-        });
-      }
-    }
-
-    function handleLogin() {
-      const user = document.getElementById('loginUsername').value.trim();
-      const pass = document.getElementById('loginPassword').value;
-
-      if ((user === 'thanhtam1710' || user === 'phucbao2006') && pass === '12345678') {
-        document.getElementById('loginScreen').classList.add('hidden');
-        
-        const displayName = user === 'thanhtam1710' ? 'Nguyễn Thanh Tâm' : 'Trần Phúc Bảo';
-        const displayAvatar = user === 'thanhtam1710' ? 'TT' : 'PB';
-        document.getElementById('sidebarName').textContent = displayName;
-        document.getElementById('sidebarAvatar').textContent = displayAvatar;
-
-        initAppData();
-        goToToday();
-      } else {
-        alert('Sai tài khoản hoặc mật khẩu! Vui lòng thử lại.');
-      }
-    }
-
-    document.getElementById('loginPassword').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') handleLogin();
-    });
-
-    function updateDataStore(court, time, updateObj) {
-      if (!appData[currentBranch][currentDateStr][court]) appData[currentBranch][currentDateStr][court] = {};
-      if (!appData[currentBranch][currentDateStr][court][time]) appData[currentBranch][currentDateStr][court][time] = { price: (court === 'Sân 01' ? 120000 : 80000) };
-      Object.assign(appData[currentBranch][currentDateStr][court][time], updateObj);
-    }
-
-    function renderGridForDate(dateStr) {
-      currentDateStr = dateStr;
-      currentBranch = document.getElementById('branchFilter').value;
-      const tbody = document.getElementById('matrixGridBody');
-      tbody.innerHTML = ''; 
-      
-      let gridState = (appData[currentBranch] && appData[currentBranch][dateStr]) ? appData[currentBranch][dateStr] : null;
-
-      courtsList.forEach(court => {
-        const isVip = court === 'Sân 01';
-        const defaultPrice = isVip ? 120000 : 80000;
-        
-        let rowHtml = `
-          <tr>
-            <td class="matrix-td-court">
-              <div class="court-info">
-                <span class="court-name">${court}</span>
-                <span class="court-type">${isVip ? 'VIP - Thảm Yonex' : 'Thường - Thảm Yonex'}</span>
-              </div>
-            </td>`;
-
-        timeSlots.forEach(timeObj => {
-          const [startTime, endTime] = timeObj.split(' - ');
-          let cellData = gridState ? gridState[court][timeObj] : { state: 'available', price: defaultPrice, customer: '', phone: '', deposit: 0 };
-          
-          rowHtml += `<td class="matrix-slot-cell">`;
-          if (cellData.state === 'available') {
-            rowHtml += `
-              <div class="slot-inner state-available" data-court="${court}" data-time="${timeObj}" onclick="quickBookSlot(this, '${court}', '${startTime}', '${endTime}', ${cellData.price})">
-                <div class="slot-action"><svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span>Đặt</span></div>
-                <span class="slot-price">${cellData.price.toLocaleString('vi-VN')} đ</span>
-              </div>`;
-          } else if (cellData.state === 'booked') {
-            rowHtml += `
-              <div class="slot-inner state-booked" data-price="${cellData.price}" data-deposit="${cellData.deposit}" data-customer="${cellData.customer}" data-phone="${cellData.phone}" data-court="${court}" data-time="${timeObj}" onclick="openDetailModal(this, 'BK-10X', '${court}', '${timeObj}', '${cellData.customer}', '${cellData.phone}', 'Đã cọc 30%', ${cellData.price}, ${cellData.deposit})">
-                <span class="slot-title">${cellData.customer}</span><span class="slot-badge-status badge-booked">Đã cọc 30%</span>
-              </div>`;
-          } else if (cellData.state === 'in-use') {
-            rowHtml += `
-              <div class="slot-inner state-in-use" data-price="${cellData.price}" data-deposit="${cellData.deposit}" data-customer="${cellData.customer}" data-phone="${cellData.phone}" data-court="${court}" data-time="${timeObj}" onclick="openCheckoutModal(this)">
-                <span class="slot-title">${cellData.customer}</span><span class="slot-badge-status badge-in-use">Đang chơi</span>
-              </div>`;
-          }
-          rowHtml += `</td>`;
-        });
-        rowHtml += `</tr>`;
-        tbody.innerHTML += rowHtml;
-      });
-
-      // Nếu đang trong chế độ tìm kiếm, render xong phải đánh dấu lại
-      handleSearch();
-    }
-
-    function goToToday() {
-      const dateInput = document.getElementById('gridDateInput');
-      if (dateInput) {
-        dateInput.value = formatDate(new Date());
-        renderGridForDate(dateInput.value);
-        document.getElementById('searchInput').value = '';
-        handleSearch();
-      }
-    }
-
-    function changeBranch() {
-      renderGridForDate(document.getElementById('gridDateInput').value);
-      document.getElementById('searchInput').value = '';
-      handleSearch();
-    }
-
-    function shiftDate(offset) {
-      const dateInput = document.getElementById('gridDateInput');
-      if (!dateInput) return;
-      const curDate = new Date(dateInput.value);
-      if (isNaN(curDate)) return;
-      curDate.setDate(curDate.getDate() + offset);
-      
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      const minDate = new Date(today); minDate.setDate(today.getDate() - 2);
-      const maxDate = new Date(today); maxDate.setDate(today.getDate() + 7);
-
-      if(curDate < minDate) { alert('Hệ thống chỉ lưu trữ dữ liệu từ 2 ngày trước!'); return; }
-      if(curDate > maxDate) { alert('Hệ thống chỉ hỗ trợ đặt lịch trước tối đa 7 ngày!'); return; }
-      
-      dateInput.value = formatDate(curDate);
-      renderGridForDate(dateInput.value);
-      document.getElementById('searchInput').value = '';
-      handleSearch();
-    }
-
-    document.getElementById('gridDateInput').addEventListener('change', function(e) {
-      renderGridForDate(e.target.value);
-      document.getElementById('searchInput').value = '';
-      handleSearch();
-    });
-
-    function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('collapsed'); }
-
     function quickBookSlot(element, courtName, startTime, endTime, pricePerHour) {
       activeSlotCell = element; 
       activeSlotCell.dataset.court = courtName;
@@ -789,6 +791,11 @@
     }
 
     function openCreateBookingModal() {
+      const todayStr = formatDate(new Date());
+      if (currentDateStr < todayStr) {
+          return alert('Hệ thống không cho phép tạo đơn đặt sân cho các ngày trong quá khứ!');
+      }
+
       activeSlotCell = null; 
       document.getElementById('bookingCustName').value=''; 
       document.getElementById('bookingCustPhone').value=''; 
@@ -801,11 +808,19 @@
       const endSelect = document.getElementById('bookingEndTime');
       if (!courtSelect || !startSelect || !endSelect) return;
 
+      const startTime = startSelect.value;
+      const endTime = endSelect.value;
+      
+      let validSlotCount = 0;
+      timeSlots.forEach(slot => {
+        const [slotStart, slotEnd] = slot.split(' - ');
+        if (slotStart >= startTime && slotEnd <= endTime) validSlotCount++;
+      });
+
       const selected = courtSelect.options[courtSelect.selectedIndex];
       const rate = Number(selected.getAttribute('data-price') || 120000);
-      const duration = Number(endSelect.value.split(':')[0]) - Number(startSelect.value.split(':')[0]);
       
-      const total = rate * (duration > 0 ? duration : 1);
+      const total = rate * (validSlotCount > 0 ? validSlotCount : 0);
       const deposit = Math.round(total * 0.3);
 
       document.getElementById('displayTotalRental').textContent = total.toLocaleString('vi-VN') + ' đ';
@@ -815,22 +830,46 @@
     function submitBookingForm() {
       const name = document.getElementById('bookingCustName').value.trim();
       const phone = document.getElementById('bookingCustPhone').value.trim();
+      
       if (!name || !phone) return alert('Vui lòng nhập họ tên và số điện thoại.');
 
-      if (activeSlotCell) {
-        const court = activeSlotCell.dataset.court;
-        const timeObj = activeSlotCell.dataset.time;
-        const total = document.getElementById('displayTotalRental').textContent.replace(/\D/g,'');
-        const deposit = document.getElementById('displayDepositRequired').textContent.replace(/\D/g,'');
+      const courtName = document.getElementById('bookingCourtSelect').value;
+      const startTime = document.getElementById('bookingStartTime').value;
+      const endTime = document.getElementById('bookingEndTime').value;
 
-        updateDataStore(court, timeObj, {
-            state: 'booked', customer: name, phone: phone, price: Number(total), deposit: Number(deposit)
-        });
-        
-        renderGridForDate(currentDateStr);
-      } else {
-        alert('Đã tạo đơn đặt sân thành công (Khách: ' + name + ')');
+      if (startTime >= endTime) return alert('Giờ kết thúc phải diễn ra sau giờ bắt đầu!');
+
+      let targetSlots = [];
+      timeSlots.forEach(slot => {
+        const [slotStart, slotEnd] = slot.split(' - ');
+        if (slotStart >= startTime && slotEnd <= endTime) targetSlots.push(slot);
+      });
+
+      if (targetSlots.length === 0) return alert('Không tìm thấy khung giờ phù hợp trên hệ thống!');
+
+      for (let i = 0; i < targetSlots.length; i++) {
+        let slot = targetSlots[i];
+        if (appData[currentBranch] && appData[currentBranch][currentDateStr] && appData[currentBranch][currentDateStr][courtName][slot]) {
+            let currentState = appData[currentBranch][currentDateStr][courtName][slot].state;
+            if (currentState !== 'available') {
+                return alert('❌ LỖI: ' + courtName + ' khung giờ ' + slot + ' đã có người cọc hoặc đang chơi. Vui lòng chọn giờ khác!');
+            }
+        }
       }
+
+      const total = Number(document.getElementById('displayTotalRental').textContent.replace(/\D/g,''));
+      const deposit = Number(document.getElementById('displayDepositRequired').textContent.replace(/\D/g,''));
+      const pricePerSlot = total / targetSlots.length;
+      const depositPerSlot = deposit / targetSlots.length;
+
+      targetSlots.forEach(slot => {
+          updateDataStore(courtName, slot, {
+              state: 'booked', customer: name, phone: phone, price: pricePerSlot, deposit: depositPerSlot, posItems: [] 
+          });
+      });
+
+      renderGridForDate(currentDateStr);
+      alert('✅ Đã đặt thành công ' + targetSlots.length + ' khung giờ liên tiếp cho khách: ' + name);
       closeCreateBookingModal();
     }
 
@@ -866,7 +905,11 @@
       activeSlotCell = element;
       currentBasePrice = Number(activeSlotCell.dataset.price) || 120000;
       currentDeposit = Number(activeSlotCell.dataset.deposit) || 36000;
-      posItems = []; 
+      
+      const court = activeSlotCell.dataset.court;
+      const timeObj = activeSlotCell.dataset.time;
+      const slotData = appData[currentBranch][currentDateStr][court][timeObj];
+      posItems = slotData.posItems ? [...slotData.posItems] : []; 
       
       renderInvoice();
       document.getElementById('checkoutModal').classList.add('active');
@@ -881,6 +924,12 @@
       const existingItem = posItems.find(i => i.name === name);
       if (existingItem) existingItem.qty += qty;
       else posItems.push({ name, price, qty });
+      
+      if(activeSlotCell) {
+        const court = activeSlotCell.dataset.court;
+        const timeObj = activeSlotCell.dataset.time;
+        updateDataStore(court, timeObj, { posItems: [...posItems] });
+      }
       
       document.getElementById('posQty').value = 1;
       renderInvoice();
@@ -926,8 +975,9 @@
         const court = activeSlotCell.dataset.court;
         const timeObj = activeSlotCell.dataset.time;
         
+        // Khi thu ngân bấm thanh toán xong -> Đổi ô sân về trạng thái Đã Thanh Toán (Completed)
         updateDataStore(court, timeObj, { 
-            state: 'available', customer: '', phone: '', deposit: 0 
+            state: 'completed', deposit: 0, posItems: [] 
         });
         renderGridForDate(currentDateStr);
       }
