@@ -18,11 +18,11 @@
 ---
 
 ## Mục lục
-- [Chức năng chính](#-chức-năng-chính)
-- [Công nghệ sử dụng](#-công-nghệ-sử-dụng)
-- [Cấu trúc phân hệ](#-cấu-trúc-phân-hệ-role-based)
-- [Hướng dẫn cài đặt](#-hướng-dẫn-cài-đặt-chạy-dự-án)
-- [Thành viên phát triển](#-thành-viên-phát-triển)
+- [Chức năng chính](#chức-năng-chính)
+- [Công nghệ sử dụng](#công-nghệ-sử-dụng)
+- [Cấu trúc phân hệ](#cấu-trúc-phân-hệ-role-based)
+- [Hướng dẫn cài đặt](#hướng-dẫn-cài-đặt-chạy-dự-án)
+- [Thành viên phát triển](#thành-viên-phát-triển)
 
 ---
 
