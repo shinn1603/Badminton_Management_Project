@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sự Kiện & Đăng Ký Giải Đấu Phong Trào - UTE Badminton</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    /* Customer Header */
+    .cust-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .cust-nav-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cust-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-dark);
+    }
+    .cust-brand-logo {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--primary) 0%, #047857 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 4px 8px rgba(13, 148, 136, 0.25);
+    }
+    .cust-brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .cust-brand-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .cust-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .cust-nav-item {
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-body);
+      transition: color 0.15s ease;
+      position: relative;
+      padding: 6px 0;
+    }
+    .cust-nav-item:hover, .cust-nav-item.active {
+      color: var(--primary);
+    }
+    .cust-nav-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    /* Tournament Layout */
+    .tour-container {
+      max-width: 1140px;
+      margin: 32px auto 60px;
+      padding: 0 20px;
+    }
+    .tour-hero {
+      background: linear-gradient(135deg, #18181b 0%, #064e3b 100%);
+      color: #ffffff;
+      padding: 40px;
+      border-radius: 16px;
+      margin-bottom: 36px;
+      position: relative;
+      overflow: hidden;
+    }
+    .tour-hero h1 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
+    .tour-hero p {
+      color: #cbd5e1;
+      font-size: 14px;
+      max-width: 650px;
+      line-height: 1.6;
+    }
+
+    /* Tournament Card */
+    .tour-card {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      display: grid;
+      grid-template-columns: 320px 1fr;
+    }
+    .tour-card-banner {
+      background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+      color: #ffffff;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .tour-card-content {
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .tour-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    .tour-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+      font-size: 13px;
+    }
+    .tour-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-body);
+    }
+    .tour-prize-row {
+      background: #f8fafc;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 14px 0;
+    }
+    .tour-progress-wrap {
+      margin: 14px 0;
+    }
+
+    @media (max-width: 860px) {
+      .tour-card { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Customer Header -->
+  <header class="cust-header">
+    <div class="cust-nav-container">
+      <a href="/customer/home" class="cust-brand">
+        <div class="cust-brand-logo">🏸</div>
+        <div>
+          <div class="cust-brand-title">UTE BADMINTON</div>
+          <div class="cust-brand-sub">Sự Kiện & Giải Đấu</div>
+        </div>
+      </a>
+
+      <nav class="cust-nav-links">
+        <a href="/customer/home" class="cust-nav-item">Trang Chủ & Bảng Giá</a>
+        <a href="/customer/booking" class="cust-nav-item">Đặt Sân Giữ Chỗ</a>
+        <a href="/customer/tournaments" class="cust-nav-item active">Giải Đấu Phong Trào</a>
+        <a href="/customer/history" class="cust-nav-item">Lịch Sử & Check-in QR</a>
+        <a href="/customer/profile" class="cust-nav-item">Hội Viên & Tích Điểm</a>
+      </nav>
+
+      <div>
+        <a href="/customer/booking" class="btn btn-primary" style="border-radius: 8px;">
+          Đặt Sân Luyện Tập
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="tour-container">
+    <!-- Hero Banner -->
+    <div class="tour-hero">
+      <div class="badge" style="background: rgba(255,255,255,0.2); color: #5eead4; margin-bottom: 12px;">SÂN CHƠI THỂ THAO PHONG TRÀO</div>
+      <h1>Hệ Thống Giải Đấu Cầu Lông UTE Open</h1>
+      <p>
+        Sân chơi giao lưu cọ xát đỉnh cao dành cho sinh viên, cán bộ, doanh nghiệp và các câu lạc bộ phong trào TP. Thủ Đức. Hệ thống trọng tài chuẩn BWF, giải thưởng hấp dẫn và truyền hình trực tiếp!
+      </p>
+    </div>
+
+    <!-- Rule notification (QĐ-KH04) -->
+    <div style="background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 10px; padding: 16px 20px; margin-bottom: 28px; font-size: 13px; color: #0f766e; line-height: 1.5; display: flex; align-items: flex-start; gap: 12px;">
+      <svg class="svg-icon" style="width: 22px; height: 22px; flex-shrink: 0; color: var(--primary);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      <div>
+        <strong>Quy định đăng ký thi đấu (QĐ-KH04):</strong><br>
+        1. VĐV tham gia là vận động viên phong trào, không thuộc diện kiện tướng quốc gia trong 3 năm gần nhất.<br>
+        2. Mỗi VĐV được đăng ký tối đa 2 nội dung thi đấu (Đôi nam, Đôi nữ hoặc Đôi nam nữ).<br>
+        3. Cổng đăng ký sẽ tự động đóng trước 3 ngày khai mạc hoặc khi đủ số lượng cặp VĐV đăng ký.
+      </div>
+    </div>
+
+    <!-- Tournament 1: Active Registration -->
+    <div class="tour-card">
+      <div class="tour-card-banner">
+        <div>
+          <span class="badge badge-success" style="background: #ffffff; color: var(--primary); font-weight: 700;">ĐANG MỞ ĐĂNG KÝ</span>
+          <div style="font-size: 24px; font-weight: 800; margin-top: 14px; line-height: 1.2;">MÙA THU 2026</div>
+          <div style="font-size: 13px; color: #99f6e4; margin-top: 4px;">Khởi tranh: 10/10/2026</div>
+        </div>
+        <div>
+          <div style="font-size: 11px; text-transform: uppercase; color: #99f6e4;">Tổng giá trị giải thưởng</div>
+          <div style="font-size: 26px; font-weight: 800; color: #ffffff;">20.000.000 đ</div>
+          <div style="font-size: 11px; color: #cbd5e1;">+ Cúp Vô Địch & Vợt Yonex Pro</div>
+        </div>
+      </div>
+
+      <div class="tour-card-content">
+        <div>
+          <h2 class="tour-title">Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026</h2>
+          <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+            Giải đấu thường niên quy mô lớn nhất trong năm do CLB UTE Badminton phối hợp cùng Hội Thể Thao Đại Học tổ chức, quy tụ 32 cặp VĐV xuất sắc.
+          </div>
+
+          <div class="tour-meta-grid">
+            <div class="tour-meta-item">
+              <span>📍</span> <strong>Địa điểm:</strong> Sân CN 1 - Võ Văn Ngân
+            </div>
+            <div class="tour-meta-item">
+              <span>🏸</span> <strong>Nội dung:</strong> Đôi nam, Đôi nam nữ
+            </div>
+            <div class="tour-meta-item">
+              <span>💰</span> <strong>Lệ phí tham gia:</strong> 300.000 đ / cặp VĐV
+            </div>
+            <div class="tour-meta-item">
+              <span>⏰</span> <strong>Hạn đăng ký:</strong> Đến hết 07/10/2026
+            </div>
+          </div>
+
+          <!-- Prize Breakdown -->
+          <div class="tour-prize-row">
+            <div><strong>🥇 Nhất:</strong> 10.000.000đ + Cúp + Vợt</div>
+            <div><strong>🥈 Nhì:</strong> 5.000.000đ + Huy chương</div>
+            <div><strong>🥉 Ba:</strong> 2.500.000đ (2 giải)</div>
+          </div>
+
+          <!-- Progress slot -->
+          <div class="tour-progress-wrap">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+              <span style="color: var(--text-muted);">Số slot đăng ký:</span>
+              <strong style="color: var(--primary);">Đã đăng ký: 24 / 32 Cặp (Còn 8 slot)</strong>
+            </div>
+            <div style="height: 8px; background: #e4e4e7; border-radius: 9999px; overflow: hidden;">
+              <div style="height: 100%; width: 75%; background: var(--primary); border-radius: 9999px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+          <span style="font-size: 12px; color: var(--text-muted);">Áp dụng thể lệ chuẩn QĐ-KH04</span>
+          <button type="button" class="btn btn-primary" onclick="openRegisterModal('Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026')" style="padding: 0 24px; font-weight: 700; border-radius: 8px;">
+            Đăng Ký Tham Gia Ngay (BM-KH03)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tournament 2: Upcoming Soon -->
+    <div class="tour-card">
+      <div class="tour-card-banner" style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);">
+        <div>
+          <span class="badge" style="background: rgba(255,255,255,0.2); color: #93c5fd; font-weight: 700;">SẮP MỞ ĐĂNG KÝ</span>
+          <div style="font-size: 24px; font-weight: 800; margin-top: 14px; line-height: 1.2;">CÚP DOANH NGHIỆP</div>
+          <div style="font-size: 13px; color: #bfdbfe; margin-top: 4px;">Khởi tranh: 20/11/2026</div>
+        </div>
+        <div>
+          <div style="font-size: 11px; text-transform: uppercase; color: #bfdbfe;">Tổng giá trị giải thưởng</div>
+          <div style="font-size: 26px; font-weight: 800; color: #ffffff;">30.000.000 đ</div>
+          <div style="font-size: 11px; color: #93c5fd;">Cúp Vàng & Kỷ niệm chương</div>
+        </div>
+      </div>
+
+      <div class="tour-card-content">
+        <div>
+          <h2 class="tour-title">Giải Cầu Lông Doanh Nghiệp & Sinh Viên Cúp Thủ Đức 2026</h2>
+          <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+            Giải đấu kết nối các doanh nghiệp tài trợ, đối tác tuyển dụng và cựu sinh viên - sinh viên đam mê thể thao tại khu công nghệ cao và TP. Thủ Đức.
+          </div>
+
+          <div class="tour-meta-grid">
+            <div class="tour-meta-item">
+              <span>📍</span> <strong>Địa điểm:</strong> Sân CN 2 - Lê Văn Việt
+            </div>
+            <div class="tour-meta-item">
+              <span>🏸</span> <strong>Nội dung:</strong> Đơn nam, Đôi nam
+            </div>
+            <div class="tour-meta-item">
+              <span>💰</span> <strong>Lệ phí tham gia:</strong> Miễn phí cho sinh viên
+            </div>
+            <div class="tour-meta-item">
+              <span>⏰</span> <strong>Mở đăng ký:</strong> 15/10/2026
+            </div>
+          </div>
+
+          <div class="tour-prize-row">
+            <div><strong>🥇 Vô Địch:</strong> 15.000.000đ</div>
+            <div><strong>🥈 Á Quân:</strong> 8.000.000đ</div>
+            <div><strong>🥉 Quý Quân:</strong> 4.000.000đ</div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+          <span style="font-size: 12px; color: var(--text-muted);">Cổng đăng ký sẽ mở vào 15/10/2026</span>
+          <button type="button" class="btn btn-outline" disabled style="padding: 0 20px; border-radius: 8px; cursor: not-allowed; opacity: 0.7;">
+            Sắp Mở Cổng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tournament Registration Modal (BM-KH03) -->
+  <div class="modal-overlay" id="regModal">
+    <div class="modal-card" style="max-width: 580px;">
+      <div class="modal-header">
+        <div>
+          <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted);">Biểu Mẫu BM-KH03</div>
+          <h3 style="font-size: 16px; margin-top: 2px;">Phiếu Đăng Ký Tham Gia Thi Đấu</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeTourModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form onsubmit="handleTournamentSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">Giải Đấu Đăng Ký</label>
+            <input type="text" id="modalTourName" class="form-control" readonly style="background: #f4f4f5; font-weight: 600;">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Nội Dung Thi Đấu (QĐ-KH04) *</label>
+              <select class="form-control" id="tourCategory" required>
+                <option value="Đôi Nam">Đôi Nam Phong Trào</option>
+                <option value="Đôi Nam Nữ" selected>Đôi Nam Nữ Phối Hợp</option>
+                <option value="Đôi Nữ">Đôi Nữ</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Tên Câu Lạc Bộ / Đội Đại Diện *</label>
+              <input type="text" class="form-control" placeholder="Ví dụ: CLB Sư Phạm Kỹ Thuật" required value="CLB UTE Masters">
+            </div>
+          </div>
+
+          <div style="margin: 18px 0 10px; font-size: 13px; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px;">
+            1. Thông Tin Vận Động Viên 1 (Đội Trưởng)
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Họ và Tên VĐV 1 *</label>
+              <input type="text" class="form-control" value="Nguyễn Văn An" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Số ĐT Liên Hệ *</label>
+              <input type="tel" class="form-control" value="0912345678" required>
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-top: 10px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Số CCCD / Mã Số Sinh Viên *</label>
+              <input type="text" class="form-control" placeholder="079xxxxxxxx hoặc 24110xxx" required value="24110234">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Trình Độ Thi Đấu</label>
+              <select class="form-control">
+                <option>Trung bình khá (Phong trào 1-2 năm)</option>
+                <option selected>Khá (Chơi thường xuyên > 3 năm)</option>
+                <option>Bán chuyên phong trào</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin: 18px 0 10px; font-size: 13px; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px;">
+            2. Thông Tin Vận Động Viên 2 (Đồng Đội)
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Họ và Tên VĐV 2 *</label>
+              <input type="text" class="form-control" placeholder="Nhập tên VĐV cùng đội" required value="Trần Thị Mai">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Số ĐT Liên Hệ VĐV 2 *</label>
+              <input type="tel" class="form-control" placeholder="09xxxxxxxx" required value="0987654321">
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-top: 10px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Số CCCD / Mã Số Sinh Viên *</label>
+              <input type="text" class="form-control" placeholder="079xxxxxxxx hoặc 24110xxx" required value="24110888">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Trình Độ Thi Đấu</label>
+              <select class="form-control">
+                <option>Trung bình khá</option>
+                <option selected>Khá</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin: 16px 0;">
+            <label style="display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer;">
+              <input type="checkbox" required checked style="accent-color: var(--primary); margin-top: 2px;">
+              <span>Chúng tôi cam kết là VĐV phong trào (QĐ-KH04), không gian lận trình độ và tuân thủ tuyệt đối quyết định của tổ trọng tài.</span>
+            </label>
+          </div>
+
+          <div class="modal-footer" style="padding: 14px 0 0; background: transparent; border-top: none;">
+            <button type="button" class="btn btn-outline" onclick="closeTourModal()">Hủy</button>
+            <button type="submit" class="btn btn-primary" style="height: 40px; padding: 0 24px; font-weight: 700;">
+              Gửi Hồ Sơ Đăng Ký (300.000đ / cặp)
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openRegisterModal(name) {
+      document.getElementById('modalTourName').value = name;
+      document.getElementById('regModal').classList.add('open');
+    }
+
+    function closeTourModal() {
+      document.getElementById('regModal').classList.remove('open');
+    }
+
+    function handleTournamentSubmit(e) {
+      e.preventDefault();
+      alert('Đăng ký giải đấu thành công! Ban tổ chức sẽ liên hệ qua SĐT để hướng dẫn nộp lệ phí 300.000đ và nhận lịch thi đấu vòng bảng.');
+      closeTourModal();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thanh Toán Tiền Cọc 30% (VietQR / VNPay) - UTE Badminton</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    /* Customer Header */
+    .cust-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-subtle);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .cust-nav-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cust-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-dark);
+    }
+    .cust-brand-logo {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--primary) 0%, #047857 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 4px 8px rgba(13, 148, 136, 0.25);
+    }
+    .cust-brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .cust-brand-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Payment Container */
+    .payment-wrapper {
+      max-width: 1040px;
+      margin: 32px auto 60px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Payment Methods Tab */
+    .payment-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .payment-tab-btn {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      background: var(--surface);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+    }
+    .payment-tab-btn.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary-hover);
+      box-shadow: 0 2px 8px rgba(13,148,136,0.12);
+    }
+
+    /* VietQR Display Box */
+    .qr-showcase-box {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    }
+    .qr-frame {
+      display: inline-block;
+      padding: 16px;
+      background: #ffffff;
+      border: 2px dashed var(--primary);
+      border-radius: 12px;
+      margin: 16px 0;
+      position: relative;
+    }
+    .qr-code-img {
+      width: 200px;
+      height: 200px;
+      display: block;
+      margin: 0 auto;
+    }
+    .bank-info-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 16px;
+      text-align: left;
+    }
+    .bank-info-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .bank-info-table td:first-child {
+      color: var(--text-muted);
+      width: 40%;
+    }
+    .bank-info-table td:last-child {
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+    .btn-copy-tag {
+      background: var(--bg-page);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--primary);
+      margin-left: 6px;
+    }
+
+    /* Invoice Confirmation Card (BM-KH02) */
+    .invoice-card {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    }
+    .invoice-top {
+      background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
+      color: #ffffff;
+      padding: 20px 24px;
+    }
+    .invoice-code {
+      font-family: monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: #5eead4;
+      letter-spacing: 1px;
+    }
+    .invoice-body {
+      padding: 24px;
+    }
+    .invoice-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+    .invoice-row .lbl {
+      color: var(--text-muted);
+    }
+    .invoice-row .val {
+      font-weight: 600;
+      color: var(--text-dark);
+      text-align: right;
+    }
+    .invoice-total-highlight {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 20px 0;
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Timer Pill */
+    .pay-timer-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12.5px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 860px) {
+      .payment-wrapper { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Customer Header -->
+  <header class="cust-header">
+    <div class="cust-nav-container">
+      <a href="/customer/home" class="cust-brand">
+        <div class="cust-brand-logo">🏸</div>
+        <div>
+          <div class="cust-brand-title">UTE BADMINTON</div>
+          <div class="cust-brand-sub">Cổng Thanh Toán Trực Tuyến</div>
+        </div>
+      </a>
+
+      <div>
+        <div class="pay-timer-pill">
+          <svg class="svg-icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Thời gian cọc còn: <span id="payTimer">09:48</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Payment Layout -->
+  <div class="payment-wrapper">
+    <!-- Left: QR Code & Payment Method -->
+    <div>
+      <div class="payment-tabs">
+        <div class="payment-tab-btn active" id="tabVietQR" onclick="selectPayMethod('vietqr')">
+          <svg class="svg-icon" style="width: 24px; height: 24px;" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          VietQR (Napas 247)
+        </div>
+        <div class="payment-tab-btn" id="tabVNPay" onclick="selectPayMethod('vnpay')">
+          <span style="font-weight: 800; color: #005baa; font-size: 16px;">VNPAY</span>
+          Thẻ ATM / Visa
+        </div>
+        <div class="payment-tab-btn" id="tabMoMo" onclick="selectPayMethod('momo')">
+          <span style="font-weight: 800; color: #a50064; font-size: 16px;">MoMo</span>
+          Ví Điện Tử MoMo
+        </div>
+      </div>
+
+      <div class="qr-showcase-box">
+        <div style="font-size: 15px; font-weight: 700; color: var(--text-dark);">Quét Mã QR Chuyển Khoản Tự Động</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Hỗ trợ 40+ ứng dụng Ngân hàng (VCB, MB, Techcombank, VPBank, ACB...)</div>
+
+        <div class="qr-frame">
+          <!-- Dynamic Simulated VietQR Code -->
+          <svg class="qr-code-img" viewBox="0 0 100 100" fill="#09090b">
+            <!-- Pattern mimicking real QR Code matrix -->
+            <rect x="0" y="0" width="28" height="28" fill="#09090b"/>
+            <rect x="4" y="4" width="20" height="20" fill="#ffffff"/>
+            <rect x="8" y="8" width="12" height="12" fill="#09090b"/>
+
+            <rect x="72" y="0" width="28" height="28" fill="#09090b"/>
+            <rect x="76" y="4" width="20" height="20" fill="#ffffff"/>
+            <rect x="80" y="8" width="12" height="12" fill="#09090b"/>
+
+            <rect x="0" y="72" width="28" height="28" fill="#09090b"/>
+            <rect x="4" y="76" width="20" height="20" fill="#ffffff"/>
+            <rect x="8" y="80" width="12" height="12" fill="#09090b"/>
+
+            <!-- Center Logo Area with Shuttlecock -->
+            <rect x="40" y="40" width="20" height="20" fill="#ffffff" rx="3"/>
+            <rect x="42" y="42" width="16" height="16" fill="#0d9488" rx="2"/>
+
+            <!-- Data Dots -->
+            <rect x="34" y="6" width="4" height="4"/>
+            <rect x="42" y="6" width="4" height="4"/>
+            <rect x="54" y="6" width="4" height="4"/>
+            <rect x="62" y="6" width="4" height="4"/>
+            <rect x="34" y="16" width="4" height="4"/>
+            <rect x="46" y="16" width="4" height="4"/>
+            <rect x="58" y="16" width="4" height="4"/>
+            <rect x="6" y="36" width="4" height="4"/>
+            <rect x="18" y="36" width="4" height="4"/>
+            <rect x="26" y="36" width="4" height="4"/>
+            <rect x="68" y="36" width="4" height="4"/>
+            <rect x="82" y="36" width="4" height="4"/>
+            <rect x="14" y="48" width="4" height="4"/>
+            <rect x="26" y="48" width="4" height="4"/>
+            <rect x="72" y="48" width="4" height="4"/>
+            <rect x="86" y="48" width="4" height="4"/>
+            <rect x="36" y="66" width="4" height="4"/>
+            <rect x="48" y="66" width="4" height="4"/>
+            <rect x="60" y="66" width="4" height="4"/>
+            <rect x="76" y="66" width="4" height="4"/>
+            <rect x="36" y="78" width="4" height="4"/>
+            <rect x="50" y="78" width="4" height="4"/>
+            <rect x="68" y="78" width="4" height="4"/>
+            <rect x="88" y="78" width="4" height="4"/>
+            <rect x="44" y="88" width="4" height="4"/>
+            <rect x="60" y="88" width="4" height="4"/>
+            <rect x="74" y="88" width="4" height="4"/>
+          </svg>
+          <div style="font-size: 11px; font-weight: 700; color: var(--primary); margin-top: 4px;">VIETQR PRO - TỰ ĐỘNG KHỚP LỆNH</div>
+        </div>
+
+        <table class="bank-info-table">
+          <tr>
+            <td>Ngân hàng:</td>
+            <td>MB Bank (Ngân Hàng Quân Đội)</td>
+          </tr>
+          <tr>
+            <td>Số tài khoản:</td>
+            <td>
+              <span>9999UTEBADMINTON</span>
+              <button type="button" class="btn-copy-tag" onclick="copyText('9999UTEBADMINTON')">Sao chép</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Tên thụ hưởng:</td>
+            <td>CLB CAU LONG UTE SPORT</td>
+          </tr>
+          <tr>
+            <td>Số tiền cọc:</td>
+            <td>
+              <span id="qrDepositAmount" style="color: var(--primary); font-size: 15px;">94.500 đ</span>
+              <button type="button" class="btn-copy-tag" onclick="copyText('94500')">Sao chép</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Nội dung CK:</td>
+            <td>
+              <span id="qrTransferContent" style="color: #ea580c; font-family: monospace; font-size: 14px;">BK202609224412</span>
+              <button type="button" class="btn-copy-tag" onclick="copyText(document.getElementById('qrTransferContent').textContent)">Sao chép</button>
+            </td>
+          </tr>
+        </table>
+
+        <div style="margin-top: 20px;">
+          <button type="button" class="btn btn-primary" onclick="confirmPaymentSuccess()" style="width: 100%; height: 44px; font-size: 14px; font-weight: 700; border-radius: 8px;">
+            <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Tôi Đã Hoàn Tất Chuyển Khoản
+          </button>
+          <a href="/customer/booking" style="display: block; margin-top: 10px; font-size: 12px; color: var(--text-muted); text-decoration: none;">
+            Hủy đơn này và chọn lại sân
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Booking Confirmation Slip (BM-KH02) -->
+    <div>
+      <div class="invoice-card">
+        <div class="invoice-top">
+          <div style="font-size: 11px; text-transform: uppercase; color: #a1a1aa; letter-spacing: 0.5px;">Biểu mẫu BM-KH02</div>
+          <div style="font-size: 17px; font-weight: 800; margin: 4px 0;">Phiếu Xác Nhận Đặt Sân</div>
+          <div class="invoice-code" id="invCode">BK-20260922-4412</div>
+        </div>
+
+        <div class="invoice-body">
+          <div class="invoice-row">
+            <span class="lbl">Họ tên khách:</span>
+            <span class="val" id="invCustomer">Nguyễn Văn An</span>
+          </div>
+          <div class="invoice-row">
+            <span class="lbl">Số điện thoại:</span>
+            <span class="val" id="invPhone">0912345678</span>
+          </div>
+          <div class="invoice-row">
+            <span class="lbl">Chi nhánh:</span>
+            <span class="val" id="invBranch">CN1 - Võ Văn Ngân, Thủ Đức</span>
+          </div>
+          <div class="invoice-row">
+            <span class="lbl">Sân thi đấu:</span>
+            <span class="val" id="invCourt">Sân Số 01 (Tiêu Chuẩn)</span>
+          </div>
+          <div class="invoice-row">
+            <span class="lbl">Ngày thi đấu:</span>
+            <span class="val" id="invDate">22/09/2026</span>
+          </div>
+          <div class="invoice-row">
+            <span class="lbl">Khung giờ:</span>
+            <span class="val" id="invSlots">17:00 - 19:00 (2 giờ)</span>
+          </div>
+
+          <div class="invoice-total-highlight">
+            <div class="invoice-row" style="margin-bottom: 6px;">
+              <span class="lbl">Tổng phí dịch vụ:</span>
+              <span class="val" id="invTotal" style="font-size: 15px;">315.000 đ</span>
+            </div>
+            <div class="invoice-row" style="margin-bottom: 6px;">
+              <span class="lbl" style="color: var(--primary); font-weight: 700;">Tiền cọc giữ sân (30%):</span>
+              <span class="val" id="invDeposit" style="color: var(--primary); font-size: 17px; font-weight: 800;">94.500 đ</span>
+            </div>
+            <div class="invoice-row" style="margin-bottom: 0;">
+              <span class="lbl" style="font-size: 11.5px;">Còn lại thanh toán tại quầy:</span>
+              <span class="val" id="invRemaining" style="font-size: 12px; color: var(--text-muted);">220.500 đ (70%)</span>
+            </div>
+          </div>
+
+          <div style="background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px; padding: 12px; font-size: 11.5px; color: #0f766e; line-height: 1.5;">
+            <strong>Chính sách hoàn cọc (QĐ-KH03):</strong><br>
+            - Hủy trước giờ chơi $\ge$ 4 tiếng: Hoàn lại <strong>100%</strong> tiền cọc tự động.<br>
+            - Hủy dưới 4 tiếng: Không áp dụng hoàn cọc.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal Popup -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-card" style="text-align: center; padding: 32px 24px; max-width: 440px;">
+      <div style="width: 60px; height: 60px; border-radius: 50%; background: #ccfbf1; color: var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+        <svg class="svg-icon" style="width: 32px; height: 32px;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <h3 style="font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px;">Đặt Cọc Thành Công!</h3>
+      <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px;">
+        Hệ thống đã ghi nhận tiền cọc <strong id="modalDepositTxt">94.500 đ</strong>. Mã vé điện tử QR đã sẵn sàng để quét tại quầy lễ tân!
+      </p>
+      <button type="button" class="btn btn-primary" onclick="window.location.href='/customer/history'" style="width: 100%; height: 42px; font-size: 13.5px; font-weight: 700; border-radius: 8px;">
+        Xem Vé Điện Tử & Lịch Sử Đặt Chỗ
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Load booking data from sessionStorage if available
+    const saved = sessionStorage.getItem('ute_booking');
+    if (saved) {
+      try {
+        const b = JSON.parse(saved);
+        if (b.id) {
+          document.getElementById('invCode').textContent = b.id;
+          document.getElementById('qrTransferContent').textContent = b.id.replace(/-/g, '');
+        }
+        if (b.customerName) document.getElementById('invCustomer').textContent = b.customerName;
+        if (b.customerPhone) document.getElementById('invPhone').textContent = b.customerPhone;
+        if (b.branch) document.getElementById('invBranch').textContent = b.branch;
+        if (b.court) document.getElementById('invCourt').textContent = b.court;
+        if (b.date) document.getElementById('invDate').textContent = b.date;
+        if (b.slots) document.getElementById('invSlots').textContent = b.slots;
+        if (b.total) document.getElementById('invTotal').textContent = b.total;
+        if (b.deposit) {
+          document.getElementById('invDeposit').textContent = b.deposit;
+          document.getElementById('qrDepositAmount').textContent = b.deposit;
+          document.getElementById('modalDepositTxt').textContent = b.deposit;
+
+          // calculate 70%
+          const cleanNum = parseInt(b.total.replace(/\D/g, '')) || 315000;
+          const depNum = parseInt(b.deposit.replace(/\D/g, '')) || 94500;
+          const rem = cleanNum - depNum;
+          document.getElementById('invRemaining').textContent = rem.toLocaleString('vi-VN') + ' đ (70%)';
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Payment timer countdown
+    let secondsLeft = 588;
+    const pTimer = setInterval(() => {
+      if (secondsLeft <= 0) {
+        clearInterval(pTimer);
+        alert('Hết hạn thanh toán! Slot đã được mở lại cho khách hàng khác.');
+        window.location.href = '/customer/booking';
+        return;
+      }
+      secondsLeft--;
+      const m = Math.floor(secondsLeft / 60);
+      const s = secondsLeft % 60;
+      document.getElementById('payTimer').textContent = 
+        String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }, 1000);
+
+    function selectPayMethod(method) {
+      document.getElementById('tabVietQR').classList.remove('active');
+      document.getElementById('tabVNPay').classList.remove('active');
+      document.getElementById('tabMoMo').classList.remove('active');
+
+      if (method === 'vietqr') {
+        document.getElementById('tabVietQR').classList.add('active');
+      } else if (method === 'vnpay') {
+        document.getElementById('tabVNPay').classList.add('active');
+      } else {
+        document.getElementById('tabMoMo').classList.add('active');
+      }
+    }
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Đã sao chép: ' + text);
+      }).catch(() => {
+        alert('Đã sao chép: ' + text);
+      });
+    }
+
+    function confirmPaymentSuccess() {
+      // Show confirmation popup
+      document.getElementById('successModal').classList.add('open');
+    }
+  </script>
+</body>
+</html>

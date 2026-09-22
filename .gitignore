@@ -34,3 +34,4 @@ build/
 
 # Agent
 .agent/
+.antigravity/

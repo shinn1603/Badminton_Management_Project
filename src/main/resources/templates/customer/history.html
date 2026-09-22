@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lịch Sử Đặt Sân & Vé Check-in QR - UTE Badminton</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    /* Customer Header */
+    .cust-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .cust-nav-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cust-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-dark);
+    }
+    .cust-brand-logo {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--primary) 0%, #047857 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 4px 8px rgba(13, 148, 136, 0.25);
+    }
+    .cust-brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .cust-brand-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .cust-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .cust-nav-item {
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-body);
+      transition: color 0.15s ease;
+      position: relative;
+      padding: 6px 0;
+    }
+    .cust-nav-item:hover, .cust-nav-item.active {
+      color: var(--primary);
+    }
+    .cust-nav-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    /* History Layout */
+    .history-container {
+      max-width: 1040px;
+      margin: 32px auto 60px;
+      padding: 0 20px;
+    }
+    .page-title-box {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .page-title-box h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.4px;
+    }
+    .page-title-box p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Policy banner */
+    .policy-alert-box {
+      background: #f0fdfa;
+      border: 1px solid #99f6e4;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 12.5px;
+      color: #0f766e;
+      line-height: 1.5;
+    }
+
+    /* Booking Cards List */
+    .booking-card {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      margin-bottom: 18px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .booking-card:hover {
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    }
+    .b-card-head {
+      padding: 14px 20px;
+      background: #fafafa;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .b-code {
+      font-family: monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .b-card-body {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1fr;
+      gap: 20px;
+      align-items: center;
+    }
+    .b-info-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+    .b-info-sub {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .b-price-item {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .b-price-item strong {
+      color: var(--text-dark);
+      font-size: 14px;
+    }
+    .b-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* QR Ticket Modal */
+    .ticket-modal-card {
+      max-width: 440px;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      text-align: center;
+    }
+    .ticket-top {
+      background: linear-gradient(135deg, var(--primary) 0%, #065f46 100%);
+      color: #ffffff;
+      padding: 24px;
+      position: relative;
+    }
+    .ticket-top::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      right: 0;
+      height: 20px;
+      background: radial-gradient(circle, transparent 10px, #ffffff 10px);
+      background-size: 24px 20px;
+      background-position: -12px 0;
+    }
+    .ticket-body {
+      padding: 28px 24px 24px;
+    }
+    .ticket-qr-box {
+      padding: 16px;
+      background: #ffffff;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+
+    /* Star Rating */
+    .star-rating {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 16px 0;
+    }
+    .star-btn {
+      font-size: 28px;
+      cursor: pointer;
+      color: #cbd5e1;
+      transition: color 0.15s;
+    }
+    .star-btn.active {
+      color: #f59e0b;
+    }
+
+    @media (max-width: 768px) {
+      .b-card-body { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Customer Header -->
+  <header class="cust-header">
+    <div class="cust-nav-container">
+      <a href="/customer/home" class="cust-brand">
+        <div class="cust-brand-logo">🏸</div>
+        <div>
+          <div class="cust-brand-title">UTE BADMINTON</div>
+          <div class="cust-brand-sub">Lịch Sử & Vé Điện Tử</div>
+        </div>
+      </a>
+
+      <nav class="cust-nav-links">
+        <a href="/customer/home" class="cust-nav-item">Trang Chủ & Bảng Giá</a>
+        <a href="/customer/booking" class="cust-nav-item">Đặt Sân Giữ Chỗ</a>
+        <a href="/customer/tournaments" class="cust-nav-item">Giải Đấu Phong Trào</a>
+        <a href="/customer/history" class="cust-nav-item active">Lịch Sử & Check-in QR</a>
+        <a href="/customer/profile" class="cust-nav-item">Hội Viên & Tích Điểm</a>
+      </nav>
+
+      <div>
+        <a href="/customer/booking" class="btn btn-primary" style="border-radius: 8px;">
+          + Đặt Thêm Sân Mới
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="history-container">
+    <div class="page-title-box">
+      <div>
+        <h1>Lịch Sử Đặt Sân & Vé Điện Tử</h1>
+        <p>Tra cứu mã đặt sân, quét QR check-in tại quầy và quản lý hủy/hoàn tiền cọc theo quy chế.</p>
+      </div>
+
+      <div class="pill-group">
+        <button class="pill-btn active" onclick="filterHistory('all', this)">Tất Cả (3)</button>
+        <button class="pill-btn" onclick="filterHistory('upcoming', this)">Sắp Tới (1)</button>
+        <button class="pill-btn" onclick="filterHistory('completed', this)">Đã Chơi (1)</button>
+        <button class="pill-btn" onclick="filterHistory('cancelled', this)">Đã Hủy (1)</button>
+      </div>
+    </div>
+
+    <!-- Policy Alert (QĐ-KH03) -->
+    <div class="policy-alert-box">
+      <svg class="svg-icon" style="width: 20px; height: 20px; flex-shrink: 0; color: var(--primary);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      <div>
+        <strong>Chính Sách Hủy Đặt Sân & Hoàn Tiền Cọc (QĐ-KH03):</strong><br>
+        - Quý khách được phép hủy đặt sân và nhận <strong>hoàn 100% tiền cọc</strong> nếu thực hiện trước giờ bắt đầu thi đấu <strong>tối thiểu 4 tiếng</strong> (tiền hoàn sẽ tự động chuyển khoản về số tài khoản trong 24h).<br>
+        - Nếu hủy trong vòng dưới 4 tiếng, hệ thống không áp dụng hoàn cọc nhằm bù đắp chi phí giữ chỗ cho cụm sân.
+      </div>
+    </div>
+
+    <!-- Booking Item 1: Upcoming (Just Booked / Active) -->
+    <div class="booking-card" data-status="upcoming">
+      <div class="b-card-head">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="b-code">Mã đơn: BK-20260922-4412</span>
+          <span class="badge badge-success">Đã Cọc 30% - Chờ Check-in</span>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted);">Đặt lúc: 18:30 Hôm nay (22/09/2026)</div>
+      </div>
+      <div class="b-card-body">
+        <div>
+          <div class="b-info-title">Sân Số 01 (Thảm Enlio BWF)</div>
+          <div class="b-info-sub">
+            <span>📍 Chi nhánh 1 - Võ Văn Ngân, P. Linh Chiểu, TP. Thủ Đức</span>
+            <span>📅 Ngày chơi: <strong>22/09/2026</strong> | ⏰ Khung giờ: <strong>17:00 - 19:00 (2 giờ)</strong></span>
+            <span>🏸 Kèm theo: Ống cầu lông thi đấu Yonex (3 quả) + 2 chai Pocari</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="b-price-item">Tổng tiền dịch vụ: <strong>315.000 đ</strong></div>
+          <div class="b-price-item" style="color: var(--primary); margin: 3px 0;">Đã cọc trước (30%): <strong>94.500 đ (VietQR)</strong></div>
+          <div class="b-price-item">Thanh toán tại quầy: <strong style="color: #ea580c;">220.500 đ</strong></div>
+        </div>
+
+        <div class="b-actions">
+          <button type="button" class="btn btn-primary" onclick="openQrModal('BK-20260922-4412', 'Sân Số 01', '17:00 - 19:00', '22/09/2026', '220.500 đ')">
+            <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            Mã Vé Check-in QR
+          </button>
+
+          <!-- Cancel button with >= 4h calculation test (QĐ-KH03) -->
+          <button type="button" class="btn btn-outline" style="color: #dc2626; border-color: #fecaca;" onclick="handleCancelRequest('BK-20260922-4412', 4.5, 94500)">
+            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            Hủy Đặt Sân
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Item 2: Completed -->
+    <div class="booking-card" data-status="completed">
+      <div class="b-card-head">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="b-code">Mã đơn: BK-20260920-1192</span>
+          <span class="badge badge-blue">Đã Hoàn Thành Trận</span>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted);">20/09/2026</div>
+      </div>
+      <div class="b-card-body">
+        <div>
+          <div class="b-info-title">Sân Số 03 - VIP Thảm Đỏ Yonex</div>
+          <div class="b-info-sub">
+            <span>📍 Chi nhánh 1 - Võ Văn Ngân, TP. Thủ Đức</span>
+            <span>📅 Ngày chơi: 20/09/2026 | ⏰ 19:00 - 21:00 (2 giờ)</span>
+            <span>⭐ Đã tích lũy: <strong>+350 điểm</strong> vào Thẻ Vàng</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="b-price-item">Tổng hóa đơn: <strong>350.000 đ</strong></div>
+          <div class="b-price-item" style="color: #059669;">Đã thanh toán 100% tại POS</div>
+        </div>
+
+        <div class="b-actions">
+          <button type="button" class="btn btn-outline" onclick="openReviewModal('BK-20260920-1192', 'Sân Số 03 VIP')">
+            <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            Đánh Giá Sân (5⭐)
+          </button>
+          <a href="/customer/booking?courtId=3" class="btn btn-outline">
+            Đặt Lại Sân Này
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Item 3: Cancelled (<4h example for QD-KH03 testing) -->
+    <div class="booking-card" data-status="cancelled">
+      <div class="b-card-head">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="b-code">Mã đơn: BK-20260915-3890</span>
+          <span class="badge badge-danger">Đã Hủy Đơn</span>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted);">15/09/2026</div>
+      </div>
+      <div class="b-card-body">
+        <div>
+          <div class="b-info-title">Sân Số 02 (Thảm Enlio)</div>
+          <div class="b-info-sub">
+            <span>📍 Chi nhánh 2 - Lê Văn Việt, Quận 9</span>
+            <span>📅 Ngày chơi: 15/09/2026 | ⏰ 18:00 - 19:00</span>
+            <span style="color: #059669;">✅ Đã hoàn 100% cọc (72.000đ) qua STK vì hủy trước 5 tiếng</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="b-price-item">Tổng phí đơn: <strong>240.000 đ</strong></div>
+          <div class="b-price-item" style="color: #059669;">Hoàn cọc thành công: <strong>72.000 đ</strong></div>
+        </div>
+
+        <div class="b-actions">
+          <button type="button" class="btn btn-outline" disabled style="opacity: 0.6; cursor: not-allowed;">
+            Đã Hủy Hoàn Tất
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Check-in Ticket Modal -->
+  <div class="modal-overlay" id="qrModal">
+    <div class="ticket-modal-card">
+      <div class="ticket-top">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">VÉ CHECK-IN ĐIỆN TỬ</div>
+        <h3 style="font-size: 20px; font-weight: 800; margin: 4px 0;" id="tktCourt">Sân Số 01</h3>
+        <div style="font-family: monospace; font-size: 15px; color: #ccfbf1;" id="tktCode">BK-20260922-4412</div>
+      </div>
+
+      <div class="ticket-body">
+        <div class="ticket-qr-box">
+          <!-- Real QR pattern -->
+          <svg style="width: 170px; height: 170px;" viewBox="0 0 100 100" fill="#09090b">
+            <rect x="0" y="0" width="28" height="28"/>
+            <rect x="4" y="4" width="20" height="20" fill="#fff"/>
+            <rect x="8" y="8" width="12" height="12"/>
+            <rect x="72" y="0" width="28" height="28"/>
+            <rect x="76" y="4" width="20" height="20" fill="#fff"/>
+            <rect x="80" y="8" width="12" height="12"/>
+            <rect x="0" y="72" width="28" height="28"/>
+            <rect x="4" y="76" width="20" height="20" fill="#fff"/>
+            <rect x="8" y="80" width="12" height="12"/>
+            <rect x="42" y="42" width="16" height="16" fill="#0d9488"/>
+            <rect x="34" y="10" width="4" height="4"/><rect x="48" y="10" width="4" height="4"/><rect x="58" y="10" width="4" height="4"/>
+            <rect x="34" y="24" width="4" height="4"/><rect x="46" y="24" width="4" height="4"/>
+            <rect x="10" y="40" width="4" height="4"/><rect x="22" y="40" width="4" height="4"/><rect x="72" y="40" width="4" height="4"/>
+            <rect x="14" y="54" width="4" height="4"/><rect x="26" y="54" width="4" height="4"/><rect x="84" y="54" width="4" height="4"/>
+            <rect x="38" y="70" width="4" height="4"/><rect x="54" y="70" width="4" height="4"/><rect x="70" y="70" width="4" height="4"/>
+            <rect x="42" y="84" width="4" height="4"/><rect x="62" y="84" width="4" height="4"/>
+          </svg>
+          <div style="font-size: 11px; font-weight: 700; color: var(--primary);">QUÉT MÃ TẠI LỄ TÂN ĐỂ NHẬN SÂN</div>
+        </div>
+
+        <div style="text-align: left; font-size: 13px; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span style="color: var(--text-muted);">Ngày thi đấu:</span>
+            <strong id="tktDate">22/09/2026</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span style="color: var(--text-muted);">Khung giờ:</span>
+            <strong id="tktTime">17:00 - 19:00</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span style="color: var(--text-muted);">Số tiền còn lại thanh toán:</span>
+            <strong id="tktRemaining" style="color: #ea580c;">220.500 đ</strong>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-outline" onclick="closeModals()" style="width: 100%; height: 38px;">
+          Đóng Vé Điện Tử
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review Modal (MH-KH05) -->
+  <div class="modal-overlay" id="reviewModal">
+    <div class="modal-card" style="max-width: 460px;">
+      <div class="modal-header">
+        <h3 id="reviewModalTitle">Đánh Giá Chất Lượng Sân</h3>
+        <button type="button" class="modal-close-btn" onclick="closeModals()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="text-align: center;">
+          <div style="font-size: 13.5px; color: var(--text-muted);">Bạn cảm thấy chất lượng mặt thảm và dịch vụ thế nào?</div>
+          <div class="star-rating">
+            <span class="star-btn active" onclick="setRating(1)">★</span>
+            <span class="star-btn active" onclick="setRating(2)">★</span>
+            <span class="star-btn active" onclick="setRating(3)">★</span>
+            <span class="star-btn active" onclick="setRating(4)">★</span>
+            <span class="star-btn active" onclick="setRating(5)">★</span>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 14px;">
+          <label class="form-label">Nhận xét chi tiết (Đèn chiếu sáng, quạt, thái độ nhân viên)</label>
+          <textarea class="form-control" rows="3" placeholder="Sân rất êm, đèn sáng rõ không bị lóa mắt, nhân viên hỗ trợ nhiệt tình..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModals()">Hủy</button>
+        <button type="button" class="btn btn-primary" onclick="submitReview()">Gửi Đánh Giá</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function filterHistory(status, btn) {
+      document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const cards = document.querySelectorAll('.booking-card');
+      cards.forEach(c => {
+        if (status === 'all' || c.getAttribute('data-status') === status) {
+          c.style.display = 'block';
+        } else {
+          c.style.display = 'none';
+        }
+      });
+    }
+
+    function openQrModal(code, court, time, date, remaining) {
+      document.getElementById('tktCode').textContent = code;
+      document.getElementById('tktCourt').textContent = court;
+      document.getElementById('tktTime').textContent = time;
+      document.getElementById('tktDate').textContent = date;
+      document.getElementById('tktRemaining').textContent = remaining;
+      document.getElementById('qrModal').classList.add('open');
+    }
+
+    function closeModals() {
+      document.getElementById('qrModal').classList.remove('open');
+      document.getElementById('reviewModal').classList.remove('open');
+    }
+
+    // Cancellation rule check (QĐ-KH03)
+    function handleCancelRequest(code, hoursBeforeMatch, depositAmount) {
+      if (hoursBeforeMatch >= 4) {
+        const confirmCancel = confirm(
+          `[QUY ĐỊNH QĐ-KH03] Thời gian đến giờ chơi còn ${hoursBeforeMatch} tiếng (≥ 4 tiếng).\n\n` +
+          `Bạn ĐƯỢC HOÀN LẠI 100% TIỀN CỌC (${depositAmount.toLocaleString('vi-VN')} đ).\n` +
+          `Hệ thống sẽ chuyển hoàn về tài khoản của bạn trong 24 giờ.\n\n` +
+          `Bạn có chắc chắn muốn xác nhận hủy đơn ${code}?`
+        );
+        if (confirmCancel) {
+          alert(`Đã hủy thành công đơn ${code}! Yêu cầu hoàn cọc ${depositAmount.toLocaleString('vi-VN')} đ đã được tạo.`);
+          window.location.reload();
+        }
+      } else {
+        const confirmCancel = confirm(
+          `[QUY ĐỊNH QĐ-KH03 CẢNH BÁO]\n` +
+          `Thời gian đến giờ chơi chỉ còn ${hoursBeforeMatch} tiếng (< 4 tiếng).\n` +
+          `Theo quy chế CLB, đơn hủy dưới 4 tiếng sẽ KHÔNG ĐƯỢC HOÀN CỌC.\n\n` +
+          `Bạn có chắc chắn vẫn muốn hủy slot này để người khác đặt không?`
+        );
+        if (confirmCancel) {
+          alert(`Đã hủy slot sân ${code}. Không hoàn cọc theo quy định.`);
+          window.location.reload();
+        }
+      }
+    }
+
+    function openReviewModal(code, court) {
+      document.getElementById('reviewModalTitle').textContent = 'Đánh Giá: ' + court + ' (' + code + ')';
+      document.getElementById('reviewModal').classList.add('open');
+    }
+
+    function setRating(stars) {
+      const starBtns = document.querySelectorAll('.star-btn');
+      starBtns.forEach((s, idx) => {
+        if (idx < stars) s.classList.add('active');
+        else s.classList.remove('active');
+      });
+    }
+
+    function submitReview() {
+      alert('Cảm ơn bạn đã gửi đánh giá chất lượng! Bạn được cộng +50 điểm hội viên.');
+      closeModals();
+    }
+  </script>
+</body>
+</html>

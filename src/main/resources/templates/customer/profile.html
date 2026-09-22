@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hồ Sơ Hội Viên & Tích Điểm - UTE Badminton</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    /* Customer Header */
+    .cust-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .cust-nav-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cust-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-dark);
+    }
+    .cust-brand-logo {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--primary) 0%, #047857 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 4px 8px rgba(13, 148, 136, 0.25);
+    }
+    .cust-brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .cust-brand-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .cust-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .cust-nav-item {
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-body);
+      transition: color 0.15s ease;
+      position: relative;
+      padding: 6px 0;
+    }
+    .cust-nav-item:hover, .cust-nav-item.active {
+      color: var(--primary);
+    }
+    .cust-nav-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    /* Profile Layout */
+    .profile-layout {
+      max-width: 1140px;
+      margin: 32px auto 60px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    /* Digital Membership Card */
+    .digital-card {
+      background: linear-gradient(135deg, #18181b 0%, #27272a 50%, #0f172a 100%);
+      border-radius: 18px;
+      padding: 24px;
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 16px 32px -8px rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.15);
+      margin-bottom: 24px;
+    }
+    .digital-card::after {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(234, 88, 12, 0.4) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .card-brand-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 2;
+    }
+    .card-tier-badge {
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      color: #000000;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+    }
+    .card-number {
+      font-family: monospace;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #f8fafc;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 2;
+    }
+    .card-footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      position: relative;
+      z-index: 2;
+    }
+    .card-holder-name {
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Progress to next tier */
+    .tier-progress-card {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      margin-bottom: 24px;
+    }
+    .progress-bar-bg {
+      height: 8px;
+      background: #e4e4e7;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin: 12px 0 8px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #ea580c);
+      border-radius: 9999px;
+      width: 60%;
+    }
+
+    /* Tier tiers list */
+    .tier-benefits-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .tier-benefit-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--bg-page);
+      font-size: 12.5px;
+    }
+    .tier-benefit-item.current {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      font-weight: 600;
+      color: #92400e;
+    }
+
+    /* Activity Stats Grid */
+    .stats-card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-mini-box {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .stat-num {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin: 4px 0 2px;
+    }
+
+    @media (max-width: 900px) {
+      .profile-layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Customer Header -->
+  <header class="cust-header">
+    <div class="cust-nav-container">
+      <a href="/customer/home" class="cust-brand">
+        <div class="cust-brand-logo">🏸</div>
+        <div>
+          <div class="cust-brand-title">UTE BADMINTON</div>
+          <div class="cust-brand-sub">Hồ Sơ & Điểm Thưởng</div>
+        </div>
+      </a>
+
+      <nav class="cust-nav-links">
+        <a href="/customer/home" class="cust-nav-item">Trang Chủ & Bảng Giá</a>
+        <a href="/customer/booking" class="cust-nav-item">Đặt Sân Giữ Chỗ</a>
+        <a href="/customer/tournaments" class="cust-nav-item">Giải Đấu Phong Trào</a>
+        <a href="/customer/history" class="cust-nav-item">Lịch Sử & Check-in QR</a>
+        <a href="/customer/profile" class="cust-nav-item active">Hội Viên & Tích Điểm</a>
+      </nav>
+
+      <div>
+        <a href="/customer/auth" class="btn btn-outline" style="border-radius: 8px; font-size: 12.5px;">
+          Đăng Xuất
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="profile-layout">
+    <!-- Left Column: Digital Member Card & Tiers -->
+    <div>
+      <!-- The Card -->
+      <div class="digital-card">
+        <div class="card-brand-row">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 22px;">🏸</span>
+            <span style="font-size: 14px; font-weight: 800; letter-spacing: 1px;">UTE SPORT VIP</span>
+          </div>
+          <div class="card-tier-badge">
+            <span>👑</span> Hạng Vàng (Gold)
+          </div>
+        </div>
+
+        <div class="card-number">MB • 8892 • 1024 • 9988</div>
+
+        <div class="card-footer-row">
+          <div>
+            <div style="font-size: 10px; color: #a1a1aa; text-transform: uppercase;">Chủ thẻ hội viên</div>
+            <div class="card-holder-name">NGUYỄN VĂN AN</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 10px; color: #a1a1aa; text-transform: uppercase;">Gia nhập từ</div>
+            <div style="font-size: 13px; font-weight: 600;">15/01/2025</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tier Progress -->
+      <div class="tier-progress-card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <strong style="font-size: 13.5px; color: var(--text-dark);">Tiến Trình Lên Hạng Kim Cương</strong>
+          <span style="font-size: 12px; font-weight: 700; color: #ea580c;">48 / 80 Giờ (60%)</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill"></div>
+        </div>
+        <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">
+          Bạn chỉ cần chơi thêm <strong>32 giờ</strong> nữa để trở thành <strong>Hội Viên Kim Cương</strong> (Giảm 15% giá sân trọn đời + miễn phí thuê vợt).
+        </div>
+      </div>
+
+      <!-- Tiers Ladder & Benefits -->
+      <div class="section-card">
+        <div class="card-header">
+          <div class="card-title">Bảng Quyền Lợi Các Hạng Thẻ</div>
+        </div>
+        <div class="card-body">
+          <div class="tier-benefits-list">
+            <div class="tier-benefit-item">
+              <div>
+                <strong>🥉 Hạng Đồng (0 - 19h)</strong>
+                <div style="font-size: 11px; color: var(--text-muted);">Tích điểm 1% hóa đơn</div>
+              </div>
+              <span class="badge">Cơ bản</span>
+            </div>
+
+            <div class="tier-benefit-item">
+              <div>
+                <strong>🥈 Hạng Bạc (20 - 39h)</strong>
+                <div style="font-size: 11px; color: var(--text-muted);">Giảm 5% giá sân, ưu tiên giữ chỗ</div>
+              </div>
+              <span class="badge badge-blue">Đã qua</span>
+            </div>
+
+            <div class="tier-benefit-item current">
+              <div>
+                <strong>🥇 Hạng Vàng (40 - 79h)</strong>
+                <div style="font-size: 11px;">Giảm 10% giá sân + Tặng 2 nước/tháng</div>
+              </div>
+              <span class="badge badge-amber">Hiện tại</span>
+            </div>
+
+            <div class="tier-benefit-item">
+              <div>
+                <strong>💎 Hạng Kim Cương (≥ 80h)</strong>
+                <div style="font-size: 11px; color: var(--text-muted);">Giảm 15% trọn đời + Miễn phí thuê vợt Yonex</div>
+              </div>
+              <span class="badge" style="background: #e0e7ff; color: #4338ca;">Mục tiêu</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Stats & Edit Profile -->
+    <div>
+      <!-- Stats Row -->
+      <div class="stats-card-grid">
+        <div class="stat-mini-box">
+          <div style="font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Điểm Thưởng Khả Dụng</div>
+          <div class="stat-num" style="color: var(--primary);">1.250 <span style="font-size: 14px; font-weight: normal;">điểm</span></div>
+          <div style="font-size: 11px; color: var(--text-muted);">1.000đ tiêu dùng = 1 điểm tích lũy</div>
+        </div>
+
+        <div class="stat-mini-box">
+          <div style="font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Tổng Giờ Đã Chơi</div>
+          <div class="stat-num" style="color: #ea580c;">48 <span style="font-size: 14px; font-weight: normal;">giờ</span></div>
+          <div style="font-size: 11px; color: var(--text-muted);">Tương đương 26 trận đấu</div>
+        </div>
+
+        <div class="stat-mini-box">
+          <div style="font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Tiết Kiệm Ưu Đãi Thẻ</div>
+          <div class="stat-num" style="color: #059669;">1.250.000 <span style="font-size: 14px; font-weight: normal;">đ</span></div>
+          <div style="font-size: 11px; color: var(--text-muted);">Chiết khấu hạng thẻ Vàng 10%</div>
+        </div>
+
+        <div class="stat-mini-box">
+          <div style="font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Giải Đấu Đã Tham Gia</div>
+          <div class="stat-num" style="color: #2563eb;">2 <span style="font-size: 14px; font-weight: normal;">giải</span></div>
+          <div style="font-size: 11px; color: var(--text-muted);">Hạng Ba UTE Cup 2025</div>
+        </div>
+      </div>
+
+      <!-- Edit Profile Form -->
+      <div class="section-card">
+        <div class="card-header">
+          <div class="card-title">Cập Nhật Thông Tin Cá Nhân</div>
+        </div>
+        <div class="card-body">
+          <form onsubmit="handleProfileUpdate(event)">
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Họ và Tên</label>
+                <input type="text" class="form-control" id="profName" value="Nguyễn Văn An" required>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Số Điện Thoại (Định danh duy nhất - QĐ-KH01)</label>
+                <input type="text" class="form-control" value="0912345678" readonly style="background: #f4f4f5; cursor: not-allowed;">
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 14px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Email Nhận Hóa Đơn & Vé QR</label>
+                <input type="email" class="form-control" id="profEmail" value="nguyenvanan.ute@gmail.com" required>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Ngày Sinh</label>
+                <input type="date" class="form-control" id="profBirth" value="2002-08-15">
+              </div>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+              <div style="font-size: 13px; font-weight: 700; margin-bottom: 10px;">Đổi Mật Khẩu (Để trống nếu không đổi)</div>
+              <div class="form-row">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label">Mật khẩu mới</label>
+                  <input type="password" class="form-control" placeholder="Tối thiểu 6 ký tự">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label">Xác nhận mật khẩu</label>
+                  <input type="password" class="form-control" placeholder="Nhập lại mật khẩu mới">
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn btn-primary" style="height: 40px; padding: 0 24px; font-weight: 700;">
+                Lưu Thay Đổi Hồ Sơ
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Point Redemption / History Table -->
+      <div class="section-card">
+        <div class="card-header">
+          <div class="card-title">Lịch Sử Biến Động Điểm Thưởng</div>
+          <span style="font-size: 12px; color: var(--text-muted);">10 giao dịch gần nhất</span>
+        </div>
+        <div class="table-container">
+          <table class="clean-table">
+            <thead>
+              <tr>
+                <th>Ngày</th>
+                <th>Hoạt Động</th>
+                <th>Mã Đơn / Sự Kiện</th>
+                <th style="text-align: right;">Biến Động</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>20/09/2026</td>
+                <td>Tích điểm đặt sân 2 giờ</td>
+                <td><span style="font-family: monospace;">BK-20260920-1192</span></td>
+                <td style="text-align: right; color: var(--primary); font-weight: 700;">+350 pts</td>
+              </tr>
+              <tr>
+                <td>15/09/2026</td>
+                <td>Đánh giá chất lượng sân 5 sao</td>
+                <td>Đánh giá dịch vụ</td>
+                <td style="text-align: right; color: var(--primary); font-weight: 700;">+50 pts</td>
+              </tr>
+              <tr>
+                <td>01/09/2026</td>
+                <td>Đổi voucher giảm giá 50.000đ</td>
+                <td>VOUCHER-50K</td>
+                <td style="text-align: right; color: #dc2626; font-weight: 700;">-500 pts</td>
+              </tr>
+              <tr>
+                <td>15/08/2026</td>
+                <td>Quà tặng sinh nhật Hội viên Vàng</td>
+                <td>Quà sinh nhật CLB</td>
+                <td style="text-align: right; color: #ea580c; font-weight: 700;">+300 pts</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function handleProfileUpdate(e) {
+      e.preventDefault();
+      const name = document.getElementById('profName').value;
+      alert('Đã cập nhật thông tin hồ sơ cho ' + name + ' thành công!');
+    }
+  </script>
+</body>
+</html>
