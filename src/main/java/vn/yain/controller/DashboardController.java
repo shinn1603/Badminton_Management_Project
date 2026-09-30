@@ -12,12 +12,12 @@ public class DashboardController {
     }
 
     // CUSTOMER PORTAL ENDPOINTS (Phan he Cong Khach Hang - Tran Bieu Huong)
-    @GetMapping({"/customer", "/customer/home"})
+    @GetMapping({ "/customer", "/customer/home" })
     public String customerHome() {
         return "customer/home";
     }
 
-    @GetMapping({"/customer/auth", "/customer/login"})
+    @GetMapping({ "/customer/auth", "/customer/login" })
     public String customerAuth() {
         return "customer/auth";
     }
@@ -47,8 +47,7 @@ public class DashboardController {
         return "customer/tournaments";
     }
 
-
-    @GetMapping({"/", "/director/dashboard"})
+    @GetMapping({ "/", "/director/dashboard" })
     public String directorDashboard() {
         return "director/dashboard";
     }
@@ -88,7 +87,7 @@ public class DashboardController {
         return "admin/logs";
     }
 
-    @GetMapping({"/booking/grid", "/pos/grid"})
+    @GetMapping({ "/booking/grid", "/pos/grid" })
     public String bookingGrid() {
         return "pos/grid";
     }
@@ -99,7 +98,7 @@ public class DashboardController {
         return "manager/dashboard";
     }
 
-    @GetMapping({"/manager/bookings", "/pos/bookings"})
+    @GetMapping({ "/manager/bookings", "/pos/bookings" })
     public String managerBookings() {
         return "manager/bookings";
     }
@@ -134,4 +133,3 @@ public class DashboardController {
         return "manager/reports";
     }
 }
-

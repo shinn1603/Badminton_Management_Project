@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
@@ -11,7 +11,7 @@
   <div class="layout-container">
     <aside class="sidebar" id="appSidebar">
       <div class="brand-header">
-        <div class="brand-icon">
+        <div class="brand-logo-wrap">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
             <circle cx="12" cy="12" r="10"></circle>
             <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
@@ -20,7 +20,7 @@
         </div>
         <div class="brand-text">
           <h2>UTE SPORT</h2>
-          <span>Quản lý chuỗi sân</span>
+          <span>BAN ĐIỀU HÀNH CHUỖI</span>
         </div>
       </div>
 
@@ -131,8 +131,8 @@
       <div class="sidebar-bottom">
         <div class="user-avatar">GD</div>
         <div class="user-meta">
-          <span class="user-name">Võ Hoàng Nam</span>
-          <span class="user-title">Giám đốc điều hành</span>
+          <span class="user-name">Nguyễn Phước Thọ</span>
+          <span class="user-title">Giám đốc chuỗi</span>
         </div>
       </div>
     </aside>
@@ -153,6 +153,9 @@
         </div>
 
         <div class="header-right">
+          <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Chuyá»ƒn Ä‘á»•i giao diá»‡n SÃ¡ng / Tá»‘i" style="padding: 6px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--text-dark); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; margin-right: 6px;">
+            <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          </button>
           <div class="search-box">
             <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: var(--text-light);">
               <circle cx="11" cy="11" r="8"></circle>
@@ -381,6 +384,26 @@
         document.getElementById('promoAction' + id).innerHTML = '<span style="color: #ef4444; font-size: 11.5px;">Bị từ chối</span>';
       }
     }
+      function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+  <script src="/js/global-hub.js">    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
   </script>
 </body>
 </html>
+
+
+

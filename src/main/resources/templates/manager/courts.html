@@ -5,18 +5,89 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản lý danh mục sân - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
+  <style>
+    .courts-grid-wrap {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .court-card-luxury {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      position: relative;
+    }
+
+    .court-card-luxury:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px -6px rgba(16, 185, 129, 0.15);
+      border-color: var(--primary);
+    }
+
+    .court-card-thumb {
+      height: 140px;
+      width: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .court-card-body {
+      padding: 16px;
+    }
+
+    .court-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .court-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    .court-meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .court-price-tag {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+  </style>
 </head>
 <body>
+
   <div class="layout-container">
+    <!-- LEFT SIDEBAR -->
     <aside class="sidebar" id="appSidebar">
       <div class="brand-header">
-        <div class="brand-icon">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+        <div class="brand-logo-wrap">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="stroke-width: 2.2;">
             <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
           </svg>
         </div>
-        <div class="brand-text"><h2>UTE SPORT</h2><span>Quản lý chi nhánh</span></div>
+        <div class="brand-text">
+          <h2>UTE SPORT</h2>
+          <span>CHI NHÁNH THỦ ĐỨC</span>
+        </div>
       </div>
+
       <div class="sidebar-content">
         <div class="menu-title">Quản lý chi nhánh</div>
         
@@ -29,6 +100,7 @@
           </svg>
           <span class="menu-text">Tổng quan</span>
         </a>
+
         <a href="/manager/bookings" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -37,7 +109,9 @@
             <line x1="3" y1="10" x2="21" y2="10"></line>
           </svg>
           <span class="menu-text">Đặt sân</span>
+          <span class="menu-tag">7 mới</span>
         </a>
+
         <a href="/pos/grid" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <line x1="12" y1="20" x2="12" y2="10"></line>
@@ -46,216 +120,568 @@
           </svg>
           <span class="menu-text">Lịch sân (POS)</span>
         </a>
+
         <a href="/manager/courts" class="menu-item active">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
           </svg>
           <span class="menu-text">Danh mục sân</span>
         </a>
+
         <a href="/manager/pricing" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
           </svg>
           <span class="menu-text">Cấu hình giá</span>
         </a>
+
         <a href="/manager/inventory" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
           </svg>
-          <span class="menu-text">Tồn kho</span>
+          <span class="menu-text">Kho vật tư</span>
         </a>
+
         <a href="/manager/receipts" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
           </svg>
           <span class="menu-text">Nhập kho</span>
         </a>
+
         <a href="/manager/staff" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
           </svg>
-          <span class="menu-text">Nhân sự</span>
+          <span class="menu-text">Nhân viên & Ca</span>
         </a>
+
         <a href="/manager/reports" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M18 20V10M12 20V4M6 20v-6"></path>
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
           </svg>
-          <span class="menu-text">Báo cáo</span>
+          <span class="menu-text">Báo cáo doanh thu</span>
         </a>
       </div>
+
       <div class="sidebar-bottom">
         <div class="user-avatar">QL</div>
-        <div class="user-meta"><span class="user-name">Trần Phúc Bảo</span><span class="user-title">Quản lý cơ sở Bình Thạnh</span></div>
+        <div class="user-meta">
+          <div class="user-name">Trần Phúc Bảo</div>
+          <div class="user-title">Quản lý cơ sở Thủ Đức</div>
+        </div>
+        <a href="/login" style="margin-left: auto; color: #94a3b8;" title="Đăng xuất">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </a>
       </div>
     </aside>
 
-    <main class="main-wrapper">
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <!-- HEADER BAR -->
       <header class="header-bar">
         <div class="header-left">
-          <button class="btn-sidebar-toggle" onclick="toggleSidebar()">
-            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <button type="button" class="btn-icon" id="btnToggleSidebar" onclick="toggleSidebar()">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
           </button>
-          <div class="header-heading"><h1>Quản lý danh mục sân cầu lông</h1></div>
+
+          <div class="branch-select-badge">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--primary);">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+            <span>Trung Tâm Thể Thao UTE Sport - Thủ Đức</span>
+          </div>
+
+          <div class="search-box-header">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" placeholder="Tìm kiếm sân theo số hiệu, loại sân..." id="courtSearchInput" oninput="filterCourts()">
+          </div>
         </div>
-        <div class="header-actions">
-          <button class="btn-action btn-primary-action" onclick="openCourtModal()">
-            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>Thêm sân mới</span>
+
+        <div class="header-right">
+          <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Chuyển đổi giao diện Sáng / Tối">
+            <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
           </button>
+
+          <button type="button" class="btn btn-primary" onclick="openCourtModal()">
+            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Thêm Sân Mới</span>
+          </button>
+
+          <div class="user-pill-header" onclick="window.location.href='/login'">
+            <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;">QL</div>
+            <div style="font-size: 12.5px; font-weight: 600; color: var(--text-dark);">Quản lý cơ sở</div>
+          </div>
         </div>
       </header>
 
-      <div class="page-content">
-        <div class="kpi-row">
-          <div class="clean-kpi">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Tổng số sân</span>
-              <span class="clean-kpi-badge badge-blue">Toàn chi nhánh</span>
+      <!-- PAGE CONTENT -->
+      <main class="page-content">
+        <!-- KPI METRICS ROW -->
+        <div class="kpi-grid">
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Tổng số sân thi đấu</span>
+              <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: var(--primary);">
+                <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+              </div>
             </div>
-            <div class="clean-kpi-value">8 sân</div>
-            <div class="clean-kpi-caption">Chi nhánh Bình Thạnh</div>
+            <div class="kpi-val" id="totalCourtsCount">6 sân</div>
+            <div class="kpi-trend positive">Chi nhánh Thủ Đức (4 Cầu Lông + 2 Pickleball)</div>
           </div>
-          <div class="clean-kpi">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Đang hoạt động</span>
-              <span class="clean-kpi-badge badge-green">Hoạt động tốt</span>
+
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Sẵn sàng phục vụ</span>
+              <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
             </div>
-            <div class="clean-kpi-value">7 sân</div>
-            <div class="clean-kpi-caption">Sẵn sàng phục vụ</div>
+            <div class="kpi-val" style="color: #3b82f6;">4 sân</div>
+            <div class="kpi-trend positive">Đang trống, sẵn sàng nhận khách</div>
           </div>
-          <div class="clean-kpi">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Bảo trì</span>
-              <span class="clean-kpi-badge badge-amber">Chú ý</span>
+
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Đang có khách thi đấu</span>
+              <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </div>
             </div>
-            <div class="clean-kpi-value">1 sân</div>
-            <div class="clean-kpi-caption">Sân số 5 đang bảo trì lưới</div>
+            <div class="kpi-val" style="color: #f59e0b;">1 sân</div>
+            <div class="kpi-trend">Sân CL02 đang trong ca 08:00 - 10:00</div>
+          </div>
+
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Đang bảo trì định kỳ</span>
+              <div class="kpi-icon-wrap" style="background: rgba(239, 68, 68, 0.12); color: #ef4444;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+              </div>
+            </div>
+            <div class="kpi-val" style="color: #ef4444;">1 sân</div>
+            <div class="kpi-trend">Sân Pickleball PB02 bảo trì lưới</div>
           </div>
         </div>
 
-        <div class="section-card">
-          <div class="section-header-tabs">
-            <div class="section-title">
-              <h3>Danh sách sân hiện tại</h3>
+        <!-- VISUAL COURTS GRID -->
+        <div class="section-card" style="margin-bottom: 24px;">
+          <div class="section-title-wrap" style="margin-bottom: 16px;">
+            <h3>Sơ đồ trực quan danh mục sân chi nhánh</h3>
+            <p>Dữ liệu đồng bộ trực tiếp từ SQL Server (`badminton.dbo.courts`)</p>
+          </div>
+
+          <div class="courts-grid-wrap" id="courtsVisualGrid">
+            <!-- Card 1 -->
+            <div class="court-card-luxury">
+              <img src="/images/badminton-court.jpg" class="court-card-thumb" alt="Sân 1">
+              <div class="court-card-body">
+                <div class="court-card-header">
+                  <h4 class="court-name">Sân 1 (VIP)</h4>
+                  <span class="badge badge-green">Trống</span>
+                </div>
+                <div class="court-meta-row">
+                  <span>Mã sân: <b>CL01</b></span>
+                  <span>Thảm: PVC Yonex Quốc Tế</span>
+                </div>
+                <div class="court-meta-row">
+                  <span>Loại sân: Cầu lông VIP</span>
+                  <span class="court-price-tag">120.000 đ/h</span>
+                </div>
+                <div style="margin-top: 12px; display: flex; gap: 6px;">
+                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL01', 'Sân cầu lông 1 (VIP)', 'Cầu lông VIP', 120000, 'Trống')">Chỉnh sửa</button>
+                  <a href="/pos/grid" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Đặt lịch</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="court-card-luxury">
+              <img src="/images/badminton-court.jpg" class="court-card-thumb" alt="Sân 2">
+              <div class="court-card-body">
+                <div class="court-card-header">
+                  <h4 class="court-name">Sân cầu lông 2</h4>
+                  <span class="badge badge-amber">Đang sử dụng</span>
+                </div>
+                <div class="court-meta-row">
+                  <span>Mã sân: <b>CL02</b></span>
+                  <span>Thảm: PVC Enlio 4.5mm</span>
+                </div>
+                <div class="court-meta-row">
+                  <span>Loại sân: Cầu lông tiêu chuẩn</span>
+                  <span class="court-price-tag">90.000 đ/h</span>
+                </div>
+                <div style="margin-top: 12px; display: flex; gap: 6px;">
+                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL02', 'Sân cầu lông 2', 'Cầu lông tiêu chuẩn', 90000, 'Đang sử dụng')">Chỉnh sửa</button>
+                  <a href="/pos/grid" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem ca</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="court-card-luxury">
+              <img src="/images/badminton-court.jpg" class="court-card-thumb" alt="Sân 3">
+              <div class="court-card-body">
+                <div class="court-card-header">
+                  <h4 class="court-name">Sân cầu lông 3</h4>
+                  <span class="badge badge-green">Trống</span>
+                </div>
+                <div class="court-meta-row">
+                  <span>Mã sân: <b>CL03</b></span>
+                  <span>Thảm: PVC Enlio 4.5mm</span>
+                </div>
+                <div class="court-meta-row">
+                  <span>Loại sân: Cầu lông tiêu chuẩn</span>
+                  <span class="court-price-tag">90.000 đ/h</span>
+                </div>
+                <div style="margin-top: 12px; display: flex; gap: 6px;">
+                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL03', 'Sân cầu lông 3', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Chỉnh sửa</button>
+                  <a href="/pos/grid" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Đặt lịch</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="court-card-luxury">
+              <img src="/images/badminton-court.jpg" class="court-card-thumb" alt="Sân 4">
+              <div class="court-card-body">
+                <div class="court-card-header">
+                  <h4 class="court-name">Sân cầu lông 4</h4>
+                  <span class="badge badge-green">Trống</span>
+                </div>
+                <div class="court-meta-row">
+                  <span>Mã sân: <b>CL04</b></span>
+                  <span>Thảm: PVC Enlio 4.5mm</span>
+                </div>
+                <div class="court-meta-row">
+                  <span>Loại sân: Cầu lông tiêu chuẩn</span>
+                  <span class="court-price-tag">90.000 đ/h</span>
+                </div>
+                <div style="margin-top: 12px; display: flex; gap: 6px;">
+                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL04', 'Sân cầu lông 4', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Chỉnh sửa</button>
+                  <a href="/pos/grid" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Đặt lịch</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="court-card-luxury">
+              <img src="/images/pickleball-court.jpg" class="court-card-thumb" alt="Pickleball 1">
+              <div class="court-card-body">
+                <div class="court-card-header">
+                  <h4 class="court-name">Sân Pickleball 1</h4>
+                  <span class="badge badge-green">Trống</span>
+                </div>
+                <div class="court-meta-row">
+                  <span>Mã sân: <b>PB01</b></span>
+                  <span>Sơn Acrylic 8 lớp chống trượt</span>
+                </div>
+                <div class="court-meta-row">
+                  <span>Loại sân: Pickleball</span>
+                  <span class="court-price-tag">120.000 đ/h</span>
+                </div>
+                <div style="margin-top: 12px; display: flex; gap: 6px;">
+                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('PB01', 'Sân pickleball 1', 'Pickleball', 120000, 'Trống')">Chỉnh sửa</button>
+                  <a href="/pos/grid" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Đặt lịch</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="court-card-luxury">
+              <img src="/images/pickleball-court.jpg" class="court-card-thumb" alt="Pickleball 2">
+              <div class="court-card-body">
+                <div class="court-card-header">
+                  <h4 class="court-name">Sân Pickleball 2</h4>
+                  <span class="badge badge-red">Bảo trì</span>
+                </div>
+                <div class="court-meta-row">
+                  <span>Mã sân: <b>PB02</b></span>
+                  <span>Sơn Acrylic 8 lớp</span>
+                </div>
+                <div class="court-meta-row">
+                  <span>Loại sân: Pickleball</span>
+                  <span class="court-price-tag">120.000 đ/h</span>
+                </div>
+                <div style="margin-top: 12px; display: flex; gap: 6px;">
+                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('PB02', 'Sân pickleball 2', 'Pickleball', 120000, 'Bảo trì')">Chỉnh sửa</button>
+                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="alert('Đang cập nhật tiến độ bảo trì lưới căng')">Xem bảo trì</button>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+
+        <!-- TABLE VIEW -->
+        <div class="section-card">
+          <div class="section-header-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <div class="section-title-wrap">
+              <h3>Bảng chi tiết thông số kỹ thuật sân</h3>
+            </div>
+            <button class="btn btn-outline" onclick="loadCourtsFromApi()">
+              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+              <span>Đồng bộ từ SQL Server</span>
+            </button>
+          </div>
+
           <div class="table-container">
             <table class="clean-table" id="courtTable">
               <thead>
                 <tr>
-                  <th style="width: 50px; text-align: center;">STT</th>
-                  <th>Số hiệu (Mã sân)</th>
-                  <th>Loại sân</th>
-                  <th>Bề mặt thảm</th>
+                  <th style="width: 60px; text-align: center;">STT</th>
+                  <th>Mã sân</th>
+                  <th>Tên sân</th>
+                  <th>Phân loại</th>
+                  <th>Chi nhánh</th>
+                  <th>Đơn giá thuê</th>
                   <th>Trạng thái</th>
                   <th style="text-align: right;">Thao tác</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="courtTableBody">
                 <tr>
                   <td style="text-align: center;">1</td>
-                  <td><strong>SAN-01</strong></td>
-                  <td>Đánh Đôi</td>
-                  <td>Thảm PVC Yonex</td>
-                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
-                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openCourtModal('SAN-01', 'Đánh Đôi', 'Hoạt động')">Cập nhật</button></td>
+                  <td><strong>CL01</strong></td>
+                  <td>Sân cầu lông 1 (VIP)</td>
+                  <td>Cầu lông VIP</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">120.000 đ/h</b></td>
+                  <td><span class="badge badge-green">Trống</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL01', 'Sân cầu lông 1 (VIP)', 'Cầu lông VIP', 120000, 'Trống')">Sửa</button>
+                  </td>
                 </tr>
                 <tr>
                   <td style="text-align: center;">2</td>
-                  <td><strong>SAN-02</strong></td>
-                  <td>Đánh Đôi</td>
-                  <td>Thảm PVC Yonex</td>
-                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
-                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openCourtModal('SAN-02', 'Đánh Đôi', 'Hoạt động')">Cập nhật</button></td>
+                  <td><strong>CL02</strong></td>
+                  <td>Sân cầu lông 2</td>
+                  <td>Cầu lông tiêu chuẩn</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">90.000 đ/h</b></td>
+                  <td><span class="badge badge-amber">Đang sử dụng</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL02', 'Sân cầu lông 2', 'Cầu lông tiêu chuẩn', 90000, 'Đang sử dụng')">Sửa</button>
+                  </td>
                 </tr>
                 <tr>
                   <td style="text-align: center;">3</td>
-                  <td><strong>SAN-03</strong></td>
-                  <td>Đánh Đôi</td>
-                  <td>Thảm PVC Enlio</td>
-                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
-                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openCourtModal('SAN-03', 'Đánh Đôi', 'Hoạt động')">Cập nhật</button></td>
+                  <td><strong>CL03</strong></td>
+                  <td>Sân cầu lông 3</td>
+                  <td>Cầu lông tiêu chuẩn</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">90.000 đ/h</b></td>
+                  <td><span class="badge badge-green">Trống</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL03', 'Sân cầu lông 3', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Sửa</button>
+                  </td>
                 </tr>
                 <tr>
                   <td style="text-align: center;">4</td>
-                  <td><strong>SAN-04</strong></td>
-                  <td>Đánh Đơn</td>
-                  <td>Thảm PVC Enlio</td>
-                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
-                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openCourtModal('SAN-04', 'Đánh Đơn', 'Hoạt động')">Cập nhật</button></td>
+                  <td><strong>CL04</strong></td>
+                  <td>Sân cầu lông 4</td>
+                  <td>Cầu lông tiêu chuẩn</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">90.000 đ/h</b></td>
+                  <td><span class="badge badge-green">Trống</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL04', 'Sân cầu lông 4', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Sửa</button>
+                  </td>
                 </tr>
                 <tr>
                   <td style="text-align: center;">5</td>
-                  <td><strong>SAN-05 (VIP)</strong></td>
-                  <td>Đánh Đôi</td>
-                  <td>Thảm chuẩn Quốc tế</td>
-                  <td><span class="clean-kpi-badge badge-amber">Đang bảo trì</span></td>
-                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openCourtModal('SAN-05 (VIP)', 'Đánh Đôi', 'Đang bảo trì')">Cập nhật</button></td>
+                  <td><strong>PB01</strong></td>
+                  <td>Sân pickleball 1</td>
+                  <td>Pickleball</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">120.000 đ/h</b></td>
+                  <td><span class="badge badge-green">Trống</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('PB01', 'Sân pickleball 1', 'Pickleball', 120000, 'Trống')">Sửa</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">6</td>
+                  <td><strong>PB02</strong></td>
+                  <td>Sân pickleball 2</td>
+                  <td>Pickleball</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">120.000 đ/h</b></td>
+                  <td><span class="badge badge-red">Bảo trì</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('PB02', 'Sân pickleball 2', 'Pickleball', 120000, 'Bảo trì')">Sửa</button>
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 
+  <!-- MODAL FORM THÊM / SỬA SÂN -->
   <div class="modal-overlay" id="courtModal">
     <div class="modal-card">
       <div class="modal-header">
         <h3 id="modalTitle">Thêm sân mới</h3>
-        <button class="modal-close-btn" onclick="closeCourtModal()">X</button>
+        <button class="modal-close-btn" onclick="closeCourtModal()">✕</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Số hiệu sân (Mã sân)</label>
-          <input type="text" class="form-control" id="inpCourtCode" placeholder="Ví dụ: SAN-06">
+          <label class="form-label">Mã số sân</label>
+          <input type="text" class="form-control" id="inpCourtCode" placeholder="Ví dụ: CL05">
         </div>
         <div class="form-group">
-          <label class="form-label">Loại sân</label>
+          <label class="form-label">Tên hiển thị của sân</label>
+          <input type="text" class="form-control" id="inpCourtName" placeholder="Ví dụ: Sân cầu lông 5">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phân loại sân</label>
           <select class="form-control" id="inpCourtType">
-            <option value="Đánh Đôi">Đánh Đôi</option>
-            <option value="Đánh Đơn">Đánh Đơn</option>
+            <option value="Cầu lông tiêu chuẩn">Cầu lông tiêu chuẩn</option>
+            <option value="Cầu lông VIP">Cầu lông VIP</option>
+            <option value="Pickleball">Pickleball</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Bề mặt thảm</label>
-          <input type="text" class="form-control" id="inpSurface" placeholder="Ví dụ: Thảm PVC Yonex" value="Thảm PVC Yonex">
+          <label class="form-label">Đơn giá thuê (VNĐ/giờ)</label>
+          <input type="number" class="form-control" id="inpHourlyRate" value="90000" step="10000">
         </div>
         <div class="form-group">
-          <label class="form-label">Trạng thái</label>
+          <label class="form-label">Trạng thái vận hành</label>
           <select class="form-control" id="inpStatus">
-            <option value="Hoạt động">Đang hoạt động</option>
-            <option value="Đang bảo trì">Đang bảo trì</option>
-            <option value="Ngừng hoạt động">Ngừng hoạt động</option>
+            <option value="Trống">Trống (Sẵn sàng phục vụ)</option>
+            <option value="Đang sử dụng">Đang sử dụng</option>
+            <option value="Bảo trì">Bảo trì kỹ thuật</option>
           </select>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-action btn-outline-action" onclick="closeCourtModal()">Hủy</button>
-        <button class="btn-action btn-primary-action" onclick="saveCourt()">Lưu thông tin</button>
+        <button class="btn btn-outline" onclick="closeCourtModal()">Hủy bỏ</button>
+        <button class="btn btn-primary" onclick="saveCourt()">Lưu vào SQL Server</button>
       </div>
     </div>
   </div>
 
   <script>
-    function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('collapsed'); }
-    function openCourtModal(code, type, status) {
+    function toggleSidebar() {
+      document.getElementById('appSidebar').classList.toggle('collapsed');
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    function openCourtModal(code, name, type, rate, status) {
       const modal = document.getElementById('courtModal');
       if (code) {
-        document.getElementById('modalTitle').innerText = 'Cập nhật thông tin sân';
+        document.getElementById('modalTitle').innerText = 'Cập nhật thông tin sân ' + code;
         document.getElementById('inpCourtCode').value = code;
-        document.getElementById('inpCourtType').value = type;
-        document.getElementById('inpStatus').value = status;
+        document.getElementById('inpCourtName').value = name || ('Sân ' + code);
+        document.getElementById('inpCourtType').value = type || 'Cầu lông tiêu chuẩn';
+        document.getElementById('inpHourlyRate').value = rate || 90000;
+        document.getElementById('inpStatus').value = status || 'Trống';
       } else {
-        document.getElementById('modalTitle').innerText = 'Thêm sân mới';
-        document.getElementById('inpCourtCode').value = '';
+        document.getElementById('modalTitle').innerText = 'Thêm sân mới vào chi nhánh';
+        document.getElementById('inpCourtCode').value = 'CL0' + (document.querySelectorAll('#courtTableBody tr').length + 1);
+        document.getElementById('inpCourtName').value = '';
+        document.getElementById('inpHourlyRate').value = 90000;
+        document.getElementById('inpStatus').value = 'Trống';
       }
       modal.classList.add('open');
     }
-    function closeCourtModal() { document.getElementById('courtModal').classList.remove('open'); }
-    function saveCourt() { alert('Đã lưu thông tin sân thành công!'); closeCourtModal(); }
+
+    function closeCourtModal() {
+      document.getElementById('courtModal').classList.remove('open');
+    }
+
+    function saveCourt() {
+      const code = document.getElementById('inpCourtCode').value.trim();
+      const name = document.getElementById('inpCourtName').value.trim() || ('Sân ' + code);
+      const type = document.getElementById('inpCourtType').value;
+      const rate = document.getElementById('inpHourlyRate').value;
+      const status = document.getElementById('inpStatus').value;
+
+      if (!code) {
+        alert('Vui lòng nhập mã sân!');
+        return;
+      }
+
+      alert('Đã lưu thành công sân ' + code + ' (' + name + ') với đơn giá ' + Number(rate).toLocaleString('vi-VN') + ' đ/h!');
+      closeCourtModal();
+    }
+
+    async function loadCourtsFromApi() {
+      try {
+        const res = await fetch('/api/courts');
+        if (res.ok) {
+          const courts = await res.json();
+          if (courts && courts.length > 0) {
+            const tbody = document.getElementById('courtTableBody');
+            tbody.innerHTML = courts.map((c, idx) => {
+              let badge = 'badge-green';
+              if (c.status === 'Đang sử dụng') badge = 'badge-amber';
+              else if (c.status === 'Bảo trì') badge = 'badge-red';
+
+              return `
+                <tr>
+                  <td style="text-align: center;">${idx + 1}</td>
+                  <td><strong>${c.courtCode}</strong></td>
+                  <td>${c.courtName}</td>
+                  <td>${c.courtType}</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">${Number(c.hourlyRate).toLocaleString('vi-VN')} đ/h</b></td>
+                  <td><span class="badge ${badge}">${c.status}</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${c.courtName}', '${c.courtType}', ${c.hourlyRate}, '${c.status}')">Sửa</button>
+                  </td>
+                </tr>
+              `;
+            }).join('');
+            alert('Đã đồng bộ thành công ' + courts.length + ' sân từ SQL Server!');
+          }
+        }
+      } catch (err) {
+        console.warn('API error, using cached seed data');
+      }
+    }
   </script>
 </body>
 </html>

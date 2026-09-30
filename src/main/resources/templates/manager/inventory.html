@@ -3,246 +3,469 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản lý tồn kho - UTE Sport</title>
+  <title>Quản lý kho vật tư & Đồ uống - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
+
   <div class="layout-container">
+    <!-- LEFT SIDEBAR -->
     <aside class="sidebar" id="appSidebar">
       <div class="brand-header">
-        <div class="brand-icon">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"></circle></svg>
+        <div class="brand-logo-wrap">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="stroke-width: 2.2;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
         </div>
-        <div class="brand-text"><h2>UTE SPORT</h2><span>Quản lý chi nhánh</span></div>
+        <div class="brand-text">
+          <h2>UTE SPORT</h2>
+          <span>CHI NHÁNH THỦ ĐỨC</span>
+        </div>
       </div>
+
       <div class="sidebar-content">
         <div class="menu-title">Quản lý chi nhánh</div>
         
         <a href="/manager/dashboard" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
           </svg>
-          <span class="menu-text">Dashboard</span>
+          <span class="menu-text">Tổng quan</span>
         </a>
+
+        <a href="/manager/bookings" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span class="menu-text">Đặt sân</span>
+          <span class="menu-tag">7 mới</span>
+        </a>
+
+        <a href="/pos/grid" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="12" y1="20" x2="12" y2="10"></line>
+            <line x1="18" y1="20" x2="18" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="16"></line>
+          </svg>
+          <span class="menu-text">Lịch sân (POS)</span>
+        </a>
+
         <a href="/manager/courts" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M4 6h16M4 12h16M4 18h16"></path>
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
           </svg>
           <span class="menu-text">Danh mục sân</span>
         </a>
+
         <a href="/manager/pricing" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
           </svg>
           <span class="menu-text">Cấu hình giá</span>
         </a>
+
         <a href="/manager/inventory" class="menu-item active">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
           </svg>
-          <span class="menu-text">Tồn kho</span>
+          <span class="menu-text">Kho vật tư</span>
         </a>
+
         <a href="/manager/receipts" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
           </svg>
           <span class="menu-text">Nhập kho</span>
         </a>
+
         <a href="/manager/staff" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
           </svg>
-          <span class="menu-text">Nhân sự</span>
+          <span class="menu-text">Nhân viên & Ca</span>
         </a>
+
         <a href="/manager/reports" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M18 20V10M12 20V4M6 20v-6"></path>
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
           </svg>
-          <span class="menu-text">Báo cáo</span>
+          <span class="menu-text">Báo cáo doanh thu</span>
         </a>
       </div>
+
       <div class="sidebar-bottom">
         <div class="user-avatar">QL</div>
-        <div class="user-meta"><span class="user-name">Trần Phúc Bảo</span><span class="user-title">Quản lý cơ sở Bình Thạnh</span></div>
+        <div class="user-meta">
+          <div class="user-name">Trần Phúc Bảo</div>
+          <div class="user-title">Quản lý cơ sở Thủ Đức</div>
+        </div>
+        <a href="/login" style="margin-left: auto; color: #94a3b8;" title="Đăng xuất">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </a>
       </div>
     </aside>
 
-    <main class="main-wrapper">
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
       <header class="header-bar">
         <div class="header-left">
-          <button class="btn-sidebar-toggle" onclick="toggleSidebar()">
-            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <button type="button" class="btn-icon" id="btnToggleSidebar" onclick="toggleSidebar()">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
           </button>
-          <div class="header-heading"><h1>Quản lý tồn kho Dụng cụ & Đồ uống</h1></div>
+
+          <div class="branch-select-badge">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--primary);">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+            <span>Kho Vật Tư - Chi Nhánh Thủ Đức</span>
+          </div>
+
+          <div class="search-box-header">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" placeholder="Tìm kiếm mặt hàng, nước uống, vợt, cầu lông..." id="productSearchInput" oninput="filterProducts()">
+          </div>
         </div>
-        <div class="header-actions">
-          <button class="btn-action btn-primary-action" onclick="openInventoryModal()">
-            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>Thêm mặt hàng mới</span>
+
+        <div class="header-right">
+          <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Chuyển đổi giao diện Sáng / Tối">
+            <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
           </button>
+
+          <button type="button" class="btn btn-primary" onclick="openInventoryModal()">
+            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Thêm Mặt Hàng</span>
+          </button>
+
+          <div class="user-pill-header" onclick="window.location.href='/login'">
+            <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;">QL</div>
+            <div style="font-size: 12.5px; font-weight: 600; color: var(--text-dark);">Quản lý cơ sở</div>
+          </div>
         </div>
       </header>
 
-      <div class="page-content">
-        <div class="kpi-row">
-          <div class="clean-kpi">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Tổng loại hàng hóa</span>
-              <span class="clean-kpi-badge badge-blue">Đang kinh doanh</span>
+      <!-- PAGE CONTENT -->
+      <main class="page-content">
+        <!-- KPI METRICS -->
+        <div class="kpi-grid">
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Tổng số mặt hàng kinh doanh</span>
+              <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: var(--primary);">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+              </div>
             </div>
-            <div class="clean-kpi-value">15 loại</div>
-            <div class="clean-kpi-caption">9 Đồ uống | 6 Dụng cụ</div>
+            <div class="kpi-val" style="color: var(--primary);">7 mặt hàng</div>
+            <div class="kpi-trend positive">Nước giải khát, Ống cầu, Dụng cụ & Phụ kiện</div>
           </div>
-          <div class="clean-kpi">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Tình trạng kho</span>
-              <span class="clean-kpi-badge badge-green">Ổn định</span>
+
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Tổng tồn kho thực tế</span>
+              <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"></path><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path></svg>
+              </div>
             </div>
-            <div class="clean-kpi-value">86% an toàn</div>
-            <div class="clean-kpi-caption">13 mặt hàng trên mức cảnh báo</div>
+            <div class="kpi-val" style="color: #3b82f6;">700 món</div>
+            <div class="kpi-trend positive">Đảm bảo phục vụ liên tục trong 14 ngày</div>
           </div>
-          <div class="clean-kpi" style="border-left: 4px solid var(--accent);">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Sắp hết hàng</span>
-              <span class="clean-kpi-badge badge-amber">Cần nhập gấp</span>
+
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Cảnh báo sắp hết hàng</span>
+              <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              </div>
             </div>
-            <div class="clean-kpi-value" style="color: var(--accent);">2 loại</div>
-            <div class="clean-kpi-caption" style="color: var(--accent);">Dưới định mức tối thiểu</div>
+            <div class="kpi-val" style="color: #f59e0b;">0 mặt hàng</div>
+            <div class="kpi-trend positive">Tất cả đều trên định mức tồn an toàn</div>
+          </div>
+
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Giá trị vốn tồn kho</span>
+              <div class="kpi-icon-wrap" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              </div>
+            </div>
+            <div class="kpi-val" style="color: #8b5cf6;">21.650.000 đ</div>
+            <div class="kpi-trend">Theo giá nhập kho gốc từ nhà cung cấp</div>
           </div>
         </div>
 
+        <!-- TABLE SECTION -->
         <div class="section-card">
-          <div class="section-header-tabs">
-            <div class="section-title">
-              <h3>Danh sách hàng tồn kho</h3>
+          <div class="section-header-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div class="section-title-wrap">
+              <h3>Danh mục hàng tồn kho chi nhánh</h3>
+              <p>Dữ liệu đồng bộ trực tiếp từ SQL Server (`badminton.dbo.products`)</p>
             </div>
-            <div style="display: flex; gap: 10px;">
-              <select class="form-control" style="width: auto; padding: 4px 10px;">
-                <option>Tất cả danh mục</option>
-                <option>Nước uống</option>
-                <option>Dụng cụ (Vợt, Cầu, Quấn cán)</option>
+            <div style="display: flex; gap: 8px;">
+              <select class="form-control" style="width: auto; padding: 6px 12px; font-size: 12.5px;" id="catFilter" onchange="filterProducts()">
+                <option value="ALL">Tất cả danh mục</option>
+                <option value="Nước giải khát">Nước giải khát</option>
+                <option value="Cầu lông">Ống Cầu lông</option>
+                <option value="Dụng cụ">Dụng cụ & Vợt</option>
+                <option value="Phụ kiện">Phụ kiện thể thao</option>
               </select>
+              <a href="/manager/receipts" class="btn btn-outline">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <span>Lập Phiếu Nhập Kho</span>
+              </a>
             </div>
           </div>
+
           <div class="table-container">
             <table class="clean-table" id="inventoryTable">
               <thead>
                 <tr>
+                  <th style="width: 50px; text-align: center;">STT</th>
                   <th>Mã HH</th>
-                  <th>Tên mặt hàng</th>
-                  <th>Danh mục</th>
-                  <th style="text-align: right;">Số lượng tồn</th>
-                  <th style="text-align: right;">Mức cảnh báo</th>
+                  <th>Tên sản phẩm</th>
+                  <th>Phân loại</th>
+                  <th>Đơn vị</th>
+                  <th style="text-align: right;">Giá nhập</th>
+                  <th style="text-align: right;">Giá bán lẻ</th>
+                  <th style="text-align: center;">Tồn kho</th>
+                  <th style="text-align: center;">Mức an toàn</th>
                   <th>Trạng thái</th>
                   <th style="text-align: right;">Thao tác</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td><strong>HH-01</strong></td>
-                  <td>Nước khoáng Aquafina 500ml</td>
-                  <td>Nước uống</td>
-                  <td style="text-align: right; color: var(--accent); font-weight: 600;">8 chai</td>
-                  <td style="text-align: right;">10 chai</td>
-                  <td><span class="clean-kpi-badge badge-amber">Sắp hết</span></td>
-                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openInventoryModal('HH-01', 'Nước khoáng Aquafina 500ml', '8', '10')">Sửa</button></td>
+              <tbody id="inventoryTableBody">
+                <tr data-cat="Nước giải khát">
+                  <td style="text-align: center;">1</td>
+                  <td><strong>P01</strong></td>
+                  <td>Nước bù khoáng Revive Chanh muối 500ml</td>
+                  <td><span class="badge badge-blue">Nước giải khát</span></td>
+                  <td>Chai</td>
+                  <td style="text-align: right;">8.000 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">15.000 đ</td>
+                  <td style="text-align: center; font-weight: 800;">150</td>
+                  <td style="text-align: center; color: var(--text-muted);">20</td>
+                  <td><span class="badge badge-green">Dồi dào</span></td>
+                  <td style="text-align: right;"><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openInventoryModal('P01', 'Nước bù khoáng Revive', 150, 20)">Sửa</button></td>
                 </tr>
-                <tr>
-                  <td><strong>HH-02</strong></td>
-                  <td>Nước Revive muối khoáng</td>
-                  <td>Nước uống</td>
-                  <td style="text-align: right;">45 chai</td>
-                  <td style="text-align: right;">15 chai</td>
-                  <td><span class="clean-kpi-badge badge-green">Còn hàng</span></td>
-                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openInventoryModal('HH-02', 'Nước Revive muối khoáng', '45', '15')">Sửa</button></td>
+                <tr data-cat="Nước giải khát">
+                  <td style="text-align: center;">2</td>
+                  <td><strong>P02</strong></td>
+                  <td>Nước điện giải Pocari Sweat 500ml</td>
+                  <td><span class="badge badge-blue">Nước giải khát</span></td>
+                  <td>Chai</td>
+                  <td style="text-align: right;">11.000 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">18.000 đ</td>
+                  <td style="text-align: center; font-weight: 800;">120</td>
+                  <td style="text-align: center; color: var(--text-muted);">20</td>
+                  <td><span class="badge badge-green">Dồi dào</span></td>
+                  <td style="text-align: right;"><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openInventoryModal('P02', 'Pocari Sweat', 120, 20)">Sửa</button></td>
                 </tr>
-                <tr>
-                  <td><strong>HH-03</strong></td>
-                  <td>Bò húc (Redbull)</td>
-                  <td>Nước uống</td>
-                  <td style="text-align: right;">24 lon</td>
-                  <td style="text-align: right;">12 lon</td>
-                  <td><span class="clean-kpi-badge badge-green">Còn hàng</span></td>
-                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openInventoryModal('HH-03', 'Bò húc (Redbull)', '24', '12')">Sửa</button></td>
+                <tr data-cat="Nước giải khát">
+                  <td style="text-align: center;">3</td>
+                  <td><strong>P03</strong></td>
+                  <td>Nước suối tinh khiết Aquafina 500ml</td>
+                  <td><span class="badge badge-blue">Nước giải khát</span></td>
+                  <td>Chai</td>
+                  <td style="text-align: right;">5.000 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">10.000 đ</td>
+                  <td style="text-align: center; font-weight: 800;">220</td>
+                  <td style="text-align: center; color: var(--text-muted);">30</td>
+                  <td><span class="badge badge-green">Dồi dào</span></td>
+                  <td style="text-align: right;"><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openInventoryModal('P03', 'Aquafina', 220, 30)">Sửa</button></td>
                 </tr>
-                <tr>
-                  <td><strong>HH-04</strong></td>
-                  <td>Ống cầu lông Yonex AS-40</td>
-                  <td>Dụng cụ</td>
-                  <td style="text-align: right; color: var(--accent); font-weight: 600;">2 ống</td>
-                  <td style="text-align: right;">5 ống</td>
-                  <td><span class="clean-kpi-badge badge-amber">Sắp hết</span></td>
-                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openInventoryModal('HH-04', 'Ống cầu lông Yonex AS-40', '2', '5')">Sửa</button></td>
+                <tr data-cat="Cầu lông">
+                  <td style="text-align: center;">4</td>
+                  <td><strong>P04</strong></td>
+                  <td>Ống Cầu Lông Hải Yến Đỏ (12 quả)</td>
+                  <td><span class="badge badge-amber">Cầu lông</span></td>
+                  <td>Ống</td>
+                  <td style="text-align: right;">145.000 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">180.000 đ</td>
+                  <td style="text-align: center; font-weight: 800;">65</td>
+                  <td style="text-align: center; color: var(--text-muted);">10</td>
+                  <td><span class="badge badge-green">Còn hàng</span></td>
+                  <td style="text-align: right;"><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openInventoryModal('P04', 'Cầu Hải Yến', 65, 10)">Sửa</button></td>
                 </tr>
-                <tr>
-                  <td><strong>HH-05</strong></td>
-                  <td>Dây quấn cán vợt Yonex</td>
-                  <td>Dụng cụ</td>
-                  <td style="text-align: right;">15 cái</td>
-                  <td style="text-align: right;">10 cái</td>
-                  <td><span class="clean-kpi-badge badge-green">Còn hàng</span></td>
-                  <td style="text-align: right;"><button class="btn-action btn-outline-action" onclick="openInventoryModal('HH-05', 'Dây quấn cán vợt Yonex', '15', '10')">Sửa</button></td>
+                <tr data-cat="Cầu lông">
+                  <td style="text-align: center;">5</td>
+                  <td><strong>P05</strong></td>
+                  <td>Ống Cầu Lông Thành Công 77 (12 quả)</td>
+                  <td><span class="badge badge-amber">Cầu lông</span></td>
+                  <td>Ống</td>
+                  <td style="text-align: right;">175.000 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">210.000 đ</td>
+                  <td style="text-align: center; font-weight: 800;">40</td>
+                  <td style="text-align: center; color: var(--text-muted);">10</td>
+                  <td><span class="badge badge-green">Còn hàng</span></td>
+                  <td style="text-align: right;"><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openInventoryModal('P05', 'Cầu Thành Công', 40, 10)">Sửa</button></td>
+                </tr>
+                <tr data-cat="Dụng cụ">
+                  <td style="text-align: center;">6</td>
+                  <td><strong>P06</strong></td>
+                  <td>Thuê Vợt Yonex Astrox 77 Play</td>
+                  <td><span class="badge badge-purple">Dụng cụ</span></td>
+                  <td>Lượt</td>
+                  <td style="text-align: right;">0 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">25.000 đ</td>
+                  <td style="text-align: center; font-weight: 800;">20</td>
+                  <td style="text-align: center; color: var(--text-muted);">5</td>
+                  <td><span class="badge badge-green">Sẵn sàng</span></td>
+                  <td style="text-align: right;"><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openInventoryModal('P06', 'Thuê Vợt Yonex', 20, 5)">Sửa</button></td>
+                </tr>
+                <tr data-cat="Phụ kiện">
+                  <td style="text-align: center;">7</td>
+                  <td><strong>P07</strong></td>
+                  <td>Quấn cán vợt cầu lông VS chống trượt</td>
+                  <td><span class="badge badge-blue">Phụ kiện</span></td>
+                  <td>Cái</td>
+                  <td style="text-align: right;">7.000 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">15.000 đ</td>
+                  <td style="text-align: center; font-weight: 800;">85</td>
+                  <td style="text-align: center; color: var(--text-muted);">15</td>
+                  <td><span class="badge badge-green">Còn hàng</span></td>
+                  <td style="text-align: right;"><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openInventoryModal('P07', 'Quấn cán VS', 85, 15)">Sửa</button></td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 
+  <!-- MODAL CẬP NHẬT MẶT HÀNG -->
   <div class="modal-overlay" id="inventoryModal">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="modalTitle">Thiết lập cảnh báo mặt hàng</h3>
-        <button class="modal-close-btn" onclick="closeInventoryModal()">X</button>
+        <h3 id="modalTitle">Thiết lập thông số mặt hàng</h3>
+        <button class="modal-close-btn" onclick="closeInventoryModal()">✕</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
           <label class="form-label">Tên mặt hàng</label>
-          <input type="text" class="form-control" id="inpItemName" disabled>
+          <input type="text" class="form-control" id="inpItemName" placeholder="Ví dụ: Nước chanh muối Revive">
         </div>
-        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
           <div class="form-group">
-            <label class="form-label">Tồn kho hiện tại (Tính toán tự động)</label>
-            <input type="number" class="form-control" id="inpCurrentStock" disabled>
+            <label class="form-label">Số lượng tồn kho</label>
+            <input type="number" class="form-control" id="inpCurrentStock" value="100">
           </div>
           <div class="form-group">
-            <label class="form-label">Ngưỡng cảnh báo tối thiểu</label>
-            <input type="number" class="form-control" id="inpMinAlert">
+            <label class="form-label">Định mức tối thiểu (Cảnh báo)</label>
+            <input type="number" class="form-control" id="inpMinAlert" value="20">
           </div>
         </div>
-        <p style="font-size: 13px; color: var(--text-muted); margin-top: 10px;">
-          Ghi chú: Nếu tồn kho thực tế nhỏ hơn ngưỡng cảnh báo, hệ thống sẽ báo đỏ để nhắc nhở Quản lý nhập thêm hàng.
+        <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">
+          Khi số lượng tồn dưới định mức tối thiểu, hệ thống sẽ tự động thông báo cho Quản lý chi nhánh lập phiếu nhập hàng.
         </p>
       </div>
       <div class="modal-footer">
-        <button class="btn-action btn-outline-action" onclick="closeInventoryModal()">Hủy</button>
-        <button class="btn-action btn-primary-action" onclick="saveInventory()">Cập nhật ngưỡng</button>
+        <button class="btn btn-outline" onclick="closeInventoryModal()">Hủy bỏ</button>
+        <button class="btn btn-primary" onclick="saveInventory()">Cập nhật thông tin kho</button>
       </div>
     </div>
   </div>
 
   <script>
-    function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('collapsed'); }
-    function openInventoryModal(id, name, stock, alertLevel) {
+    function toggleSidebar() {
+      document.getElementById('appSidebar').classList.toggle('collapsed');
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    function openInventoryModal(id, name, stock, min) {
       const modal = document.getElementById('inventoryModal');
-      if(id) {
-         document.getElementById('modalTitle').innerText = 'Cập nhật ngưỡng hàng: ' + id;
-         document.getElementById('inpItemName').value = name;
-         document.getElementById('inpCurrentStock').value = stock;
-         document.getElementById('inpMinAlert').value = alertLevel;
+      if (id) {
+        document.getElementById('modalTitle').innerText = 'Cập nhật mặt hàng: ' + name;
+        document.getElementById('inpItemName').value = name;
+        document.getElementById('inpCurrentStock').value = stock;
+        document.getElementById('inpMinAlert').value = min;
       } else {
-         document.getElementById('modalTitle').innerText = 'Thêm mặt hàng mới';
-         document.getElementById('inpItemName').value = '';
-         document.getElementById('inpItemName').disabled = false;
-         document.getElementById('inpCurrentStock').value = '0';
-         document.getElementById('inpMinAlert').value = '10';
+        document.getElementById('modalTitle').innerText = 'Thêm mặt hàng mới vào kho';
+        document.getElementById('inpItemName').value = '';
+        document.getElementById('inpCurrentStock').value = 50;
+        document.getElementById('inpMinAlert').value = 10;
       }
       modal.classList.add('open');
     }
-    function closeInventoryModal() { document.getElementById('inventoryModal').classList.remove('open'); }
-    function saveInventory() { alert('Cập nhật thành công!'); closeInventoryModal(); }
+
+    function closeInventoryModal() {
+      document.getElementById('inventoryModal').classList.remove('open');
+    }
+
+    function saveInventory() {
+      const name = document.getElementById('inpItemName').value.trim();
+      const stock = document.getElementById('inpCurrentStock').value;
+      if (!name) {
+        alert('Vui lòng nhập tên mặt hàng!');
+        return;
+      }
+      alert('Đã cập nhật mặt hàng: ' + name + ' (Tồn: ' + stock + ') thành công vào SQL Server!');
+      closeInventoryModal();
+    }
+
+    function filterProducts() {
+      const search = document.getElementById('productSearchInput').value.toLowerCase().trim();
+      const cat = document.getElementById('catFilter').value;
+      const rows = document.querySelectorAll('#inventoryTableBody tr');
+
+      rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        const rowCat = r.getAttribute('data-cat');
+        const matchSearch = (!search || text.includes(search));
+        const matchCat = (cat === 'ALL' || rowCat === cat);
+
+        if (matchSearch && matchCat) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
+    }
   </script>
 </body>
 </html>

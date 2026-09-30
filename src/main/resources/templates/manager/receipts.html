@@ -6,194 +6,429 @@
   <title>Lập phiếu nhập kho - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
   <style>
-    .split-layout { display: grid; grid-template-columns: 3fr 2fr; gap: 24px; }
-    .receipt-item-row { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr 30px; gap: 10px; margin-bottom: 10px; align-items: center; }
-    .totals-box { background-color: var(--bg-page); padding: 15px; border-radius: 8px; margin-top: 15px; text-align: right; }
+    .split-layout {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 992px) {
+      .split-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .receipt-item-row {
+      display: grid;
+      grid-template-columns: 2.2fr 1fr 1.2fr 1.2fr 36px;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .totals-box {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-top: 18px;
+    }
   </style>
 </head>
 <body>
+
   <div class="layout-container">
+    <!-- LEFT SIDEBAR -->
     <aside class="sidebar" id="appSidebar">
       <div class="brand-header">
-        <div class="brand-icon">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"></circle></svg>
+        <div class="brand-logo-wrap">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="stroke-width: 2.2;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
         </div>
-        <div class="brand-text"><h2>UTE SPORT</h2><span>Quản lý chi nhánh</span></div>
+        <div class="brand-text">
+          <h2>UTE SPORT</h2>
+          <span>CHI NHÁNH THỦ ĐỨC</span>
+        </div>
       </div>
+
       <div class="sidebar-content">
         <div class="menu-title">Quản lý chi nhánh</div>
         
         <a href="/manager/dashboard" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
           </svg>
-          <span class="menu-text">Dashboard</span>
+          <span class="menu-text">Tổng quan</span>
         </a>
+
+        <a href="/manager/bookings" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span class="menu-text">Đặt sân</span>
+          <span class="menu-tag">7 mới</span>
+        </a>
+
+        <a href="/pos/grid" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="12" y1="20" x2="12" y2="10"></line>
+            <line x1="18" y1="20" x2="18" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="16"></line>
+          </svg>
+          <span class="menu-text">Lịch sân (POS)</span>
+        </a>
+
         <a href="/manager/courts" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M4 6h16M4 12h16M4 18h16"></path>
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
           </svg>
           <span class="menu-text">Danh mục sân</span>
         </a>
+
         <a href="/manager/pricing" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
           </svg>
           <span class="menu-text">Cấu hình giá</span>
         </a>
+
         <a href="/manager/inventory" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
           </svg>
-          <span class="menu-text">Tồn kho</span>
+          <span class="menu-text">Kho vật tư</span>
         </a>
+
         <a href="/manager/receipts" class="menu-item active">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
           </svg>
           <span class="menu-text">Nhập kho</span>
         </a>
+
         <a href="/manager/staff" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
           </svg>
-          <span class="menu-text">Nhân sự</span>
+          <span class="menu-text">Nhân viên & Ca</span>
         </a>
+
         <a href="/manager/reports" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M18 20V10M12 20V4M6 20v-6"></path>
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
           </svg>
-          <span class="menu-text">Báo cáo</span>
+          <span class="menu-text">Báo cáo doanh thu</span>
         </a>
       </div>
+
       <div class="sidebar-bottom">
         <div class="user-avatar">QL</div>
-        <div class="user-meta"><span class="user-name">Trần Phúc Bảo</span><span class="user-title">Quản lý cơ sở Bình Thạnh</span></div>
+        <div class="user-meta">
+          <div class="user-name">Trần Phúc Bảo</div>
+          <div class="user-title">Quản lý cơ sở Thủ Đức</div>
+        </div>
+        <a href="/login" style="margin-left: auto; color: #94a3b8;" title="Đăng xuất">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </a>
       </div>
     </aside>
 
-    <main class="main-wrapper">
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
       <header class="header-bar">
         <div class="header-left">
-          <button class="btn-sidebar-toggle" onclick="toggleSidebar()">
-            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <button type="button" class="btn-icon" id="btnToggleSidebar" onclick="toggleSidebar()">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
           </button>
-          <div class="header-heading"><h1>Lập phiếu nhập kho & Lịch sử</h1></div>
+
+          <div class="branch-select-badge">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--primary);">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+            <span>Nhập Kho Vật Tư - Thủ Đức</span>
+          </div>
+
+          <div class="search-box-header">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" placeholder="Tìm kiếm phiếu nhập theo số chứng từ, nhà cung cấp...">
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Chuyển đổi giao diện Sáng / Tối">
+            <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+
+          <a href="/manager/inventory" class="btn btn-outline">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+            <span>Xem Kho Hiện Tại</span>
+          </a>
+
+          <div class="user-pill-header" onclick="window.location.href='/login'">
+            <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;">QL</div>
+            <div style="font-size: 12.5px; font-weight: 600; color: var(--text-dark);">Quản lý cơ sở</div>
+          </div>
         </div>
       </header>
 
-      <div class="page-content">
+      <!-- PAGE CONTENT -->
+      <main class="page-content">
         <div class="split-layout">
-          
           <!-- BÊN TRÁI: FORM LẬP PHIẾU NHẬP -->
           <div class="section-card">
-            <div class="section-header-tabs">
-              <div class="section-title"><h3>Tạo phiếu nhập kho mới</h3></div>
+            <div class="section-header-tabs" style="margin-bottom: 20px;">
+              <div class="section-title-wrap">
+                <h3>Lập phiếu nhập kho vật tư mới</h3>
+                <p>Cập nhật số lượng tồn kho tự động trong SQL Server</p>
+              </div>
             </div>
-            <div style="padding: 20px;">
-              <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+
+            <form id="receiptForm" onsubmit="submitReceipt(event)">
+              <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; margin-bottom: 18px;">
                 <div class="form-group">
-                  <label class="form-label">Nhà cung cấp</label>
-                  <select class="form-control">
-                    <option>Đại lý Nước giải khát Tuấn Anh</option>
-                    <option>Công ty thể thao Yonex VN</option>
-                    <option>Khác (Nhập lẻ)</option>
+                  <label class="form-label">Nhà cung cấp / Đối tác</label>
+                  <select class="form-control" id="supplierSelect">
+                    <option value="Đại lý Nước giải khát Tuấn Anh">Đại lý Nước giải khát Tuấn Anh</option>
+                    <option value="Công ty TNHH Thể Thao Yonex Việt Nam">Công ty Thể Thao Yonex Việt Nam</option>
+                    <option value="Công ty Cầu Lông Thành Công">Công ty Cầu Lông Thành Công</option>
+                    <option value="Đại lý Phụ Kiện Thể Thao VS">Đại lý Phụ Kiện Thể Thao VS</option>
                   </select>
                 </div>
+
                 <div class="form-group">
-                  <label class="form-label">Ghi chú (Tùy chọn)</label>
-                  <input type="text" class="form-control" placeholder="Ví dụ: Bổ sung gấp hàng cho giải đấu cuối tuần">
+                  <label class="form-label">Ngày nhập kho</label>
+                  <input type="date" class="form-control" id="receiptDate" value="2026-09-30">
                 </div>
               </div>
 
-              <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                  <strong style="font-size: 14px;">Chi tiết mặt hàng nhập</strong>
-                  <button class="btn-action btn-outline-action" style="padding: 4px 10px;" onclick="addReceiptItem()">+ Thêm dòng</button>
-                </div>
-                
-                <div id="receiptItemsContainer">
-                  <div class="receipt-item-row">
-                    <select class="form-control"><option>Nước khoáng Aquafina 500ml</option><option>Ống cầu lông Yonex AS-40</option></select>
-                    <input type="number" class="form-control" placeholder="Số lượng" value="24">
-                    <input type="text" class="form-control" placeholder="ĐVT" value="Chai" disabled>
-                    <input type="number" class="form-control" placeholder="Đơn giá" value="4000">
-                    <button class="btn-action" style="color: var(--accent); padding: 0;" title="Xóa">X</button>
-                  </div>
-                  <div class="receipt-item-row">
-                    <select class="form-control"><option>Ống cầu lông Yonex AS-40</option><option>Nước khoáng Aquafina 500ml</option></select>
-                    <input type="number" class="form-control" placeholder="Số lượng" value="5">
-                    <input type="text" class="form-control" placeholder="ĐVT" value="Ống" disabled>
-                    <input type="number" class="form-control" placeholder="Đơn giá" value="380000">
-                    <button class="btn-action" style="color: var(--accent); padding: 0;" title="Xóa">X</button>
-                  </div>
+              <!-- DANH SÁCH MẶT HÀNG NHẬP -->
+              <div style="margin-bottom: 12px; font-weight: 800; font-size: 14px; color: var(--text-dark);">
+                Chi tiết hàng hóa nhập:
+              </div>
+
+              <div id="receiptItemsContainer">
+                <div class="receipt-item-row">
+                  <select class="form-control" onchange="calcTotals()">
+                    <option value="8000">Nước Revive Chanh Muối 500ml</option>
+                    <option value="11000">Nước Pocari Sweat 500ml</option>
+                    <option value="5000">Nước suối Aquafina 500ml</option>
+                    <option value="145000">Ống Cầu Hải Yến Đỏ (12 quả)</option>
+                    <option value="175000">Ống Cầu Thành Công 77</option>
+                    <option value="7000">Quấn cán vợt VS</option>
+                  </select>
+                  <input type="number" class="form-control" placeholder="SL" value="50" min="1" oninput="calcTotals()">
+                  <input type="number" class="form-control" placeholder="Giá nhập" value="8000" step="1000" oninput="calcTotals()">
+                  <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); text-align: right;" class="item-subtotal">400.000 đ</div>
+                  <button type="button" class="btn-icon" style="color: #ef4444;" onclick="this.parentElement.remove(); calcTotals();">✕</button>
                 </div>
 
-                <div class="totals-box">
-                  <span style="color: var(--text-muted); margin-right: 15px;">Tổng cộng:</span>
-                  <strong style="font-size: 18px; color: var(--primary);">1,996,000 đ</strong>
+                <div class="receipt-item-row">
+                  <select class="form-control" onchange="calcTotals()">
+                    <option value="145000" selected>Ống Cầu Hải Yến Đỏ (12 quả)</option>
+                    <option value="8000">Nước Revive Chanh Muối 500ml</option>
+                    <option value="11000">Nước Pocari Sweat 500ml</option>
+                    <option value="5000">Nước suối Aquafina 500ml</option>
+                    <option value="175000">Ống Cầu Thành Công 77</option>
+                    <option value="7000">Quấn cán vợt VS</option>
+                  </select>
+                  <input type="number" class="form-control" placeholder="SL" value="20" min="1" oninput="calcTotals()">
+                  <input type="number" class="form-control" placeholder="Giá nhập" value="145000" step="5000" oninput="calcTotals()">
+                  <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); text-align: right;" class="item-subtotal">2.900.000 đ</div>
+                  <button type="button" class="btn-icon" style="color: #ef4444;" onclick="this.parentElement.remove(); calcTotals();">✕</button>
                 </div>
               </div>
 
-              <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
-                <button class="btn-action btn-primary-action" onclick="submitReceipt()">Lưu & Hoàn tất phiếu nhập</button>
+              <button type="button" class="btn btn-outline" style="font-size: 12.5px; margin-top: 8px;" onclick="addReceiptRow()">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>+ Thêm dòng sản phẩm</span>
+              </button>
+
+              <!-- TOTALS BOX -->
+              <div class="totals-box">
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); margin-bottom: 6px;">
+                  <span>Tổng số lượng nhập:</span>
+                  <span id="totalItemsCount" style="font-weight: 700; color: var(--text-dark);">70 món</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; color: var(--text-dark); border-top: 1px solid var(--border-subtle); padding-top: 8px;">
+                  <span>TỔNG TIỀN THANH TOÁN:</span>
+                  <span id="grandTotal" style="color: var(--primary);">3.300.000 đ</span>
+                </div>
               </div>
-            </div>
+
+              <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1; padding: 12px; font-size: 14px;">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Hoàn tất & Nhập hàng vào kho</span>
+                </button>
+              </div>
+            </form>
           </div>
 
-          <!-- BÊN PHẢI: LỊCH SỬ -->
+          <!-- BÊN PHẢI: LỊCH SỬ PHIẾU NHẬP GẦN ĐÂY -->
           <div class="section-card">
-            <div class="section-header-tabs">
-              <div class="section-title"><h3>Lịch sử nhập kho (Gần đây)</h3></div>
+            <div class="section-header-tabs" style="margin-bottom: 16px;">
+              <div class="section-title-wrap">
+                <h3>Lịch sử phiếu nhập gần đây</h3>
+                <p>Theo dõi các đợt bổ sung hàng hóa chi nhánh</p>
+              </div>
             </div>
+
             <div class="table-container">
-              <table class="clean-table" style="font-size: 13px;">
+              <table class="clean-table">
                 <thead>
                   <tr>
-                    <th>Mã Phiếu</th>
+                    <th>Mã phiếu</th>
                     <th>Ngày nhập</th>
+                    <th>Nhà cung cấp</th>
                     <th style="text-align: right;">Tổng tiền</th>
+                    <th>Trạng thái</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td><strong>PN-0042</strong></td>
-                    <td>15/09/2026 09:30</td>
-                    <td style="text-align: right; font-weight: 600;">2,450,000 đ</td>
+                    <td><strong>PN-260901</strong></td>
+                    <td>28/09/2026</td>
+                    <td>Đại lý Tuấn Anh</td>
+                    <td style="text-align: right; font-weight: 800; color: var(--primary);">2.400.000 đ</td>
+                    <td><span class="badge badge-green">Đã nhập kho</span></td>
                   </tr>
                   <tr>
-                    <td colspan="3" style="border-bottom: 1px solid var(--border-color); padding-top: 0; color: var(--text-muted);">Đại lý thể thao VNB</td>
+                    <td><strong>PN-260902</strong></td>
+                    <td>22/09/2026</td>
+                    <td>Yonex Việt Nam</td>
+                    <td style="text-align: right; font-weight: 800; color: var(--primary);">8.750.000 đ</td>
+                    <td><span class="badge badge-green">Đã nhập kho</span></td>
                   </tr>
                   <tr>
-                    <td><strong>PN-0041</strong></td>
-                    <td>01/09/2026 14:15</td>
-                    <td style="text-align: right; font-weight: 600;">1,200,000 đ</td>
+                    <td><strong>PN-260903</strong></td>
+                    <td>15/09/2026</td>
+                    <td>Cầu Lông Thành Công</td>
+                    <td style="text-align: right; font-weight: 800; color: var(--primary);">3.500.000 đ</td>
+                    <td><span class="badge badge-green">Đã nhập kho</span></td>
                   </tr>
                   <tr>
-                    <td colspan="3" style="border-bottom: 1px solid var(--border-color); padding-top: 0; color: var(--text-muted);">Đại lý Nước giải khát Tuấn Anh</td>
-                  </tr>
-                  <tr>
-                    <td><strong>PN-0040</strong></td>
-                    <td>20/08/2026 10:00</td>
-                    <td style="text-align: right; font-weight: 600;">4,800,000 đ</td>
-                  </tr>
-                  <tr>
-                    <td colspan="3" style="border-bottom: 1px solid var(--border-color); padding-top: 0; color: var(--text-muted);">Công ty thể thao Yonex VN</td>
+                    <td><strong>PN-260904</strong></td>
+                    <td>10/09/2026</td>
+                    <td>Phụ Kiện Thể Thao VS</td>
+                    <td style="text-align: right; font-weight: 800; color: var(--primary);">1.050.000 đ</td>
+                    <td><span class="badge badge-green">Đã nhập kho</span></td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
-
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 
   <script>
-    function toggleSidebar() { document.getElementById('appSidebar').classList.toggle('collapsed'); }
-    function addReceiptItem() { alert('Chức năng thêm dòng đang trong chế độ demo'); }
-    function submitReceipt() { alert('Đã lưu Phiếu Nhập Kho thành công! Số lượng hàng hóa đã được cộng vào kho.'); }
+    function toggleSidebar() {
+      document.getElementById('appSidebar').classList.toggle('collapsed');
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    function calcTotals() {
+      const rows = document.querySelectorAll('.receipt-item-row');
+      let totalQty = 0;
+      let totalSum = 0;
+
+      rows.forEach(r => {
+        const qtyInp = r.querySelectorAll('input')[0];
+        const priceInp = r.querySelectorAll('input')[1];
+        const subtotalEl = r.querySelector('.item-subtotal');
+
+        const qty = Number(qtyInp.value) || 0;
+        const price = Number(priceInp.value) || 0;
+        const sub = qty * price;
+
+        totalQty += qty;
+        totalSum += sub;
+
+        subtotalEl.innerText = sub.toLocaleString('vi-VN') + ' đ';
+      });
+
+      document.getElementById('totalItemsCount').innerText = totalQty + ' món';
+      document.getElementById('grandTotal').innerText = totalSum.toLocaleString('vi-VN') + ' đ';
+    }
+
+    function addReceiptRow() {
+      const container = document.getElementById('receiptItemsContainer');
+      const div = document.createElement('div');
+      div.className = 'receipt-item-row';
+      div.innerHTML = `
+        <select class="form-control" onchange="calcTotals()">
+          <option value="11000">Nước Pocari Sweat 500ml</option>
+          <option value="8000">Nước Revive Chanh Muối 500ml</option>
+          <option value="5000">Nước suối Aquafina 500ml</option>
+          <option value="175000">Ống Cầu Thành Công 77</option>
+          <option value="145000">Ống Cầu Hải Yến Đỏ</option>
+          <option value="7000">Quấn cán vợt VS</option>
+        </select>
+        <input type="number" class="form-control" placeholder="SL" value="10" min="1" oninput="calcTotals()">
+        <input type="number" class="form-control" placeholder="Giá nhập" value="11000" step="1000" oninput="calcTotals()">
+        <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); text-align: right;" class="item-subtotal">110.000 đ</div>
+        <button type="button" class="btn-icon" style="color: #ef4444;" onclick="this.parentElement.remove(); calcTotals();">✕</button>
+      `;
+      container.appendChild(div);
+      calcTotals();
+    }
+
+    function submitReceipt(e) {
+      e.preventDefault();
+      const grandTotal = document.getElementById('grandTotal').innerText;
+      const supplier = document.getElementById('supplierSelect').value;
+
+      alert(`Đã lập thành công phiếu nhập kho từ "${supplier}" với tổng giá trị ${grandTotal}! Số lượng tồn kho đã được cộng dồn vào SQL Server.`);
+    }
   </script>
 </body>
 </html>
