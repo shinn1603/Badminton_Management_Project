@@ -6,17 +6,38 @@
   <title>Thanh Toán Tiền Cọc 30% (VietQR / VNPay) - UTE Badminton</title>
   <link rel="stylesheet" href="/css/main.css">
   <style>
-    /* Customer Header */
+    :root {
+      --cust-bg: var(--bg-page);
+      --cust-surface: var(--surface);
+      --cust-border: var(--border-subtle);
+      --cust-primary: var(--primary);
+      --cust-primary-hover: var(--primary-hover);
+      --cust-primary-light: var(--primary-light);
+      --cust-primary-border: var(--primary-border);
+      --cust-text-main: var(--text-dark);
+      --cust-text-body: var(--text-body);
+      --cust-text-muted: var(--text-muted);
+    }
+
+    body {
+      background-color: var(--cust-bg);
+      color: var(--cust-text-body);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Common Header */
     .cust-header {
       background: #ffffff;
-      border-bottom: 1px solid var(--border-subtle);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      border-bottom: 1px solid var(--cust-border);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
     }
     .cust-nav-container {
       max-width: 1240px;
       margin: 0 auto;
       padding: 0 24px;
-      height: 70px;
+      height: 68px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -26,28 +47,28 @@
       align-items: center;
       gap: 12px;
       text-decoration: none;
-      color: var(--text-dark);
+      color: var(--cust-text-main);
     }
     .cust-brand-logo {
-      width: 42px;
-      height: 42px;
-      background: linear-gradient(135deg, var(--primary) 0%, #047857 100%);
+      width: 40px;
+      height: 40px;
+      background: var(--cust-primary);
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #ffffff;
-      box-shadow: 0 4px 8px rgba(13, 148, 136, 0.25);
+      box-shadow: 0 2px 6px rgba(13, 148, 136, 0.2);
     }
     .cust-brand-title {
-      font-size: 17px;
+      font-size: 16.5px;
       font-weight: 800;
       letter-spacing: -0.3px;
     }
     .cust-brand-sub {
       font-size: 11px;
       font-weight: 600;
-      color: var(--primary);
+      color: var(--cust-primary);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -63,147 +84,143 @@
       align-items: start;
     }
 
-    /* Payment Methods Tab */
+    /* Payment Tabs */
     .payment-tabs {
       display: flex;
       gap: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .payment-tab-btn {
       flex: 1;
-      padding: 12px;
-      border: 1px solid var(--border-subtle);
-      border-radius: 10px;
-      background: var(--surface);
+      padding: 10px;
+      border: 1px solid var(--cust-border);
+      border-radius: 8px;
+      background: #ffffff;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       font-size: 12px;
       font-weight: 600;
-      color: var(--text-muted);
+      color: var(--cust-text-muted);
       transition: all 0.15s ease;
     }
     .payment-tab-btn.active {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      color: var(--primary-hover);
-      box-shadow: 0 2px 8px rgba(13,148,136,0.12);
+      border-color: var(--cust-primary);
+      background: var(--cust-primary-light);
+      color: var(--cust-primary-hover);
+      box-shadow: 0 1px 4px rgba(13,148,136,0.1);
     }
 
     /* VietQR Display Box */
     .qr-showcase-box {
       background: #ffffff;
-      border: 1px solid var(--border-subtle);
-      border-radius: 14px;
-      padding: 24px;
+      border: 1px solid var(--cust-border);
+      border-radius: 10px;
+      padding: 22px;
       text-align: center;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
     }
     .qr-frame {
       display: inline-block;
-      padding: 16px;
+      padding: 14px;
       background: #ffffff;
-      border: 2px dashed var(--primary);
-      border-radius: 12px;
-      margin: 16px 0;
-      position: relative;
+      border: 2px dashed var(--cust-primary);
+      border-radius: 10px;
+      margin: 14px 0;
     }
     .qr-code-img {
-      width: 200px;
-      height: 200px;
+      width: 190px;
+      height: 190px;
       display: block;
       margin: 0 auto;
     }
     .bank-info-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
-      margin-top: 16px;
+      font-size: 12.5px;
+      margin-top: 14px;
       text-align: left;
     }
     .bank-info-table td {
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--border-subtle);
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--cust-border);
     }
     .bank-info-table td:first-child {
-      color: var(--text-muted);
+      color: var(--cust-text-muted);
       width: 40%;
     }
     .bank-info-table td:last-child {
-      font-weight: 700;
-      color: var(--text-dark);
+      font-weight: 600;
+      color: var(--cust-text-main);
     }
     .btn-copy-tag {
-      background: var(--bg-page);
-      border: 1px solid var(--border-subtle);
+      background: #f1f5f9;
+      border: 1px solid var(--cust-border);
       border-radius: 4px;
       padding: 2px 6px;
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 600;
       cursor: pointer;
-      color: var(--primary);
+      color: var(--cust-primary-hover);
       margin-left: 6px;
     }
 
-    /* Invoice Confirmation Card (BM-KH02) */
+    /* Invoice Card */
     .invoice-card {
       background: #ffffff;
-      border: 1px solid var(--border-subtle);
-      border-radius: 14px;
+      border: 1px solid var(--cust-border);
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
     }
     .invoice-top {
-      background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
-      color: #ffffff;
-      padding: 20px 24px;
+      background: #fafafa;
+      border-bottom: 1px solid var(--cust-border);
+      padding: 16px 20px;
     }
     .invoice-code {
       font-family: monospace;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
-      color: #5eead4;
-      letter-spacing: 1px;
+      color: var(--cust-primary-hover);
+      letter-spacing: 0.5px;
     }
     .invoice-body {
-      padding: 24px;
+      padding: 20px;
     }
     .invoice-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 12px;
-      font-size: 13px;
+      margin-bottom: 10px;
+      font-size: 12.5px;
     }
-    .invoice-row .lbl {
-      color: var(--text-muted);
-    }
+    .invoice-row .lbl { color: var(--cust-text-muted); }
     .invoice-row .val {
       font-weight: 600;
-      color: var(--text-dark);
+      color: var(--cust-text-main);
       text-align: right;
     }
     .invoice-total-highlight {
-      background: #f8fafc;
+      background: #fafafa;
       border-radius: 8px;
-      padding: 16px;
-      margin: 20px 0;
-      border: 1px solid var(--border-subtle);
+      padding: 14px;
+      margin: 16px 0;
+      border: 1px solid var(--cust-border);
     }
 
-    /* Timer Pill */
     .pay-timer-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #fee2e2;
-      color: #dc2626;
-      border: 1px solid #fca5a5;
-      padding: 4px 12px;
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+      padding: 4px 10px;
       border-radius: 9999px;
-      font-size: 12.5px;
-      font-weight: 700;
+      font-size: 12px;
+      font-weight: 600;
     }
 
     @media (max-width: 860px) {
@@ -217,9 +234,15 @@
   <header class="cust-header">
     <div class="cust-nav-container">
       <a href="/customer/home" class="cust-brand">
-        <div class="cust-brand-logo">🏸</div>
+        <div class="cust-brand-logo">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; stroke: #ffffff;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
         <div>
-          <div class="cust-brand-title">UTE BADMINTON</div>
+          <div class="cust-brand-title">UTE SPORT</div>
           <div class="cust-brand-sub">Cổng Thanh Toán Trực Tuyến</div>
         </div>
       </a>
@@ -239,73 +262,50 @@
     <div>
       <div class="payment-tabs">
         <div class="payment-tab-btn active" id="tabVietQR" onclick="selectPayMethod('vietqr')">
-          <svg class="svg-icon" style="width: 24px; height: 24px;" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <svg class="svg-icon" style="width: 22px; height: 22px;" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
           VietQR (Napas 247)
         </div>
         <div class="payment-tab-btn" id="tabVNPay" onclick="selectPayMethod('vnpay')">
-          <span style="font-weight: 800; color: #005baa; font-size: 16px;">VNPAY</span>
+          <span style="font-weight: 800; color: #005baa; font-size: 15px;">VNPAY</span>
           Thẻ ATM / Visa
         </div>
         <div class="payment-tab-btn" id="tabMoMo" onclick="selectPayMethod('momo')">
-          <span style="font-weight: 800; color: #a50064; font-size: 16px;">MoMo</span>
+          <span style="font-weight: 800; color: #a50064; font-size: 15px;">MoMo</span>
           Ví Điện Tử MoMo
         </div>
       </div>
 
       <div class="qr-showcase-box">
-        <div style="font-size: 15px; font-weight: 700; color: var(--text-dark);">Quét Mã QR Chuyển Khoản Tự Động</div>
-        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Hỗ trợ 40+ ứng dụng Ngân hàng (VCB, MB, Techcombank, VPBank, ACB...)</div>
+        <div style="font-size: 14.5px; font-weight: 700; color: var(--cust-text-main);">Quét Mã QR Chuyển Khoản Khớp Lệnh Tự Động</div>
+        <div style="font-size: 11.5px; color: var(--cust-text-muted); margin-top: 4px;">Hỗ trợ tất cả ứng dụng Ngân hàng (VCB, MB, Techcombank, VPBank...)</div>
 
         <div class="qr-frame">
-          <!-- Dynamic Simulated VietQR Code -->
-          <svg class="qr-code-img" viewBox="0 0 100 100" fill="#09090b">
-            <!-- Pattern mimicking real QR Code matrix -->
-            <rect x="0" y="0" width="28" height="28" fill="#09090b"/>
+          <svg class="qr-code-img" viewBox="0 0 100 100" fill="#0f172a">
+            <rect x="0" y="0" width="28" height="28" fill="#0f172a"/>
             <rect x="4" y="4" width="20" height="20" fill="#ffffff"/>
-            <rect x="8" y="8" width="12" height="12" fill="#09090b"/>
+            <rect x="8" y="8" width="12" height="12" fill="#0f172a"/>
 
-            <rect x="72" y="0" width="28" height="28" fill="#09090b"/>
+            <rect x="72" y="0" width="28" height="28" fill="#0f172a"/>
             <rect x="76" y="4" width="20" height="20" fill="#ffffff"/>
-            <rect x="80" y="8" width="12" height="12" fill="#09090b"/>
+            <rect x="80" y="8" width="12" height="12" fill="#0f172a"/>
 
-            <rect x="0" y="72" width="28" height="28" fill="#09090b"/>
+            <rect x="0" y="72" width="28" height="28" fill="#0f172a"/>
             <rect x="4" y="76" width="20" height="20" fill="#ffffff"/>
-            <rect x="8" y="80" width="12" height="12" fill="#09090b"/>
+            <rect x="8" y="80" width="12" height="12" fill="#0f172a"/>
 
-            <!-- Center Logo Area with Shuttlecock -->
             <rect x="40" y="40" width="20" height="20" fill="#ffffff" rx="3"/>
             <rect x="42" y="42" width="16" height="16" fill="#0d9488" rx="2"/>
 
-            <!-- Data Dots -->
-            <rect x="34" y="6" width="4" height="4"/>
-            <rect x="42" y="6" width="4" height="4"/>
-            <rect x="54" y="6" width="4" height="4"/>
-            <rect x="62" y="6" width="4" height="4"/>
-            <rect x="34" y="16" width="4" height="4"/>
-            <rect x="46" y="16" width="4" height="4"/>
-            <rect x="58" y="16" width="4" height="4"/>
-            <rect x="6" y="36" width="4" height="4"/>
-            <rect x="18" y="36" width="4" height="4"/>
-            <rect x="26" y="36" width="4" height="4"/>
-            <rect x="68" y="36" width="4" height="4"/>
-            <rect x="82" y="36" width="4" height="4"/>
-            <rect x="14" y="48" width="4" height="4"/>
-            <rect x="26" y="48" width="4" height="4"/>
-            <rect x="72" y="48" width="4" height="4"/>
-            <rect x="86" y="48" width="4" height="4"/>
-            <rect x="36" y="66" width="4" height="4"/>
-            <rect x="48" y="66" width="4" height="4"/>
-            <rect x="60" y="66" width="4" height="4"/>
-            <rect x="76" y="66" width="4" height="4"/>
-            <rect x="36" y="78" width="4" height="4"/>
-            <rect x="50" y="78" width="4" height="4"/>
-            <rect x="68" y="78" width="4" height="4"/>
-            <rect x="88" y="78" width="4" height="4"/>
-            <rect x="44" y="88" width="4" height="4"/>
-            <rect x="60" y="88" width="4" height="4"/>
-            <rect x="74" y="88" width="4" height="4"/>
+            <rect x="34" y="6" width="4" height="4"/><rect x="42" y="6" width="4" height="4"/><rect x="54" y="6" width="4" height="4"/>
+            <rect x="34" y="16" width="4" height="4"/><rect x="46" y="16" width="4" height="4"/>
+            <rect x="6" y="36" width="4" height="4"/><rect x="18" y="36" width="4" height="4"/><rect x="26" y="36" width="4" height="4"/>
+            <rect x="68" y="36" width="4" height="4"/><rect x="82" y="36" width="4" height="4"/>
+            <rect x="14" y="48" width="4" height="4"/><rect x="72" y="48" width="4" height="4"/>
+            <rect x="36" y="66" width="4" height="4"/><rect x="48" y="66" width="4" height="4"/><rect x="76" y="66" width="4" height="4"/>
+            <rect x="50" y="78" width="4" height="4"/><rect x="68" y="78" width="4" height="4"/>
+            <rect x="44" y="88" width="4" height="4"/><rect x="60" y="88" width="4" height="4"/>
           </svg>
-          <div style="font-size: 11px; font-weight: 700; color: var(--primary); margin-top: 4px;">VIETQR PRO - TỰ ĐỘNG KHỚP LỆNH</div>
+          <div style="font-size: 11px; font-weight: 700; color: var(--cust-primary); margin-top: 4px;">VIETQR PRO - TỰ ĐỘNG KHỚP LỆNH</div>
         </div>
 
         <table class="bank-info-table">
@@ -325,39 +325,39 @@
             <td>CLB CAU LONG UTE SPORT</td>
           </tr>
           <tr>
-            <td>Số tiền cọc:</td>
+            <td>Số tiền cọc (30%):</td>
             <td>
-              <span id="qrDepositAmount" style="color: var(--primary); font-size: 15px;">94.500 đ</span>
+              <span id="qrDepositAmount" style="color: var(--cust-primary-hover); font-size: 14px; font-weight: 700;">94.500 đ</span>
               <button type="button" class="btn-copy-tag" onclick="copyText('94500')">Sao chép</button>
             </td>
           </tr>
           <tr>
             <td>Nội dung CK:</td>
             <td>
-              <span id="qrTransferContent" style="color: #ea580c; font-family: monospace; font-size: 14px;">BK202609224412</span>
+              <span id="qrTransferContent" style="color: var(--cust-primary-hover); font-family: monospace; font-size: 13.5px; font-weight: 700;">BK202609224412</span>
               <button type="button" class="btn-copy-tag" onclick="copyText(document.getElementById('qrTransferContent').textContent)">Sao chép</button>
             </td>
           </tr>
         </table>
 
-        <div style="margin-top: 20px;">
-          <button type="button" class="btn btn-primary" onclick="confirmPaymentSuccess()" style="width: 100%; height: 44px; font-size: 14px; font-weight: 700; border-radius: 8px;">
+        <div style="margin-top: 18px;">
+          <button type="button" class="btn btn-primary" onclick="confirmPaymentSuccess()" style="width: 100%; height: 40px; font-size: 13.5px; font-weight: 600; border-radius: 6px;">
             <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
             Tôi Đã Hoàn Tất Chuyển Khoản
           </button>
-          <a href="/customer/booking" style="display: block; margin-top: 10px; font-size: 12px; color: var(--text-muted); text-decoration: none;">
+          <a href="/customer/booking" style="display: block; margin-top: 10px; font-size: 11.5px; color: var(--cust-text-muted); text-decoration: none;">
             Hủy đơn này và chọn lại sân
           </a>
         </div>
       </div>
     </div>
 
-    <!-- Right: Booking Confirmation Slip (BM-KH02) -->
+    <!-- Right: Booking Confirmation Slip -->
     <div>
       <div class="invoice-card">
-        <div class="invoice-top">
-          <div style="font-size: 11px; text-transform: uppercase; color: #a1a1aa; letter-spacing: 0.5px;">Biểu mẫu BM-KH02</div>
-          <div style="font-size: 17px; font-weight: 800; margin: 4px 0;">Phiếu Xác Nhận Đặt Sân</div>
+        <div class="invoice-header">
+          <div style="font-size: 11px; text-transform: uppercase; color: var(--cust-primary); font-weight: 600;">Xác Nhận Giữ Chỗ</div>
+          <div style="font-size: 15px; font-weight: 800; color: var(--cust-text-main); margin: 2px 0;">Phiếu Xác Nhận Đặt Sân</div>
           <div class="invoice-code" id="invCode">BK-20260922-4412</div>
         </div>
 
@@ -390,21 +390,21 @@
           <div class="invoice-total-highlight">
             <div class="invoice-row" style="margin-bottom: 6px;">
               <span class="lbl">Tổng phí dịch vụ:</span>
-              <span class="val" id="invTotal" style="font-size: 15px;">315.000 đ</span>
+              <span class="val" id="invTotal" style="font-size: 14px;">315.000 đ</span>
             </div>
             <div class="invoice-row" style="margin-bottom: 6px;">
-              <span class="lbl" style="color: var(--primary); font-weight: 700;">Tiền cọc giữ sân (30%):</span>
-              <span class="val" id="invDeposit" style="color: var(--primary); font-size: 17px; font-weight: 800;">94.500 đ</span>
+              <span class="lbl" style="color: var(--cust-primary-hover); font-weight: 700;">Tiền cọc giữ sân (30%):</span>
+              <span class="val" id="invDeposit" style="color: var(--cust-primary-hover); font-size: 16px; font-weight: 800;">94.500 đ</span>
             </div>
             <div class="invoice-row" style="margin-bottom: 0;">
               <span class="lbl" style="font-size: 11.5px;">Còn lại thanh toán tại quầy:</span>
-              <span class="val" id="invRemaining" style="font-size: 12px; color: var(--text-muted);">220.500 đ (70%)</span>
+              <span class="val" id="invRemaining" style="font-size: 11.5px; color: var(--cust-text-muted);">220.500 đ (70%)</span>
             </div>
           </div>
 
-          <div style="background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px; padding: 12px; font-size: 11.5px; color: #0f766e; line-height: 1.5;">
-            <strong>Chính sách hoàn cọc (QĐ-KH03):</strong><br>
-            - Hủy trước giờ chơi $\ge$ 4 tiếng: Hoàn lại <strong>100%</strong> tiền cọc tự động.<br>
+          <div style="background: var(--cust-primary-light); border: 1px solid var(--cust-primary-border); border-radius: 6px; padding: 12px; font-size: 11.5px; color: var(--cust-primary-hover); line-height: 1.5;">
+            <strong>Chính sách hoàn tiền cọc:</strong><br>
+            - Hủy trước giờ chơi từ 4 tiếng trở lên: Hoàn lại <strong>100%</strong> tiền cọc tự động.<br>
             - Hủy dưới 4 tiếng: Không áp dụng hoàn cọc.
           </div>
         </div>
@@ -414,22 +414,21 @@
 
   <!-- Success Modal Popup -->
   <div class="modal-overlay" id="successModal">
-    <div class="modal-card" style="text-align: center; padding: 32px 24px; max-width: 440px;">
-      <div style="width: 60px; height: 60px; border-radius: 50%; background: #ccfbf1; color: var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-        <svg class="svg-icon" style="width: 32px; height: 32px;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <div class="modal-card" style="text-align: center; padding: 30px 24px; max-width: 420px;">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--cust-primary-light); color: var(--cust-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; border: 1px solid var(--cust-primary-border);">
+        <svg class="svg-icon" style="width: 28px; height: 28px;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
       </div>
-      <h3 style="font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px;">Đặt Cọc Thành Công!</h3>
-      <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px;">
-        Hệ thống đã ghi nhận tiền cọc <strong id="modalDepositTxt">94.500 đ</strong>. Mã vé điện tử QR đã sẵn sàng để quét tại quầy lễ tân!
+      <h3 style="font-size: 18px; font-weight: 800; color: var(--cust-text-main); margin-bottom: 6px;">Đặt Cọc Thành Công!</h3>
+      <p style="font-size: 12.5px; color: var(--cust-text-muted); line-height: 1.5; margin-bottom: 18px;">
+        Hệ thống đã xác nhận tiền cọc <strong id="modalDepositTxt" style="color: var(--cust-primary);">94.500 đ</strong>. Mã vé điện tử QR đã sẵn sàng để quét nhận sân tại quầy POS!
       </p>
-      <button type="button" class="btn btn-primary" onclick="window.location.href='/customer/history'" style="width: 100%; height: 42px; font-size: 13.5px; font-weight: 700; border-radius: 8px;">
+      <button type="button" class="btn btn-primary" onclick="window.location.href='/customer/history'" style="width: 100%; height: 40px; font-size: 13px; font-weight: 600; border-radius: 6px;">
         Xem Vé Điện Tử & Lịch Sử Đặt Chỗ
       </button>
     </div>
   </div>
 
   <script>
-    // Load booking data from sessionStorage if available
     const saved = sessionStorage.getItem('ute_booking');
     if (saved) {
       try {
@@ -450,7 +449,6 @@
           document.getElementById('qrDepositAmount').textContent = b.deposit;
           document.getElementById('modalDepositTxt').textContent = b.deposit;
 
-          // calculate 70%
           const cleanNum = parseInt(b.total.replace(/\D/g, '')) || 315000;
           const depNum = parseInt(b.deposit.replace(/\D/g, '')) || 94500;
           const rem = cleanNum - depNum;
@@ -461,12 +459,11 @@
       }
     }
 
-    // Payment timer countdown
     let secondsLeft = 588;
     const pTimer = setInterval(() => {
       if (secondsLeft <= 0) {
         clearInterval(pTimer);
-        alert('Hết hạn thanh toán! Slot đã được mở lại cho khách hàng khác.');
+        alert('Hết hạn thanh toán! Slot đã được mở lại.');
         window.location.href = '/customer/booking';
         return;
       }
@@ -500,7 +497,6 @@
     }
 
     function confirmPaymentSuccess() {
-      // Show confirmation popup
       document.getElementById('successModal').classList.add('open');
     }
   </script>

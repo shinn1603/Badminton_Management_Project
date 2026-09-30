@@ -6,20 +6,43 @@
   <title>Hồ Sơ Hội Viên & Tích Điểm - UTE Badminton</title>
   <link rel="stylesheet" href="/css/main.css">
   <style>
-    /* Customer Header */
+    :root {
+      --cust-bg: var(--bg-page);
+      --cust-surface: var(--surface);
+      --cust-border: var(--border-subtle);
+      --cust-primary: var(--primary);
+      --cust-primary-hover: var(--primary-hover);
+      --cust-primary-light: var(--primary-light);
+      --cust-primary-border: var(--primary-border);
+      --cust-accent: var(--accent);
+      --cust-accent-light: var(--accent-light);
+      --cust-text-main: var(--text-dark);
+      --cust-text-body: var(--text-body);
+      --cust-text-muted: var(--text-muted);
+    }
+
+    body {
+      background-color: var(--cust-bg);
+      color: var(--cust-text-body);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Common Header */
     .cust-header {
       background: #ffffff;
-      border-bottom: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--cust-border);
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
     }
     .cust-nav-container {
       max-width: 1240px;
       margin: 0 auto;
       padding: 0 24px;
-      height: 70px;
+      height: 68px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -29,47 +52,49 @@
       align-items: center;
       gap: 12px;
       text-decoration: none;
-      color: var(--text-dark);
+      color: var(--cust-text-main);
     }
     .cust-brand-logo {
-      width: 42px;
-      height: 42px;
-      background: linear-gradient(135deg, var(--primary) 0%, #047857 100%);
+      width: 40px;
+      height: 40px;
+      background: var(--cust-primary);
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #ffffff;
-      box-shadow: 0 4px 8px rgba(13, 148, 136, 0.25);
+      box-shadow: 0 2px 6px rgba(13, 148, 136, 0.2);
     }
     .cust-brand-title {
-      font-size: 17px;
+      font-size: 16.5px;
       font-weight: 800;
       letter-spacing: -0.3px;
     }
     .cust-brand-sub {
       font-size: 11px;
       font-weight: 600;
-      color: var(--primary);
+      color: var(--cust-primary);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .cust-nav-links {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 24px;
     }
     .cust-nav-item {
       text-decoration: none;
       font-size: 13.5px;
-      font-weight: 600;
-      color: var(--text-body);
-      transition: color 0.15s ease;
+      font-weight: 500;
+      color: var(--cust-text-muted);
+      transition: all 0.15s ease;
       position: relative;
-      padding: 6px 0;
+      padding: 8px 0;
     }
-    .cust-nav-item:hover, .cust-nav-item.active {
-      color: var(--primary);
+    .cust-nav-item:hover { color: var(--cust-text-main); }
+    .cust-nav-item.active {
+      color: var(--cust-primary);
+      font-weight: 600;
     }
     .cust-nav-item.active::after {
       content: '';
@@ -78,7 +103,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: var(--primary);
+      background: var(--cust-primary);
       border-radius: 2px;
     }
 
@@ -88,98 +113,82 @@
       margin: 32px auto 60px;
       padding: 0 20px;
       display: grid;
-      grid-template-columns: 420px 1fr;
-      gap: 28px;
+      grid-template-columns: 400px 1fr;
+      gap: 24px;
       align-items: start;
     }
 
-    /* Digital Membership Card */
+    /* Elegant Executive Member Card */
     .digital-card {
-      background: linear-gradient(135deg, #18181b 0%, #27272a 50%, #0f172a 100%);
-      border-radius: 18px;
-      padding: 24px;
+      background: linear-gradient(135deg, #0f766e 0%, #115e59 60%, #134e4a 100%);
+      border-radius: 14px;
+      padding: 22px;
       color: #ffffff;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 16px 32px -8px rgba(0,0,0,0.35);
-      border: 1px solid rgba(255,255,255,0.15);
-      margin-bottom: 24px;
-    }
-    .digital-card::after {
-      content: '';
-      position: absolute;
-      top: -60px;
-      right: -60px;
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, rgba(234, 88, 12, 0.4) 0%, transparent 70%);
-      border-radius: 50%;
+      box-shadow: 0 10px 25px -5px rgba(13, 148, 136, 0.25);
+      border: 1px solid rgba(255,255,255,0.2);
+      margin-bottom: 20px;
     }
     .card-brand-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
-      position: relative;
-      z-index: 2;
+      margin-bottom: 26px;
     }
     .card-tier-badge {
-      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-      color: #000000;
+      background: #fef3c7;
+      color: #92400e;
       font-size: 11px;
       font-weight: 800;
-      padding: 4px 10px;
+      padding: 3px 10px;
       border-radius: 9999px;
       letter-spacing: 0.5px;
       text-transform: uppercase;
       display: flex;
       align-items: center;
       gap: 4px;
-      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+      border: 1px solid #fde68a;
     }
     .card-number {
       font-family: monospace;
-      font-size: 19px;
+      font-size: 18px;
       font-weight: 700;
-      letter-spacing: 3px;
-      color: #f8fafc;
-      margin-bottom: 24px;
-      position: relative;
-      z-index: 2;
+      letter-spacing: 2.5px;
+      color: #f0fdfa;
+      margin-bottom: 22px;
     }
     .card-footer-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      position: relative;
-      z-index: 2;
     }
     .card-holder-name {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    /* Progress to next tier */
+    /* Progress card */
     .tier-progress-card {
       background: #ffffff;
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-      margin-bottom: 24px;
+      border: 1px solid var(--cust-border);
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      margin-bottom: 20px;
     }
     .progress-bar-bg {
-      height: 8px;
-      background: #e4e4e7;
+      height: 7px;
+      background: #f1f5f9;
       border-radius: 9999px;
       overflow: hidden;
-      margin: 12px 0 8px;
+      margin: 10px 0 6px;
     }
     .progress-bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, #f59e0b, #ea580c);
+      background: var(--cust-primary);
       border-radius: 9999px;
       width: 60%;
     }
@@ -188,22 +197,23 @@
     .tier-benefits-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
     .tier-benefit-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 14px;
-      border-radius: 8px;
-      background: var(--bg-page);
-      font-size: 12.5px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: #fafafa;
+      border: 1px solid var(--cust-border);
+      font-size: 12px;
     }
     .tier-benefit-item.current {
-      background: #fef3c7;
-      border: 1px solid #fde68a;
+      background: var(--cust-primary-light);
+      border-color: var(--cust-primary-border);
       font-weight: 600;
-      color: #92400e;
+      color: var(--cust-primary-hover);
     }
 
     /* Activity Stats Grid */
@@ -211,18 +221,19 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     .stat-mini-box {
       background: #ffffff;
-      border: 1px solid var(--border-subtle);
-      border-radius: 10px;
-      padding: 16px;
+      border: 1px solid var(--cust-border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
     }
     .stat-num {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
-      color: var(--text-dark);
+      color: var(--cust-text-main);
       margin: 4px 0 2px;
     }
 
@@ -237,10 +248,16 @@
   <header class="cust-header">
     <div class="cust-nav-container">
       <a href="/customer/home" class="cust-brand">
-        <div class="cust-brand-logo">🏸</div>
+        <div class="cust-brand-logo">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; stroke: #ffffff;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
         <div>
-          <div class="cust-brand-title">UTE BADMINTON</div>
-          <div class="cust-brand-sub">Hồ Sơ & Điểm Thưởng</div>
+          <div class="cust-brand-title">UTE SPORT</div>
+          <div class="cust-brand-sub">Đặt Sân &amp; Khách Hàng</div>
         </div>
       </a>
 
@@ -253,7 +270,7 @@
       </nav>
 
       <div>
-        <a href="/customer/auth" class="btn btn-outline" style="border-radius: 8px; font-size: 12.5px;">
+        <a href="/customer/auth" class="btn btn-outline" style="border-radius: 6px; height: 36px; font-size: 12.5px;">
           Đăng Xuất
         </a>
       </div>
@@ -261,17 +278,17 @@
   </header>
 
   <div class="profile-layout">
-    <!-- Left Column: Digital Member Card & Tiers -->
+    <!-- Left Column: Member Card & Tiers -->
     <div>
       <!-- The Card -->
       <div class="digital-card">
         <div class="card-brand-row">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 22px;">🏸</span>
-            <span style="font-size: 14px; font-weight: 800; letter-spacing: 1px;">UTE SPORT VIP</span>
+            <span style="font-size: 20px;">🏸</span>
+            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">UTE SPORT VIP</span>
           </div>
           <div class="card-tier-badge">
-            <span>👑</span> Hạng Vàng (Gold)
+            <span>👑</span> Hạng Vàng
           </div>
         </div>
 
@@ -279,12 +296,12 @@
 
         <div class="card-footer-row">
           <div>
-            <div style="font-size: 10px; color: #a1a1aa; text-transform: uppercase;">Chủ thẻ hội viên</div>
+            <div style="font-size: 10px; color: #ccfbf1; text-transform: uppercase;">Chủ thẻ hội viên</div>
             <div class="card-holder-name">NGUYỄN VĂN AN</div>
           </div>
           <div style="text-align: right;">
-            <div style="font-size: 10px; color: #a1a1aa; text-transform: uppercase;">Gia nhập từ</div>
-            <div style="font-size: 13px; font-weight: 600;">15/01/2025</div>
+            <div style="font-size: 10px; color: #ccfbf1; text-transform: uppercase;">Gia nhập từ</div>
+            <div style="font-size: 12px; font-weight: 600;">15/01/2025</div>
           </div>
         </div>
       </div>
@@ -292,14 +309,14 @@
       <!-- Tier Progress -->
       <div class="tier-progress-card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <strong style="font-size: 13.5px; color: var(--text-dark);">Tiến Trình Lên Hạng Kim Cương</strong>
-          <span style="font-size: 12px; font-weight: 700; color: #ea580c;">48 / 80 Giờ (60%)</span>
+          <strong style="font-size: 13px; color: var(--cust-text-main);">Tiến Trình Lên Hạng Kim Cương</strong>
+          <span style="font-size: 12px; font-weight: 700; color: var(--cust-primary-hover);">48 / 80 Giờ (60%)</span>
         </div>
         <div class="progress-bar-bg">
           <div class="progress-bar-fill"></div>
         </div>
-        <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">
-          Bạn chỉ cần chơi thêm <strong>32 giờ</strong> nữa để trở thành <strong>Hội Viên Kim Cương</strong> (Giảm 15% giá sân trọn đời + miễn phí thuê vợt).
+        <div style="font-size: 11.5px; color: var(--cust-text-muted); line-height: 1.4;">
+          Bạn chỉ cần chơi thêm <strong>32 giờ</strong> nữa để lên <strong>Hạng Kim Cương</strong> (Giảm 15% trọn đời + miễn phí thuê vợt).
         </div>
       </div>
 
@@ -313,7 +330,7 @@
             <div class="tier-benefit-item">
               <div>
                 <strong>🥉 Hạng Đồng (0 - 19h)</strong>
-                <div style="font-size: 11px; color: var(--text-muted);">Tích điểm 1% hóa đơn</div>
+                <div style="font-size: 11px; color: var(--cust-text-muted);">Tích điểm 1% hóa đơn</div>
               </div>
               <span class="badge">Cơ bản</span>
             </div>
@@ -321,7 +338,7 @@
             <div class="tier-benefit-item">
               <div>
                 <strong>🥈 Hạng Bạc (20 - 39h)</strong>
-                <div style="font-size: 11px; color: var(--text-muted);">Giảm 5% giá sân, ưu tiên giữ chỗ</div>
+                <div style="font-size: 11px; color: var(--cust-text-muted);">Giảm 5% giá sân, ưu tiên giữ chỗ</div>
               </div>
               <span class="badge badge-blue">Đã qua</span>
             </div>
@@ -329,15 +346,15 @@
             <div class="tier-benefit-item current">
               <div>
                 <strong>🥇 Hạng Vàng (40 - 79h)</strong>
-                <div style="font-size: 11px;">Giảm 10% giá sân + Tặng 2 nước/tháng</div>
+                <div style="font-size: 11px;">Giảm 10% giá sân + 2 nước/tháng</div>
               </div>
-              <span class="badge badge-amber">Hiện tại</span>
+              <span class="badge badge-success">Hiện tại</span>
             </div>
 
             <div class="tier-benefit-item">
               <div>
                 <strong>💎 Hạng Kim Cương (≥ 80h)</strong>
-                <div style="font-size: 11px; color: var(--text-muted);">Giảm 15% trọn đời + Miễn phí thuê vợt Yonex</div>
+                <div style="font-size: 11px; color: var(--cust-text-muted);">Giảm 15% trọn đời + Miễn phí vợt Yonex</div>
               </div>
               <span class="badge" style="background: #e0e7ff; color: #4338ca;">Mục tiêu</span>
             </div>
@@ -348,30 +365,29 @@
 
     <!-- Right Column: Stats & Edit Profile -->
     <div>
-      <!-- Stats Row -->
       <div class="stats-card-grid">
         <div class="stat-mini-box">
-          <div style="font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Điểm Thưởng Khả Dụng</div>
-          <div class="stat-num" style="color: var(--primary);">1.250 <span style="font-size: 14px; font-weight: normal;">điểm</span></div>
-          <div style="font-size: 11px; color: var(--text-muted);">1.000đ tiêu dùng = 1 điểm tích lũy</div>
+          <div style="font-size: 11px; color: var(--cust-text-muted); text-transform: uppercase; font-weight: 600;">Điểm Thưởng Khả Dụng</div>
+          <div class="stat-num" style="color: var(--cust-primary-hover);">1.250 <span style="font-size: 13px; font-weight: normal;">pts</span></div>
+          <div style="font-size: 11px; color: var(--cust-text-muted);">1.000đ tiêu dùng = 1 điểm</div>
         </div>
 
         <div class="stat-mini-box">
-          <div style="font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Tổng Giờ Đã Chơi</div>
-          <div class="stat-num" style="color: #ea580c;">48 <span style="font-size: 14px; font-weight: normal;">giờ</span></div>
-          <div style="font-size: 11px; color: var(--text-muted);">Tương đương 26 trận đấu</div>
+          <div style="font-size: 11px; color: var(--cust-text-muted); text-transform: uppercase; font-weight: 600;">Tổng Giờ Đã Chơi</div>
+          <div class="stat-num" style="color: var(--cust-text-main);">48 <span style="font-size: 13px; font-weight: normal;">giờ</span></div>
+          <div style="font-size: 11px; color: var(--cust-text-muted);">Tương đương 26 trận đấu</div>
         </div>
 
         <div class="stat-mini-box">
-          <div style="font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Tiết Kiệm Ưu Đãi Thẻ</div>
-          <div class="stat-num" style="color: #059669;">1.250.000 <span style="font-size: 14px; font-weight: normal;">đ</span></div>
-          <div style="font-size: 11px; color: var(--text-muted);">Chiết khấu hạng thẻ Vàng 10%</div>
+          <div style="font-size: 11px; color: var(--cust-text-muted); text-transform: uppercase; font-weight: 600;">Tiết Kiệm Ưu Đãi Thẻ</div>
+          <div class="stat-num" style="color: #059669;">1.250.000 <span style="font-size: 13px; font-weight: normal;">đ</span></div>
+          <div style="font-size: 11px; color: var(--cust-text-muted);">Chiết khấu hạng thẻ Vàng 10%</div>
         </div>
 
         <div class="stat-mini-box">
-          <div style="font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Giải Đấu Đã Tham Gia</div>
-          <div class="stat-num" style="color: #2563eb;">2 <span style="font-size: 14px; font-weight: normal;">giải</span></div>
-          <div style="font-size: 11px; color: var(--text-muted);">Hạng Ba UTE Cup 2025</div>
+          <div style="font-size: 11px; color: var(--cust-text-muted); text-transform: uppercase; font-weight: 600;">Giải Đấu Tham Gia</div>
+          <div class="stat-num" style="color: #2563eb;">2 <span style="font-size: 13px; font-weight: normal;">giải</span></div>
+          <div style="font-size: 11px; color: var(--cust-text-muted);">Hạng Ba UTE Cup 2025</div>
         </div>
       </div>
 
@@ -388,12 +404,12 @@
                 <input type="text" class="form-control" id="profName" value="Nguyễn Văn An" required>
               </div>
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label">Số Điện Thoại (Định danh duy nhất - QĐ-KH01)</label>
-                <input type="text" class="form-control" value="0912345678" readonly style="background: #f4f4f5; cursor: not-allowed;">
+                <label class="form-label">Số Điện Thoại</label>
+                <input type="text" class="form-control" value="0912345678" readonly style="background: #f1f5f9; cursor: not-allowed;">
               </div>
             </div>
 
-            <div class="form-row" style="margin-top: 14px;">
+            <div class="form-row" style="margin-top: 12px;">
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label">Email Nhận Hóa Đơn & Vé QR</label>
                 <input type="email" class="form-control" id="profEmail" value="nguyenvanan.ute@gmail.com" required>
@@ -404,8 +420,8 @@
               </div>
             </div>
 
-            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
-              <div style="font-size: 13px; font-weight: 700; margin-bottom: 10px;">Đổi Mật Khẩu (Để trống nếu không đổi)</div>
+            <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--cust-border);">
+              <div style="font-size: 12.5px; font-weight: 700; margin-bottom: 8px;">Đổi Mật Khẩu (Để trống nếu không đổi)</div>
               <div class="form-row">
                 <div class="form-group" style="margin-bottom: 0;">
                   <label class="form-label">Mật khẩu mới</label>
@@ -413,13 +429,13 @@
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
                   <label class="form-label">Xác nhận mật khẩu</label>
-                  <input type="password" class="form-control" placeholder="Nhập lại mật khẩu mới">
+                  <input type="password" class="form-control" placeholder="Khớp mật khẩu mới">
                 </div>
               </div>
             </div>
 
-            <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
-              <button type="submit" class="btn btn-primary" style="height: 40px; padding: 0 24px; font-weight: 700;">
+            <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn btn-primary" style="height: 38px; padding: 0 20px; font-weight: 600; border-radius: 6px;">
                 Lưu Thay Đổi Hồ Sơ
               </button>
             </div>
@@ -427,11 +443,11 @@
         </div>
       </div>
 
-      <!-- Point Redemption / History Table -->
+      <!-- Point History Table -->
       <div class="section-card">
         <div class="card-header">
           <div class="card-title">Lịch Sử Biến Động Điểm Thưởng</div>
-          <span style="font-size: 12px; color: var(--text-muted);">10 giao dịch gần nhất</span>
+          <span style="font-size: 11.5px; color: var(--cust-text-muted);">Giao dịch gần đây</span>
         </div>
         <div class="table-container">
           <table class="clean-table">
@@ -448,13 +464,13 @@
                 <td>20/09/2026</td>
                 <td>Tích điểm đặt sân 2 giờ</td>
                 <td><span style="font-family: monospace;">BK-20260920-1192</span></td>
-                <td style="text-align: right; color: var(--primary); font-weight: 700;">+350 pts</td>
+                <td style="text-align: right; color: var(--cust-primary-hover); font-weight: 700;">+350 pts</td>
               </tr>
               <tr>
                 <td>15/09/2026</td>
                 <td>Đánh giá chất lượng sân 5 sao</td>
                 <td>Đánh giá dịch vụ</td>
-                <td style="text-align: right; color: var(--primary); font-weight: 700;">+50 pts</td>
+                <td style="text-align: right; color: var(--cust-primary-hover); font-weight: 700;">+50 pts</td>
               </tr>
               <tr>
                 <td>01/09/2026</td>
@@ -466,7 +482,7 @@
                 <td>15/08/2026</td>
                 <td>Quà tặng sinh nhật Hội viên Vàng</td>
                 <td>Quà sinh nhật CLB</td>
-                <td style="text-align: right; color: #ea580c; font-weight: 700;">+300 pts</td>
+                <td style="text-align: right; color: var(--cust-accent); font-weight: 700;">+300 pts</td>
               </tr>
             </tbody>
           </table>

@@ -6,20 +6,41 @@
   <title>Lịch Sử Đặt Sân & Vé Check-in QR - UTE Badminton</title>
   <link rel="stylesheet" href="/css/main.css">
   <style>
-    /* Customer Header */
+    :root {
+      --cust-bg: var(--bg-page);
+      --cust-surface: var(--surface);
+      --cust-border: var(--border-subtle);
+      --cust-primary: var(--primary);
+      --cust-primary-hover: var(--primary-hover);
+      --cust-primary-light: var(--primary-light);
+      --cust-primary-border: var(--primary-border);
+      --cust-text-main: var(--text-dark);
+      --cust-text-body: var(--text-body);
+      --cust-text-muted: var(--text-muted);
+    }
+
+    body {
+      background-color: var(--cust-bg);
+      color: var(--cust-text-body);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Common Header */
     .cust-header {
       background: #ffffff;
-      border-bottom: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--cust-border);
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
     }
     .cust-nav-container {
       max-width: 1240px;
       margin: 0 auto;
       padding: 0 24px;
-      height: 70px;
+      height: 68px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -29,47 +50,49 @@
       align-items: center;
       gap: 12px;
       text-decoration: none;
-      color: var(--text-dark);
+      color: var(--cust-text-main);
     }
     .cust-brand-logo {
-      width: 42px;
-      height: 42px;
-      background: linear-gradient(135deg, var(--primary) 0%, #047857 100%);
+      width: 40px;
+      height: 40px;
+      background: var(--cust-primary);
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #ffffff;
-      box-shadow: 0 4px 8px rgba(13, 148, 136, 0.25);
+      box-shadow: 0 2px 6px rgba(13, 148, 136, 0.2);
     }
     .cust-brand-title {
-      font-size: 17px;
+      font-size: 16.5px;
       font-weight: 800;
       letter-spacing: -0.3px;
     }
     .cust-brand-sub {
       font-size: 11px;
       font-weight: 600;
-      color: var(--primary);
+      color: var(--cust-primary);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .cust-nav-links {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 24px;
     }
     .cust-nav-item {
       text-decoration: none;
       font-size: 13.5px;
-      font-weight: 600;
-      color: var(--text-body);
-      transition: color 0.15s ease;
+      font-weight: 500;
+      color: var(--cust-text-muted);
+      transition: all 0.15s ease;
       position: relative;
-      padding: 6px 0;
+      padding: 8px 0;
     }
-    .cust-nav-item:hover, .cust-nav-item.active {
-      color: var(--primary);
+    .cust-nav-item:hover { color: var(--cust-text-main); }
+    .cust-nav-item.active {
+      color: var(--cust-primary);
+      font-weight: 600;
     }
     .cust-nav-item.active::after {
       content: '';
@@ -78,7 +101,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: var(--primary);
+      background: var(--cust-primary);
       border-radius: 2px;
     }
 
@@ -89,96 +112,97 @@
       padding: 0 20px;
     }
     .page-title-box {
-      margin-bottom: 24px;
+      margin-bottom: 22px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 14px;
     }
     .page-title-box h1 {
-      font-size: 22px;
+      font-size: 21px;
       font-weight: 800;
-      color: var(--text-dark);
-      letter-spacing: -0.4px;
+      color: var(--cust-text-main);
+      letter-spacing: -0.3px;
     }
     .page-title-box p {
-      font-size: 13px;
-      color: var(--text-muted);
+      font-size: 12.5px;
+      color: var(--cust-text-muted);
       margin-top: 2px;
     }
 
-    /* Policy banner */
+    /* Policy Alert */
     .policy-alert-box {
-      background: #f0fdfa;
-      border: 1px solid #99f6e4;
-      border-radius: 10px;
-      padding: 14px 18px;
-      margin-bottom: 24px;
+      background: var(--cust-primary-light);
+      border: 1px solid var(--cust-primary-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 22px;
       display: flex;
       align-items: flex-start;
-      gap: 12px;
-      font-size: 12.5px;
-      color: #0f766e;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--cust-primary-hover);
       line-height: 1.5;
     }
 
     /* Booking Cards List */
     .booking-card {
       background: #ffffff;
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      margin-bottom: 18px;
+      border: 1px solid var(--cust-border);
+      border-radius: 10px;
+      margin-bottom: 16px;
       overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
     .booking-card:hover {
-      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-color: #cbd5e1;
     }
     .b-card-head {
-      padding: 14px 20px;
+      padding: 12px 18px;
       background: #fafafa;
-      border-bottom: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--cust-border);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
     }
     .b-code {
       font-family: monospace;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
-      color: var(--primary);
+      color: var(--cust-primary-hover);
     }
     .b-card-body {
-      padding: 20px;
+      padding: 18px;
       display: grid;
       grid-template-columns: 2fr 1.2fr 1fr;
-      gap: 20px;
+      gap: 18px;
       align-items: center;
     }
     .b-info-title {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--text-dark);
-      margin-bottom: 4px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--cust-text-main);
+      margin-bottom: 3px;
     }
     .b-info-sub {
-      font-size: 12.5px;
-      color: var(--text-muted);
+      font-size: 12px;
+      color: var(--cust-text-muted);
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
     }
     .b-price-item {
-      font-size: 12px;
-      color: var(--text-muted);
+      font-size: 11.5px;
+      color: var(--cust-text-muted);
     }
     .b-price-item strong {
-      color: var(--text-dark);
-      font-size: 14px;
+      color: var(--cust-text-main);
+      font-size: 13.5px;
     }
     .b-actions {
       display: flex;
@@ -186,59 +210,46 @@
       gap: 8px;
     }
 
-    /* QR Ticket Modal */
+    /* Ticket Modal */
     .ticket-modal-card {
-      max-width: 440px;
+      max-width: 420px;
       background: #ffffff;
-      border-radius: 16px;
+      border-radius: 12px;
       overflow: hidden;
       text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
     .ticket-top {
-      background: linear-gradient(135deg, var(--primary) 0%, #065f46 100%);
-      color: #ffffff;
-      padding: 24px;
-      position: relative;
-    }
-    .ticket-top::after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      left: 0;
-      right: 0;
-      height: 20px;
-      background: radial-gradient(circle, transparent 10px, #ffffff 10px);
-      background-size: 24px 20px;
-      background-position: -12px 0;
+      background: var(--cust-primary-light);
+      border-bottom: 1px solid var(--cust-primary-border);
+      color: var(--cust-primary-hover);
+      padding: 20px;
     }
     .ticket-body {
-      padding: 28px 24px 24px;
+      padding: 22px;
     }
     .ticket-qr-box {
-      padding: 16px;
+      padding: 14px;
       background: #ffffff;
-      border: 2px dashed #cbd5e1;
-      border-radius: 12px;
+      border: 1px dashed var(--cust-primary);
+      border-radius: 8px;
       display: inline-block;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
-    /* Star Rating */
     .star-rating {
       display: flex;
       gap: 8px;
       justify-content: center;
-      margin: 16px 0;
+      margin: 14px 0;
     }
     .star-btn {
-      font-size: 28px;
+      font-size: 26px;
       cursor: pointer;
       color: #cbd5e1;
       transition: color 0.15s;
     }
-    .star-btn.active {
-      color: #f59e0b;
-    }
+    .star-btn.active { color: #f59e0b; }
 
     @media (max-width: 768px) {
       .b-card-body { grid-template-columns: 1fr; }
@@ -251,10 +262,16 @@
   <header class="cust-header">
     <div class="cust-nav-container">
       <a href="/customer/home" class="cust-brand">
-        <div class="cust-brand-logo">🏸</div>
+        <div class="cust-brand-logo">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; stroke: #ffffff;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
         <div>
-          <div class="cust-brand-title">UTE BADMINTON</div>
-          <div class="cust-brand-sub">Lịch Sử & Vé Điện Tử</div>
+          <div class="cust-brand-title">UTE SPORT</div>
+          <div class="cust-brand-sub">Đặt Sân &amp; Khách Hàng</div>
         </div>
       </a>
 
@@ -267,7 +284,7 @@
       </nav>
 
       <div>
-        <a href="/customer/booking" class="btn btn-primary" style="border-radius: 8px;">
+        <a href="/customer/booking" class="btn btn-primary" style="border-radius: 6px; height: 36px; font-size: 12.5px;">
           + Đặt Thêm Sân Mới
         </a>
       </div>
@@ -278,7 +295,7 @@
     <div class="page-title-box">
       <div>
         <h1>Lịch Sử Đặt Sân & Vé Điện Tử</h1>
-        <p>Tra cứu mã đặt sân, quét QR check-in tại quầy và quản lý hủy/hoàn tiền cọc theo quy chế.</p>
+        <p>Tra cứu mã đặt sân, quét QR check-in tại quầy POS và quản lý hủy/hoàn cọc minh bạch.</p>
       </div>
 
       <div class="pill-group">
@@ -289,24 +306,24 @@
       </div>
     </div>
 
-    <!-- Policy Alert (QĐ-KH03) -->
+    <!-- Policy Alert -->
     <div class="policy-alert-box">
-      <svg class="svg-icon" style="width: 20px; height: 20px; flex-shrink: 0; color: var(--primary);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      <svg class="svg-icon" style="width: 18px; height: 18px; flex-shrink: 0; color: var(--cust-primary);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
       <div>
-        <strong>Chính Sách Hủy Đặt Sân & Hoàn Tiền Cọc (QĐ-KH03):</strong><br>
-        - Quý khách được phép hủy đặt sân và nhận <strong>hoàn 100% tiền cọc</strong> nếu thực hiện trước giờ bắt đầu thi đấu <strong>tối thiểu 4 tiếng</strong> (tiền hoàn sẽ tự động chuyển khoản về số tài khoản trong 24h).<br>
-        - Nếu hủy trong vòng dưới 4 tiếng, hệ thống không áp dụng hoàn cọc nhằm bù đắp chi phí giữ chỗ cho cụm sân.
+        <strong>Chính Sách Hủy Đặt Sân & Hoàn Tiền Cọc:</strong><br>
+        - Quý khách được phép hủy đặt sân và nhận <strong>hoàn 100% tiền cọc</strong> nếu hủy trước giờ bắt đầu thi đấu <strong>tối thiểu 4 tiếng</strong>.<br>
+        - Nếu hủy trong vòng dưới 4 tiếng, hệ thống không áp dụng hoàn cọc nhằm bù đắp chi phí giữ chỗ cho chi nhánh.
       </div>
     </div>
 
-    <!-- Booking Item 1: Upcoming (Just Booked / Active) -->
+    <!-- Booking Item 1: Upcoming -->
     <div class="booking-card" data-status="upcoming">
       <div class="b-card-head">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span class="b-code">Mã đơn: BK-20260922-4412</span>
           <span class="badge badge-success">Đã Cọc 30% - Chờ Check-in</span>
         </div>
-        <div style="font-size: 12px; color: var(--text-muted);">Đặt lúc: 18:30 Hôm nay (22/09/2026)</div>
+        <div style="font-size: 11.5px; color: var(--cust-text-muted);">Đặt lúc: 18:30 Hôm nay (22/09/2026)</div>
       </div>
       <div class="b-card-body">
         <div>
@@ -320,8 +337,8 @@
 
         <div>
           <div class="b-price-item">Tổng tiền dịch vụ: <strong>315.000 đ</strong></div>
-          <div class="b-price-item" style="color: var(--primary); margin: 3px 0;">Đã cọc trước (30%): <strong>94.500 đ (VietQR)</strong></div>
-          <div class="b-price-item">Thanh toán tại quầy: <strong style="color: #ea580c;">220.500 đ</strong></div>
+          <div class="b-price-item" style="color: var(--cust-primary-hover); margin: 3px 0;">Đã cọc trước (30%): <strong>94.500 đ (VietQR)</strong></div>
+          <div class="b-price-item">Thanh toán tại quầy: <strong style="color: var(--cust-accent);">220.500 đ</strong></div>
         </div>
 
         <div class="b-actions">
@@ -329,10 +346,7 @@
             <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
             Mã Vé Check-in QR
           </button>
-
-          <!-- Cancel button with >= 4h calculation test (QĐ-KH03) -->
-          <button type="button" class="btn btn-outline" style="color: #dc2626; border-color: #fecaca;" onclick="handleCancelRequest('BK-20260922-4412', 4.5, 94500)">
-            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+          <button type="button" class="btn btn-outline" style="color: #dc2626; border-color: #fca5a5;" onclick="handleCancelRequest('BK-20260922-4412', 4.5, 94500)">
             Hủy Đặt Sân
           </button>
         </div>
@@ -346,7 +360,7 @@
           <span class="b-code">Mã đơn: BK-20260920-1192</span>
           <span class="badge badge-blue">Đã Hoàn Thành Trận</span>
         </div>
-        <div style="font-size: 12px; color: var(--text-muted);">20/09/2026</div>
+        <div style="font-size: 11.5px; color: var(--cust-text-muted);">20/09/2026</div>
       </div>
       <div class="b-card-body">
         <div>
@@ -360,7 +374,7 @@
 
         <div>
           <div class="b-price-item">Tổng hóa đơn: <strong>350.000 đ</strong></div>
-          <div class="b-price-item" style="color: #059669;">Đã thanh toán 100% tại POS</div>
+          <div class="b-price-item" style="color: #059669;">Đã thanh toán 100% tại quầy POS</div>
         </div>
 
         <div class="b-actions">
@@ -375,14 +389,14 @@
       </div>
     </div>
 
-    <!-- Booking Item 3: Cancelled (<4h example for QD-KH03 testing) -->
+    <!-- Booking Item 3: Cancelled -->
     <div class="booking-card" data-status="cancelled">
       <div class="b-card-head">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span class="b-code">Mã đơn: BK-20260915-3890</span>
           <span class="badge badge-danger">Đã Hủy Đơn</span>
         </div>
-        <div style="font-size: 12px; color: var(--text-muted);">15/09/2026</div>
+        <div style="font-size: 11.5px; color: var(--cust-text-muted);">15/09/2026</div>
       </div>
       <div class="b-card-body">
         <div>
@@ -390,7 +404,7 @@
           <div class="b-info-sub">
             <span>📍 Chi nhánh 2 - Lê Văn Việt, Quận 9</span>
             <span>📅 Ngày chơi: 15/09/2026 | ⏰ 18:00 - 19:00</span>
-            <span style="color: #059669;">✅ Đã hoàn 100% cọc (72.000đ) qua STK vì hủy trước 5 tiếng</span>
+            <span style="color: #059669;">✅ Đã hoàn 100% cọc (72.000đ) vì hủy trước 5 tiếng</span>
           </div>
         </div>
 
@@ -412,15 +426,14 @@
   <div class="modal-overlay" id="qrModal">
     <div class="ticket-modal-card">
       <div class="ticket-top">
-        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">VÉ CHECK-IN ĐIỆN TỬ</div>
-        <h3 style="font-size: 20px; font-weight: 800; margin: 4px 0;" id="tktCourt">Sân Số 01</h3>
-        <div style="font-family: monospace; font-size: 15px; color: #ccfbf1;" id="tktCode">BK-20260922-4412</div>
+        <div style="font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">VÉ CHECK-IN ĐIỆN TỬ</div>
+        <h3 style="font-size: 18px; font-weight: 800; margin: 4px 0; color: var(--cust-text-main);" id="tktCourt">Sân Số 01</h3>
+        <div style="font-family: monospace; font-size: 14px; color: var(--cust-primary-hover);" id="tktCode">BK-20260922-4412</div>
       </div>
 
       <div class="ticket-body">
         <div class="ticket-qr-box">
-          <!-- Real QR pattern -->
-          <svg style="width: 170px; height: 170px;" viewBox="0 0 100 100" fill="#09090b">
+          <svg style="width: 160px; height: 160px;" viewBox="0 0 100 100" fill="#0f172a">
             <rect x="0" y="0" width="28" height="28"/>
             <rect x="4" y="4" width="20" height="20" fill="#fff"/>
             <rect x="8" y="8" width="12" height="12"/>
@@ -431,48 +444,46 @@
             <rect x="4" y="76" width="20" height="20" fill="#fff"/>
             <rect x="8" y="80" width="12" height="12"/>
             <rect x="42" y="42" width="16" height="16" fill="#0d9488"/>
-            <rect x="34" y="10" width="4" height="4"/><rect x="48" y="10" width="4" height="4"/><rect x="58" y="10" width="4" height="4"/>
-            <rect x="34" y="24" width="4" height="4"/><rect x="46" y="24" width="4" height="4"/>
-            <rect x="10" y="40" width="4" height="4"/><rect x="22" y="40" width="4" height="4"/><rect x="72" y="40" width="4" height="4"/>
-            <rect x="14" y="54" width="4" height="4"/><rect x="26" y="54" width="4" height="4"/><rect x="84" y="54" width="4" height="4"/>
-            <rect x="38" y="70" width="4" height="4"/><rect x="54" y="70" width="4" height="4"/><rect x="70" y="70" width="4" height="4"/>
-            <rect x="42" y="84" width="4" height="4"/><rect x="62" y="84" width="4" height="4"/>
+            <rect x="34" y="10" width="4" height="4"/><rect x="48" y="10" width="4" height="4"/>
+            <rect x="10" y="40" width="4" height="4"/><rect x="22" y="40" width="4" height="4"/>
+            <rect x="14" y="54" width="4" height="4"/><rect x="84" y="54" width="4" height="4"/>
+            <rect x="38" y="70" width="4" height="4"/><rect x="54" y="70" width="4" height="4"/>
           </svg>
-          <div style="font-size: 11px; font-weight: 700; color: var(--primary);">QUÉT MÃ TẠI LỄ TÂN ĐỂ NHẬN SÂN</div>
+          <div style="font-size: 10.5px; font-weight: 700; color: var(--cust-primary); margin-top: 4px;">QUÉT MÃ TẠI QUẦY ĐỂ NHẬN SÂN</div>
         </div>
 
-        <div style="text-align: left; font-size: 13px; margin-bottom: 20px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-            <span style="color: var(--text-muted);">Ngày thi đấu:</span>
+        <div style="text-align: left; font-size: 12.5px; margin-bottom: 18px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+            <span style="color: var(--cust-text-muted);">Ngày thi đấu:</span>
             <strong id="tktDate">22/09/2026</strong>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-            <span style="color: var(--text-muted);">Khung giờ:</span>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+            <span style="color: var(--cust-text-muted);">Khung giờ:</span>
             <strong id="tktTime">17:00 - 19:00</strong>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-            <span style="color: var(--text-muted);">Số tiền còn lại thanh toán:</span>
-            <strong id="tktRemaining" style="color: #ea580c;">220.500 đ</strong>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--cust-text-muted);">Số tiền còn lại thanh toán:</span>
+            <strong id="tktRemaining" style="color: var(--cust-accent);">220.500 đ</strong>
           </div>
         </div>
 
-        <button type="button" class="btn btn-outline" onclick="closeModals()" style="width: 100%; height: 38px;">
+        <button type="button" class="btn btn-outline" onclick="closeModals()" style="width: 100%; height: 36px; font-size: 12.5px;">
           Đóng Vé Điện Tử
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Review Modal (MH-KH05) -->
+  <!-- Review Modal -->
   <div class="modal-overlay" id="reviewModal">
-    <div class="modal-card" style="max-width: 460px;">
+    <div class="modal-card" style="max-width: 440px;">
       <div class="modal-header">
-        <h3 id="reviewModalTitle">Đánh Giá Chất Lượng Sân</h3>
+        <h3 id="reviewModalTitle" style="font-size: 15px;">Đánh Giá Chất Lượng Sân</h3>
         <button type="button" class="modal-close-btn" onclick="closeModals()">✕</button>
       </div>
       <div class="modal-body">
         <div style="text-align: center;">
-          <div style="font-size: 13.5px; color: var(--text-muted);">Bạn cảm thấy chất lượng mặt thảm và dịch vụ thế nào?</div>
+          <div style="font-size: 13px; color: var(--cust-text-muted);">Bạn cảm thấy chất lượng mặt thảm và dịch vụ thế nào?</div>
           <div class="star-rating">
             <span class="star-btn active" onclick="setRating(1)">★</span>
             <span class="star-btn active" onclick="setRating(2)">★</span>
@@ -482,14 +493,14 @@
           </div>
         </div>
 
-        <div class="form-group" style="margin-top: 14px;">
-          <label class="form-label">Nhận xét chi tiết (Đèn chiếu sáng, quạt, thái độ nhân viên)</label>
-          <textarea class="form-control" rows="3" placeholder="Sân rất êm, đèn sáng rõ không bị lóa mắt, nhân viên hỗ trợ nhiệt tình..."></textarea>
+        <div class="form-group" style="margin-top: 12px;">
+          <label class="form-label">Nhận xét chi tiết</label>
+          <textarea class="form-control" rows="3" placeholder="Sân rất êm, đèn sáng rõ không bị lóa mắt, nhân viên quầy nhiệt tình..."></textarea>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline" onclick="closeModals()">Hủy</button>
-        <button type="button" class="btn btn-primary" onclick="submitReview()">Gửi Đánh Giá</button>
+        <button type="button" class="btn btn-primary" onclick="submitReview()">Gửi Đánh Giá (+50 pts)</button>
       </div>
     </div>
   </div>
@@ -523,14 +534,12 @@
       document.getElementById('reviewModal').classList.remove('open');
     }
 
-    // Cancellation rule check (QĐ-KH03)
     function handleCancelRequest(code, hoursBeforeMatch, depositAmount) {
       if (hoursBeforeMatch >= 4) {
         const confirmCancel = confirm(
-          `[QUY ĐỊNH QĐ-KH03] Thời gian đến giờ chơi còn ${hoursBeforeMatch} tiếng (≥ 4 tiếng).\n\n` +
-          `Bạn ĐƯỢC HOÀN LẠI 100% TIỀN CỌC (${depositAmount.toLocaleString('vi-VN')} đ).\n` +
-          `Hệ thống sẽ chuyển hoàn về tài khoản của bạn trong 24 giờ.\n\n` +
-          `Bạn có chắc chắn muốn xác nhận hủy đơn ${code}?`
+          `Thời gian đến giờ chơi còn ${hoursBeforeMatch} tiếng (từ 4 tiếng trở lên).\n\n` +
+          `Bạn ĐƯỢC HOÀN LẠI 100% TIỀN CỌC (${depositAmount.toLocaleString('vi-VN')} đ).\n\n` +
+          `Xác nhận hủy đơn ${code}?`
         );
         if (confirmCancel) {
           alert(`Đã hủy thành công đơn ${code}! Yêu cầu hoàn cọc ${depositAmount.toLocaleString('vi-VN')} đ đã được tạo.`);
@@ -538,20 +547,19 @@
         }
       } else {
         const confirmCancel = confirm(
-          `[QUY ĐỊNH QĐ-KH03 CẢNH BÁO]\n` +
-          `Thời gian đến giờ chơi chỉ còn ${hoursBeforeMatch} tiếng (< 4 tiếng).\n` +
-          `Theo quy chế CLB, đơn hủy dưới 4 tiếng sẽ KHÔNG ĐƯỢC HOÀN CỌC.\n\n` +
-          `Bạn có chắc chắn vẫn muốn hủy slot này để người khác đặt không?`
+          `Cảnh báo hủy sát giờ chơi:\nThời gian đến giờ chơi chỉ còn ${hoursBeforeMatch} tiếng (dưới 4 tiếng).\n` +
+          `Theo quy chế, đơn hủy dưới 4 tiếng sẽ KHÔNG ĐƯỢC HOÀN CỌC.\n\n` +
+          `Bạn có chắc chắn vẫn muốn hủy slot này không?`
         );
         if (confirmCancel) {
-          alert(`Đã hủy slot sân ${code}. Không hoàn cọc theo quy định.`);
+          alert(`Đã hủy slot sân ${code}. Không áp dụng hoàn cọc do thời gian hủy sát giờ chơi (dưới 4 tiếng).`);
           window.location.reload();
         }
       }
     }
 
     function openReviewModal(code, court) {
-      document.getElementById('reviewModalTitle').textContent = 'Đánh Giá: ' + court + ' (' + code + ')';
+      document.getElementById('reviewModalTitle').textContent = 'Đánh Giá: ' + court;
       document.getElementById('reviewModal').classList.add('open');
     }
 
@@ -564,7 +572,7 @@
     }
 
     function submitReview() {
-      alert('Cảm ơn bạn đã gửi đánh giá chất lượng! Bạn được cộng +50 điểm hội viên.');
+      alert('Cảm ơn bạn đã gửi đánh giá! Bạn được cộng +50 điểm hội viên.');
       closeModals();
     }
   </script>

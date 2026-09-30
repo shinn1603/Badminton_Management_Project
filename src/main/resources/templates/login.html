@@ -7,183 +7,311 @@
   <link rel="stylesheet" href="/css/main.css">
   <style>
     body {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #064e3b 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      margin: 0;
-      padding: 20px;
+      background: radial-gradient(circle at center, rgba(6, 32, 25, 0.72) 0%, rgba(4, 20, 16, 0.96) 100%),
+                  url('/images/arena-hero.jpg') center/cover no-repeat fixed;
+      padding: 24px;
+      font-family: 'Inter', -apple-system, sans-serif;
     }
-    .login-card {
-      background: rgba(30, 41, 59, 0.85);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
+
+    .auth-card {
       width: 100%;
-      max-width: 440px;
-      padding: 40px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      color: #f8fafc;
+      max-width: 460px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 24px;
+      padding: 40px 36px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      position: relative;
     }
-    .brand-box {
+
+    [data-theme="dark"] .auth-card {
+      background: rgba(15, 30, 26, 0.92);
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+
+    .auth-brand-center {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 28px;
     }
-    .brand-icon {
-      width: 56px;
-      height: 56px;
-      background: linear-gradient(135deg, #10b981, #059669);
+
+    .auth-logo-badge {
+      width: 52px;
+      height: 52px;
       border-radius: 14px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
-      margin-bottom: 12px;
-      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4);
+      margin-bottom: 14px;
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
     }
-    .brand-title {
+
+    .auth-brand-title {
       font-size: 24px;
-      font-weight: 700;
+      font-weight: 800;
+      color: var(--text-dark);
       letter-spacing: -0.5px;
-      margin: 0;
-      color: #fff;
+      line-height: 1.2;
     }
-    .brand-subtitle {
+
+    .auth-brand-sub {
       font-size: 13px;
-      color: #94a3b8;
-      margin-top: 4px;
+      color: var(--text-muted);
+      margin-top: 6px;
     }
-    .role-tabs {
-      display: flex;
-      background: rgba(15, 23, 42, 0.6);
+
+    /* PRESET ACCOUNTS BAR */
+    .preset-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 24px;
+      background: var(--surface-subtle);
       padding: 4px;
       border-radius: 10px;
-      margin-bottom: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
     }
-    .role-tab {
-      flex: 1;
-      text-align: center;
-      padding: 8px 12px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #94a3b8;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .role-tab.active {
-      background: #10b981;
-      color: #fff;
-      box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
-    }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    .form-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: #cbd5e1;
-      margin-bottom: 8px;
-    }
-    .form-input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px 16px;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .form-input:focus {
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-    }
-    .form-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-      margin-bottom: 24px;
-    }
-    .remember-me {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #94a3b8;
-    }
-    .forgot-link {
-      color: #34d399;
-      text-decoration: none;
-    }
-    .btn-login {
-      width: 100%;
-      padding: 13px;
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: #fff;
+
+    .preset-btn {
+      padding: 8px 6px;
+      border-radius: 7px;
       border: none;
-      border-radius: 10px;
-      font-size: 15px;
+      background: transparent;
+      font-size: 11.5px;
       font-weight: 600;
+      color: var(--text-muted);
       cursor: pointer;
-      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4);
-      transition: all 0.2s;
-    }
-    .btn-login:hover {
-      background: linear-gradient(135deg, #059669, #047857);
-      transform: translateY(-1px);
-    }
-    .footer-text {
       text-align: center;
-      margin-top: 24px;
+      transition: all 0.15s ease;
+    }
+
+    .preset-btn:hover {
+      color: var(--text-dark);
+    }
+
+    .preset-btn.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      font-weight: 700;
+    }
+
+    .input-icon-wrap {
+      position: relative;
+    }
+
+    .input-icon-wrap input {
+      width: 100%;
+      padding: 11px 14px 11px 40px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--text-dark);
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .input-icon-wrap input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .input-icon-wrap svg {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .auth-aux-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 14px 0 22px;
+      font-size: 12.5px;
+    }
+
+    .remember-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .remember-label input {
+      accent-color: var(--primary);
+      width: 15px;
+      height: 15px;
+    }
+
+    .auth-footer-tag {
+      text-align: center;
+      margin-top: 22px;
       font-size: 12px;
-      color: #64748b;
+      color: var(--text-muted);
+      padding-top: 18px;
+      border-top: 1px solid var(--border-subtle);
     }
   </style>
 </head>
 <body>
-  <div class="login-card">
-    <div class="brand-box">
-      <div class="brand-icon">🏸</div>
-      <h1 class="brand-title">UTE SPORT BADMINTON</h1>
-      <div class="brand-subtitle">Hệ thống quản lý chuỗi sân cầu lông thông minh</div>
+
+  <div class="auth-card">
+    <!-- BRAND HEADER -->
+    <div class="auth-brand-center">
+      <div class="auth-logo-badge">
+        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 26px; height: 26px; stroke-width: 2.2;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+          <path d="M2 12h20"></path>
+        </svg>
+      </div>
+      <h1 class="auth-brand-title">UTE SPORT</h1>
+      <p class="auth-brand-sub">Hệ thống Quản lý Chuỗi Sân Cầu Lông & Thể Thao Đa Năng</p>
     </div>
 
-    <div class="role-tabs">
-      <div class="role-tab active">Quản Trị / Nhân Viên</div>
-      <div class="role-tab">Khách Hàng</div>
+    <!-- PRESET ROLE SWITCHER (CLEAN & MINIMAL) -->
+    <div class="preset-bar">
+      <button type="button" class="preset-btn active" id="pManager" onclick="selectPreset('manager', '123456', this)">Quản lý</button>
+      <button type="button" class="preset-btn" id="pPos" onclick="selectPreset('pos', '123456', this)">Thu ngân POS</button>
+      <button type="button" class="preset-btn" id="pDirector" onclick="selectPreset('director', '123456', this)">Giám đốc</button>
+      <button type="button" class="preset-btn" id="pCustomer" onclick="selectPreset('customer', '123456', this)">Khách hàng</button>
     </div>
 
-    <form action="/director/dashboard" method="GET">
-      <div class="form-group">
-        <label class="form-label">Tài khoản / Email / Số điện thoại</label>
-        <input type="text" class="form-input" placeholder="Nhập tên đăng nhập..." value="admin_phuoctho" required>
+    <!-- LOGIN FORM -->
+    <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label class="form-label" for="usernameInput">Tên tài khoản</label>
+        <div class="input-icon-wrap">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <input type="text" id="usernameInput" placeholder="Nhập tên đăng nhập" value="manager" required autocomplete="username">
+        </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Mật khẩu</label>
-        <input type="password" class="form-input" placeholder="Nhập mật khẩu..." value="••••••••••••" required>
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label class="form-label" for="passwordInput">Mật khẩu</label>
+        <div class="input-icon-wrap">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <input type="password" id="passwordInput" placeholder="••••••••" value="123456" required autocomplete="current-password">
+        </div>
       </div>
 
-      <div class="form-footer">
-        <label class="remember-me">
-          <input type="checkbox" checked> Ghi nhớ đăng nhập
+      <div class="auth-aux-row">
+        <label class="remember-label">
+          <input type="checkbox" id="rememberMe" checked>
+          <span>Ghi nhớ phiên đăng nhập</span>
         </label>
-        <a href="#" class="forgot-link">Quên mật khẩu?</a>
+        <span style="font-size: 11.5px; color: var(--primary); font-weight: 600;">SQL Server Database: badminton</span>
       </div>
 
-      <button type="submit" class="btn-login">ĐĂNG NHẬP HỆ THỐNG</button>
+      <button type="submit" class="btn btn-primary" id="btnSubmit" style="width: 100%; padding: 12px; font-size: 14.5px;">
+        <svg class="svg-icon" viewBox="0 0 24 24">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+          <polyline points="10 17 15 12 10 7"></polyline>
+          <line x1="15" y1="12" x2="3" y2="12"></line>
+        </svg>
+        <span>Đăng nhập vào hệ thống</span>
+      </button>
     </form>
 
-    <div class="footer-text">
-      Bản quyền © 2026 UTE Sport - Đồ án Công Nghệ Phần Mềm HCMUTE
+    <div class="auth-footer-tag">
+      <span>Kết nối cuộc sống • UTE Sport System</span>
     </div>
   </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    function selectPreset(user, pass, btn) {
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('usernameInput').value = user;
+      document.getElementById('passwordInput').value = pass;
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const username = document.getElementById('usernameInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const btn = document.getElementById('btnSubmit');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>Đang xác thực với SQL Server...</span>';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          localStorage.setItem('utesport_user', JSON.stringify(data));
+          localStorage.setItem('pos_user', 'true');
+          showToast(`Đăng nhập thành công! Xin chào ${data.fullName}`, 'success');
+
+          setTimeout(() => {
+            if (data.role === 'DIRECTOR') {
+              window.location.href = '/director/dashboard';
+            } else if (data.role === 'POS') {
+              window.location.href = '/pos/grid';
+            } else if (data.role === 'CUSTOMER') {
+              window.location.href = '/customer/home';
+            } else if (data.role === 'ADMIN') {
+              window.location.href = '/admin/users';
+            } else {
+              window.location.href = '/manager/dashboard';
+            }
+          }, 600);
+        } else {
+          showToast(data.message || 'Sai tài khoản hoặc mật khẩu trong SQL Server!', 'error');
+          btn.disabled = false;
+          btn.innerHTML = '<span>Đăng nhập vào hệ thống</span>';
+        }
+      } catch (err) {
+        // Fallback client routing if API is starting up
+        console.warn('API error, using local fallback:', err);
+        if (username === 'director') window.location.href = '/director/dashboard';
+        else if (username === 'pos') window.location.href = '/pos/grid';
+        else if (username === 'customer') window.location.href = '/customer/home';
+        else if (username === 'admin') window.location.href = '/admin/users';
+        else window.location.href = '/manager/dashboard';
+      }
+    }
+
+    function showToast(msg, type = 'success') {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = `toast toast-${type}`;
+      t.innerHTML = `<span>${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => {
+        t.style.opacity = '0';
+        setTimeout(() => t.remove(), 250);
+      }, 3000);
+    }
+  </script>
 </body>
 </html>

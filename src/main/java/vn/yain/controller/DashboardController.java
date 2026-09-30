@@ -99,6 +99,11 @@ public class DashboardController {
         return "manager/dashboard";
     }
 
+    @GetMapping({"/manager/bookings", "/pos/bookings"})
+    public String managerBookings() {
+        return "manager/bookings";
+    }
+
     @GetMapping("/manager/courts")
     public String managerCourts() {
         return "manager/courts";

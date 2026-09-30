@@ -3,46 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard tổng quan chi nhánh - UTE Sport</title>
+  <title>Dashboard Tổng quan - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
-    .status-badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .status-playing { background-color: rgba(13, 148, 136, 0.1); color: #0d9488; }
-    .status-empty { background-color: rgba(228, 228, 231, 0.5); color: #52525b; }
-    .status-maintenance { background-color: rgba(234, 88, 12, 0.1); color: #ea580c; }
-    
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 24px;
-      margin-top: 24px;
-    }
-    
-    .warning-item {
+    /* Specific Dashboard Polish */
+    .dashboard-top-section {
       display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border-color);
+      flex-direction: column;
+      gap: 20px;
     }
-    .warning-item:last-child {
-      border-bottom: none;
+    
+    .chart-container-wrap {
+      position: relative;
+      height: 250px;
+      width: 100%;
+    }
+
+    .donut-center-stat {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .donut-center-num {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-dark);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      line-height: 1.1;
+    }
+
+    .donut-center-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
     }
   </style>
 </head>
 <body>
 
   <div class="layout-container">
+    <!-- LEFT SIDEBAR -->
     <aside class="sidebar" id="appSidebar">
       <div class="brand-header">
-        <div class="brand-icon">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+        <div class="brand-logo-wrap">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="stroke-width: 2.2;">
             <circle cx="12" cy="12" r="10"></circle>
             <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
             <path d="M2 12h20"></path>
@@ -50,7 +59,7 @@
         </div>
         <div class="brand-text">
           <h2>UTE SPORT</h2>
-          <span>Quản lý chi nhánh</span>
+          <span>CHI NHÁNH THỦ ĐỨC</span>
         </div>
       </div>
 
@@ -59,21 +68,43 @@
         
         <a href="/manager/dashboard" class="menu-item active">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="3" y1="9" x2="21" y2="9"></line>
-            <line x1="9" y1="21" x2="9" y2="9"></line>
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
           </svg>
-          <span class="menu-text">Dashboard</span>
+          <span class="menu-text">Tổng quan</span>
         </a>
-        <a href="/manager/courts" class="menu-item">
+
+        <a href="/manager/bookings" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>
             <line x1="8" y1="2" x2="8" y2="6"></line>
             <line x1="3" y1="10" x2="21" y2="10"></line>
           </svg>
+          <span class="menu-text">Đặt sân</span>
+          <span class="menu-tag">7 mới</span>
+        </a>
+
+        <a href="/pos/grid" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="12" y1="20" x2="12" y2="10"></line>
+            <line x1="18" y1="20" x2="18" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="16"></line>
+          </svg>
+          <span class="menu-text">Lịch sân (POS)</span>
+        </a>
+
+        <a href="/manager/courts" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
           <span class="menu-text">Danh mục sân</span>
         </a>
+
         <a href="/manager/pricing" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <line x1="12" y1="1" x2="12" y2="23"></line>
@@ -81,23 +112,22 @@
           </svg>
           <span class="menu-text">Cấu hình giá</span>
         </a>
+
         <a href="/manager/inventory" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-            <line x1="12" y1="22.08" x2="12" y2="12"></line>
           </svg>
-          <span class="menu-text">Tồn kho</span>
+          <span class="menu-text">Kho vật tư</span>
         </a>
+
         <a href="/manager/receipts" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="12" y1="18" x2="12" y2="12"></line>
-            <line x1="9" y1="15" x2="15" y2="15"></line>
           </svg>
           <span class="menu-text">Nhập kho</span>
         </a>
+
         <a href="/manager/staff" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -105,184 +135,732 @@
             <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
             <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
           </svg>
-          <span class="menu-text">Nhân sự</span>
+          <span class="menu-text">Nhân viên & Ca</span>
         </a>
+
         <a href="/manager/reports" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <line x1="18" y1="20" x2="18" y2="10"></line>
             <line x1="12" y1="20" x2="12" y2="4"></line>
             <line x1="6" y1="20" x2="6" y2="14"></line>
           </svg>
-          <span class="menu-text">Báo cáo</span>
+          <span class="menu-text">Báo cáo doanh thu</span>
         </a>
+
+        <div class="sidebar-motto">
+          <div class="sidebar-motto-title">Thể thao kiến tạo</div>
+          <div class="sidebar-motto-sub">kết nối cuộc sống</div>
+        </div>
       </div>
 
       <div class="sidebar-bottom">
         <div class="user-avatar">QL</div>
         <div class="user-meta">
-          <span class="user-name">Trần Phúc Bảo</span>
-          <span class="user-title">Quản lý cơ sở Bình Thạnh</span>
+          <div class="user-name">Nguyễn Phước Thọ</div>
+          <div class="user-title">Quản lý trung tâm</div>
         </div>
+        <a href="/login" style="margin-left: auto; color: #94a3b8;" title="Đăng xuất">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </a>
       </div>
     </aside>
 
-    <main class="main-wrapper">
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <!-- HEADER BAR -->
       <header class="header-bar">
         <div class="header-left">
-          <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="Thu gọn / Mở rộng">
+          <button type="button" class="btn-icon" id="btnToggleSidebar" onclick="toggleSidebar()">
             <svg class="svg-icon" viewBox="0 0 24 24">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
           </button>
-          <div class="header-heading">
-            <h1>Dashboard tổng quan chi nhánh</h1>
+
+          <div class="branch-select-badge" onclick="alert('Đang hiển thị dữ liệu Chi nhánh 1 - Thủ Đức')">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--primary);">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+            <span>Trung Tâm Thể Thao UTE Sport - Thủ Đức</span>
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; color: var(--text-muted);">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+
+          <div class="search-box-header">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" placeholder="Tìm kiếm khách hàng, sân, hoặc mã đặt sân..." id="globalSearchInput">
           </div>
         </div>
-        
-        <div class="header-actions">
-           <span style="font-size: 13px; font-weight: 500; color: #52525b;">Hôm nay: <span id="currentDate"></span></span>
+
+        <div class="header-right">
+          <!-- Theme Toggle Button -->
+          <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Chuyển đổi giao diện Sáng / Tối">
+            <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+
+          <!-- Notification Bell -->
+          <button type="button" class="btn-icon notification-btn" onclick="showToast('Bạn có 3 đơn đặt sân mới chờ duyệt', 'info')">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="notification-dot"></span>
+          </button>
+
+          <!-- User Profile Pill -->
+          <div class="user-pill-header" onclick="window.location.href='/login'">
+            <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;">QL</div>
+            <div style="font-size: 12.5px; font-weight: 600; color: var(--text-dark);">Quản lý trung tâm</div>
+          </div>
         </div>
       </header>
 
-      <div class="page-content">
-        
-        <!-- KPIs ROW -->
-        <div class="kpi-row">
-          <div class="clean-kpi">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Doanh thu trong ngày</span>
-              <span class="clean-kpi-badge badge-green">Hoạt động tốt</span>
+      <!-- PAGE CONTENT -->
+      <main class="page-content">
+        <!-- TOP SECTION: HERO BANNER (REFERENCE IMAGE 4) -->
+        <div class="dashboard-top-section">
+          <div class="hero-banner">
+            <div class="hero-banner-content">
+              <h1 class="hero-title">Dashboard Đặt Sân Thể Thao - UTE Sport</h1>
+              <p class="hero-subtitle">Quản lý đặt sân dễ dàng — Vận hành hiệu quả — Lan tỏa tinh thần thể thao</p>
+              <div class="hero-badges-wrap">
+                <span class="hero-badge-pill">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: #10b981;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                  </svg>
+                  Sân đa môn tiêu chuẩn
+                </span>
+                <span class="hero-badge-pill">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: #10b981;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  Đặt sân nhanh chóng
+                </span>
+                <span class="hero-badge-pill">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: #10b981;">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  </svg>
+                  Vận hành tập trung
+                </span>
+              </div>
             </div>
-            <div class="clean-kpi-value">6.850.000 đ</div>
-            <div class="clean-kpi-caption">Thuê sân: 4.2M | Dịch vụ: 2.65M</div>
           </div>
 
-          <div class="clean-kpi">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Tỷ lệ lấp đầy hôm nay</span>
-              <span class="clean-kpi-badge badge-blue">Đạt chỉ tiêu</span>
+          <!-- STATS KPI CARDS & QUICK ACTIONS (REFERENCE IMAGE 1 & 4) -->
+          <div class="stats-header-row">
+            <!-- Stat 1 -->
+            <div class="stat-card" onclick="window.location.href='/manager/bookings'">
+              <div class="stat-card-top">
+                <span class="stat-label">Tổng lượt đặt</span>
+                <div class="stat-icon-wrap stat-icon-green">
+                  <svg class="svg-icon" viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value">248</div>
+              <div class="stat-trend stat-trend-up">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+                <span>↑ 12% so với tuần trước</span>
+              </div>
             </div>
-            <div class="clean-kpi-value">82%</div>
-            <div class="clean-kpi-caption">Đã đặt 52/64 ca (8 sân)</div>
-          </div>
 
-          <div class="clean-kpi">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Nhân sự ca trực hiện tại</span>
-              <span class="clean-kpi-badge badge-green">Đầy đủ</span>
+            <!-- Stat 2 -->
+            <div class="stat-card" onclick="window.location.href='/manager/reports'">
+              <div class="stat-card-top">
+                <span class="stat-label">Doanh thu hôm nay</span>
+                <div class="stat-icon-wrap stat-icon-blue">
+                  <svg class="svg-icon" viewBox="0 0 24 24">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value">12.450.000đ</div>
+              <div class="stat-trend stat-trend-up">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+                <span>↑ 18% so với hôm qua</span>
+              </div>
             </div>
-            <div class="clean-kpi-value">3 / 3</div>
-            <div class="clean-kpi-caption">Ca tối (17:30 - 22:30)</div>
-          </div>
 
-          <div class="clean-kpi" style="border-left: 4px solid var(--accent);">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Cảnh báo tồn kho</span>
-              <span class="clean-kpi-badge badge-amber">Cần chú ý</span>
+            <!-- Stat 3 -->
+            <div class="stat-card" onclick="window.location.href='/pos/grid'">
+              <div class="stat-card-top">
+                <span class="stat-label">Tỷ lệ lấp đầy</span>
+                <div class="stat-icon-wrap stat-icon-orange">
+                  <svg class="svg-icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value">78%</div>
+              <div class="stat-trend stat-trend-up">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+                <span>↑ 6% so với tuần trước</span>
+              </div>
             </div>
-            <div class="clean-kpi-value">2 mặt hàng</div>
-            <div class="clean-kpi-caption" style="color: var(--accent);">Sắp hết nước suối, cầu Yonex</div>
+
+            <!-- Stat 4 -->
+            <div class="stat-card" onclick="window.location.href='/manager/staff'">
+              <div class="stat-card-top">
+                <span class="stat-label">Khách hàng mới</span>
+                <div class="stat-icon-wrap stat-icon-purple">
+                  <svg class="svg-icon" viewBox="0 0 24 24">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-value">36</div>
+              <div class="stat-trend stat-trend-up">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+                <span>↑ 20% so với tuần trước</span>
+              </div>
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="quick-action-group">
+              <button type="button" class="btn btn-primary" onclick="openCreateBookingModal()">
+                <svg class="svg-icon" viewBox="0 0 24 24">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>+ Tạo đặt sân</span>
+              </button>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-outline" style="flex: 1; padding: 7px 10px; font-size: 11.5px;" onclick="showToast('Mở form thêm khách hàng mới', 'info')">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                  </svg>
+                  <span>Thêm khách</span>
+                </button>
+                <button type="button" class="btn btn-outline" style="flex: 1; padding: 7px 10px; font-size: 11.5px;" onclick="showToast('Đang xuất báo cáo tổng hợp PDF...', 'success')">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>Xuất báo cáo</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="dashboard-grid">
-          <!-- BIỂU ĐỒ BÊN TRÁI -->
-          <div class="section-card">
-            <div class="section-title">
-              <h3>Tỷ lệ lấp đầy sân theo khung giờ (Hôm nay)</h3>
-            </div>
-            <div style="padding: 20px; height: 300px;">
-              <canvas id="hourlyChart"></canvas>
-            </div>
-          </div>
-
-          <!-- DANH SÁCH BÊN PHẢI -->
+        <!-- DASHBOARD MAIN TWO-COLUMN SECTION -->
+        <div class="dashboard-grid-main">
+          <!-- LEFT 65%: CHARTS & LOWER STATUS CARDS -->
           <div style="display: flex; flex-direction: column; gap: 24px;">
-            
-            <div class="section-card">
-              <div class="section-title">
-                <h3>Trạng thái sân trực tiếp</h3>
+            <!-- CHARTS DUAL ROW -->
+            <div class="charts-dual-row">
+              <!-- CHART 1: COMBO BOOKINGS & REVENUE -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary);">
+                      <line x1="18" y1="20" x2="18" y2="10"></line>
+                      <line x1="12" y1="20" x2="12" y2="4"></line>
+                      <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    <span>Lượt đặt sân & Doanh thu theo ngày</span>
+                  </div>
+                  <select class="form-control" style="padding: 4px 10px; font-size: 12px; width: auto;" onchange="updateComboChart(this.value)">
+                    <option value="7">7 ngày qua</option>
+                    <option value="14">14 ngày qua</option>
+                    <option value="30">30 ngày qua</option>
+                  </select>
+                </div>
+                <div class="card-body">
+                  <div class="chart-container-wrap">
+                    <canvas id="comboChart"></canvas>
+                  </div>
+                </div>
               </div>
-              <div style="padding: 0 20px 20px 20px;">
-                <table class="clean-table" style="margin-top: 0;">
-                  <tbody>
-                    <tr>
-                      <td style="font-weight: 600;">Sân 1</td>
-                      <td><span class="status-badge status-playing">Đang đánh (đến 20:00)</span></td>
-                    </tr>
-                    <tr>
-                      <td style="font-weight: 600;">Sân 2</td>
-                      <td><span class="status-badge status-playing">Đang đánh (đến 19:30)</span></td>
-                    </tr>
-                    <tr>
-                      <td style="font-weight: 600;">Sân 3</td>
-                      <td><span class="status-badge status-empty">Đang trống</span></td>
-                    </tr>
-                    <tr>
-                      <td style="font-weight: 600;">Sân 4</td>
-                      <td><span class="status-badge status-playing">Đang đánh (đến 21:00)</span></td>
-                    </tr>
-                    <tr>
-                      <td style="font-weight: 600;">Sân 5 (VIP)</td>
-                      <td><span class="status-badge status-maintenance">Đang bảo trì lưới</span></td>
-                    </tr>
-                  </tbody>
-                </table>
+
+              <!-- CHART 2: DONUT CATEGORY BREAKDOWN -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--secondary);">
+                      <circle cx="12" cy="12" r="10"></circle>
+                    </svg>
+                    <span>Cơ cấu đặt sân theo môn</span>
+                  </div>
+                  <select class="form-control" style="padding: 4px 10px; font-size: 12px; width: auto;">
+                    <option>Tháng này</option>
+                    <option>Quý này</option>
+                  </select>
+                </div>
+                <div class="card-body">
+                  <div class="chart-container-wrap" style="position: relative;">
+                    <canvas id="donutChart"></canvas>
+                    <div class="donut-center-stat">
+                      <div class="donut-center-num">248</div>
+                      <div class="donut-center-label">lượt đặt</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="section-card">
-              <div class="section-title">
-                <h3 style="color: var(--accent);">Danh sách hàng hóa sắp hết</h3>
+            <!-- COURT THUMBNAIL CARDS (REFERENCE IMAGE 1 & 4) -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary);">
+                    <circle cx="12" cy="12" r="10"></circle>
+                  </svg>
+                  <span>Trạng thái sân thể thao chi nhánh</span>
+                </div>
+                <a href="/manager/courts" style="font-size: 12.5px; font-weight: 600; color: var(--primary);">Xem tất cả →</a>
               </div>
-              <div style="padding: 10px 20px 20px 20px;">
-                <div class="warning-item">
-                  <span>Nước khoáng Aquafina 500ml</span>
-                  <strong style="color: var(--accent);">Còn 8 chai</strong>
-                </div>
-                <div class="warning-item">
-                  <span>Ống cầu lông Yonex AS-40</span>
-                  <strong style="color: var(--accent);">Còn 2 ống</strong>
-                </div>
-                <div style="margin-top: 15px;">
-                  <a href="/manager/receipts" class="btn-action btn-primary-action" style="width: 100%; justify-content: center; text-decoration: none;">
-                    Lập phiếu nhập kho ngay
-                  </a>
+              <div class="card-body">
+                <div class="courts-thumbs-grid">
+                  <!-- Court 1 -->
+                  <div class="court-thumb-card" onclick="window.location.href='/pos/grid'">
+                    <div class="court-thumb-img-wrap">
+                      <img src="/images/badminton-court.jpg" alt="Sân Cầu Lông 1">
+                      <span class="badge badge-available court-thumb-badge">● Trống</span>
+                    </div>
+                    <div class="court-thumb-body">
+                      <div class="court-thumb-title">Sân cầu lông 1</div>
+                      <div class="court-thumb-meta">Thảm Taraflex cao cấp • 05:00 - 23:00</div>
+                    </div>
+                  </div>
+
+                  <!-- Court 2 -->
+                  <div class="court-thumb-card" onclick="window.location.href='/pos/grid'">
+                    <div class="court-thumb-img-wrap">
+                      <img src="/images/badminton-court.jpg" alt="Sân Cầu Lông 2">
+                      <span class="badge badge-in-use court-thumb-badge">● Đang sử dụng</span>
+                    </div>
+                    <div class="court-thumb-body">
+                      <div class="court-thumb-title">Sân cầu lông 2</div>
+                      <div class="court-thumb-meta">Sân tiêu chuẩn thi đấu • 05:00 - 23:00</div>
+                    </div>
+                  </div>
+
+                  <!-- Court 3 -->
+                  <div class="court-thumb-card" onclick="window.location.href='/pos/grid'">
+                    <div class="court-thumb-img-wrap">
+                      <img src="/images/pickleball-court.jpg" alt="Sân Pickleball 1">
+                      <span class="badge badge-available court-thumb-badge">● Trống</span>
+                    </div>
+                    <div class="court-thumb-body">
+                      <div class="court-thumb-title">Sân pickleball 1</div>
+                      <div class="court-thumb-meta">Mặt sân Cushion nhám • 06:00 - 22:00</div>
+                    </div>
+                  </div>
+
+                  <!-- Court 4 -->
+                  <div class="court-thumb-card" onclick="window.location.href='/pos/grid'">
+                    <div class="court-thumb-img-wrap">
+                      <img src="/images/pickleball-court.jpg" alt="Sân Pickleball 2">
+                      <span class="badge badge-maintenance court-thumb-badge">● Bảo trì lưới</span>
+                    </div>
+                    <div class="court-thumb-body">
+                      <div class="court-thumb-title">Sân pickleball 2</div>
+                      <div class="court-thumb-meta">Thay lưới đèn LED • Hoàn thành 14:00</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
+            <!-- RECENT BOOKINGS TABLE (REFERENCE IMAGE 1) -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary);">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                  <span>Đặt sân gần đây</span>
+                </div>
+                <a href="/manager/bookings" style="font-size: 12.5px; font-weight: 600; color: var(--primary);">Xem tất cả đơn →</a>
+              </div>
+              <div class="card-body" style="padding: 0;">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Sân</th>
+                        <th>Thời gian</th>
+                        <th>Số tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recentBookingsTbody">
+                      <tr>
+                        <td><strong>#DS0101</strong></td>
+                        <td>Nguyễn Hoàng Nam <br><span style="font-size: 11px; color: var(--text-muted);">0903.123.456</span></td>
+                        <td>Sân cầu lông 2</td>
+                        <td>Hôm nay • 08:00 - 10:00</td>
+                        <td><strong>180.000đ</strong></td>
+                        <td><span class="badge badge-in-use">Đang sử dụng</span></td>
+                        <td>
+                          <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="window.location.href='/pos/grid'">Vào POS</button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong>#DS0102</strong></td>
+                        <td>Lê Minh Đức <br><span style="font-size: 11px; color: var(--text-muted);">0912.888.999</span></td>
+                        <td>Sân cầu lông 1</td>
+                        <td>Hôm nay • 14:00 - 16:00</td>
+                        <td><strong>180.000đ</strong></td>
+                        <td><span class="badge badge-pending">Đã cọc 30%</span></td>
+                        <td>
+                          <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="showToast('Đã xác nhận đơn #DS0102', 'success')">Duyệt</button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong>#DS0103</strong></td>
+                        <td>Phạm Gia Huy <br><span style="font-size: 11px; color: var(--text-muted);">0988.777.666</span></td>
+                        <td>Sân pickleball 1</td>
+                        <td>Hôm nay • 18:00 - 20:00</td>
+                        <td><strong>240.000đ</strong></td>
+                        <td><span class="badge badge-available">Đã xác nhận</span></td>
+                        <td>
+                          <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="window.location.href='/pos/grid'">Nhận sân</button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong>#DS0104</strong></td>
+                        <td>Vũ Thị Mai Anh <br><span style="font-size: 11px; color: var(--text-muted);">0977.555.444</span></td>
+                        <td>Sân cầu lông 3</td>
+                        <td>Hôm nay • 19:00 - 20:00</td>
+                        <td><strong>90.000đ</strong></td>
+                        <td><span class="badge badge-pending">Chờ xác nhận</span></td>
+                        <td>
+                          <button class="btn btn-primary" style="padding: 4px 8px; font-size: 11.5px;" onclick="showToast('Đã nhận đơn đặt online #DS0104', 'success')">Nhận đơn</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT 35%: TIMELINE SCHEDULE & PROMO BANNER -->
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- TIMELINE SCHEDULE CARD (REFERENCE IMAGE 1) -->
+            <div class="card timeline-schedule-card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary);">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span>Lịch sân hôm nay</span>
+                </div>
+                <button type="button" class="btn btn-outline" style="padding: 3px 8px; font-size: 11.5px;" onclick="window.location.href='/pos/grid'">Xem đầy đủ</button>
+              </div>
+              <div class="card-body">
+                <!-- Date bar -->
+                <div class="timeline-date-bar">
+                  <button type="button" class="btn-icon" style="width: 26px; height: 26px;" onclick="changeTimelineDate(-1)">‹</button>
+                  <span id="timelineDateLabel">Hôm nay, 30/09/2026</span>
+                  <button type="button" class="btn-icon" style="width: 26px; height: 26px;" onclick="changeTimelineDate(1)">›</button>
+                </div>
+
+                <!-- Slots List -->
+                <div class="timeline-slots-list">
+                  <div class="timeline-slot-item">
+                    <span class="timeline-hour">07:00</span>
+                    <div class="timeline-court-info">
+                      <div class="timeline-court-name">Sân cầu lông 1</div>
+                      <div class="timeline-court-sub">Khung giờ sáng sớm</div>
+                    </div>
+                    <span class="badge badge-available">Trống</span>
+                  </div>
+
+                  <div class="timeline-slot-item" style="border-left: 3px solid #2563eb;">
+                    <span class="timeline-hour">08:00</span>
+                    <div class="timeline-court-info">
+                      <div class="timeline-court-name">Sân cầu lông 2</div>
+                      <div class="timeline-court-sub">Nguyễn Hoàng Nam • Khách quen</div>
+                    </div>
+                    <span class="badge badge-in-use">Đang chơi</span>
+                  </div>
+
+                  <div class="timeline-slot-item" style="border-left: 3px solid #f59e0b;">
+                    <span class="timeline-hour">09:00</span>
+                    <div class="timeline-court-info">
+                      <div class="timeline-court-name">Sân pickleball 1</div>
+                      <div class="timeline-court-sub">Lê Minh Đức • Đã cọc 30%</div>
+                    </div>
+                    <span class="badge badge-pending">Đã cọc</span>
+                  </div>
+
+                  <div class="timeline-slot-item">
+                    <span class="timeline-hour">10:00</span>
+                    <div class="timeline-court-info">
+                      <div class="timeline-court-name">Sân cầu lông 3</div>
+                      <div class="timeline-court-sub">Sân tiêu chuẩn</div>
+                    </div>
+                    <span class="badge badge-available">Trống</span>
+                  </div>
+
+                  <div class="timeline-slot-item" style="border-left: 3px solid #2563eb;">
+                    <span class="timeline-hour">11:00</span>
+                    <div class="timeline-court-info">
+                      <div class="timeline-court-name">Sân cầu lông 1</div>
+                      <div class="timeline-court-sub">Khách vãng lai check-in quầy</div>
+                    </div>
+                    <span class="badge badge-in-use">Đang chơi</span>
+                  </div>
+                </div>
+
+                <!-- Promo Banner in Right Column (IMAGE 1) -->
+                <div class="promo-mini-banner">
+                  <div class="promo-mini-text">
+                    Thể thao kiến tạo<br>phiên bản tốt hơn của bạn.
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 
-  <script>
-    function toggleSidebar() {
-      document.getElementById('appSidebar').classList.toggle('collapsed');
-    }
-    
-    // Set current date
-    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('vi-VN', dateOptions);
+  <!-- QUICK MODAL "+ TẠO ĐẶT SÂN" -->
+  <div class="modal-overlay" id="createBookingModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Tạo phiếu đặt sân nhanh</h3>
+        <button type="button" class="btn-icon" onclick="closeCreateBookingModal()">✕</button>
+      </div>
+      <form id="createBookingForm" onsubmit="handleCreateBooking(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Tên khách hàng</label>
+            <input type="text" id="mCustName" class="form-control" placeholder="Ví dụ: Trần Phúc Bảo" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Số điện thoại</label>
+            <input type="tel" id="mCustPhone" class="form-control" placeholder="09xx xxx xxx" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Chọn sân</label>
+              <select id="mCourtSelect" class="form-control" required onchange="calculateModalTotal()">
+                <option value="Sân cầu lông 1">Sân cầu lông 1 (90k/h)</option>
+                <option value="Sân cầu lông 2">Sân cầu lông 2 (90k/h)</option>
+                <option value="Sân cầu lông 3">Sân cầu lông 3 (90k/h)</option>
+                <option value="Sân pickleball 1">Sân pickleball 1 (120k/h)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ngày chơi</label>
+              <input type="date" id="mBookingDate" class="form-control" required>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Khung giờ</label>
+              <select id="mTimeSlot" class="form-control" required onchange="calculateModalTotal()">
+                <option value="1">08:00 - 09:00 (1 giờ)</option>
+                <option value="2" selected>08:00 - 10:00 (2 giờ)</option>
+                <option value="1">17:00 - 18:00 (1 giờ)</option>
+                <option value="2">18:00 - 20:00 (2 giờ)</option>
+                <option value="2">20:00 - 22:00 (2 giờ)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tạm tính (đ)</label>
+              <input type="text" id="mTotalDisplay" class="form-control" value="180.000đ" readonly style="font-weight: 700; color: var(--primary);">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hình thức đặt</label>
+            <select id="mStatusSelect" class="form-control">
+              <option value="Chờ xác nhận">Chờ xác nhận (Khách online)</option>
+              <option value="Đã xác nhận" selected>Đã xác nhận (Khách hẹn trước)</option>
+              <option value="Đang sử dụng">Khách đang vào chơi (POS trực tiếp)</option>
+              <option value="Đã cọc 30%">Đã cọc 30% qua QR</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeCreateBookingModal()">Hủy bỏ</button>
+          <button type="submit" class="btn btn-primary">Xác nhận tạo đơn</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-    // Initialize Chart
-    document.addEventListener('DOMContentLoaded', () => {
-      const ctx = document.getElementById('hourlyChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- DASHBOARD JAVASCRIPT & CHARTS -->
+  <script>
+    // THEME TOGGLE
+    function initTheme() {
+      const saved = localStorage.getItem('utesport_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+    initTheme();
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('utesport_theme', next);
+      showToast(`Đã chuyển sang chế độ ${next === 'dark' ? 'Tối (Dark Mode)' : 'Sáng (Light Mode)'}`, 'info');
+      // Re-render chart styles
+      renderCharts();
+    }
+
+    // SIDEBAR TOGGLE
+    function toggleSidebar() {
+      const sidebar = document.getElementById('appSidebar');
+      sidebar.classList.toggle('collapsed');
+    }
+
+    // TOAST NOTIFICATION
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `
+        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px; color: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 14 14"></polyline>
+        </svg>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 250);
+      }, 3000);
+    }
+
+    // MODAL CONTROL
+    function openCreateBookingModal() {
+      document.getElementById('createBookingModal').classList.add('active');
+      document.getElementById('mBookingDate').value = new Date().toISOString().split('T')[0];
+      calculateModalTotal();
+    }
+    function closeCreateBookingModal() {
+      document.getElementById('createBookingModal').classList.remove('active');
+    }
+
+    function calculateModalTotal() {
+      const court = document.getElementById('mCourtSelect').value;
+      const hours = parseInt(document.getElementById('mTimeSlot').value || '1', 10);
+      const rate = court.includes('pickleball') ? 120000 : 90000;
+      const total = rate * hours;
+      document.getElementById('mTotalDisplay').value = total.toLocaleString('vi-VN') + 'đ';
+    }
+
+    function handleCreateBooking(e) {
+      e.preventDefault();
+      const cust = document.getElementById('mCustName').value;
+      const phone = document.getElementById('mCustPhone').value;
+      const court = document.getElementById('mCourtSelect').value;
+      const status = document.getElementById('mStatusSelect').value;
+      const total = document.getElementById('mTotalDisplay').value;
+
+      const code = '#DS' + Math.floor(1000 + Math.random() * 9000);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${code}</strong></td>
+        <td>${cust} <br><span style="font-size: 11px; color: var(--text-muted);">${phone}</span></td>
+        <td>${court}</td>
+        <td>Hôm nay • 08:00 - 10:00</td>
+        <td><strong>${total}</strong></td>
+        <td><span class="badge ${status === 'Đang sử dụng' ? 'badge-in-use' : status === 'Đã cọc 30%' ? 'badge-pending' : 'badge-available'}">${status}</span></td>
+        <td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="window.location.href='/pos/grid'">Chi tiết</button></td>
+      `;
+      document.getElementById('recentBookingsTbody').prepend(tr);
+      closeCreateBookingModal();
+      showToast(`Đã tạo thành công đơn ${code} cho ${cust}!`, 'success');
+    }
+
+    // CHARTS RENDERING
+    let comboChartInstance = null;
+    let donutChartInstance = null;
+
+    function renderCharts() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const textColor = isDark ? '#94a3b8' : '#64748b';
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)';
+
+      // 1. Combo Chart (Bookings & Revenue)
+      const ctxCombo = document.getElementById('comboChart').getContext('2d');
+      if (comboChartInstance) comboChartInstance.destroy();
+
+      comboChartInstance = new Chart(ctxCombo, {
         data: {
-          labels: ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+          labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
           datasets: [
             {
-              label: 'Số lượng sân đang dùng (Tối đa: 8)',
-              data: [3, 5, 2, 1, 3, 6, 8, 8, 4],
-              backgroundColor: '#0d9488',
-              borderRadius: 4
+              type: 'bar',
+              label: 'Lượt đặt sân',
+              data: [32, 45, 52, 58, 48, 72, 65],
+              backgroundColor: '#10b981',
+              borderRadius: 6,
+              barThickness: 24,
+              yAxisID: 'y'
+            },
+            {
+              type: 'line',
+              label: 'Doanh thu (triệu đ)',
+              data: [4.2, 5.8, 7.1, 7.5, 6.8, 10.5, 9.2],
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderWidth: 3,
+              tension: 0.35,
+              fill: true,
+              pointBackgroundColor: '#3b82f6',
+              pointRadius: 4,
+              yAxisID: 'y1'
             }
           ]
         },
@@ -290,21 +868,104 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: 'top', labels: { font: { family: 'Inter', size: 12 } } }
+            legend: {
+              position: 'bottom',
+              labels: { color: textColor, font: { family: 'Inter', size: 12 } }
+            }
           },
           scales: {
-            y: { 
-              beginAtZero: true, 
-              max: 8,
-              grid: { color: '#e4e4e7' }, 
-              ticks: { stepSize: 2 } 
+            x: {
+              grid: { display: false },
+              ticks: { color: textColor }
             },
-            x: { 
-              grid: { display: false } 
+            y: {
+              type: 'linear',
+              position: 'left',
+              grid: { color: gridColor },
+              ticks: { color: textColor }
+            },
+            y1: {
+              type: 'linear',
+              position: 'right',
+              grid: { display: false },
+              ticks: { color: textColor }
             }
           }
         }
       });
+
+      // 2. Donut Chart (Sport Category Breakdown)
+      const ctxDonut = document.getElementById('donutChart').getContext('2d');
+      if (donutChartInstance) donutChartInstance.destroy();
+
+      donutChartInstance = new Chart(ctxDonut, {
+        type: 'doughnut',
+        data: {
+          labels: ['Cầu lông (55%)', 'Pickleball (20%)', 'Bóng đá (15%)', 'Bóng rổ (10%)'],
+          datasets: [{
+            data: [55, 20, 15, 10],
+            backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#a855f7'],
+            borderWidth: 0,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '72%',
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: textColor, font: { family: 'Inter', size: 11.5 }, boxWidth: 12 }
+            }
+          }
+        }
+      });
+    }
+
+    function updateComboChart(days) {
+      showToast(`Đang tải dữ liệu báo cáo trong ${days} ngày qua...`, 'info');
+    }
+
+    function changeTimelineDate(delta) {
+      showToast(`Chuyển lịch xem ngày ${delta > 0 ? 'tiếp theo' : 'trước đó'}`, 'info');
+    }
+
+    // REAL SQL SERVER DATA FETCH
+    async function loadRealSqlData() {
+      try {
+        const res = await fetch('/api/bookings');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            const tbody = document.getElementById('recentBookingsTbody');
+            if (tbody) {
+              tbody.innerHTML = '';
+              data.slice(0, 5).forEach(b => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                  <td><strong>#${b.bookingCode}</strong></td>
+                  <td>${b.customerName} <br><span style="font-size: 11px; color: var(--text-muted);">${b.customerPhone}</span></td>
+                  <td>${b.courtCode}</td>
+                  <td>${b.bookingDate} • ${b.timeSlot}</td>
+                  <td><strong>${Number(b.totalPrice).toLocaleString('vi-VN')}đ</strong></td>
+                  <td><span class="badge ${b.status === 'Đang sử dụng' ? 'badge-in-use' : b.status === 'Hoàn thành' ? 'badge-completed' : 'badge-pending'}">${b.status}</span></td>
+                  <td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="window.location.href='/manager/bookings'">Chi tiết</button></td>
+                `;
+                tbody.appendChild(tr);
+              });
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Real SQL fetch failed, using fallback:', e);
+      }
+    }
+
+    // Run charts and real SQL load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCharts();
+      loadRealSqlData();
     });
   </script>
 </body>

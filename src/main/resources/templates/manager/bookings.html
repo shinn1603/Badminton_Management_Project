@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý đặt sân - UTE Sport</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    .booking-mgmt-layout {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    @media (max-width: 1080px) {
+      .booking-mgmt-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .breadcrumb-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .breadcrumb-row a:hover {
+      color: var(--primary);
+    }
+
+    .booking-page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .booking-header-title h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.3px;
+    }
+    .booking-header-title p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* 4 MINI STAT CARDS (REFERENCE IMAGE 3) */
+    .mini-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    @media (max-width: 860px) {
+      .mini-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .mini-stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-fast);
+    }
+    .mini-stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary-border);
+    }
+
+    .mini-stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .mini-stat-meta {
+      display: flex;
+      flex-direction: column;
+    }
+    .mini-stat-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .mini-stat-val {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-dark);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* VIEW SWITCHER & FILTER BAR */
+    .table-control-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .view-toggle-btn-group {
+      display: flex;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 3px;
+      gap: 2px;
+    }
+    .view-btn {
+      padding: 5px 12px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .view-btn.active {
+      background: var(--surface);
+      color: var(--text-dark);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    /* FORM PANEL (REFERENCE IMAGE 3) */
+    .booking-form-panel {
+      position: sticky;
+      top: 90px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="layout-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-header">
+        <div class="brand-logo-wrap">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="stroke-width: 2.2;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>UTE SPORT</h2>
+          <span>CHI NHÁNH THỦ ĐỨC</span>
+        </div>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="menu-title">Quản lý chi nhánh</div>
+        <a href="/manager/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span class="menu-text">Tổng quan</span>
+        </a>
+
+        <a href="/manager/bookings" class="menu-item active">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span class="menu-text">Đặt sân</span>
+          <span class="menu-tag">7 đơn</span>
+        </a>
+
+        <a href="/pos/grid" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="12" y1="20" x2="12" y2="10"></line>
+            <line x1="18" y1="20" x2="18" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="16"></line>
+          </svg>
+          <span class="menu-text">Lịch sân (POS)</span>
+        </a>
+
+        <a href="/manager/courts" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          <span class="menu-text">Danh mục sân</span>
+        </a>
+
+        <a href="/manager/pricing" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          <span class="menu-text">Cấu hình giá</span>
+        </a>
+
+        <a href="/manager/inventory" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+          <span class="menu-text">Kho vật tư</span>
+        </a>
+
+        <a href="/manager/reports" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span class="menu-text">Báo cáo doanh thu</span>
+        </a>
+
+        <div class="sidebar-motto">
+          <div class="sidebar-motto-title">Thể thao kiến tạo</div>
+          <div class="sidebar-motto-sub">kết nối cuộc sống</div>
+        </div>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="user-avatar">QL</div>
+        <div class="user-meta">
+          <div class="user-name">Nguyễn Phước Thọ</div>
+          <div class="user-title">Quản lý trung tâm</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <!-- HEADER -->
+      <header class="header-bar">
+        <div class="header-left">
+          <button type="button" class="btn-icon" onclick="toggleSidebar()">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="branch-select-badge">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--primary);">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+            <span>Trung Tâm Thể Thao UTE Sport - Thủ Đức</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Đổi giao diện">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+            </svg>
+          </button>
+          <div class="user-pill-header" onclick="window.location.href='/login'">
+            <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;">QL</div>
+            <div style="font-size: 12.5px; font-weight: 600; color: var(--text-dark);">Quản lý trung tâm</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <main class="page-content">
+        <!-- BREADCRUMB & TITLE (REFERENCE IMAGE 3) -->
+        <div class="breadcrumb-row">
+          <a href="/manager/dashboard">Trang chủ</a>
+          <span>&gt;</span>
+          <span style="color: var(--text-dark); font-weight: 600;">Đặt sân</span>
+        </div>
+
+        <div class="booking-page-header">
+          <div class="booking-header-title">
+            <h1>Quản lý đặt sân</h1>
+            <p>Tạo, xác nhận, chỉnh sửa và hủy lịch đặt sân của khách hàng chi nhánh</p>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="resetFormForNew()">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>+ Tạo đặt sân</span>
+          </button>
+        </div>
+
+        <!-- 4 MINI KPI CARDS (REFERENCE IMAGE 3) -->
+        <div class="mini-stats-grid">
+          <div class="mini-stat-card">
+            <div class="mini-stat-icon stat-icon-green">
+              <svg class="svg-icon" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+              </svg>
+            </div>
+            <div class="mini-stat-meta">
+              <span class="mini-stat-label">Tổng lượt đặt</span>
+              <span class="mini-stat-val" id="statTotalCount">7</span>
+            </div>
+          </div>
+
+          <div class="mini-stat-card">
+            <div class="mini-stat-icon stat-icon-orange">
+              <svg class="svg-icon" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div class="mini-stat-meta">
+              <span class="mini-stat-label">Chờ xác nhận</span>
+              <span class="mini-stat-val" id="statPendingCount">2</span>
+            </div>
+          </div>
+
+          <div class="mini-stat-card">
+            <div class="mini-stat-icon stat-icon-blue">
+              <svg class="svg-icon" viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div class="mini-stat-meta">
+              <span class="mini-stat-label">Đã xác nhận</span>
+              <span class="mini-stat-val" id="statConfirmedCount">3</span>
+            </div>
+          </div>
+
+          <div class="mini-stat-card">
+            <div class="mini-stat-icon stat-icon-purple">
+              <svg class="svg-icon" viewBox="0 0 24 24">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </div>
+            <div class="mini-stat-meta">
+              <span class="mini-stat-label">Tạm tính (đ)</span>
+              <span class="mini-stat-val" id="statTotalRevenue">2.370.000đ</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TWO COLUMN LAYOUT: LEFT TABLE/KANBAN (65%) + RIGHT FORM PANEL (35%) (REFERENCE IMAGE 3) -->
+        <div class="booking-mgmt-layout">
+          <!-- LEFT: BOOKING LIST / KANBAN -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary);">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                  <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                  <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                <span>Danh sách đặt sân</span>
+              </div>
+
+              <!-- VIEW SWITCHER (TABLE VS KANBAN) -->
+              <div class="view-toggle-btn-group">
+                <button type="button" class="view-btn active" id="btnViewTable" onclick="switchView('table')">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                  </svg>
+                  <span>Bảng</span>
+                </button>
+                <button type="button" class="view-btn" id="btnViewKanban" onclick="switchView('kanban')">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+                    <rect x="3" y="3" width="7" height="18" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="18" rx="1"></rect>
+                  </svg>
+                  <span>Kanban</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <!-- CONTROLS & FILTER -->
+              <div class="table-control-bar">
+                <div style="display: flex; gap: 10px; align-items: center; flex: 1; min-width: 260px;">
+                  <input type="text" id="filterKeyword" class="form-control" placeholder="Tìm tên khách, SĐT, mã đơn..." oninput="applyFilters()" style="flex: 1;">
+                  <select id="filterStatus" class="form-control" style="width: auto;" onchange="applyFilters()">
+                    <option value="ALL">Tất cả trạng thái</option>
+                    <option value="Chờ xác nhận">Chờ xác nhận</option>
+                    <option value="Đã xác nhận">Đã xác nhận</option>
+                    <option value="Đang sử dụng">Đang sử dụng</option>
+                    <option value="Hoàn thành">Hoàn thành</option>
+                    <option value="Đã hủy">Đã hủy</option>
+                    <option value="Đã cọc 30%">Đã cọc 30%</option>
+                  </select>
+                </div>
+                <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;" id="recordsCountText">7 / 7 bản ghi</span>
+              </div>
+
+              <!-- VIEW 1: TABLE VIEW (DEFAULT) -->
+              <div id="tableViewWrap" class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Mã đặt sân</th>
+                      <th>Khách hàng</th>
+                      <th>Sân</th>
+                      <th>Ngày đặt</th>
+                      <th>Khung giờ</th>
+                      <th>Tổng tiền</th>
+                      <th>Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bookingsTableBody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- VIEW 2: KANBAN BOARD VIEW -->
+              <div id="kanbanViewWrap" class="kanban-board" style="display: none;">
+                <!-- Col 1: Chờ xác nhận -->
+                <div class="kanban-column" id="kanbanPending">
+                  <div class="kanban-column-header">
+                    <span>Chờ xác nhận</span>
+                    <span class="badge badge-pending" id="kCountPending">2</span>
+                  </div>
+                  <div class="kanban-cards-wrap" id="kListPending"></div>
+                </div>
+
+                <!-- Col 2: Đã xác nhận / Đã cọc -->
+                <div class="kanban-column" id="kanbanConfirmed">
+                  <div class="kanban-column-header">
+                    <span>Đã xác nhận</span>
+                    <span class="badge badge-available" id="kCountConfirmed">3</span>
+                  </div>
+                  <div class="kanban-cards-wrap" id="kListConfirmed"></div>
+                </div>
+
+                <!-- Col 3: Đang sử dụng -->
+                <div class="kanban-column" id="kanbanInUse">
+                  <div class="kanban-column-header">
+                    <span>Đang sử dụng</span>
+                    <span class="badge badge-in-use" id="kCountInUse">1</span>
+                  </div>
+                  <div class="kanban-cards-wrap" id="kListInUse"></div>
+                </div>
+
+                <!-- Col 4: Hoàn thành / Hủy -->
+                <div class="kanban-column" id="kanbanCompleted">
+                  <div class="kanban-column-header">
+                    <span>Hoàn thành / Hủy</span>
+                    <span class="badge badge-completed" id="kCountCompleted">1</span>
+                  </div>
+                  <div class="kanban-cards-wrap" id="kListCompleted"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: PHIẾU ĐẶT SÂN / CHI TIẾT (REFERENCE IMAGE 3) -->
+          <div class="card booking-form-panel">
+            <div class="card-header">
+              <div class="card-title">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary);">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <span>Phiếu đặt sân</span>
+              </div>
+              <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 12px;" onclick="resetFormForNew()">
+                + Thêm mới
+              </button>
+            </div>
+
+            <form id="bookingEditForm" onsubmit="saveBookingForm(event)" class="card-body">
+              <div class="form-group">
+                <label class="form-label">Mã đặt sân</label>
+                <input type="text" id="fBookingCode" class="form-control" value="DS0108" readonly style="background: var(--surface-subtle); font-weight: 700;">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Khách hàng</label>
+                <input type="text" id="fCustomerName" class="form-control" placeholder="Tên khách hàng" value="Nguyễn Hoàng Nam" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Số điện thoại</label>
+                <input type="tel" id="fCustomerPhone" class="form-control" placeholder="09xx xxx xxx" value="0903123456" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Sân</label>
+                <select id="fCourtName" class="form-control" onchange="calculateFormPrice()">
+                  <option value="Sân cầu lông 1">Sân cầu lông 1 (90.000đ/h)</option>
+                  <option value="Sân cầu lông 2" selected>Sân cầu lông 2 (90.000đ/h)</option>
+                  <option value="Sân cầu lông 3">Sân cầu lông 3 (90.000đ/h)</option>
+                  <option value="Sân pickleball 1">Sân pickleball 1 (120.000đ/h)</option>
+                  <option value="Sân pickleball 2">Sân pickleball 2 (120.000đ/h)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Ngày đặt</label>
+                <input type="date" id="fBookingDate" class="form-control" value="2026-09-25" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Khung giờ</label>
+                <select id="fTimeSlot" class="form-control" onchange="calculateFormPrice()">
+                  <option value="08:00 - 10:00" data-hours="2" selected>08:00 - 10:00 (2 tiếng)</option>
+                  <option value="09:00 - 10:00" data-hours="1">09:00 - 10:00 (1 tiếng)</option>
+                  <option value="14:00 - 16:00" data-hours="2">14:00 - 16:00 (2 tiếng)</option>
+                  <option value="17:00 - 18:00" data-hours="1">17:00 - 18:00 (1 tiếng)</option>
+                  <option value="18:00 - 20:00" data-hours="2">18:00 - 20:00 (2 tiếng)</option>
+                  <option value="20:00 - 22:00" data-hours="2">20:00 - 22:00 (2 tiếng)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Tổng tiền (đ)</label>
+                <input type="text" id="fTotalPrice" class="form-control" value="180.000" readonly style="font-weight: 700; color: var(--primary);">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Trạng thái</label>
+                <select id="fBookingStatus" class="form-control">
+                  <option value="Chờ xác nhận">Chờ xác nhận</option>
+                  <option value="Đã xác nhận" selected>Đã xác nhận</option>
+                  <option value="Đang sử dụng">Đang sử dụng</option>
+                  <option value="Hoàn thành">Hoàn thành</option>
+                  <option value="Đã cọc 30%">Đã cọc 30%</option>
+                  <option value="Quá giờ check-in">Quá giờ check-in (Cảnh báo)</option>
+                  <option value="Đã hủy">Đã hủy</option>
+                </select>
+              </div>
+
+              <!-- BUTTONS (REFERENCE IMAGE 3: Lưu / Làm mới / Xóa) -->
+              <div style="display: flex; gap: 8px; margin-top: 20px;">
+                <button type="submit" class="btn btn-primary" style="flex: 2;">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  </svg>
+                  <span>Lưu</span>
+                </button>
+                <button type="button" class="btn btn-outline" style="flex: 1;" onclick="resetFormForNew()">Làm mới</button>
+                <button type="button" class="btn btn-outline" style="flex: 1; border-color: var(--danger-border); color: var(--danger);" onclick="deleteCurrentBooking()">Xóa</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- BOOKINGS CRUD & DATA LOGIC -->
+  <script>
+    // Initial 7 records matching Reference Image 3:
+    // DS0101: Nguyễn Hoàng Nam - Sân cầu lông 2 - 25/09/2026 - 08:00 - 10:00 - 180.000 - Đã xác nhận
+    // DS0102: Lê Minh Đức - Sân bóng rổ 2 - 25/09/2026 - 09:00 - 10:00 - 280.000 - Hoàn thành
+    // DS0103: Phạm Gia Huy - Sân bóng đá 2 - 25/09/2026 - 18:00 - 20:00 - 900.000 - Đã xác nhận
+    // DS0104: Vũ Thị Mai Anh - Sân pickleball 1 - 25/09/2026 - 19:00 - 20:00 - 120.000 - Chờ xác nhận
+    // DS0105: Trần Thanh Hằng - Sân cầu lông 1 - 26/09/2026 - 17:00 - 18:00 - 90.000 - Chờ xác nhận
+    // DS0106: Bùi Khánh Linh - Sân bóng đá 1 - 26/09/2026 - 20:00 - 22:00 - 600.000 - Đã xác nhận
+    // DS0107: Đỗ Quang Vinh - Sân bóng rổ 1 - 24/09/2026 - 15:00 - 16:00 - 200.000 - Đã hủy
+
+    let initialBookings = [
+      { code: 'DS0101', name: 'Nguyễn Hoàng Nam', phone: '0903123456', court: 'Sân cầu lông 2', date: '2026-09-25', time: '08:00 - 10:00', price: 180000, status: 'Đã xác nhận' },
+      { code: 'DS0102', name: 'Lê Minh Đức', phone: '0912888999', court: 'Sân cầu lông 1', date: '2026-09-25', time: '09:00 - 10:00', price: 90000, status: 'Hoàn thành' },
+      { code: 'DS0103', name: 'Phạm Gia Huy', phone: '0988777666', court: 'Sân pickleball 2', date: '2026-09-25', time: '18:00 - 20:00', price: 240000, status: 'Đã xác nhận' },
+      { code: 'DS0104', name: 'Vũ Thị Mai Anh', phone: '0977555444', court: 'Sân pickleball 1', date: '2026-09-25', time: '19:00 - 20:00', price: 120000, status: 'Chờ xác nhận' },
+      { code: 'DS0105', name: 'Trần Thanh Hằng', phone: '0933444555', court: 'Sân cầu lông 1', date: '2026-09-26', time: '17:00 - 18:00', price: 90000, status: 'Chờ xác nhận' },
+      { code: 'DS0106', name: 'Bùi Khánh Linh', phone: '0909111222', court: 'Sân cầu lông 3', date: '2026-09-26', time: '20:00 - 22:00', price: 180000, status: 'Đã xác nhận' },
+      { code: 'DS0107', name: 'Đỗ Quang Vinh', phone: '0944333222', court: 'Sân cầu lông 2', date: '2026-09-24', time: '15:00 - 16:00', price: 90000, status: 'Đã hủy' }
+    ];
+
+    let bookings = JSON.parse(localStorage.getItem('utesport_bookings')) || initialBookings;
+
+    function saveToStorage() {
+      localStorage.setItem('utesport_bookings', JSON.stringify(bookings));
+    }
+
+    function init() {
+      const savedTheme = localStorage.getItem('utesport_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      renderAll();
+    }
+
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'light';
+      const nxt = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', nxt);
+      localStorage.setItem('utesport_theme', nxt);
+      showToast(`Chuyển sang giao diện ${nxt === 'dark' ? 'Tối' : 'Sáng'}`, 'info');
+    }
+
+    function toggleSidebar() {
+      document.getElementById('appSidebar').classList.toggle('collapsed');
+    }
+
+    function showToast(msg, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<span>${msg}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 250);
+      }, 3000);
+    }
+
+    function getBadgeClass(status) {
+      switch(status) {
+        case 'Đang sử dụng': return 'badge-in-use';
+        case 'Đã xác nhận': return 'badge-available';
+        case 'Chờ xác nhận': return 'badge-pending';
+        case 'Đã cọc 30%': return 'badge-pending';
+        case 'Hoàn thành': return 'badge-completed';
+        case 'Đã hủy': return 'badge-danger';
+        case 'Quá giờ check-in': return 'badge-danger';
+        default: return 'badge-available';
+      }
+    }
+
+    function renderAll() {
+      renderTable();
+      renderKanban();
+      updateStats();
+    }
+
+    function updateStats() {
+      const total = bookings.length;
+      const pending = bookings.filter(b => b.status === 'Chờ xác nhận').length;
+      const confirmed = bookings.filter(b => b.status === 'Đã xác nhận' || b.status === 'Đã cọc 30%').length;
+      const rev = bookings.filter(b => b.status !== 'Đã hủy').reduce((acc, cur) => acc + cur.price, 0);
+
+      document.getElementById('statTotalCount').textContent = total;
+      document.getElementById('statPendingCount').textContent = pending;
+      document.getElementById('statConfirmedCount').textContent = confirmed;
+      document.getElementById('statTotalRevenue').textContent = rev.toLocaleString('vi-VN') + 'đ';
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('bookingsTableBody');
+      const kw = document.getElementById('filterKeyword').value.toLowerCase();
+      const st = document.getElementById('filterStatus').value;
+
+      const filtered = bookings.filter(b => {
+        const matchKw = b.code.toLowerCase().includes(kw) || b.name.toLowerCase().includes(kw) || b.phone.includes(kw);
+        const matchSt = st === 'ALL' || b.status === st;
+        return matchKw && matchSt;
+      });
+
+      document.getElementById('recordsCountText').textContent = `${filtered.length} / ${bookings.length} bản ghi`;
+
+      tbody.innerHTML = '';
+      filtered.forEach(b => {
+        const tr = document.createElement('tr');
+        tr.style.cursor = 'pointer';
+        tr.onclick = () => selectBookingToEdit(b.code);
+        tr.innerHTML = `
+          <td><strong>${b.code}</strong></td>
+          <td>${b.name} <br><span style="font-size: 11px; color: var(--text-muted);">${b.phone}</span></td>
+          <td>${b.court}</td>
+          <td>${b.date}</td>
+          <td>${b.time}</td>
+          <td><strong>${b.price.toLocaleString('vi-VN')}</strong></td>
+          <td><span class="badge ${getBadgeClass(b.status)}">${b.status}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderKanban() {
+      const pList = document.getElementById('kListPending');
+      const cList = document.getElementById('kListConfirmed');
+      const uList = document.getElementById('kListInUse');
+      const dList = document.getElementById('kListCompleted');
+
+      pList.innerHTML = '';
+      cList.innerHTML = '';
+      uList.innerHTML = '';
+      dList.innerHTML = '';
+
+      let pC = 0, cC = 0, uC = 0, dC = 0;
+
+      bookings.forEach(b => {
+        const card = document.createElement('div');
+        card.className = 'kanban-card';
+        card.onclick = () => selectBookingToEdit(b.code);
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong>${b.code}</strong>
+            <span class="badge ${getBadgeClass(b.status)}" style="font-size: 10px;">${b.status}</span>
+          </div>
+          <div style="font-weight: 600; font-size: 13px;">${b.name}</div>
+          <div style="font-size: 11.5px; color: var(--text-muted);">${b.court} • ${b.time}</div>
+          <div style="font-size: 12.5px; font-weight: 700; color: var(--primary); margin-top: 4px;">${b.price.toLocaleString('vi-VN')}đ</div>
+        `;
+
+        if (b.status === 'Chờ xác nhận') {
+          pList.appendChild(card);
+          pC++;
+        } else if (b.status === 'Đã xác nhận' || b.status === 'Đã cọc 30%') {
+          cList.appendChild(card);
+          cC++;
+        } else if (b.status === 'Đang sử dụng') {
+          uList.appendChild(card);
+          uC++;
+        } else {
+          dList.appendChild(card);
+          dC++;
+        }
+      });
+
+      document.getElementById('kCountPending').textContent = pC;
+      document.getElementById('kCountConfirmed').textContent = cC;
+      document.getElementById('kCountInUse').textContent = uC;
+      document.getElementById('kCountCompleted').textContent = dC;
+    }
+
+    function switchView(view) {
+      const btnTable = document.getElementById('btnViewTable');
+      const btnKanban = document.getElementById('btnViewKanban');
+      const tableWrap = document.getElementById('tableViewWrap');
+      const kanbanWrap = document.getElementById('kanbanViewWrap');
+
+      if (view === 'table') {
+        btnTable.classList.add('active');
+        btnKanban.classList.remove('active');
+        tableWrap.style.display = 'block';
+        kanbanWrap.style.display = 'none';
+      } else {
+        btnKanban.classList.add('active');
+        btnTable.classList.remove('active');
+        tableWrap.style.display = 'none';
+        kanbanWrap.style.display = 'grid';
+      }
+    }
+
+    function applyFilters() {
+      renderTable();
+    }
+
+    function selectBookingToEdit(code) {
+      const item = bookings.find(b => b.code === code);
+      if (!item) return;
+
+      document.getElementById('fBookingCode').value = item.code;
+      document.getElementById('fCustomerName').value = item.name;
+      document.getElementById('fCustomerPhone').value = item.phone;
+      document.getElementById('fCourtName').value = item.court;
+      document.getElementById('fBookingDate').value = item.date;
+      document.getElementById('fTimeSlot').value = item.time;
+      document.getElementById('fTotalPrice').value = item.price.toLocaleString('vi-VN');
+      document.getElementById('fBookingStatus').value = item.status;
+
+      showToast(`Đã chọn đơn ${item.code} của ${item.name}`, 'info');
+    }
+
+    function resetFormForNew() {
+      const nextCode = 'DS0' + (101 + bookings.length);
+      document.getElementById('fBookingCode').value = nextCode;
+      document.getElementById('fCustomerName').value = '';
+      document.getElementById('fCustomerPhone').value = '';
+      document.getElementById('fBookingDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('fBookingStatus').value = 'Chờ xác nhận';
+      calculateFormPrice();
+      document.getElementById('fCustomerName').focus();
+      showToast('Đã làm mới form tạo đặt sân', 'info');
+    }
+
+    function calculateFormPrice() {
+      const court = document.getElementById('fCourtName').value;
+      const slotEl = document.getElementById('fTimeSlot');
+      const hours = parseInt(slotEl.options[slotEl.selectedIndex].getAttribute('data-hours') || '1', 10);
+      const rate = court.includes('pickleball') ? 120000 : 90000;
+      const total = rate * hours;
+      document.getElementById('fTotalPrice').value = total.toLocaleString('vi-VN');
+    }
+
+    function saveBookingForm(e) {
+      e.preventDefault();
+      const code = document.getElementById('fBookingCode').value;
+      const name = document.getElementById('fCustomerName').value;
+      const phone = document.getElementById('fCustomerPhone').value;
+      const court = document.getElementById('fCourtName').value;
+      const date = document.getElementById('fBookingDate').value;
+      const time = document.getElementById('fTimeSlot').value;
+      const price = parseInt(document.getElementById('fTotalPrice').value.replace(/\./g, ''), 10);
+      const status = document.getElementById('fBookingStatus').value;
+
+      const idx = bookings.findIndex(b => b.code === code);
+      const newBooking = { code, name, phone, court, date, time, price, status };
+      if (idx >= 0) {
+        bookings[idx] = newBooking;
+        showToast(`Đã cập nhật đơn đặt sân ${code}!`, 'success');
+      } else {
+        bookings.unshift(newBooking);
+        showToast(`Đã thêm mới đơn đặt sân ${code}!`, 'success');
+      }
+
+      // Sync to SQL Server database
+      fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookingCode: code,
+          customerName: name,
+          customerPhone: phone,
+          courtCode: court,
+          branchCode: 'CN01',
+          bookingDate: date,
+          timeSlot: time,
+          hourlyPrice: 90000,
+          totalPrice: price,
+          status: status
+        })
+      }).catch(e => console.warn('SQL save error:', e));
+
+      saveToStorage();
+      renderAll();
+    }
+
+    async function loadFromSqlServer() {
+      try {
+        const res = await fetch('/api/bookings');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            bookings = data.map(b => ({
+              code: b.bookingCode,
+              name: b.customerName,
+              phone: b.customerPhone,
+              court: b.courtCode,
+              date: b.bookingDate,
+              time: b.timeSlot,
+              price: Number(b.totalPrice),
+              status: b.status
+            }));
+            saveToStorage();
+            renderAll();
+          }
+        }
+      } catch (err) {
+        console.warn('SQL API load fallback to local:', err);
+      }
+    }
+
+    function deleteCurrentBooking() {
+      const code = document.getElementById('fBookingCode').value;
+      if (!confirm(`Bạn có chắc chắn muốn xóa đơn ${code}?`)) return;
+
+      bookings = bookings.filter(b => b.code !== code);
+      saveToStorage();
+      renderAll();
+      resetFormForNew();
+      showToast(`Đã xóa đơn ${code}`, 'error');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      init();
+      loadFromSqlServer();
+    });
+  </script>
+</body>
+</html>
