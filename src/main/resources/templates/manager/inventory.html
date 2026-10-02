@@ -235,7 +235,7 @@
           <div class="section-header-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div class="section-title-wrap">
               <h3>Danh mục hàng tồn kho chi nhánh</h3>
-              <p>Dữ liệu đồng bộ trực tiếp từ SQL Server (`badminton.dbo.products`)</p>
+              <p>Theo dõi tồn kho nước giải khát, ống cầu lông và phụ kiện tại chi nhánh</p>
             </div>
             <div style="display: flex; gap: 8px;">
               <select class="form-control" style="width: auto; padding: 6px 12px; font-size: 12.5px;" id="catFilter" onchange="filterProducts()">
@@ -402,21 +402,8 @@
     </div>
   </div>
 
+  <script src="/js/global-hub.js"></script>
   <script>
-    function toggleSidebar() {
-      document.getElementById('appSidebar').classList.toggle('collapsed');
-    }
-
-    function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme') || 'light';
-      const next = current === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-    }
-
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-
     function openInventoryModal(id, name, stock, min) {
       const modal = document.getElementById('inventoryModal');
       if (id) {
@@ -441,10 +428,10 @@
       const name = document.getElementById('inpItemName').value.trim();
       const stock = document.getElementById('inpCurrentStock').value;
       if (!name) {
-        alert('Vui lòng nhập tên mặt hàng!');
+        showToast('Vui lòng nhập tên mặt hàng!', 'warning');
         return;
       }
-      alert('Đã cập nhật mặt hàng: ' + name + ' (Tồn: ' + stock + ') thành công vào SQL Server!');
+      showToast(`Đã cập nhật mặt hàng: ${name} (Tồn: ${stock})!`, 'success');
       closeInventoryModal();
     }
 
@@ -466,6 +453,52 @@
         }
       });
     }
+
+    async function loadProductsFromApi() {
+      try {
+        const res = await fetch('/api/products');
+        if (res.ok) {
+          const products = await res.json();
+          if (products && products.length > 0) {
+            const tbody = document.getElementById('inventoryTableBody');
+            tbody.innerHTML = products.map((p, idx) => {
+              let badgeColor = 'badge-blue';
+              if (p.category === 'Cầu lông') badgeColor = 'badge-amber';
+              else if (p.category === 'Dụng cụ') badgeColor = 'badge-purple';
+              else if (p.category === 'Phụ kiện') badgeColor = 'badge-green';
+
+              const statusBadge = p.stockQuantity <= p.minQuantity 
+                ? '<span class="badge badge-red">Sắp hết</span>' 
+                : '<span class="badge badge-green">Dồi dào</span>';
+
+              return `
+                <tr data-cat="${p.category}">
+                  <td style="text-align: center;">${idx + 1}</td>
+                  <td><strong>${p.productCode}</strong></td>
+                  <td>${p.productName}</td>
+                  <td><span class="badge ${badgeColor}">${p.category}</span></td>
+                  <td>${p.unit}</td>
+                  <td style="text-align: right;">${Number(p.costPrice).toLocaleString('vi-VN')} đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">${Number(p.unitPrice).toLocaleString('vi-VN')} đ</td>
+                  <td style="text-align: center; font-weight: 800;">${p.stockQuantity}</td>
+                  <td style="text-align: center; color: var(--text-muted);">${p.minQuantity}</td>
+                  <td>${statusBadge}</td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openInventoryModal('${p.productCode}', '${p.productName}', ${p.stockQuantity}, ${p.minQuantity})">Sửa</button>
+                  </td>
+                </tr>
+              `;
+            }).join('');
+          }
+        }
+      } catch (err) {
+        console.warn('API error, using cached seed data');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProductsFromApi();
+    });
   </script>
 </body>
 </html>

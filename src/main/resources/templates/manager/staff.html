@@ -292,7 +292,7 @@
               <p>Chi nhánh Thủ Đức • Ca Sáng: 05h00 - 13h30 | Ca Tối: 13h30 - 22h30</p>
             </div>
             <div style="display: flex; gap: 8px;">
-              <button class="btn btn-outline" onclick="alert('Đã đồng bộ lịch ca trực vào cơ sở dữ liệu!')">
+              <button class="btn btn-outline" onclick="showToast('Đã lưu và áp dụng lịch ca trực tuần thành công!', 'success')">
                 <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
                 <span>Lưu Lịch Ca</span>
               </button>
@@ -538,11 +538,12 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeStaffModal()">Hủy bỏ</button>
-        <button class="btn btn-primary" onclick="saveStaff()">Lưu vào SQL Server</button>
+        <button class="btn btn-primary" onclick="saveStaff()">Lưu hồ sơ nhân sự</button>
       </div>
     </div>
   </div>
 
+  <script src="/js/global-hub.js"></script>
   <script>
     function toggleSidebar() {
       document.getElementById('appSidebar').classList.toggle('collapsed');
@@ -581,10 +582,10 @@
       const name = document.getElementById('inpStaffName').value.trim();
       const code = document.getElementById('inpStaffCode').value.trim();
       if (!name) {
-        alert('Vui lòng nhập họ tên nhân viên!');
+        showToast('Vui lòng nhập họ tên nhân viên!', 'warning');
         return;
       }
-      alert('Đã cập nhật nhân sự: ' + name + ' (' + code + ') thành công vào SQL Server!');
+      showToast(`Đã lưu hồ sơ nhân sự: ${name} (${code}) thành công!`, 'success');
       closeStaffModal();
     }
   </script>

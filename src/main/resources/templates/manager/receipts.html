@@ -8,11 +8,11 @@
   <style>
     .split-layout {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 24px;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
     }
 
-    @media (max-width: 992px) {
+    @media (max-width: 1100px) {
       .split-layout {
         grid-template-columns: 1fr;
       }
@@ -20,10 +20,15 @@
 
     .receipt-item-row {
       display: grid;
-      grid-template-columns: 2.2fr 1fr 1.2fr 1.2fr 36px;
-      gap: 10px;
+      grid-template-columns: 1.8fr 65px 95px 105px 32px;
+      gap: 8px;
       margin-bottom: 12px;
       align-items: center;
+    }
+
+    .receipts-history-table th, .receipts-history-table td {
+      padding: 10px 8px !important;
+      font-size: 12px !important;
     }
 
     .totals-box {
@@ -218,7 +223,7 @@
             <div class="section-header-tabs" style="margin-bottom: 20px;">
               <div class="section-title-wrap">
                 <h3>Lập phiếu nhập kho vật tư mới</h3>
-                <p>Cập nhật số lượng tồn kho tự động trong SQL Server</p>
+                <p>Bổ sung hàng hóa và cập nhật số lượng tồn kho chi nhánh</p>
               </div>
             </div>
 
@@ -313,7 +318,7 @@
             </div>
 
             <div class="table-container">
-              <table class="clean-table">
+              <table class="clean-table receipts-history-table">
                 <thead>
                   <tr>
                     <th>Mã phiếu</th>
@@ -361,21 +366,8 @@
     </div>
   </div>
 
+  <script src="/js/global-hub.js"></script>
   <script>
-    function toggleSidebar() {
-      document.getElementById('appSidebar').classList.toggle('collapsed');
-    }
-
-    function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme') || 'light';
-      const next = current === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-    }
-
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-
     function calcTotals() {
       const rows = document.querySelectorAll('.receipt-item-row');
       let totalQty = 0;
@@ -427,7 +419,7 @@
       const grandTotal = document.getElementById('grandTotal').innerText;
       const supplier = document.getElementById('supplierSelect').value;
 
-      alert(`Đã lập thành công phiếu nhập kho từ "${supplier}" với tổng giá trị ${grandTotal}! Số lượng tồn kho đã được cộng dồn vào SQL Server.`);
+      showToast(`Đã lập thành công phiếu nhập kho từ "${supplier}" với tổng giá trị ${grandTotal}!`, 'success');
     }
   </script>
 </body>

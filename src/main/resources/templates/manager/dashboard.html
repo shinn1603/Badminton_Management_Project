@@ -422,7 +422,7 @@
                     <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--secondary);">
                       <circle cx="12" cy="12" r="10"></circle>
                     </svg>
-                    <span>Cơ cấu đặt sân theo môn</span>
+                    <span>Cơ cấu loại thảm sân</span>
                   </div>
                   <select class="form-control" style="padding: 4px 10px; font-size: 12px; width: auto;">
                     <option>Tháng này</option>
@@ -430,12 +430,8 @@
                   </select>
                 </div>
                 <div class="card-body">
-                  <div class="chart-container-wrap" style="position: relative;">
+                  <div class="chart-container-wrap" style="position: relative; height: 260px;">
                     <canvas id="donutChart"></canvas>
-                    <div class="donut-center-stat">
-                      <div class="donut-center-num">248</div>
-                      <div class="donut-center-label">lượt đặt</div>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -896,13 +892,37 @@
       });
 
       // 2. Donut Chart (Sport Category Breakdown)
+      // 2. Donut Chart (Badminton Court Carpet Breakdown)
       const ctxDonut = document.getElementById('donutChart').getContext('2d');
       if (donutChartInstance) donutChartInstance.destroy();
+
+      const centerTextPlugin = {
+        id: 'centerText',
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          const meta = chart.getDatasetMeta(0);
+          if (!meta || !meta.data || !meta.data.length) return;
+          const x = meta.data[0].x;
+          const y = meta.data[0].y;
+          ctx.save();
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          
+          ctx.font = '800 24px "Plus Jakarta Sans", sans-serif';
+          ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
+          ctx.fillText('248', x, y - 9);
+          
+          ctx.font = '600 11px "Inter", sans-serif';
+          ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+          ctx.fillText('LƯỢT ĐẶT', x, y + 13);
+          ctx.restore();
+        }
+      };
 
       donutChartInstance = new Chart(ctxDonut, {
         type: 'doughnut',
         data: {
-          labels: ['Thảm VIP Yonex (48%)', 'Thảm Tiêu chuẩn Enlio (32%)', 'Thảm Thi Đấu Quốc Tế (20%)'],
+          labels: ['Thảm VIP Yonex (48%)', 'Thảm Tiêu chuẩn Enlio (32%)', 'Thảm Quốc Tế (20%)'],
           datasets: [{
             data: [48, 32, 20],
             backgroundColor: ['#10b981', '#3b82f6', '#f59e0b'],
@@ -916,11 +936,19 @@
           cutout: '72%',
           plugins: {
             legend: {
-              position: 'right',
-              labels: { color: textColor, font: { family: 'Inter', size: 11.5 }, boxWidth: 12 }
+              position: 'bottom',
+              labels: {
+                color: textColor,
+                font: { family: 'Inter', size: 12, weight: '500' },
+                boxWidth: 8,
+                padding: 14,
+                usePointStyle: true,
+                pointStyle: 'circle'
+              }
             }
           }
-        }
+        },
+        plugins: [centerTextPlugin]
       });
     }
 

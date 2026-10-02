@@ -298,7 +298,7 @@
         <div class="section-card" style="margin-bottom: 24px;">
           <div class="section-title-wrap" style="margin-bottom: 16px;">
             <h3>Sơ đồ trực quan danh mục sân chi nhánh</h3>
-            <p>Dữ liệu đồng bộ trực tiếp từ SQL Server (`badminton.dbo.courts`)</p>
+            <p>Hệ thống 6 sân thảm thi đấu chuẩn BWF tại chi nhánh Thủ Đức</p>
           </div>
 
           <div class="courts-grid-wrap" id="courtsVisualGrid">
@@ -307,7 +307,7 @@
               <img src="/images/badminton-court.jpg" class="court-card-thumb" alt="Sân 1">
               <div class="court-card-body">
                 <div class="court-card-header">
-                  <h4 class="court-name">Sân 1 (VIP)</h4>
+                  <h4 class="court-name">Sân cầu lông 1 (VIP)</h4>
                   <span class="badge badge-green">Trống</span>
                 </div>
                 <div class="court-meta-row">
@@ -399,12 +399,12 @@
               <img src="/images/badminton-court.jpg" class="court-card-thumb" alt="Sân cầu lông 5">
               <div class="court-card-body">
                 <div class="court-card-header">
-                  <h4 class="court-name">Sân Cầu Lông 5</h4>
+                  <h4 class="court-name">Sân cầu lông 5</h4>
                   <span class="badge badge-green">Trống</span>
                 </div>
                 <div class="court-meta-row">
                   <span>Mã sân: <b>CL05</b></span>
-                  <span>Thảm Enlio chống trượt 4.5mm</span>
+                  <span>Thảm: PVC Enlio 4.5mm</span>
                 </div>
                 <div class="court-meta-row">
                   <span>Loại sân: Tiêu chuẩn</span>
@@ -422,12 +422,12 @@
               <img src="/images/badminton-court.jpg" class="court-card-thumb" alt="Sân cầu lông 6">
               <div class="court-card-body">
                 <div class="court-card-header">
-                  <h4 class="court-name">Sân Cầu Lông 6</h4>
+                  <h4 class="court-name">Sân cầu lông 6 (VIP)</h4>
                   <span class="badge badge-red">Bảo trì</span>
                 </div>
                 <div class="court-meta-row">
                   <span>Mã sân: <b>CL06</b></span>
-                  <span>Thảm Yonex BWF tiêu chuẩn thi đấu</span>
+                  <span>Thảm: Yonex BWF VIP</span>
                 </div>
                 <div class="court-meta-row">
                   <span>Loại sân: Cầu lông VIP</span>
@@ -435,7 +435,7 @@
                 </div>
                 <div style="margin-top: 12px; display: flex; gap: 6px;">
                   <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL06', 'Sân cầu lông 6', 'Cầu lông VIP', 120000, 'Bảo trì')">Chỉnh sửa</button>
-                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="alert('Đang bảo trì thay hệ thống đèn LED chiếu sáng')">Xem bảo trì</button>
+                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="showToast('Sân CL06 đang bảo trì hệ thống chiếu sáng chuẩn BWF', 'info')">Xem bảo trì</button>
                 </div>
               </div>
             </div>
@@ -450,7 +450,7 @@
             </div>
             <button class="btn btn-outline" onclick="loadCourtsFromApi()">
               <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-              <span>Đồng bộ từ SQL Server</span>
+              <span>Làm mới danh sách</span>
             </button>
           </div>
 
@@ -588,27 +588,13 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeCourtModal()">Hủy bỏ</button>
-        <button class="btn btn-primary" onclick="saveCourt()">Lưu vào SQL Server</button>
+        <button class="btn btn-primary" onclick="saveCourt()">Lưu thông tin sân</button>
       </div>
     </div>
   </div>
 
+  <script src="/js/global-hub.js"></script>
   <script>
-    function toggleSidebar() {
-      document.getElementById('appSidebar').classList.toggle('collapsed');
-    }
-
-    function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme') || 'light';
-      const next = current === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-    }
-
-    // Load saved theme
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-
     function openCourtModal(code, name, type, rate, status) {
       const modal = document.getElementById('courtModal');
       if (code) {
@@ -640,11 +626,11 @@
       const status = document.getElementById('inpStatus').value;
 
       if (!code) {
-        alert('Vui lòng nhập mã sân!');
+        showToast('Vui lòng nhập mã sân!', 'warning');
         return;
       }
 
-      alert('Đã lưu thành công sân ' + code + ' (' + name + ') với đơn giá ' + Number(rate).toLocaleString('vi-VN') + ' đ/h!');
+      showToast(`Đã lưu sân ${code} (${name}) - ${Number(rate).toLocaleString('vi-VN')} đ/h!`, 'success');
       closeCourtModal();
     }
 
@@ -675,13 +661,17 @@
                 </tr>
               `;
             }).join('');
-            alert('Đã đồng bộ thành công ' + courts.length + ' sân từ SQL Server!');
+            showToast(`Đã đồng bộ ${courts.length} sân thi đấu từ cơ sở dữ liệu`, 'success');
           }
         }
       } catch (err) {
         console.warn('API error, using cached seed data');
       }
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCourtsFromApi();
+    });
   </script>
 </body>
 </html>

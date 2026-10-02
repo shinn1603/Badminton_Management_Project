@@ -385,6 +385,7 @@
     </div>
   </div>
 
+  <script src="/js/global-hub.js"></script>
   <script>
     function toggleSidebar() {
       document.getElementById('appSidebar').classList.toggle('collapsed');
@@ -413,7 +414,7 @@
       const day = document.getElementById('inpDayType').value;
       const price = document.getElementById('inpNewPrice').value;
 
-      alert(`Đã cập nhật biểu giá: ${slot} cho ${day} thành công với mức ${Number(price).toLocaleString('vi-VN')} đ/h!`);
+      showToast(`Đã cập nhật biểu giá: ${slot} cho ${day} thành công với mức ${Number(price).toLocaleString('vi-VN')} đ/h!`, 'success');
       closePriceModal();
     }
   </script>
