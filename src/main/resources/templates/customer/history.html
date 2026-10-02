@@ -542,7 +542,7 @@
           `Xác nhận hủy đơn ${code}?`
         );
         if (confirmCancel) {
-          alert(`Đã hủy thành công đơn ${code}! Yêu cầu hoàn cọc ${depositAmount.toLocaleString('vi-VN')} đ đã được tạo.`);
+          showToast(`Đã hủy thành công đơn ${code}! Yêu cầu hoàn cọc ${depositAmount.toLocaleString('vi-VN', 'success')} đ đã được tạo.`);
           window.location.reload();
         }
       } else {
@@ -552,7 +552,7 @@
           `Bạn có chắc chắn vẫn muốn hủy slot này không?`
         );
         if (confirmCancel) {
-          alert(`Đã hủy slot sân ${code}. Không áp dụng hoàn cọc do thời gian hủy sát giờ chơi (dưới 4 tiếng).`);
+          showToast(`Đã hủy slot sân ${code}. Không áp dụng hoàn cọc do thời gian hủy sát giờ chơi (dưới 4 tiếng, 'info').`);
           window.location.reload();
         }
       }
@@ -572,7 +572,7 @@
     }
 
     function submitReview() {
-      alert('Cảm ơn bạn đã gửi đánh giá! Bạn được cộng +50 điểm hội viên.');
+      showToast('Cảm ơn bạn đã gửi đánh giá! Bạn được cộng +50 điểm hội viên.', 'info');
       closeModals();
     }
   </script>

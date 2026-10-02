@@ -463,7 +463,7 @@
     const pTimer = setInterval(() => {
       if (secondsLeft <= 0) {
         clearInterval(pTimer);
-        alert('Hết hạn thanh toán! Slot đã được mở lại.');
+        showToast('Hết hạn thanh toán! Slot đã được mở lại.', 'info');
         window.location.href = '/customer/booking';
         return;
       }
@@ -490,9 +490,9 @@
 
     function copyText(text) {
       navigator.clipboard.writeText(text).then(() => {
-        alert('Đã sao chép: ' + text);
+        showToast('Đã sao chép: ' + text, 'info');
       }).catch(() => {
-        alert('Đã sao chép: ' + text);
+        showToast('Đã sao chép: ' + text, 'info');
       });
     }
 

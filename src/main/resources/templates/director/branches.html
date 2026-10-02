@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản lý hệ thống chi nhánh - UTE Sport</title>
+  <title>Quản lý hệ thống chi nhánh sân cầu lông - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
@@ -452,10 +452,10 @@
     function saveBranch() {
       const name = document.getElementById('inpBranchName').value.trim();
       if (!name) {
-        alert('Vui lòng nhập tên chi nhánh.');
+        showToast('Vui lòng nhập tên chi nhánh!', 'warning');
         return;
       }
-      alert('Đã lưu thông tin chi nhánh thành công!');
+      showToast('Đã lưu thông tin chi nhánh thành công!', 'success');
       closeBranchModal();
     }
 
@@ -467,26 +467,7 @@
         r.style.display = txt.includes(q) ? '' : 'none';
       });
     }
-      function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme') || 'light';
-      const next = current === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-    }
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
   </script>
-  <script src="/js/global-hub.js">    function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme') || 'light';
-      const next = current === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-    }
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-  </script>
+  <script src="/js/global-hub.js"></script>
 </body>
 </html>
-
-
-

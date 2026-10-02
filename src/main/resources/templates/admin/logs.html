@@ -118,7 +118,7 @@
         </div>
 
         <div class="header-right">
-          <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Chuyá»ƒn Ä‘á»•i giao diá»‡n SÃ¡ng / Tá»‘i" style="padding: 6px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--text-dark); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; margin-right: 6px;">
+          <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Chuyển đổi giao diện Sáng / Tối" style="padding: 6px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--text-dark); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; margin-right: 6px;">
             <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
           </button>
           <div class="search-box">
@@ -295,16 +295,16 @@
         </td>
       `;
       tbody.insertBefore(tr, tbody.firstChild);
-      alert('Đã tạo bản sao lưu CSDL thành công: ' + filename);
+      if (window.showToast) { showToast('Đã sao lưu CSDL: ' + filename, 'success'); }
     }
 
     function downloadBackup(file) {
-      alert('Đang tải file sao lưu: ' + file);
+      if (window.showToast) { showToast('Đang tải file sao lưu: ' + file, 'info'); }
     }
 
     function restoreBackup(file) {
       if (confirm('CẢNH BÁO: Việc phục hồi cơ sở dữ liệu từ file ' + file + ' sẽ ghi đè toàn bộ dữ liệu hiện tại. Bạn có chắc chắn không?')) {
-        alert('Đã phục hồi dữ liệu từ bản sao lưu thành công!');
+        if (window.showToast) { showToast('Đã phục hồi dữ liệu từ bản sao lưu thành công', 'success'); }
       }
     }
       function toggleTheme() {
@@ -316,15 +316,7 @@
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
   </script>
-  <script src="/js/global-hub.js">    function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme') || 'light';
-      const next = current === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-    }
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-  </script>
+  <script src="/js/global-hub.js"></script>
 </body>
 </html>
 

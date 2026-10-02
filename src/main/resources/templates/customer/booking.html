@@ -672,7 +672,7 @@
     const timerInterval = setInterval(() => {
       if (remainingSeconds <= 0) {
         clearInterval(timerInterval);
-        alert('Hết thời gian giữ chỗ 10 phút! Vui lòng tải lại trang.');
+        showToast('Hết thời gian giữ chỗ 10 phút! Vui lòng tải lại trang.', 'warning');
         window.location.reload();
         return;
       }
@@ -696,7 +696,7 @@
       const idx = selectedSlots.findIndex(s => s.time === time);
       if (idx >= 0) {
         if (selectedSlots.length === 1) {
-          alert('Bạn phải chọn ít nhất 1 khung giờ thi đấu!');
+          showToast('Bạn phải chọn ít nhất 1 khung giờ thi đấu!', 'info');
           return;
         }
         selectedSlots.splice(idx, 1);
