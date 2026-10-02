@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản lý đặt sân - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
+  <script src="/js/global-hub.js"></script>
   <style>
     .booking-mgmt-layout {
       display: grid;
@@ -597,10 +598,10 @@
       { code: 'DS0107', name: 'Đỗ Quang Vinh', phone: '0944333222', court: 'Sân cầu lông 2', date: '2026-09-24', time: '15:00 - 16:00', price: 90000, status: 'Đã hủy' }
     ];
 
-    let bookings = JSON.parse(localStorage.getItem('utesport_bookings')) || initialBookings;
+    let bookings = JSON.parse(localStorage.getItem('utesport_bookings_v2')) || initialBookings;
 
     function saveToStorage() {
-      localStorage.setItem('utesport_bookings', JSON.stringify(bookings));
+      localStorage.setItem('utesport_bookings_v2', JSON.stringify(bookings));
     }
 
     function init() {

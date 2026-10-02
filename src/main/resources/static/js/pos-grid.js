@@ -30,10 +30,10 @@ function ensureDataForDate(dateStr) {
 
   branchesList.forEach(branch => {
     if (!appData[branch]) appData[branch] = {};
-    if (!appData[branch][dateStr]) {
-      appData[branch][dateStr] = {};
+    if (!appData[branch][dateStr]) appData[branch][dateStr] = {};
 
-      courtsList.forEach(court => {
+    courtsList.forEach(court => {
+      if (!appData[branch][dateStr][court]) {
         appData[branch][dateStr][court] = {};
         let price = court.includes('VIP') ? 120000 : 90000;
         let hasInUse = false;
@@ -65,8 +65,8 @@ function ensureDataForDate(dateStr) {
             state: state, customer: customer, phone: phone, price: price, deposit: price * 0.3, posItems: []
           };
         });
-      });
-    }
+      }
+    });
   });
 }
 
@@ -116,7 +116,8 @@ function renderGridForDate(dateStr) {
 
     timeSlots.forEach(timeObj => {
       const [startTime, endTime] = timeObj.split(' - ');
-      let cellData = gridState[court][timeObj] || { state: 'available', price: defaultPrice };
+      const courtSlots = (gridState && gridState[court]) ? gridState[court] : {};
+      let cellData = courtSlots[timeObj] || { state: 'available', price: defaultPrice };
 
       rowHtml += `<td class="matrix-slot-cell">`;
       if (cellData.state === 'available') {
