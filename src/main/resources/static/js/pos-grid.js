@@ -14,7 +14,7 @@ let currentDeposit = 36000;
 const mockNames = ['Lê Bá Đạt', 'Trần Nam', 'Đoàn Thanh Niên', 'Vũ Quốc Cường', 'Nguyễn Hải', 'Nhóm IT UTE', 'CLB Tân Bình', 'Khách vãng lai', 'Chị Lan', 'Anh Hoàng Vũ'];
 const mockPhones = ['0901234567', '0988777666', '0912345678', '0933444555', '0909888777'];
 const timeSlots = ['06:00 - 07:00', '07:00 - 08:00', '08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00', '14:00 - 15:00', '15:00 - 16:00', '17:00 - 18:00', '18:00 - 19:00', '19:00 - 20:00', '20:00 - 21:00', '21:00 - 22:00'];
-let courtsList = ['Sân 01 (VIP)', 'Sân 02', 'Sân 03', 'Sân 04', 'Sân Pickleball 01', 'Sân Pickleball 02'];
+let courtsList = ['Sân 01 (VIP Yonex)', 'Sân 02 (VIP Yonex)', 'Sân 03 (Thảm Enlio)', 'Sân 04 (Thảm Enlio)', 'Sân 05 (Tiêu chuẩn)', 'Sân 06 (Tiêu chuẩn)'];
 const branchesList = ['CN01', 'CN02', 'CN03'];
 
 function formatDate(dateObj) {
@@ -35,7 +35,7 @@ function ensureDataForDate(dateStr) {
 
       courtsList.forEach(court => {
         appData[branch][dateStr][court] = {};
-        let price = court.includes('VIP') || court.includes('Pickleball') ? 120000 : 90000;
+        let price = court.includes('VIP') ? 120000 : 90000;
         let hasInUse = false;
 
         timeSlots.forEach(time => {
@@ -102,15 +102,15 @@ function renderGridForDate(dateStr) {
 
   courtsList.forEach(court => {
     const isVip = court.includes('VIP');
-    const isPickleball = court.includes('Pickleball');
-    const defaultPrice = isVip || isPickleball ? 120000 : 90000;
+    const isEnlio = court.includes('Enlio');
+    const defaultPrice = isVip ? 120000 : 90000;
 
     let rowHtml = `
       <tr>
         <td class="matrix-td-court">
           <div class="court-info">
             <span class="court-name">${court}</span>
-            <span class="court-type">${isVip ? 'VIP - Thảm Yonex' : (isPickleball ? 'Sân Pickleball' : 'Tiêu chuẩn - Taraflex')}</span>
+            <span class="court-type">${isVip ? 'VIP • Thảm Yonex BWF' : (isEnlio ? 'Tiêu chuẩn • Thảm Enlio' : 'Tiêu chuẩn • Thảm Taraflex')}</span>
           </div>
         </td>`;
 

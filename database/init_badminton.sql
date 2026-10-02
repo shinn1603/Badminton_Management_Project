@@ -56,7 +56,7 @@ CREATE TABLE courts (
     id INT IDENTITY(1,1) PRIMARY KEY,
     court_code VARCHAR(20) NOT NULL UNIQUE,
     court_name NVARCHAR(100) NOT NULL,
-    court_type NVARCHAR(50) NOT NULL, -- Cầu lông VIP, Cầu lông tiêu chuẩn, Pickleball
+    court_type NVARCHAR(50) NOT NULL, -- Cầu lông VIP, Cầu lông tiêu chuẩn, Cầu lông thi đấu
     branch_code VARCHAR(20) NOT NULL,
     hourly_rate DECIMAL(18,2) NOT NULL,
     status NVARCHAR(30) DEFAULT N'Trống', -- Trống, Đang sử dụng, Bảo trì
@@ -134,8 +134,8 @@ INSERT INTO courts (court_code, court_name, court_type, branch_code, hourly_rate
 ('CL02', N'Sân cầu lông 2', N'Cầu lông tiêu chuẩn', 'CN01', 90000, N'Đang sử dụng', '/images/badminton-court.jpg'),
 ('CL03', N'Sân cầu lông 3', N'Cầu lông tiêu chuẩn', 'CN01', 90000, N'Trống', '/images/badminton-court.jpg'),
 ('CL04', N'Sân cầu lông 4', N'Cầu lông tiêu chuẩn', 'CN01', 90000, N'Trống', '/images/badminton-court.jpg'),
-('PB01', N'Sân pickleball 1', N'Pickleball', 'CN01', 120000, N'Trống', '/images/pickleball-court.jpg'),
-('PB02', N'Sân pickleball 2', N'Pickleball', 'CN01', 120000, N'Bảo trì', '/images/pickleball-court.jpg');
+('CL05', N'Sân cầu lông 5', N'Cầu lông tiêu chuẩn', 'CN01', 90000, N'Trống', '/images/badminton-court.jpg'),
+('CL06', N'Sân cầu lông 6 (VIP)', N'Cầu lông VIP', 'CN01', 120000, N'Bảo trì', '/images/badminton-court.jpg');
 
 -- 8.4 Danh sách mặt hàng quầy & Dụng cụ cho thuê
 INSERT INTO products (product_code, product_name, category, unit, unit_price, cost_price, stock_quantity, min_quantity, branch_code) VALUES
@@ -151,7 +151,7 @@ INSERT INTO products (product_code, product_name, category, unit, unit_price, co
 INSERT INTO bookings (booking_code, customer_name, customer_phone, court_code, branch_code, booking_date, time_slot, hourly_price, total_price, deposit_amount, status, notes) VALUES
 ('DS0101', N'Nguyễn Hoàng Nam', '0903123456', 'CL02', 'CN01', CAST(GETDATE() AS DATE), '08:00 - 10:00', 90000, 180000, 54000, N'Đang sử dụng', N'Khách quen tuần 3 buổi'),
 ('DS0102', N'Lê Minh Đức', '0912888999', 'CL01', 'CN01', CAST(GETDATE() AS DATE), '09:00 - 10:00', 120000, 120000, 36000, N'Hoàn thành', N'Đã thanh toán đủ tiền mặt'),
-('DS0103', N'Phạm Gia Huy', '0988777666', 'PB01', 'CN01', CAST(GETDATE() AS DATE), '18:00 - 20:00', 120000, 240000, 72000, N'Đã xác nhận', N'Đặt sân pickleball tối'),
+('DS0103', N'Phạm Gia Huy', '0988777666', 'CL06', 'CN01', CAST(GETDATE() AS DATE), '18:00 - 20:00', 120000, 240000, 72000, N'Đã xác nhận', N'Đặt sân VIP tối'),
 ('DS0104', N'Vũ Thị Mai Anh', '0977555444', 'CL03', 'CN01', CAST(GETDATE() AS DATE), '19:00 - 20:00', 90000, 90000, 27000, N'Chờ xác nhận', N'Khách đặt qua app trực tuyến'),
 ('DS0105', N'Trần Thanh Hằng', '0933444555', 'CL01', 'CN01', DATEADD(DAY, 1, CAST(GETDATE() AS DATE)), '17:00 - 18:00', 120000, 120000, 36000, N'Đã cọc 30%', N'Chuyển khoản VietQR'),
 ('DS0106', N'Bùi Khánh Linh', '0909111222', 'CL04', 'CN01', DATEADD(DAY, 1, CAST(GETDATE() AS DATE)), '20:00 - 22:00', 90000, 180000, 54000, N'Đã xác nhận', N'Giao lưu công ty'),

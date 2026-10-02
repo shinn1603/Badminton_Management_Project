@@ -71,42 +71,6 @@
       margin-top: 6px;
     }
 
-    /* PRESET ACCOUNTS BAR */
-    .preset-bar {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      margin-bottom: 24px;
-      background: var(--surface-subtle);
-      padding: 4px;
-      border-radius: 10px;
-      border: 1px solid var(--border-subtle);
-    }
-
-    .preset-btn {
-      padding: 8px 6px;
-      border-radius: 7px;
-      border: none;
-      background: transparent;
-      font-size: 11.5px;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.15s ease;
-    }
-
-    .preset-btn:hover {
-      color: var(--text-dark);
-    }
-
-    .preset-btn.active {
-      background: var(--surface);
-      color: var(--primary);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-      font-weight: 700;
-    }
-
     .input-icon-wrap {
       position: relative;
     }
@@ -183,19 +147,7 @@
         </svg>
       </div>
       <h1 class="auth-brand-title">UTE SPORT</h1>
-      <p class="auth-brand-sub">Hệ thống Quản lý Chuỗi Sân Cầu Lông & Thể Thao Đa Năng</p>
-    </div>
-
-    <!-- PRESET ROLE SWITCHER (CLEAN & MINIMAL) -->
-    <div class="preset-bar">
-      <button type="button" class="preset-btn active" id="pManager"
-        onclick="selectPreset('manager', '123456', this)">Quản lý</button>
-      <button type="button" class="preset-btn" id="pPos" onclick="selectPreset('pos', '123456', this)">Thu ngân
-        POS</button>
-      <button type="button" class="preset-btn" id="pDirector" onclick="selectPreset('director', '123456', this)">Giám
-        đốc</button>
-      <button type="button" class="preset-btn" id="pCustomer" onclick="selectPreset('customer', '123456', this)">Khách
-        hàng</button>
+      <p class="auth-brand-sub">Hệ thống Quản lý Chuỗi Sân Cầu Lông Cao Cấp</p>
     </div>
 
     <!-- LOGIN FORM -->
@@ -207,7 +159,7 @@
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
-          <input type="text" id="usernameInput" placeholder="Nhập tên đăng nhập" value="manager" required
+          <input type="text" id="usernameInput" placeholder="Tên đăng nhập (vd: manager, director, pos)" value="manager" required
             autocomplete="username">
         </div>
       </div>
@@ -219,7 +171,7 @@
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
           </svg>
-          <input type="password" id="passwordInput" placeholder="••••••••" value="123456" required
+          <input type="password" id="passwordInput" placeholder="Mật khẩu (mặc định: 123456)" value="123456" required
             autocomplete="current-password">
         </div>
       </div>
@@ -229,7 +181,7 @@
           <input type="checkbox" id="rememberMe" checked>
           <span>Ghi nhớ phiên đăng nhập</span>
         </label>
-        <span style="font-size: 11.5px; color: var(--primary); font-weight: 600;">SQL Server Database: badminton</span>
+        <a href="#" style="font-size: 12px; color: var(--primary); font-weight: 500; text-decoration: none;">Quên mật khẩu?</a>
       </div>
 
       <button type="submit" class="btn btn-primary" id="btnSubmit"
@@ -239,25 +191,18 @@
           <polyline points="10 17 15 12 10 7"></polyline>
           <line x1="15" y1="12" x2="3" y2="12"></line>
         </svg>
-        <span>Đăng nhập vào hệ thống</span>
+        <span>Đăng nhập hệ thống</span>
       </button>
     </form>
 
     <div class="auth-footer-tag">
-      <span>Kết nối cuộc sống • UTE Sport System</span>
+      <span>UTE Sport • Chuỗi Sân Cầu Lông Tiêu Chuẩn Quốc Tế</span>
     </div>
   </div>
 
   <div class="toast-container" id="toastContainer"></div>
 
   <script>
-    function selectPreset(user, pass, btn) {
-      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('usernameInput').value = user;
-      document.getElementById('passwordInput').value = pass;
-    }
-
     async function handleLoginSubmit(e) {
       e.preventDefault();
       const username = document.getElementById('usernameInput').value.trim();

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
@@ -523,8 +523,8 @@
                   <option value="Sân cầu lông 1">Sân cầu lông 1 (90.000đ/h)</option>
                   <option value="Sân cầu lông 2" selected>Sân cầu lông 2 (90.000đ/h)</option>
                   <option value="Sân cầu lông 3">Sân cầu lông 3 (90.000đ/h)</option>
-                  <option value="Sân pickleball 1">Sân pickleball 1 (120.000đ/h)</option>
-                  <option value="Sân pickleball 2">Sân pickleball 2 (120.000đ/h)</option>
+                  <option value="Sân cầu lông 4 (VIP)">Sân cầu lông 4 (VIP 120.000đ/h)</option>
+                  <option value="Sân cầu lông 5 (VIP)">Sân cầu lông 5 (VIP 120.000đ/h)</option>
                 </select>
               </div>
 
@@ -587,19 +587,11 @@
   <!-- BOOKINGS CRUD & DATA LOGIC -->
   <script>
     // Initial 7 records matching Reference Image 3:
-    // DS0101: Nguyễn Hoàng Nam - Sân cầu lông 2 - 25/09/2026 - 08:00 - 10:00 - 180.000 - Đã xác nhận
-    // DS0102: Lê Minh Đức - Sân bóng rổ 2 - 25/09/2026 - 09:00 - 10:00 - 280.000 - Hoàn thành
-    // DS0103: Phạm Gia Huy - Sân bóng đá 2 - 25/09/2026 - 18:00 - 20:00 - 900.000 - Đã xác nhận
-    // DS0104: Vũ Thị Mai Anh - Sân pickleball 1 - 25/09/2026 - 19:00 - 20:00 - 120.000 - Chờ xác nhận
-    // DS0105: Trần Thanh Hằng - Sân cầu lông 1 - 26/09/2026 - 17:00 - 18:00 - 90.000 - Chờ xác nhận
-    // DS0106: Bùi Khánh Linh - Sân bóng đá 1 - 26/09/2026 - 20:00 - 22:00 - 600.000 - Đã xác nhận
-    // DS0107: Đỗ Quang Vinh - Sân bóng rổ 1 - 24/09/2026 - 15:00 - 16:00 - 200.000 - Đã hủy
-
     let initialBookings = [
       { code: 'DS0101', name: 'Nguyễn Hoàng Nam', phone: '0903123456', court: 'Sân cầu lông 2', date: '2026-09-25', time: '08:00 - 10:00', price: 180000, status: 'Đã xác nhận' },
       { code: 'DS0102', name: 'Lê Minh Đức', phone: '0912888999', court: 'Sân cầu lông 1', date: '2026-09-25', time: '09:00 - 10:00', price: 90000, status: 'Hoàn thành' },
-      { code: 'DS0103', name: 'Phạm Gia Huy', phone: '0988777666', court: 'Sân pickleball 2', date: '2026-09-25', time: '18:00 - 20:00', price: 240000, status: 'Đã xác nhận' },
-      { code: 'DS0104', name: 'Vũ Thị Mai Anh', phone: '0977555444', court: 'Sân pickleball 1', date: '2026-09-25', time: '19:00 - 20:00', price: 120000, status: 'Chờ xác nhận' },
+      { code: 'DS0103', name: 'Phạm Gia Huy', phone: '0988777666', court: 'Sân cầu lông 4 (VIP)', date: '2026-09-25', time: '18:00 - 20:00', price: 240000, status: 'Đã xác nhận' },
+      { code: 'DS0104', name: 'Vũ Thị Mai Anh', phone: '0977555444', court: 'Sân cầu lông 5 (VIP)', date: '2026-09-25', time: '19:00 - 20:00', price: 120000, status: 'Chờ xác nhận' },
       { code: 'DS0105', name: 'Trần Thanh Hằng', phone: '0933444555', court: 'Sân cầu lông 1', date: '2026-09-26', time: '17:00 - 18:00', price: 90000, status: 'Chờ xác nhận' },
       { code: 'DS0106', name: 'Bùi Khánh Linh', phone: '0909111222', court: 'Sân cầu lông 3', date: '2026-09-26', time: '20:00 - 22:00', price: 180000, status: 'Đã xác nhận' },
       { code: 'DS0107', name: 'Đỗ Quang Vinh', phone: '0944333222', court: 'Sân cầu lông 2', date: '2026-09-24', time: '15:00 - 16:00', price: 90000, status: 'Đã hủy' }
@@ -806,7 +798,7 @@
       const court = document.getElementById('fCourtName').value;
       const slotEl = document.getElementById('fTimeSlot');
       const hours = parseInt(slotEl.options[slotEl.selectedIndex].getAttribute('data-hours') || '1', 10);
-      const rate = court.includes('pickleball') ? 120000 : 90000;
+      const rate = court.includes('VIP') ? 120000 : 90000;
       const total = rate * hours;
       document.getElementById('fTotalPrice').value = total.toLocaleString('vi-VN');
     }

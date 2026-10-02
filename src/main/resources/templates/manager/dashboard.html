@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
@@ -480,24 +480,24 @@
                   <!-- Court 3 -->
                   <div class="court-thumb-card" onclick="window.location.href='/pos/grid'">
                     <div class="court-thumb-img-wrap">
-                      <img src="/images/pickleball-court.jpg" alt="Sân Pickleball 1">
+                      <img src="/images/badminton-court.jpg" alt="Sân Cầu Lông 3">
                       <span class="badge badge-available court-thumb-badge">● Trống</span>
                     </div>
                     <div class="court-thumb-body">
-                      <div class="court-thumb-title">Sân pickleball 1</div>
-                      <div class="court-thumb-meta">Mặt sân Cushion nhám • 06:00 - 22:00</div>
+                      <div class="court-thumb-title">Sân Cầu Lông 3</div>
+                      <div class="court-thumb-meta">Thảm Enlio tiêu chuẩn • 06:00 - 22:00</div>
                     </div>
                   </div>
 
                   <!-- Court 4 -->
                   <div class="court-thumb-card" onclick="window.location.href='/pos/grid'">
                     <div class="court-thumb-img-wrap">
-                      <img src="/images/pickleball-court.jpg" alt="Sân Pickleball 2">
-                      <span class="badge badge-maintenance court-thumb-badge">● Bảo trì lưới</span>
+                      <img src="/images/badminton-court.jpg" alt="Sân Cầu Lông 4 (VIP)">
+                      <span class="badge badge-maintenance court-thumb-badge">● Bảo trì đèn</span>
                     </div>
                     <div class="court-thumb-body">
-                      <div class="court-thumb-title">Sân pickleball 2</div>
-                      <div class="court-thumb-meta">Thay lưới đèn LED • Hoàn thành 14:00</div>
+                      <div class="court-thumb-title">Sân Cầu Lông 4 (VIP)</div>
+                      <div class="court-thumb-meta">Thảm Yonex BWF • Hoàn thành 14:00</div>
                     </div>
                   </div>
                 </div>
@@ -556,7 +556,7 @@
                       <tr>
                         <td><strong>#DS0103</strong></td>
                         <td>Phạm Gia Huy <br><span style="font-size: 11px; color: var(--text-muted);">0988.777.666</span></td>
-                        <td>Sân pickleball 1</td>
+                        <td>Sân Cầu Lông 2</td>
                         <td>Hôm nay • 18:00 - 20:00</td>
                         <td><strong>240.000đ</strong></td>
                         <td><span class="badge badge-available">Đã xác nhận</span></td>
@@ -627,7 +627,7 @@
                   <div class="timeline-slot-item" style="border-left: 3px solid #f59e0b;">
                     <span class="timeline-hour">09:00</span>
                     <div class="timeline-court-info">
-                      <div class="timeline-court-name">Sân pickleball 1</div>
+                      <div class="timeline-court-name">Sân Cầu Lông 2</div>
                       <div class="timeline-court-sub">Lê Minh Đức • Đã cọc 30%</div>
                     </div>
                     <span class="badge badge-pending">Đã cọc</span>
@@ -687,10 +687,10 @@
             <div class="form-group">
               <label class="form-label">Chọn sân</label>
               <select id="mCourtSelect" class="form-control" required onchange="calculateModalTotal()">
-                <option value="Sân cầu lông 1">Sân cầu lông 1 (90k/h)</option>
-                <option value="Sân cầu lông 2">Sân cầu lông 2 (90k/h)</option>
-                <option value="Sân cầu lông 3">Sân cầu lông 3 (90k/h)</option>
-                <option value="Sân pickleball 1">Sân pickleball 1 (120k/h)</option>
+                <option value="Sân Cầu Lông 1">Sân Cầu Lông 1 (90k/h)</option>
+                <option value="Sân Cầu Lông 2">Sân Cầu Lông 2 (90k/h)</option>
+                <option value="Sân Cầu Lông 3">Sân Cầu Lông 3 (90k/h)</option>
+                <option value="Sân Cầu Lông 4 (VIP)">Sân Cầu Lông 4 (VIP 120k/h)</option>
               </select>
             </div>
             <div class="form-group">
@@ -794,7 +794,7 @@
     function calculateModalTotal() {
       const court = document.getElementById('mCourtSelect').value;
       const hours = parseInt(document.getElementById('mTimeSlot').value || '1', 10);
-      const rate = court.includes('pickleball') ? 120000 : 90000;
+      const rate = court.includes('VIP') ? 120000 : 90000;
       const total = rate * hours;
       document.getElementById('mTotalDisplay').value = total.toLocaleString('vi-VN') + 'đ';
     }
@@ -901,10 +901,10 @@
       donutChartInstance = new Chart(ctxDonut, {
         type: 'doughnut',
         data: {
-          labels: ['Cầu lông (55%)', 'Pickleball (20%)', 'Bóng đá (15%)', 'Bóng rổ (10%)'],
+          labels: ['Thảm VIP Yonex (48%)', 'Thảm Tiêu chuẩn Enlio (32%)', 'Thảm Thi Đấu Quốc Tế (20%)'],
           datasets: [{
-            data: [55, 20, 15, 10],
-            backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#a855f7'],
+            data: [48, 32, 20],
+            backgroundColor: ['#10b981', '#3b82f6', '#f59e0b'],
             borderWidth: 0,
             hoverOffset: 6
           }]
