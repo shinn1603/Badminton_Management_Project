@@ -27,7 +27,19 @@
 ---
 
 ## Chức năng chính
-- **Quản lý đặt sân (Booking & POS)**: Giao diện dạng lưới trực quan giúp nhân viên dễ dàng sắp xếp ca, check-in, check-out và thanh toán.
+- **Cổng Khách Hàng Trực Tuyến (Customer Portal & Slot-Level Locking)**:
+  - Xem toàn bộ danh sách sân của từng chi nhánh với bộ lọc linh hoạt.
+  - Lưới chọn giờ đặt sân trực quan theo thời gian thực (06:00 - 22:00).
+  - Khóa giữ chỗ cấp khung giờ (Slot-Level Locking): Chỉ khóa duy nhất sân và khung giờ được đặt trong cơ sở dữ liệu, các khung giờ khác và các sân khác hoàn toàn không bị ảnh hưởng.
+  - Đồng bộ ngôn ngữ thiết kế Luxury Emerald Dashboard toàn bộ 6 màn hình phân hệ khách hàng.
+- **Thanh toán VietQR & Webhook Tự Động (SePay / Casso / Ngân hàng)**:
+  - Sinh mã VietQR động theo tiền cọc 30% và cú pháp chuyển khoản `CK DSxxxxxx`.
+  - Bộ đếm thời gian giữ chỗ 10 phút.
+  - Webhook tự động đối soát giao dịch ngân hàng và xác nhận cọc tức thì không cần duyệt tay.
+  - Vé điện tử & Mã QR Check-in tức thì tại quầy POS.
+- **Trợ Lý Thông Minh AI Badminton Consultant**:
+  - Hỗ trợ tư vấn chi nhánh gần nhất, tra cứu khung giờ trống thời gian thực và tự động tạo đơn đặt sân.
+- **Quản lý đặt sân & Thu ngân (Booking & POS)**: Giao diện dạng lưới trực quan giúp nhân viên dễ dàng sắp xếp ca, check-in mã QR, check-out và thanh toán dịch vụ F&B.
 - **Quản lý Chi nhánh (Store Manager)**: Theo dõi tình trạng sân, quản lý kho vật tư (đồ uống, vợt, cầu), lập phiếu nhập kho và xếp ca làm việc cho nhân viên.
 - **Quản lý Chuỗi (Director)**: Bảng điều khiển (Dashboard) tổng hợp doanh thu, so sánh tỷ lệ lấp đầy giữa các chi nhánh, phê duyệt giải đấu và ban hành bảng giá.
 - **Quản trị Hệ thống (Admin)**: Quản lý tài khoản, phân quyền truy cập, theo dõi nhật ký hoạt động (Logs).

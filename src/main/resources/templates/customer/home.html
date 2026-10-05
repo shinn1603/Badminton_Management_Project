@@ -808,6 +808,249 @@
       .cust-nav-menu { display: none; }
       .cust-footer-inner { grid-template-columns: 1fr; }
     }
+
+    /* TIME SLOT GRID MODAL & MATRIX CSS */
+    .slot-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(4, 20, 16, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1050;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .slot-modal-overlay.active {
+      display: flex;
+    }
+    .slot-modal-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 820px;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+      animation: modalSlideUp 0.22s ease-out;
+    }
+    @keyframes modalSlideUp {
+      from { opacity: 0; transform: scale(0.96) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .slot-modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      z-index: 10;
+    }
+    .slot-modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.3px;
+    }
+    .slot-modal-sub {
+      font-size: 12.5px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .slot-modal-body {
+      padding: 22px 24px 26px;
+    }
+    .slot-modal-date-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 12px 16px;
+      border-radius: 12px;
+    }
+    .slot-grid-layout {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    @media (max-width: 720px) {
+      .slot-grid-layout { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .slot-grid-layout { grid-template-columns: repeat(2, 1fr); }
+    }
+    .slot-cell {
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px 10px;
+      text-align: center;
+      background: var(--surface);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: relative;
+    }
+    .slot-cell:hover:not(.slot-cell-disabled) {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.18);
+    }
+    .slot-cell.slot-cell-selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+    .slot-cell.slot-cell-disabled {
+      background: var(--surface-subtle);
+      opacity: 0.55;
+      cursor: not-allowed;
+      border-color: var(--border-subtle);
+    }
+    .slot-time-text {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.2px;
+    }
+    .slot-status-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    .pill-free {
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+    }
+    .pill-booked {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+    }
+    .pill-selected {
+      background: var(--primary);
+      color: #ffffff;
+    }
+    .slot-price-text {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .slot-peak-tag {
+      position: absolute;
+      top: -8px;
+      right: 8px;
+      background: #f59e0b;
+      color: #ffffff;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    /* VIETQR MODAL */
+    .vietqr-modal-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 520px;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+      text-align: center;
+      animation: modalSlideUp 0.22s ease-out;
+    }
+    .vietqr-qr-frame {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 16px;
+      display: inline-block;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin: 14px 0 16px;
+      border: 2px solid var(--primary);
+    }
+    .vietqr-qr-frame img {
+      width: 220px;
+      height: 220px;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* MATRIX SCHEDULE TABLE */
+    .matrix-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      background: var(--surface);
+      margin-top: 14px;
+    }
+    .cust-matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 960px;
+      text-align: center;
+      font-size: 12.5px;
+    }
+    .cust-matrix-table th {
+      background: var(--surface-subtle);
+      padding: 12px 8px;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .cust-matrix-table td {
+      padding: 8px 6px;
+      border: 1px solid var(--border-subtle);
+      height: 48px;
+    }
+    .cust-matrix-court-col {
+      text-align: left;
+      font-weight: 700;
+      color: var(--text-dark);
+      padding-left: 14px !important;
+      background: var(--surface-subtle);
+      white-space: nowrap;
+    }
+    .matrix-cell-free {
+      background: rgba(16, 185, 129, 0.08);
+      color: #059669;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border-radius: 6px;
+      padding: 6px 4px;
+      display: block;
+    }
+    .matrix-cell-free:hover {
+      background: #10b981;
+      color: #ffffff;
+      transform: scale(1.04);
+    }
+    .matrix-cell-booked {
+      background: var(--surface-subtle);
+      color: var(--text-muted);
+      font-weight: 600;
+      border-radius: 6px;
+      padding: 6px 4px;
+      cursor: not-allowed;
+      display: block;
+      opacity: 0.65;
+    }
   </style>
 </head>
 <body>
@@ -988,7 +1231,7 @@
         </div>
         <div class="dash-kpi-value" id="kpiAvailableCourts">18 / 26 Sân</div>
         <div class="dash-kpi-caption">
-          <span style="color: var(--primary); font-weight: 700;">●</span>
+          <span style="color: var(--primary); font-weight: 700;">•</span>
           <span>Cập nhật trực tiếp trên toàn chuỗi</span>
         </div>
       </div>
@@ -1036,7 +1279,11 @@
         <div class="dash-tabs-nav">
           <button class="dash-tab-btn active" onclick="switchCustomerTab('tab-courts', this)">
             <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            <span>Sơ Đồ Sân Khả Dụng</span>
+            <span>Sơ Đồ Danh Sách Sân</span>
+          </button>
+          <button class="dash-tab-btn" onclick="switchCustomerTab('tab-matrix', this)">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span>Lưới Lịch Sân Trực Tuyến</span>
           </button>
           <button class="dash-tab-btn" onclick="switchCustomerTab('tab-pricing', this)">
             <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
@@ -1053,12 +1300,12 @@
         </div>
 
         <div class="dash-branch-filter">
-          <span style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Đang xem:</span>
-          <select id="dashBranchPicker" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;" onchange="filterBranchDisplay(this.value)">
-            <option value="CN01" selected>CN01 - Thủ Đức</option>
-            <option value="CN02">CN02 - Quận 7</option>
-            <option value="CN03">CN03 - Bình Thạnh</option>
-            <option value="CN04">CN04 - Gò Vấp</option>
+          <span style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Chi nhánh:</span>
+          <select id="dashBranchPicker" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px; font-weight: 600;" onchange="onDashBranchChanged(this.value)">
+            <option value="CN01" selected>CN01 - Võ Văn Ngân, TP. Thủ Đức (8 Sân BWF)</option>
+            <option value="CN02">CN02 - Nguyễn Thị Thập, Quận 7 (6 Sân BWF)</option>
+            <option value="CN03">CN03 - Điện Biên Phủ, Bình Thạnh (6 Sân BWF)</option>
+            <option value="CN04">CN04 - Quang Trung, Gò Vấp (6 Sân BWF)</option>
           </select>
         </div>
       </div>
@@ -1066,247 +1313,52 @@
       <!-- PANE 1: COURTS SHOWCASE -->
       <div id="tab-courts" class="tab-pane active" style="display: block;">
         <div class="courts-card-grid" id="courtsContainer">
-
-          <!-- COURT 1 -->
-          <div class="court-display-card" data-branch="CN01" data-type="vip">
-            <div class="court-card-thumb-wrap">
-              <img src="/images/badminton-court.jpg" alt="Sân 01 VIP Yonex">
-              <span class="court-thumb-badge badge-vip">👑 Sân VIP Yonex</span>
-              <div class="court-status-indicator">
-                <span class="hero-pulse-dot"></span> Sẵn sàng
-              </div>
-            </div>
-            <div class="court-info-body">
-              <div class="court-name-row">
-                <div class="court-item-title">Sân Số 01 (VIP Yonex)</div>
-                <div class="court-mat-type">Chi nhánh Thủ Đức</div>
-              </div>
-              <div class="court-amenities-tags">
-                <span class="amenity-tag">🏸 Thảm Yonex BWF 5 lớp</span>
-                <span class="amenity-tag">💡 LED 500 Lux chống lóa</span>
-                <span class="amenity-tag">💨 Quạt làm mát đối lưu</span>
-              </div>
-              <div class="court-price-row">
-                <span class="price-big">120.000 đ</span>
-                <span class="price-note">/ giờ (Cọc trước 30%: 36.000đ)</span>
-              </div>
-              <div class="slot-choice-wrap">
-                <div class="slot-choice-label">Slot trống hôm nay:</div>
-                <div class="slot-choice-pills">
-                  <button type="button" class="slot-choice-btn selected">17:00 - 18:00</button>
-                  <button type="button" class="slot-choice-btn">18:00 - 19:00</button>
-                  <button type="button" class="slot-choice-btn">20:00 - 21:00</button>
-                </div>
-              </div>
-            </div>
-            <div class="court-card-action">
-              <a href="/customer/booking?courtId=1&branch=CN01" class="btn-book-instant">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                <span>Khóa Giữ Chỗ 10 Phút</span>
-              </a>
-            </div>
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+            Đang tải dữ liệu toàn bộ sân của chi nhánh...
           </div>
+        </div>
+      </div>
 
-          <!-- COURT 2 -->
-          <div class="court-display-card" data-branch="CN01" data-type="vip">
-            <div class="court-card-thumb-wrap">
-              <img src="/images/badminton-court.jpg" alt="Sân 02 VIP Yonex">
-              <span class="court-thumb-badge badge-vip">👑 Sân VIP Yonex</span>
-              <div class="court-status-indicator">
-                <span class="hero-pulse-dot"></span> Sẵn sàng
-              </div>
-            </div>
-            <div class="court-info-body">
-              <div class="court-name-row">
-                <div class="court-item-title">Sân Số 02 (VIP Yonex)</div>
-                <div class="court-mat-type">Chi nhánh Thủ Đức</div>
-              </div>
-              <div class="court-amenities-tags">
-                <span class="amenity-tag">🏸 Thảm Yonex BWF 5 lớp</span>
-                <span class="amenity-tag">💡 LED 500 Lux chống lóa</span>
-                <span class="amenity-tag">📹 Hỗ trợ camera quay lại</span>
-              </div>
-              <div class="court-price-row">
-                <span class="price-big">120.000 đ</span>
-                <span class="price-note">/ giờ (Cọc trước 30%: 36.000đ)</span>
-              </div>
-              <div class="slot-choice-wrap">
-                <div class="slot-choice-label">Slot trống hôm nay:</div>
-                <div class="slot-choice-pills">
-                  <button type="button" class="slot-choice-btn">16:00 - 17:00</button>
-                  <button type="button" class="slot-choice-btn selected">19:00 - 20:00</button>
-                  <button type="button" class="slot-choice-btn">21:00 - 22:00</button>
-                </div>
-              </div>
-            </div>
-            <div class="court-card-action">
-              <a href="/customer/booking?courtId=2&branch=CN01" class="btn-book-instant">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                <span>Khóa Giữ Chỗ 10 Phút</span>
-              </a>
-            </div>
+      <!-- PANE 1.5: REALTIME SCHEDULE MATRIX (LIKE POS / MANAGER) -->
+      <div id="tab-matrix" class="tab-pane" style="display: none;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
+          <div>
+            <h4 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-dark);">Lưới Giờ Sân Thời Gian Thực Chuỗi Arena</h4>
+            <p style="margin: 2px 0 0; font-size: 12.5px; color: var(--text-muted);">Xem trực tiếp mọi sân của chi nhánh từ 06:00 đến 22:00. Bấm vào slot trống để chọn và khóa slot duy nhất đó.</p>
           </div>
-
-          <!-- COURT 3 -->
-          <div class="court-display-card" data-branch="CN01" data-type="standard">
-            <div class="court-card-thumb-wrap">
-              <img src="/images/badminton-court.jpg" alt="Sân 03 Enlio">
-              <span class="court-thumb-badge badge-standard">Sân Tiêu Chuẩn</span>
-              <div class="court-status-indicator">
-                <span class="hero-pulse-dot"></span> Sẵn sàng
-              </div>
-            </div>
-            <div class="court-info-body">
-              <div class="court-name-row">
-                <div class="court-item-title">Sân Số 03 (Thảm Enlio)</div>
-                <div class="court-mat-type">Chi nhánh Thủ Đức</div>
-              </div>
-              <div class="court-amenities-tags">
-                <span class="amenity-tag">🏸 Thảm Enlio xanh lá</span>
-                <span class="amenity-tag">📏 Kích thước 13.4m x 6.1m</span>
-                <span class="amenity-tag">💨 Ghế nghỉ & quạt mát</span>
-              </div>
-              <div class="court-price-row">
-                <span class="price-big">90.000 đ</span>
-                <span class="price-note">/ giờ (Cọc trước 30%: 27.000đ)</span>
-              </div>
-              <div class="slot-choice-wrap">
-                <div class="slot-choice-label">Slot trống hôm nay:</div>
-                <div class="slot-choice-pills">
-                  <button type="button" class="slot-choice-btn selected">17:00 - 18:00</button>
-                  <button type="button" class="slot-choice-btn">18:00 - 19:00</button>
-                  <button type="button" class="slot-choice-btn">20:00 - 21:00</button>
-                </div>
-              </div>
-            </div>
-            <div class="court-card-action">
-              <a href="/customer/booking?courtId=3&branch=CN01" class="btn-book-instant">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                <span>Khóa Giữ Chỗ 10 Phút</span>
-              </a>
-            </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <label style="font-size: 12.5px; font-weight: 700; color: var(--text-dark);">Ngày xem:</label>
+            <input type="date" id="matrixViewDate" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;" onchange="loadMatrixSchedule()">
+            <button type="button" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;" onclick="setMatrixDateToday()">Hôm nay</button>
           </div>
+        </div>
 
-          <!-- COURT 4 -->
-          <div class="court-display-card" data-branch="CN01" data-type="standard">
-            <div class="court-card-thumb-wrap">
-              <img src="/images/badminton-court.jpg" alt="Sân 04 Enlio">
-              <span class="court-thumb-badge badge-standard">Sân Tiêu Chuẩn</span>
-              <div class="court-status-indicator">
-                <span class="hero-pulse-dot"></span> Sẵn sàng
-              </div>
-            </div>
-            <div class="court-info-body">
-              <div class="court-name-row">
-                <div class="court-item-title">Sân Số 04 (Thảm Enlio)</div>
-                <div class="court-mat-type">Chi nhánh Thủ Đức</div>
-              </div>
-              <div class="court-amenities-tags">
-                <span class="amenity-tag">🏸 Thảm Enlio xanh lá</span>
-                <span class="amenity-tag">💡 Ánh sáng đều không lóa</span>
-                <span class="amenity-tag">❄️ Khu vực ngồi rộng</span>
-              </div>
-              <div class="court-price-row">
-                <span class="price-big">90.000 đ</span>
-                <span class="price-note">/ giờ (Cọc trước 30%: 27.000đ)</span>
-              </div>
-              <div class="slot-choice-wrap">
-                <div class="slot-choice-label">Slot trống hôm nay:</div>
-                <div class="slot-choice-pills">
-                  <button type="button" class="slot-choice-btn">15:00 - 16:00</button>
-                  <button type="button" class="slot-choice-btn selected">18:00 - 19:00</button>
-                  <button type="button" class="slot-choice-btn">19:00 - 20:00</button>
-                </div>
-              </div>
-            </div>
-            <div class="court-card-action">
-              <a href="/customer/booking?courtId=4&branch=CN01" class="btn-book-instant">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                <span>Khóa Giữ Chỗ 10 Phút</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- COURT 5 -->
-          <div class="court-display-card" data-branch="CN01" data-type="standard">
-            <div class="court-card-thumb-wrap">
-              <img src="/images/badminton-court.jpg" alt="Sân 05 Tiêu chuẩn">
-              <span class="court-thumb-badge badge-standard">Sân Tiêu Chuẩn</span>
-              <div class="court-status-indicator">
-                <span class="hero-pulse-dot"></span> Sẵn sàng
-              </div>
-            </div>
-            <div class="court-info-body">
-              <div class="court-name-row">
-                <div class="court-item-title">Sân Số 05 (Tiêu Chuẩn)</div>
-                <div class="court-mat-type">Chi nhánh Thủ Đức</div>
-              </div>
-              <div class="court-amenities-tags">
-                <span class="amenity-tag">🏸 Thảm cao su đàn hồi</span>
-                <span class="amenity-tag">📏 13.4m x 6.1m</span>
-                <span class="amenity-tag">💨 Quạt gió êm dịu</span>
-              </div>
-              <div class="court-price-row">
-                <span class="price-big">80.000 đ</span>
-                <span class="price-note">/ giờ (Cọc trước 30%: 24.000đ)</span>
-              </div>
-              <div class="slot-choice-wrap">
-                <div class="slot-choice-label">Slot trống hôm nay:</div>
-                <div class="slot-choice-pills">
-                  <button type="button" class="slot-choice-btn selected">07:00 - 08:00</button>
-                  <button type="button" class="slot-choice-btn">08:00 - 09:00</button>
-                  <button type="button" class="slot-choice-btn">14:00 - 15:00</button>
-                </div>
-              </div>
-            </div>
-            <div class="court-card-action">
-              <a href="/customer/booking?courtId=5&branch=CN01" class="btn-book-instant">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                <span>Khóa Giữ Chỗ 10 Phút</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- COURT 6 -->
-          <div class="court-display-card" data-branch="CN01" data-type="standard">
-            <div class="court-card-thumb-wrap">
-              <img src="/images/badminton-court.jpg" alt="Sân 06 Tiêu chuẩn">
-              <span class="court-thumb-badge badge-standard">Sân Tiêu Chuẩn</span>
-              <div class="court-status-indicator">
-                <span class="hero-pulse-dot"></span> Sẵn sàng
-              </div>
-            </div>
-            <div class="court-info-body">
-              <div class="court-name-row">
-                <div class="court-item-title">Sân Số 06 (Tiêu Chuẩn)</div>
-                <div class="court-mat-type">Chi nhánh Thủ Đức</div>
-              </div>
-              <div class="court-amenities-tags">
-                <span class="amenity-tag">🏸 Thảm cao su đàn hồi</span>
-                <span class="amenity-tag">💡 Đèn LED phân bổ đều</span>
-                <span class="amenity-tag">❄️ Gần quầy nước</span>
-              </div>
-              <div class="court-price-row">
-                <span class="price-big">80.000 đ</span>
-                <span class="price-note">/ giờ (Cọc trước 30%: 24.000đ)</span>
-              </div>
-              <div class="slot-choice-wrap">
-                <div class="slot-choice-label">Slot trống hôm nay:</div>
-                <div class="slot-choice-pills">
-                  <button type="button" class="slot-choice-btn selected">09:00 - 10:00</button>
-                  <button type="button" class="slot-choice-btn">10:00 - 11:00</button>
-                  <button type="button" class="slot-choice-btn">17:00 - 18:00</button>
-                </div>
-              </div>
-            </div>
-            <div class="court-card-action">
-              <a href="/customer/booking?courtId=6&branch=CN01" class="btn-book-instant">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                <span>Khóa Giữ Chỗ 10 Phút</span>
-              </a>
-            </div>
-          </div>
-
+        <div class="matrix-table-wrap">
+          <table class="cust-matrix-table">
+            <thead>
+              <tr>
+                <th class="cust-matrix-court-col" style="min-width: 170px;">SÂN / THỜI GIAN</th>
+                <th>06:00 - 07:00</th>
+                <th>07:00 - 08:00</th>
+                <th>08:00 - 09:00</th>
+                <th>09:00 - 10:00</th>
+                <th>10:00 - 11:00</th>
+                <th>14:00 - 15:00</th>
+                <th>15:00 - 16:00</th>
+                <th>16:00 - 17:00</th>
+                <th>17:00 - 18:00</th>
+                <th>18:00 - 19:00</th>
+                <th>19:00 - 20:00</th>
+                <th>20:00 - 21:00</th>
+                <th>21:00 - 22:00</th>
+              </tr>
+            </thead>
+            <tbody id="custMatrixBody">
+              <tr>
+                <td colspan="14" style="padding: 30px; text-align: center; color: var(--text-muted);">Đang tải lưới lịch sân thời gian thực...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -1325,35 +1377,35 @@
             </thead>
             <tbody>
               <tr>
-                <td><strong>🌅 Khung Giờ Sáng</strong></td>
+                <td><strong> Khung Giờ Sáng</strong></td>
                 <td>06:00 - 10:00 (Thứ 2 - CN)</td>
                 <td><strong style="color: var(--primary);">80.000 đ/h</strong></td>
                 <td><strong style="color: #d97706;">110.000 đ/h</strong></td>
                 <td>Slot thoáng, phù hợp tập luyện thể lực</td>
               </tr>
               <tr>
-                <td><strong>☀️ Khung Giờ Thường (Trưa/Chiều)</strong></td>
+                <td><strong> Khung Giờ Thường (Trưa/Chiều)</strong></td>
                 <td>10:00 - 16:00 (Thứ 2 - Thứ 6)</td>
                 <td><strong style="color: var(--primary);">70.000 đ/h</strong></td>
                 <td><strong style="color: #d97706;">100.000 đ/h</strong></td>
                 <td>Ưu đãi giảm 10k cho học sinh / sinh viên</td>
               </tr>
               <tr>
-                <td><strong>🔥 KHUNG GIỜ VÀNG (Cao Điểm)</strong></td>
+                <td><strong> KHUNG GIỜ VÀNG (Cao Điểm)</strong></td>
                 <td>17:00 - 21:00 (Hàng ngày)</td>
                 <td><strong style="color: var(--primary);">90.000 đ/h</strong></td>
                 <td><strong style="color: #d97706;">120.000 đ/h</strong></td>
                 <td>Yêu cầu cọc 30% qua VietQR để giữ chỗ</td>
               </tr>
               <tr>
-                <td><strong>🌙 Khung Giờ Tối Muộn</strong></td>
+                <td><strong> Khung Giờ Tối Muộn</strong></td>
                 <td>21:00 - 22:30 (Hàng ngày)</td>
                 <td><strong style="color: var(--primary);">80.000 đ/h</strong></td>
                 <td><strong style="color: #d97706;">110.000 đ/h</strong></td>
                 <td>Phù hợp giao lưu sau giờ làm việc</td>
               </tr>
               <tr>
-                <td><strong>🎉 Thứ 7, Chủ Nhật & Lễ Tết</strong></td>
+                <td><strong> Thứ 7, Chủ Nhật & Lễ Tết</strong></td>
                 <td>Toàn bộ khung giờ</td>
                 <td>Phụ thu <strong>+10.000 đ/h</strong></td>
                 <td>Phụ thu <strong>+15.000 đ/h</strong></td>
@@ -1369,16 +1421,16 @@
         <div class="tournament-showcase-card">
           <div class="tournament-info-col">
             <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
-              🏆 GIẢI ĐẤU TOÀN CHUỖI MÙA THU 2026
+               GIẢI ĐẤU TOÀN CHUỖI MÙA THU 2026
             </span>
             <h3>Giải Cầu Lông Đôi Nam Nữ UTE Open 2026</h3>
             <p style="color: #cbd5e1; max-width: 650px; font-size: 13.5px; line-height: 1.6;">
               Quy tụ 32 cặp vận động viên phong trào xuất sắc nhất các câu lạc bộ tại TP. Hồ Chí Minh. Thi đấu theo thể thức loại trực tiếp 3 set 21 điểm tại Sân VIP 01 - 04 Chi nhánh Thủ Đức.
             </p>
             <div style="display: flex; gap: 24px; margin-top: 14px; font-size: 13px;">
-              <div>📅 <strong>Khai mạc:</strong> 15/10/2026</div>
-              <div>💰 <strong>Giải Nhất:</strong> 12.000.000 đ + Cúp vô địch</div>
-              <div>🎯 <strong>Lệ phí:</strong> 300.000 đ / cặp</div>
+              <div>Lịch: <strong>Khai mạc:</strong> 15/10/2026</div>
+              <div>Thưởng: <strong>Giải Nhất:</strong> 12.000.000 đ + Cúp vô địch</div>
+              <div>Phí: <strong>Lệ phí:</strong> 300.000 đ / cặp</div>
             </div>
           </div>
           <div>
@@ -1495,10 +1547,165 @@
     </div>
   </footer>
 
+  
+  <!-- TIME GRID MODAL: CHON GIO VA KHOA DUY NHAT 1 SAN / 1 GIO -->
+  <div class="slot-modal-overlay" id="courtTimeGridModal">
+    <div class="slot-modal-card">
+      <div class="slot-modal-header">
+        <div>
+          <div class="slot-modal-title" id="gridModalCourtTitle">Lưới Giờ Đặt Sân - Sân 01 (VIP Yonex)</div>
+          <div class="slot-modal-sub" id="gridModalBranchSub">Chi nhánh Thủ Đức • Chuẩn thi đấu BWF</div>
+        </div>
+        <button type="button" class="btn-icon" onclick="closeCourtTimeGridModal()" style="border: none; background: transparent; cursor: pointer; color: var(--text-muted); font-size: 20px;">✕</button>
+      </div>
+
+      <div class="slot-modal-body">
+        <!-- Date Navigator -->
+        <div class="slot-modal-date-row">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <label style="font-size: 13px; font-weight: 700; color: var(--text-dark);">Ngày đặt sân:</label>
+            <input type="date" id="modalBookingDate" class="form-control" style="width: auto; padding: 6px 12px; font-weight: 600;" onchange="fetchCourtSlots()">
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-outline" style="padding: 5px 12px; font-size: 12px;" onclick="setModalDate(0)">Hôm nay</button>
+            <button type="button" class="btn btn-outline" style="padding: 5px 12px; font-size: 12px;" onclick="setModalDate(1)">Ngày mai</button>
+            <button type="button" class="btn btn-outline" style="padding: 5px 12px; font-size: 12px;" onclick="setModalDate(2)">Ngày kia</button>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div style="display: flex; gap: 16px; margin-bottom: 16px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="width: 12px; height: 12px; border-radius: 3px; background: var(--surface); border: 1.5px solid var(--primary); display: inline-block;"></span>
+            <span>Slot trống khả dụng</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="width: 12px; height: 12px; border-radius: 3px; background: var(--primary); display: inline-block;"></span>
+            <span style="color: var(--primary); font-weight: 700;">Đang chọn</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="width: 12px; height: 12px; border-radius: 3px; background: var(--surface-subtle); border: 1px solid var(--border-subtle); display: inline-block;"></span>
+            <span>Đã có người đặt</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="background: rgba(245, 158, 11, 0.15); color: #d97706; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-size: 10.5px;">Giờ Vàng</span>
+            <span>17:00 - 21:00</span>
+          </div>
+        </div>
+
+        <!-- 12 HOURLY SLOTS GRID -->
+        <div class="slot-grid-layout" id="modalSlotsContainer">
+          <!-- Dynamically populated by JS -->
+        </div>
+
+        <!-- BOOKING CONFIRMATION BAR -->
+        <div style="background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 18px 20px; margin-bottom: 20px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;">
+            <div>
+              <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Khung giờ đã chọn:</label>
+              <div id="modalSelectedSlotSummary" style="font-size: 15px; font-weight: 800; color: var(--primary);">Vui lòng chọn 1 khung giờ phía trên</div>
+            </div>
+            <div style="text-align: right;">
+              <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Tiền cọc giữ chỗ (30%):</label>
+              <div id="modalDepositSummary" style="font-size: 17px; font-weight: 900; color: #d97706;">0 đ</div>
+              <div id="modalTotalSummary" style="font-size: 11.5px; color: var(--text-muted);">(Tổng giá thuê: 0 đ)</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div>
+              <label style="font-size: 12px; font-weight: 600; color: var(--text-dark); display: block; margin-bottom: 4px;">Họ tên người đặt (*):</label>
+              <input type="text" id="modalCustName" class="form-control" placeholder="vd: Nguyen Van A">
+            </div>
+            <div>
+              <label style="font-size: 12px; font-weight: 600; color: var(--text-dark); display: block; margin-bottom: 4px;">Số điện thoại (*):</label>
+              <input type="tel" id="modalCustPhone" class="form-control" placeholder="vd: 0903123456">
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+          <button type="button" class="btn btn-outline" onclick="closeCourtTimeGridModal()">Đóng</button>
+          <button type="button" class="btn btn-primary" id="btnConfirmLockSlot" onclick="submitSlotLock()" disabled style="padding: 11px 24px; font-size: 14px; font-weight: 700; border-radius: 10px;">
+            Khóa Sân & Lấy Mã VietQR
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIETQR DEPOSIT PAYMENT MODAL -->
+  <div class="slot-modal-overlay" id="vietqrPaymentModal">
+    <div class="vietqr-modal-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <span class="badge badge-green" style="font-size: 12px; padding: 4px 10px;">Khóa Giữ Chỗ Thành Công</span>
+        <button type="button" class="btn-icon" onclick="closeVietQrModal()" style="border: none; background: transparent; cursor: pointer; color: var(--text-muted); font-size: 18px;">✕</button>
+      </div>
+
+      <h3 style="margin: 0 0 6px; font-size: 20px; font-weight: 800; color: var(--text-dark);">Quét Mã VietQR Chuyển Khoản Cọc</h3>
+      <p style="font-size: 12.5px; color: var(--text-muted); margin: 0 0 14px;">Hệ thống đã khóa duy nhất slot này cho bạn trong <strong style="color: #ef4444;" id="vietqrTimer">10:00</strong>. Các slot khác và sân khác hoàn toàn không bị ảnh hưởng.</p>
+
+      <div class="vietqr-qr-frame">
+        <img id="vietqrImg" src="/images/vietqr-bank.png" alt="Mã VietQR Chuyển Khoản Cọc">
+      </div>
+
+      <div style="background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px 16px; text-align: left; font-size: 13px; margin-bottom: 18px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color: var(--text-muted);">Mã đơn đặt sân:</span>
+          <strong id="vqBookingCode" style="color: var(--primary); font-family: monospace; font-size: 14px;">DS000000</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color: var(--text-muted);">Số tiền cọc (30%):</span>
+          <strong id="vqDepositAmount" style="color: #d97706; font-size: 15px;">0 đ</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color: var(--text-muted);">Ngân hàng thụ hưởng:</span>
+          <strong id="vqBankName">MBBank</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color: var(--text-muted);">Số tài khoản:</span>
+          <strong id="vqAccountNo">0903123456</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-subtle); padding-top: 6px; margin-top: 6px;">
+          <span style="color: var(--text-muted);">Nội dung chuyển khoản:</span>
+          <span style="display: flex; align-items: center; gap: 6px;">
+            <strong id="vqContent" style="color: #ef4444; font-family: monospace;">CK DS000000</strong>
+            <button type="button" class="btn btn-outline" style="padding: 2px 7px; font-size: 11px;" onclick="copyVqContent()">Sao chép</button>
+          </span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeVietQrModal()">Đóng & Thanh Toán Sau</button>
+        <button type="button" class="btn btn-primary" style="flex: 1.3;" onclick="confirmPaymentDone()">
+          Tôi Đã Chuyển Khoản
+        </button>
+      </div>
+    </div>
+  </div>
+
+
   <!-- SCRIPT LOGIC -->
   <script src="/js/global-hub.js"></script>
   <script src="/js/auth-guard.js"></script>
   <script>
+    const TIME_SLOTS = [
+      '06:00 - 07:00', '07:00 - 08:00', '08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00',
+      '14:00 - 15:00', '15:00 - 16:00', '16:00 - 17:00', '17:00 - 18:00', '18:00 - 19:00',
+      '19:00 - 20:00', '20:00 - 21:00', '21:00 - 22:00'
+    ];
+
+    let currentModalCourt = {
+      courtCode: '',
+      courtName: '',
+      hourlyRate: 90000,
+      branchCode: 'CN01'
+    };
+    let currentSelectedSlot = null;
+    let currentBookedSlots = [];
+    let vietqrTimerInterval = null;
+
     // Tab switching for Customer Portal
     function switchCustomerTab(tabId, btn) {
       document.querySelectorAll('.dash-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1506,6 +1713,10 @@
       document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
       const target = document.getElementById(tabId);
       if (target) target.style.display = 'block';
+
+      if (tabId === 'tab-matrix') {
+        loadMatrixSchedule();
+      }
     }
 
     function scrollToConsole() {
@@ -1513,11 +1724,464 @@
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    // Set today date as default in hero finder
+    function onDashBranchChanged(branchCode) {
+      const heroSelect = document.getElementById('heroBranchSelect');
+      if (heroSelect) heroSelect.value = branchCode;
+      loadBranchCourts(branchCode);
+      const matrixTab = document.getElementById('tab-matrix');
+      if (matrixTab && matrixTab.style.display === 'block') {
+        loadMatrixSchedule();
+      }
+    }
+
+    function updateCourtsByBranch() {
+      const heroSelect = document.getElementById('heroBranchSelect');
+      const dashSelect = document.getElementById('dashBranchPicker');
+      if (heroSelect && dashSelect) {
+        dashSelect.value = heroSelect.value;
+        onDashBranchChanged(heroSelect.value);
+      }
+    }
+
+    // Helper: Slot Hour Overlap Checker
+    function isSlotOverlapping(s1, s2) {
+      if (!s1 || !s2) return false;
+      if (s1.trim().toLowerCase() === s2.trim().toLowerCase()) return true;
+      const parseHours = (slot) => {
+        const m = slot.match(/(\d{1,2}):\d{2}\s*-\s*(\d{1,2}):\d{2}/);
+        return m ? [parseInt(m[1]), parseInt(m[2])] : [0, 0];
+      };
+      const [start1, end1] = parseHours(s1);
+      const [start2, end2] = parseHours(s2);
+      return Math.max(start1, start2) < Math.min(end1, end2);
+    }
+
+    // Load all courts for a branch
+    async function loadBranchCourts(branchCode) {
+      const container = document.getElementById('courtsContainer');
+      if (!container) return;
+
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+          <div style="margin-bottom: 8px;">Đang tải danh sách sân ${branchCode}...</div>
+        </div>
+      `;
+
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const [courtsRes, slotsRes] = await Promise.all([
+          fetch(`/api/courts?branchCode=${branchCode}`).then(r => r.json()),
+          fetch(`/api/bookings/slots?branchCode=${branchCode}&date=${today}`).then(r => r.json())
+        ]);
+
+        const courts = courtsRes || [];
+        const booked = slotsRes || [];
+
+        if (courts.length === 0) {
+          container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">Không tìm thấy sân nào cho chi nhánh này.</div>`;
+          return;
+        }
+
+        const kpiEl = document.getElementById('kpiAvailableCourts');
+        if (kpiEl) {
+          kpiEl.innerText = `${courts.length} / ${courts.length} Sân Sẵn Sàng`;
+        }
+
+        let html = '';
+        courts.forEach(c => {
+          const isVip = (c.courtType && c.courtType.toLowerCase().includes('vip')) || (c.hourlyRate >= 110000);
+          const rateFormatted = (c.hourlyRate || 90000).toLocaleString('vi-VN');
+          const depositFormatted = Math.round((c.hourlyRate || 90000) * 0.3).toLocaleString('vi-VN');
+          const courtBookings = booked.filter(b => b.courtCode === c.courtCode);
+
+          // Get quick available slots count
+          const availableCount = TIME_SLOTS.filter(slot => !courtBookings.some(b => isSlotOverlapping(slot, b.timeSlot))).length;
+
+          html += `
+            <div class="court-display-card" data-branch="${c.branchCode}" data-code="${c.courtCode}">
+              <div class="court-card-thumb-wrap">
+                <img src="${c.imageUrl || '/images/badminton-court.jpg'}" alt="${c.courtName}">
+                <span class="court-thumb-badge ${isVip ? 'badge-vip' : 'badge-standard'}">
+                  ${isVip ? 'Sân VIP Yonex' : 'Sân Chuẩn Enlio'}
+                </span>
+                <div class="court-status-indicator">
+                  <span class="hero-pulse-dot"></span> ${availableCount} slot trống hôm nay
+                </div>
+              </div>
+              <div class="court-info-body">
+                <div class="court-name-row">
+                  <div class="court-item-title">${c.courtName}</div>
+                  <div class="court-mat-type">Mã: ${c.courtCode}</div>
+                </div>
+                <div class="court-amenities-tags">
+                  <span class="amenity-tag">${isVip ? 'Thảm Yonex BWF 5 lớp' : 'Thảm Enlio BWF'}</span>
+                  <span class="amenity-tag">Đèn LED 500 Lux</span>
+                  <span class="amenity-tag">Thông gió đối lưu</span>
+                </div>
+                <div class="court-price-row">
+                  <span class="price-big">${rateFormatted} đ</span>
+                  <span class="price-note">/ giờ (Cọc trước 30%: ${depositFormatted}đ)</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+                  Bấm để mở lưới chọn giờ. Khi đặt chỉ khóa đúng giờ được chọn, các giờ khác vẫn mở.
+                </div>
+              </div>
+              <div class="court-card-action">
+                <button type="button" class="btn-book-instant" onclick="openCourtTimeGridModal('${c.courtCode}', '${c.courtName}', ${c.hourlyRate || 90000}, '${c.branchCode}')">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  <span>Xem Lưới Giờ & Khóa Sân</span>
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      } catch (err) {
+        console.error('Error loading branch courts:', err);
+        container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #ef4444;">Lỗi kết nối máy chủ khi tải danh sách sân.</div>`;
+      }
+    }
+
+    // Load Live Schedule Matrix (Tab 1.5)
+    async function loadMatrixSchedule() {
+      const branchCode = document.getElementById('dashBranchPicker').value || 'CN01';
+      const dateInput = document.getElementById('matrixViewDate');
+      const date = dateInput && dateInput.value ? dateInput.value : new Date().toISOString().split('T')[0];
+      const tbody = document.getElementById('custMatrixBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = `<tr><td colspan="14" style="padding: 24px; text-align: center; color: var(--text-muted);">Đang cập nhật lịch sân cho ngày ${date}...</td></tr>`;
+
+      try {
+        const [courts, bookings] = await Promise.all([
+          fetch(`/api/courts?branchCode=${branchCode}`).then(r => r.json()),
+          fetch(`/api/bookings/slots?branchCode=${branchCode}&date=${date}`).then(r => r.json())
+        ]);
+
+        if (!courts || courts.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="14" style="padding: 24px; text-align: center;">Không có dữ liệu sân.</td></tr>`;
+          return;
+        }
+
+        let html = '';
+        courts.forEach(c => {
+          html += `<tr>`;
+          html += `<td class="cust-matrix-court-col"><strong>${c.courtName}</strong><div style="font-size: 11px; color: var(--text-muted);">${(c.hourlyRate || 90000).toLocaleString()} đ/h</div></td>`;
+
+          TIME_SLOTS.forEach(slot => {
+            const isBooked = bookings.some(b => b.courtCode === c.courtCode && isSlotOverlapping(slot, b.timeSlot));
+            if (isBooked) {
+              html += `<td><span class="matrix-cell-booked" title="Khung giờ đã có người đặt trước">Đã đặt</span></td>`;
+            } else {
+              html += `<td><span class="matrix-cell-free" onclick="openCourtTimeGridModal('${c.courtCode}', '${c.courtName}', ${c.hourlyRate || 90000}, '${c.branchCode}', '${slot}', '${date}')" title="Bấm để chọn và khóa slot này">Trống</span></td>`;
+            }
+          });
+
+          html += `</tr>`;
+        });
+
+        tbody.innerHTML = html;
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="14" style="padding: 24px; text-align: center; color: #ef4444;">Lỗi tải dữ liệu lưới lịch sân.</td></tr>`;
+      }
+    }
+
+    function setMatrixDateToday() {
+      const today = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('matrixViewDate');
+      if (dateInput) {
+        dateInput.value = today;
+        loadMatrixSchedule();
+      }
+    }
+
+    // Modal Control: Open Court Time Grid
+    function openCourtTimeGridModal(courtCode, courtName, rate, branchCode, preselectedSlot = null, preselectedDate = null) {
+      currentModalCourt = {
+        courtCode,
+        courtName,
+        hourlyRate: rate || 90000,
+        branchCode: branchCode || 'CN01'
+      };
+      currentSelectedSlot = null;
+
+      document.getElementById('gridModalCourtTitle').innerText = `Lưới Giờ Đặt Sân - ${courtName}`;
+      document.getElementById('gridModalBranchSub').innerText = `Chi nhánh ${branchCode} • Mã sân: ${courtCode}`;
+
+      const dateInput = document.getElementById('modalBookingDate');
+      if (dateInput) {
+        dateInput.value = preselectedDate || (document.getElementById('matrixViewDate')?.value || new Date().toISOString().split('T')[0]);
+      }
+
+      // Prefill user profile info if logged in
+      const rawUser = localStorage.getItem('utesport_user');
+      if (rawUser) {
+        try {
+          const u = JSON.parse(rawUser);
+          if (u.fullName) document.getElementById('modalCustName').value = u.fullName;
+          if (u.phone) document.getElementById('modalCustPhone').value = u.phone;
+        } catch(e) {}
+      } else {
+        if (!document.getElementById('modalCustName').value) {
+          document.getElementById('modalCustName').value = 'Khách đặt trực tuyến';
+        }
+        if (!document.getElementById('modalCustPhone').value) {
+          document.getElementById('modalCustPhone').value = '0903123456';
+        }
+      }
+
+      resetModalSummary();
+      const modal = document.getElementById('courtTimeGridModal');
+      if (modal) modal.classList.add('active');
+
+      fetchCourtSlots(preselectedSlot);
+    }
+
+    function closeCourtTimeGridModal() {
+      const modal = document.getElementById('courtTimeGridModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function setModalDate(offsetDays) {
+      const d = new Date();
+      d.setDate(d.getDate() + offsetDays);
+      const dateStr = d.toISOString().split('T')[0];
+      const dateInput = document.getElementById('modalBookingDate');
+      if (dateInput) {
+        dateInput.value = dateStr;
+        fetchCourtSlots();
+      }
+    }
+
+    async function fetchCourtSlots(autoSelectSlot = null) {
+      const container = document.getElementById('modalSlotsContainer');
+      const date = document.getElementById('modalBookingDate').value || new Date().toISOString().split('T')[0];
+      if (!container) return;
+
+      container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--text-muted);">Đang tải các slot của ngày ${date}...</div>`;
+      resetModalSummary();
+
+      try {
+        const res = await fetch(`/api/bookings/slots?branchCode=${currentModalCourt.branchCode}&courtCode=${currentModalCourt.courtCode}&date=${date}`);
+        const bookings = await res.json() || [];
+        currentBookedSlots = bookings;
+
+        let html = '';
+        TIME_SLOTS.forEach(slot => {
+          const isBooked = bookings.some(b => isSlotOverlapping(slot, b.timeSlot));
+          const startHour = parseInt(slot.split(':')[0]);
+          const isPeak = startHour >= 17 && startHour < 21;
+          const rate = isPeak ? Math.round(currentModalCourt.hourlyRate * 1.25) : currentModalCourt.hourlyRate;
+
+          if (isBooked) {
+            html += `
+              <div class="slot-cell slot-cell-disabled" title="Khung giờ này đã có người đặt trước">
+                <span class="slot-time-text">${slot}</span>
+                <span class="slot-status-pill pill-booked">Đã Đặt</span>
+                <span class="slot-price-text">Khóa</span>
+              </div>
+            `;
+          } else {
+            const isAutoSelect = autoSelectSlot && autoSelectSlot === slot;
+            html += `
+              <div class="slot-cell ${isAutoSelect ? 'slot-cell-selected' : ''}" id="slotCell_${startHour}" onclick="selectModalSlot('${slot}', ${rate}, this)">
+                ${isPeak ? '<span class="slot-peak-tag">Giờ Vàng</span>' : ''}
+                <span class="slot-time-text">${slot}</span>
+                <span class="slot-status-pill pill-free">Trống</span>
+                <span class="slot-price-text">${rate.toLocaleString()} đ</span>
+              </div>
+            `;
+          }
+        });
+
+        container.innerHTML = html;
+
+        if (autoSelectSlot) {
+          const startHour = parseInt(autoSelectSlot.split(':')[0]);
+          const isPeak = startHour >= 17 && startHour < 21;
+          const rate = isPeak ? Math.round(currentModalCourt.hourlyRate * 1.25) : currentModalCourt.hourlyRate;
+          const cell = document.getElementById(`slotCell_${startHour}`);
+          if (cell) selectModalSlot(autoSelectSlot, rate, cell);
+        }
+      } catch (err) {
+        container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #ef4444;">Lỗi khi tải danh sách slot.</div>`;
+      }
+    }
+
+    function selectModalSlot(slotTime, price, cellEl) {
+      document.querySelectorAll('#modalSlotsContainer .slot-cell').forEach(c => c.classList.remove('slot-cell-selected'));
+      if (cellEl) cellEl.classList.add('slot-cell-selected');
+
+      currentSelectedSlot = {
+        timeSlot: slotTime,
+        price: price,
+        deposit: Math.round(price * 0.3)
+      };
+
+      const dateStr = document.getElementById('modalBookingDate').value;
+      document.getElementById('modalSelectedSlotSummary').innerText = `${currentModalCourt.courtName} • ${slotTime} (${dateStr})`;
+      document.getElementById('modalDepositSummary').innerText = `${currentSelectedSlot.deposit.toLocaleString('vi-VN')} đ`;
+      document.getElementById('modalTotalSummary').innerText = `(Tổng giá thuê: ${currentSelectedSlot.price.toLocaleString('vi-VN')} đ)`;
+
+      const btnLock = document.getElementById('btnConfirmLockSlot');
+      if (btnLock) btnLock.disabled = false;
+    }
+
+    function resetModalSummary() {
+      currentSelectedSlot = null;
+      document.getElementById('modalSelectedSlotSummary').innerText = 'Vui lòng chọn 1 khung giờ phía trên';
+      document.getElementById('modalDepositSummary').innerText = '0 đ';
+      document.getElementById('modalTotalSummary').innerText = '(Tổng giá thuê: 0 đ)';
+      const btnLock = document.getElementById('btnConfirmLockSlot');
+      if (btnLock) btnLock.disabled = true;
+    }
+
+    // Submit Slot-Level Locking: ONLY locks this specific slot & court
+    async function submitSlotLock() {
+      if (!currentSelectedSlot) {
+        showToast('Vui lòng chọn khung giờ muốn đặt!', 'warning');
+        return;
+      }
+
+      const custName = document.getElementById('modalCustName').value.trim();
+      const custPhone = document.getElementById('modalCustPhone').value.trim();
+      const bookingDate = document.getElementById('modalBookingDate').value;
+
+      if (!custName || !custPhone) {
+        showToast('Vui lòng nhập họ tên và số điện thoại người đặt!', 'warning');
+        return;
+      }
+
+      const btnLock = document.getElementById('btnConfirmLockSlot');
+      btnLock.disabled = true;
+      btnLock.innerText = 'Đang xử lý khóa slot...';
+
+      try {
+        const payload = {
+          courtCode: currentModalCourt.courtCode,
+          branchCode: currentModalCourt.branchCode,
+          date: bookingDate,
+          timeSlot: currentSelectedSlot.timeSlot,
+          customerName: custName,
+          customerPhone: custPhone
+        };
+
+        const res = await fetch('/api/bookings/slot-lock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          showToast(`Khóa thành công sân ${data.courtName} khung giờ ${data.timeSlot}!`, 'success');
+          closeCourtTimeGridModal();
+          openVietQrModal(data);
+          // Refresh background lists
+          loadBranchCourts(currentModalCourt.branchCode);
+          loadMatrixSchedule();
+        } else {
+          showToast(data.message || 'Không thể khóa slot này. Vui lòng thử lại!', 'error');
+          btnLock.disabled = false;
+          btnLock.innerText = 'Khóa Sân & Lấy Mã VietQR';
+        }
+      } catch (err) {
+        console.error('Lock error:', err);
+        showToast('Lỗi kết nối máy chủ khi khóa slot!', 'error');
+        btnLock.disabled = false;
+        btnLock.innerText = 'Khóa Sân & Lấy Mã VietQR';
+      }
+    }
+
+    // VietQR Modal Control
+    function openVietQrModal(data) {
+      document.getElementById('vqBookingCode').innerText = data.bookingCode;
+      document.getElementById('vqDepositAmount').innerText = (data.depositAmount || 0).toLocaleString('vi-VN') + ' đ';
+      document.getElementById('vqBankName').innerText = data.bankName || 'MBBank';
+      document.getElementById('vqAccountNo').innerText = data.accountNo || '0903123456';
+      document.getElementById('vqContent').innerText = `CK ${data.bookingCode}`;
+
+      const qrImg = document.getElementById('vietqrImg');
+      if (qrImg) {
+        qrImg.src = data.qrUrl || `https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=${data.depositAmount}&addInfo=CK%20${data.bookingCode}&accountName=UTE%20BADMINTON%20CLUB`;
+      }
+
+      // Start 10 minute countdown timer
+      startVietQrTimer(600);
+
+      const modal = document.getElementById('vietqrPaymentModal');
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeVietQrModal() {
+      if (vietqrTimerInterval) clearInterval(vietqrTimerInterval);
+      const modal = document.getElementById('vietqrPaymentModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function startVietQrTimer(seconds) {
+      if (vietqrTimerInterval) clearInterval(vietqrTimerInterval);
+      let remain = seconds;
+      const timerEl = document.getElementById('vietqrTimer');
+
+      vietqrTimerInterval = setInterval(() => {
+        remain--;
+        if (remain <= 0) {
+          clearInterval(vietqrTimerInterval);
+          if (timerEl) timerEl.innerText = '00:00 (Hết hạn)';
+        } else {
+          const m = String(Math.floor(remain / 60)).padStart(2, '0');
+          const s = String(remain % 60).padStart(2, '0');
+          if (timerEl) timerEl.innerText = `${m}:${s}`;
+        }
+      }, 1000);
+    }
+
+    function copyVqContent() {
+      const code = document.getElementById('vqContent').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast(`Đã sao chép nội dung: ${code}`, 'success');
+      }).catch(() => {
+        showToast(`Nội dung chuyển khoản: ${code}`, 'info');
+      });
+    }
+
+    async function confirmPaymentDone() {
+      const bookingCode = document.getElementById('vqBookingCode').innerText;
+      showToast('Đang kiểm tra giao dịch chuyển khoản VietQR...', 'info');
+
+      try {
+        // Trigger simulated or webhook confirmation
+        await fetch('/api/webhook/vietqr', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: `CK ${bookingCode}`, amount: 30000 })
+        });
+
+        setTimeout(() => {
+          showToast(`Đã ghi nhận tiền cọc cho đơn ${bookingCode}! Vé đặt sân đã sẵn sàng.`, 'success');
+          closeVietQrModal();
+          // Prompt user to view tickets
+          setTimeout(() => {
+            if (confirm('Đặt sân và cọc thành công! Bạn có muốn mở trang Lịch Sử & Vé Check-in QR không?')) {
+              window.location.href = '/customer/history';
+            }
+          }, 800);
+        }, 1200);
+      } catch (e) {
+        closeVietQrModal();
+      }
+    }
+
+    // Initialize on DOM Ready
     document.addEventListener('DOMContentLoaded', () => {
       const today = new Date().toISOString().split('T')[0];
       const dateInput = document.getElementById('heroBookingDate');
       if (dateInput) dateInput.value = today;
+
+      const matrixDateInput = document.getElementById('matrixViewDate');
+      if (matrixDateInput) matrixDateInput.value = today;
 
       // Update Nav User Widget if logged in
       const rawUser = localStorage.getItem('utesport_user');
@@ -1544,6 +2208,9 @@
           }
         } catch(e) {}
       }
+
+      // Initial court load for CN01
+      loadBranchCourts('CN01');
     });
 
     function handleQuickSearch(e) {
@@ -1553,26 +2220,21 @@
       const time = document.getElementById('heroTimeSelect').value;
       const type = document.getElementById('heroCourtType').value;
 
-      showToast(`Đang tìm kiếm sân trống cho ngày ${date}...`, 'info');
-      setTimeout(() => {
-        window.location.href = `/customer/booking?branch=${branch}&date=${date}&time=${time}&type=${type}`;
-      }, 700);
-    }
+      showToast(`Đang mở lưới giờ cho chi nhánh ${branch}...`, 'info');
+      // Switch to matrix tab directly on home page
+      const dashSelect = document.getElementById('dashBranchPicker');
+      if (dashSelect) dashSelect.value = branch;
+      onDashBranchChanged(branch);
+      const matrixDate = document.getElementById('matrixViewDate');
+      if (matrixDate && date) matrixDate.value = date;
 
-    function filterBranchDisplay(branchCode) {
-      const cards = document.querySelectorAll('.court-display-card');
-      let count = 0;
-      cards.forEach(c => {
-        if (branchCode === 'ALL' || c.dataset.branch === branchCode) {
-          c.style.display = 'flex';
-          count++;
-        } else {
-          c.style.display = 'none';
-        }
-      });
-      document.getElementById('kpiAvailableCourts').innerText = `${count} / 26 Sân`;
-      showToast(`Đã lọc danh sách theo ${branchCode}!`, 'info');
+      const matrixTabBtn = document.querySelectorAll('.dash-tab-btn')[1];
+      if (matrixTabBtn) switchCustomerTab('tab-matrix', matrixTabBtn);
+
+      const sectionCard = document.querySelector('.dash-section-card');
+      if (sectionCard) sectionCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   </script>
+
 </body>
 </html>

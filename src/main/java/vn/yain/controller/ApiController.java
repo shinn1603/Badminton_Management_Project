@@ -12,7 +12,12 @@ import vn.yain.service.CourtService;
 import vn.yain.service.UserService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @RestController
 @RequestMapping("/api")
@@ -42,6 +47,9 @@ public class ApiController {
 
     @Autowired
     private EquipmentRepository equipmentRepository;
+
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -213,6 +221,178 @@ public class ApiController {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
     }
+
+    @GetMapping("/bookings/slots")
+    public ResponseEntity<?> getBookedSlots(
+            @RequestParam String branchCode,
+            @RequestParam(required = false) String courtCode,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        LocalDate targetDate = date != null ? date : LocalDate.now();
+        List<Booking> bookings;
+        if (courtCode != null && !courtCode.trim().isEmpty()) {
+            bookings = bookingRepository.findByCourtCodeAndBookingDate(courtCode.trim(), targetDate);
+        } else {
+            bookings = bookingRepository.findByBranchCodeAndBookingDate(branchCode.trim(), targetDate);
+        }
+
+        List<Map<String, Object>> activeSlots = bookings.stream()
+                .filter(b -> b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus()))
+                .map(b -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("bookingCode", b.getBookingCode());
+                    map.put("courtCode", b.getCourtCode());
+                    map.put("branchCode", b.getBranchCode());
+                    map.put("timeSlot", b.getTimeSlot());
+                    map.put("status", b.getStatus());
+                    map.put("customerName", b.getCustomerName());
+                    return map;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(activeSlots);
+    }
+
+    @PostMapping("/bookings/slot-lock")
+    public ResponseEntity<?> lockSlotBooking(@RequestBody Map<String, Object> payload) {
+        try {
+            String courtCode = (String) payload.get("courtCode");
+            String branchCode = (String) payload.get("branchCode");
+            String dateStr = (String) payload.get("date");
+            String timeSlot = (String) payload.get("timeSlot");
+            String customerName = (String) payload.getOrDefault("customerName", "Khách đặt trực tuyến");
+            String customerPhone = (String) payload.getOrDefault("customerPhone", "0903123456");
+
+            LocalDate bookingDate = (dateStr != null && !dateStr.trim().isEmpty())
+                    ? LocalDate.parse(dateStr.trim())
+                    : LocalDate.now();
+
+            // Validate that the slot is not already booked (including multi-hour overlaps)
+            List<Booking> existing = bookingRepository.findByCourtCodeAndBookingDate(courtCode, bookingDate);
+            boolean alreadyBooked = existing.stream()
+                    .anyMatch(b -> b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus()) && isSlotOverlapping(timeSlot, b.getTimeSlot()));
+            if (alreadyBooked) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Khung giờ " + timeSlot + " của sân này đã có người đặt trước!"));
+            }
+
+            // Duration and pricing
+            int duration = 1;
+            Pattern p = Pattern.compile("(\\d{2}):00\\s*-\\s*(\\d{2}):00");
+            Matcher m = p.matcher(timeSlot);
+            int startHour = 18;
+            if (m.find()) {
+                startHour = Integer.parseInt(m.group(1));
+                int endHour = Integer.parseInt(m.group(2));
+                duration = Math.max(1, endHour - startHour);
+            }
+
+            // Hourly rate check from court or default
+            BigDecimal hourlyRate = (startHour >= 17 && startHour < 21) ? new BigDecimal("140000") : new BigDecimal("90000");
+            Optional<Court> courtOpt = courtRepository.findByCourtCode(courtCode);
+            if (courtOpt.isPresent() && courtOpt.get().getHourlyRate() != null) {
+                hourlyRate = courtOpt.get().getHourlyRate();
+                if (startHour >= 17 && startHour < 21) {
+                    hourlyRate = hourlyRate.multiply(new BigDecimal("1.25")); // peak hour boost
+                }
+            }
+
+            BigDecimal totalPrice = hourlyRate.multiply(new BigDecimal(duration));
+            BigDecimal deposit = totalPrice.multiply(new BigDecimal("0.3"));
+
+            String bookingCode = "DS" + (100000 + (int) (Math.random() * 900000));
+            Booking booking = new Booking();
+            booking.setBookingCode(bookingCode);
+            booking.setBranchCode(branchCode);
+            booking.setCourtCode(courtCode);
+            booking.setCustomerName(customerName);
+            booking.setCustomerPhone(customerPhone);
+            booking.setBookingDate(bookingDate);
+            booking.setTimeSlot(timeSlot);
+            booking.setHourlyPrice(hourlyRate);
+            booking.setTotalPrice(totalPrice);
+            booking.setDepositAmount(deposit);
+            booking.setPaymentMethod("Chuyển khoản VietQR");
+            booking.setStatus("Chờ cọc 30%");
+            booking.setNotes("Đặt qua Lưới giờ Sân trực tuyến");
+
+            Booking saved = bookingRepository.save(booking);
+
+            // Dynamic VietQR payment URL (MBBank)
+            String qrUrl = String.format(
+                    "https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=%d&addInfo=CK%%20%s&accountName=UTE%%20BADMINTON%%20CLUB",
+                    deposit.longValue(), bookingCode
+            );
+
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("success", true);
+            resp.put("bookingCode", bookingCode);
+            resp.put("courtCode", courtCode);
+            resp.put("courtName", courtOpt.isPresent() ? courtOpt.get().getCourtName() : courtCode);
+            resp.put("branchCode", branchCode);
+            resp.put("date", bookingDate.toString());
+            resp.put("timeSlot", timeSlot);
+            resp.put("totalPrice", totalPrice);
+            resp.put("depositAmount", deposit);
+            resp.put("qrUrl", qrUrl);
+            resp.put("bankName", "MBBank (Ngân hàng Quân Đội)");
+            resp.put("accountNo", "0903123456");
+            resp.put("accountName", "UTE BADMINTON CLUB");
+
+            return ResponseEntity.ok(resp);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    // ==========================================
+    // 3.5. WEBHOOK VIETQR / SEPAY / CASSO
+    // ==========================================
+
+    @PostMapping("/webhook/vietqr")
+    public ResponseEntity<?> handleVietQRWebhook(@RequestBody Map<String, Object> webhookData) {
+        try {
+            String content = (String) webhookData.getOrDefault("content", "");
+            if (content == null || content.isEmpty()) {
+                content = (String) webhookData.getOrDefault("description", "");
+            }
+            if (content == null) content = "";
+
+            Pattern p = Pattern.compile("DS\\d{6}", Pattern.CASE_INSENSITIVE);
+            Matcher m = p.matcher(content);
+            if (m.find()) {
+                String bookingCode = m.group(0).toUpperCase();
+                Optional<Booking> opt = bookingRepository.findByBookingCode(bookingCode);
+                if (opt.isPresent()) {
+                    Booking b = opt.get();
+                    b.setStatus("Đã cọc 30%");
+                    bookingRepository.save(b);
+                    return ResponseEntity.ok(Map.of("success", true, "message", "Auto-confirmed deposit for " + bookingCode));
+                }
+            }
+            return ResponseEntity.ok(Map.of("success", true, "message", "Webhook received successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(Map.of("success", false, "error", e.getMessage()));
+    }
+
+    private boolean isSlotOverlapping(String s1, String s2) {
+        if (s1 == null || s2 == null) return false;
+        if (s1.trim().equalsIgnoreCase(s2.trim())) return true;
+        try {
+            int[] r1 = parseSlotHours(s1);
+            int[] r2 = parseSlotHours(s2);
+            return Math.max(r1[0], r2[0]) < Math.min(r1[1], r2[1]);
+        } catch (Exception e) {
+            return s1.trim().equalsIgnoreCase(s2.trim());
+        }
+    }
+
+    private int[] parseSlotHours(String slot) {
+        Pattern p = Pattern.compile("(\\d{1,2}):\\d{2}\\s*-\\s*(\\d{1,2}):\\d{2}");
+        Matcher m = p.matcher(slot);
+        if (m.find()) {
+            return new int[]{Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2))};
+        }
+        return new int[]{0, 0};
+    }
+
 
     // ==========================================
     // 4. PRODUCTS, BRANCHES, INVOICES, TOURNAMENTS

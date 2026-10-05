@@ -254,16 +254,170 @@
     @media (max-width: 768px) {
       .b-card-body { grid-template-columns: 1fr; }
     }
+  
+    /* LUXURY TOP NAVBAR & FOOTER STYLES */
+    .cust-navbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .cust-nav-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cust-brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-dark);
+    }
+    .cust-logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+    }
+    .cust-brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: var(--text-dark);
+      line-height: 1.2;
+    }
+    .cust-brand-sub {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .cust-nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .cust-nav-link {
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+      position: relative;
+      padding: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cust-nav-link:hover, .cust-nav-link.active {
+      color: var(--primary);
+    }
+    .cust-nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    }
+    .cust-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    @media (max-width: 768px) {
+      .cust-nav-menu { display: none; }
+    }
+
+    /* LUXURY FOOTER */
+    .cust-footer-dark {
+      background: #061813;
+      color: #94a3b8;
+      padding: 56px 24px 28px;
+      border-top: 1px solid rgba(16, 185, 129, 0.2);
+      font-size: 13px;
+      margin-top: 60px;
+    }
+    .cust-footer-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    @media (max-width: 1100px) {
+      .cust-footer-inner { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .cust-footer-inner { grid-template-columns: 1fr; }
+    }
+    .footer-col-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 18px;
+    }
+    .footer-links-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-links-list a {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+    .footer-links-list a:hover {
+      color: #10b981;
+    }
+    .footer-bottom-bar {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
   </style>
 </head>
 <body>
 
   <!-- Customer Header -->
-  <header class="cust-header">
-    <div class="cust-nav-container">
-      <a href="/customer/home" class="cust-brand">
-        <div class="cust-brand-logo">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; stroke: #ffffff;">
+    <!-- 1. TOP NAVBAR -->
+  <header class="cust-navbar">
+    <div class="cust-nav-inner">
+      <a href="/customer/home" class="cust-brand-wrap">
+        <div class="cust-logo-icon">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 22px; height: 22px; stroke-width: 2.2;">
             <circle cx="12" cy="12" r="10"></circle>
             <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
             <path d="M2 12h20"></path>
@@ -271,22 +425,54 @@
         </div>
         <div>
           <div class="cust-brand-title">UTE SPORT</div>
-          <div class="cust-brand-sub">Đặt Sân &amp; Khách Hàng</div>
+          <div class="cust-brand-sub">Hệ Thống Đặt Sân Cầu Lông Quốc Tế</div>
         </div>
       </a>
 
-      <nav class="cust-nav-links">
-        <a href="/customer/home" class="cust-nav-item">Trang Chủ & Bảng Giá</a>
-        <a href="/customer/booking" class="cust-nav-item">Đặt Sân Giữ Chỗ</a>
-        <a href="/customer/tournaments" class="cust-nav-item">Giải Đấu Phong Trào</a>
-        <a href="/customer/history" class="cust-nav-item active">Lịch Sử & Check-in QR</a>
-        <a href="/customer/profile" class="cust-nav-item">Hội Viên & Tích Điểm</a>
+      <nav class="cust-nav-menu">
+        <a href="/customer/home" class="cust-nav-link">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+          Trang Chủ & Tổng Quan
+        </a>
+        <a href="/customer/booking" class="cust-nav-link">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          Đặt Sân Giữ Chỗ
+        </a>
+        <a href="/customer/tournaments" class="cust-nav-link">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+          Giải Đấu UTE Open
+        </a>
+        <a href="/customer/history" class="cust-nav-link active">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Lịch Sử & Check-in QR
+        </a>
+        <a href="/customer/profile" class="cust-nav-link">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Thẻ Hội Viên VIP
+        </a>
       </nav>
 
-      <div>
-        <a href="/customer/booking" class="btn btn-primary" style="border-radius: 6px; height: 36px; font-size: 12.5px;">
-          + Đặt Thêm Sân Mới
-        </a>
+      <div class="cust-nav-actions">
+        <!-- THEME TOGGLE BUTTON -->
+        <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Đổi giao diện Sáng / Tối" style="padding: 8px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--text-dark); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;">
+          <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+          </svg>
+        </button>
+
+        <!-- DYNAMIC USER AUTH WIDGET -->
+        <div id="navUserArea">
+          <a href="/customer/auth" class="btn btn-primary" id="btnNavAuth" style="padding: 9px 18px; border-radius: 8px; font-size: 13.5px; font-weight: 600;">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            Đăng Nhập / Đăng Ký
+          </a>
+        </div>
       </div>
     </div>
   </header>
@@ -329,9 +515,9 @@
         <div>
           <div class="b-info-title">Sân Số 01 (Thảm Enlio BWF)</div>
           <div class="b-info-sub">
-            <span>📍 Chi nhánh 1 - Võ Văn Ngân, P. Linh Chiểu, TP. Thủ Đức</span>
-            <span>📅 Ngày chơi: <strong>22/09/2026</strong> | ⏰ Khung giờ: <strong>17:00 - 19:00 (2 giờ)</strong></span>
-            <span>🏸 Kèm theo: Ống cầu lông thi đấu Yonex (3 quả) + 2 chai Pocari</span>
+            <span> Chi nhánh 1 - Võ Văn Ngân, P. Linh Chiểu, TP. Thủ Đức</span>
+            <span> Ngày chơi: <strong>22/09/2026</strong> | ⏰ Khung giờ: <strong>17:00 - 19:00 (2 giờ)</strong></span>
+            <span> Kèm theo: Ống cầu lông thi đấu Yonex (3 quả) + 2 chai Pocari</span>
           </div>
         </div>
 
@@ -366,8 +552,8 @@
         <div>
           <div class="b-info-title">Sân Số 03 - VIP Thảm Đỏ Yonex</div>
           <div class="b-info-sub">
-            <span>📍 Chi nhánh 1 - Võ Văn Ngân, TP. Thủ Đức</span>
-            <span>📅 Ngày chơi: 20/09/2026 | ⏰ 19:00 - 21:00 (2 giờ)</span>
+            <span> Chi nhánh 1 - Võ Văn Ngân, TP. Thủ Đức</span>
+            <span> Ngày chơi: 20/09/2026 | ⏰ 19:00 - 21:00 (2 giờ)</span>
             <span>⭐ Đã tích lũy: <strong>+350 điểm</strong> vào Thẻ Vàng</span>
           </div>
         </div>
@@ -402,8 +588,8 @@
         <div>
           <div class="b-info-title">Sân Số 02 (Thảm Enlio)</div>
           <div class="b-info-sub">
-            <span>📍 Chi nhánh 2 - Lê Văn Việt, Quận 9</span>
-            <span>📅 Ngày chơi: 15/09/2026 | ⏰ 18:00 - 19:00</span>
+            <span> Chi nhánh 2 - Lê Văn Việt, Quận 9</span>
+            <span> Ngày chơi: 15/09/2026 | ⏰ 18:00 - 19:00</span>
             <span style="color: #059669;">✅ Đã hoàn 100% cọc (72.000đ) vì hủy trước 5 tiếng</span>
           </div>
         </div>
@@ -576,7 +762,102 @@
       closeModals();
     }
   </script>
+  
+  <footer class="cust-footer-dark">
+    <div class="cust-footer-inner">
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+          <div class="cust-logo-icon" style="width: 38px; height: 38px;">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+          </div>
+          <span style="font-size: 18px; font-weight: 900; color: #ffffff;">UTE SPORT ARENA</span>
+        </div>
+        <p style="line-height: 1.6; margin-bottom: 18px;">
+          Hệ thống chuỗi sân cầu lông tiêu chuẩn quốc tế BWF. Tiên phong ứng dụng công nghệ khóa giữ chỗ thời gian thực, đối soát thanh toán tự động VietQR và dịch vụ chăm sóc người chơi hàng đầu.
+        </p>
+        <div>
+          <span style="color: #6ee7b7; font-weight: 700;">Hotline Đặt Sân:</span>
+          <strong style="color: #ffffff; font-size: 15px;"> 1900 6868 - 028 3722 1223</strong>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Chi Nhánh Sân Cầu Lông</div>
+        <ul class="footer-links-list">
+          <li>• CN 1: Võ Văn Ngân, TP. Thủ Đức</li>
+          <li>• CN 2: Nguyễn Thị Thập, Quận 7</li>
+          <li>• CN 3: Điện Biên Phủ, Bình Thạnh</li>
+          <li>• CN 4: Quang Trung, Gò Vấp</li>
+          <li>• Giờ mở cửa: <strong>05:30 - 22:30</strong> (Thứ 2 - CN)</li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Dịch Vụ & Hội Viên</div>
+        <ul class="footer-links-list">
+          <li><a href="/customer/booking">Đặt Sân Trực Tuyến</a></li>
+          <li><a href="/customer/tournaments">Đăng Ký Giải Đấu UTE</a></li>
+          <li><a href="/customer/profile">Tích Điểm Thẻ Hội Viên</a></li>
+          <li><a href="/customer/history">Tra Cứu Lịch Sử & Check-in</a></li>
+          <li><a href="#">Chính Sách Hoàn Cọc 100%</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Hệ Thống & Quản Trị</div>
+        <ul class="footer-links-list">
+          <li><a href="/login">Đăng Nhập Cán Bộ & Nhân Viên</a></li>
+          <li><a href="/pos/grid">Giao Diện Thu Ngân POS</a></li>
+          <li><a href="/manager/dashboard">Dashboard Quản Lý Chi Nhánh</a></li>
+          <li><a href="/director/dashboard">Dashboard Điều Hành Chuỗi</a></li>
+          <li><a href="/admin/users">Quản Trị Người Dùng & Phân Quyền</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-bar">
+      <div>
+        © 2026 <strong>UTE Sport Badminton Management System</strong> • Nhóm 11 (Thọ - Bảo - Tâm - Hương)
+      </div>
+      <div style="display: flex; gap: 20px;">
+        <span>Tiêu chuẩn thảm thi đấu BWF</span>
+        <span>Thanh toán VietQR tự động</span>
+        <span>Hỗ trợ kỹ thuật 24/7</span>
+      </div>
+    </div>
+  </footer>
+
   <script src="/js/global-hub.js"></script>
+  <script>
+    // Sync Nav User Profile
+    document.addEventListener('DOMContentLoaded', () => {
+      const rawUser = localStorage.getItem('utesport_user');
+      if (rawUser) {
+        try {
+          const user = JSON.parse(rawUser);
+          if (user && user.fullName) {
+            const userArea = document.getElementById('navUserArea');
+            if (userArea) {
+              userArea.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <a href="/customer/profile" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px var(--primary-glow);">
+                      ${user.fullName.substring(0, 2).toUpperCase()}
+                    </div>
+                    <div style="text-align: left;">
+                      <div style="font-size: 13px; font-weight: 700; color: var(--text-dark);">${user.fullName}</div>
+                      <div style="font-size: 11px; color: var(--primary); font-weight: 600;">Hội Viên VIP</div>
+                    </div>
+                  </a>
+                </div>
+              `;
+            }
+          }
+        } catch(e) {}
+      }
+    });
+
+  </script>
 </body>
 </html>
 
