@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đặt Sân Cầu Lông & Giữ Chỗ Tạm Thời - UTE Badminton</title>
+  <title>Đặt Sân Cầu Lông & Khóa Slot Thời Gian Thực - UTE Badminton</title>
   <link rel="stylesheet" href="/css/main.css">
   <style>
     :root {
@@ -14,9 +14,6 @@
       --cust-primary-hover: var(--primary-hover);
       --cust-primary-light: var(--primary-light);
       --cust-primary-border: var(--primary-border);
-      --cust-accent: var(--accent);
-      --cust-accent-light: var(--accent-light);
-      --cust-accent-border: var(--accent-border);
       --cust-text-main: var(--text-dark);
       --cust-text-body: var(--text-body);
       --cust-text-muted: var(--text-muted);
@@ -30,346 +27,6 @@
       padding: 0;
     }
 
-    /* Common Header */
-    .cust-header {
-      background: #ffffff;
-      border-bottom: 1px solid var(--cust-border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-    }
-    .cust-nav-container {
-      max-width: 1240px;
-      margin: 0 auto;
-      padding: 0 24px;
-      height: 68px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .cust-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: var(--cust-text-main);
-    }
-    .cust-brand-logo {
-      width: 40px;
-      height: 40px;
-      background: var(--cust-primary);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-      box-shadow: 0 2px 6px rgba(13, 148, 136, 0.2);
-    }
-    .cust-brand-title {
-      font-size: 16.5px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-    }
-    .cust-brand-sub {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--cust-primary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .cust-nav-links {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-    }
-    .cust-nav-item {
-      text-decoration: none;
-      font-size: 13.5px;
-      font-weight: 500;
-      color: var(--cust-text-muted);
-      transition: all 0.15s ease;
-      position: relative;
-      padding: 8px 0;
-    }
-    .cust-nav-item:hover { color: var(--cust-text-main); }
-    .cust-nav-item.active {
-      color: var(--cust-primary);
-      font-weight: 600;
-    }
-    .cust-nav-item.active::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--cust-primary);
-      border-radius: 2px;
-    }
-
-    /* Booking Layout */
-    .booking-wrapper {
-      max-width: 1240px;
-      margin: 28px auto 60px;
-      padding: 0 24px;
-      display: grid;
-      grid-template-columns: 1fr 370px;
-      gap: 24px;
-      align-items: start;
-    }
-
-    /* Clean Lock Timer Banner */
-    .lock-timer-banner {
-      background: #fffbeb;
-      border: 1px solid #fde68a;
-      border-radius: 8px;
-      padding: 12px 18px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-    }
-    .lock-timer-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .lock-timer-digit {
-      font-family: monospace;
-      font-size: 18px;
-      font-weight: 800;
-      color: #b45309;
-      background: #fef3c7;
-      padding: 4px 10px;
-      border-radius: 6px;
-      letter-spacing: 1px;
-    }
-
-    /* Section Cards */
-    .section-card {
-      background: #ffffff;
-      border: 1px solid var(--cust-border);
-      border-radius: 10px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-    .card-header {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--cust-border);
-      background: #fafafa;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .card-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--cust-text-main);
-    }
-    .card-body {
-      padding: 18px;
-    }
-
-    /* Court Chips */
-    .court-select-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 10px;
-    }
-    .court-chip-btn {
-      background: #ffffff;
-      border: 1px solid var(--cust-border);
-      border-radius: 8px;
-      padding: 10px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .court-chip-btn:hover { border-color: var(--cust-primary); }
-    .court-chip-btn.selected {
-      background: var(--cust-primary-light);
-      border-color: var(--cust-primary);
-      box-shadow: 0 0 0 1px var(--cust-primary);
-    }
-    .court-chip-name {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--cust-text-main);
-    }
-    .court-chip-badge {
-      font-size: 10.5px;
-      color: var(--cust-text-muted);
-      margin-top: 2px;
-    }
-
-    /* Time slots matrix */
-    .slots-picker-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 8px;
-    }
-    .slot-cell {
-      background: #ffffff;
-      border: 1px solid var(--cust-border);
-      border-radius: 6px;
-      padding: 9px 8px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .slot-cell:hover:not(.booked) {
-      border-color: var(--cust-primary);
-      background: var(--cust-primary-light);
-    }
-    .slot-cell.selected {
-      background: var(--cust-primary);
-      border-color: var(--cust-primary);
-    }
-    .slot-cell.selected .slot-time,
-    .slot-cell.selected .slot-rate {
-      color: #ffffff !important;
-    }
-    .slot-cell.booked {
-      background: #f1f5f9;
-      border-color: #e2e8f0;
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-    .slot-time {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--cust-text-main);
-    }
-    .slot-rate {
-      font-size: 10.5px;
-      color: var(--cust-text-muted);
-      margin-top: 2px;
-    }
-    .slot-tag-gold {
-      font-size: 9.5px;
-      font-weight: 700;
-      color: var(--cust-accent);
-    }
-
-    /* Add-on Services */
-    .service-addon-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .addon-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 14px;
-      border-radius: 6px;
-      border: 1px solid var(--cust-border);
-      background: #ffffff;
-      transition: border-color 0.15s;
-      cursor: pointer;
-    }
-    .addon-item:hover { border-color: #cbd5e1; }
-    .addon-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .addon-checkbox {
-      width: 17px;
-      height: 17px;
-      accent-color: var(--cust-primary);
-      cursor: pointer;
-    }
-    .addon-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--cust-text-main);
-    }
-    .addon-desc {
-      font-size: 11px;
-      color: var(--cust-text-muted);
-    }
-    .addon-price {
-      font-size: 12.5px;
-      font-weight: 700;
-      color: var(--cust-primary-hover);
-    }
-
-    /* Sticky Order Summary Panel */
-    .order-summary-panel {
-      background: #ffffff;
-      border: 1px solid var(--cust-border);
-      border-radius: 10px;
-      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
-      position: sticky;
-      top: 90px;
-      overflow: hidden;
-    }
-    .summary-header {
-      padding: 16px 18px;
-      border-bottom: 1px solid var(--cust-border);
-      background: #fafafa;
-    }
-    .summary-title {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--cust-text-main);
-    }
-    .summary-body {
-      padding: 18px;
-    }
-    .summary-line {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 12.5px;
-    }
-    .summary-label { color: var(--cust-text-muted); }
-    .summary-val {
-      font-weight: 600;
-      color: var(--cust-text-main);
-      text-align: right;
-    }
-    .summary-divider {
-      height: 1px;
-      background: var(--cust-border);
-      margin: 14px 0;
-    }
-    .deposit-highlight-box {
-      background: var(--cust-primary-light);
-      border: 1px solid var(--cust-primary-border);
-      border-radius: 8px;
-      padding: 12px 14px;
-      margin: 14px 0;
-    }
-    .deposit-label {
-      font-size: 11.5px;
-      font-weight: 700;
-      color: var(--cust-primary-hover);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-    .deposit-val {
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--cust-primary-hover);
-      margin-top: 2px;
-    }
-    .deposit-sub {
-      font-size: 11px;
-      color: var(--cust-text-muted);
-      margin-top: 2px;
-    }
-
-    @media (max-width: 900px) {
-      .booking-wrapper { grid-template-columns: 1fr; }
-      .order-summary-panel { position: static; }
-    }
-  
     /* LUXURY TOP NAVBAR & FOOTER STYLES */
     .cust-navbar {
       background: var(--surface);
@@ -462,6 +119,275 @@
       .cust-nav-menu { display: none; }
     }
 
+    /* Page Layout */
+    .booking-wrapper {
+      max-width: 1240px;
+      margin: 28px auto 60px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Step Banner */
+    .step-guide-banner {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    /* Section Cards */
+    .section-card {
+      background: var(--cust-surface);
+      border: 1px solid var(--cust-border);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+    }
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--cust-border);
+    }
+    .card-step-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--cust-text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Court Chips Grid */
+    .court-select-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 640px) {
+      .court-select-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .court-chip-btn {
+      border: 1.5px solid var(--cust-border);
+      background: var(--cust-surface);
+      border-radius: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-align: left;
+    }
+    .court-chip-btn:hover {
+      border-color: var(--cust-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12);
+    }
+    .court-chip-btn.selected {
+      border-color: var(--cust-primary);
+      background: var(--cust-primary-light);
+      box-shadow: 0 0 0 2px var(--cust-primary);
+    }
+    .chip-name {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--cust-text-main);
+      margin-bottom: 2px;
+    }
+    .chip-desc {
+      font-size: 11.5px;
+      color: var(--cust-text-muted);
+    }
+    .chip-rate {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--cust-primary);
+      margin-top: 4px;
+    }
+
+    /* Time Slots Grid */
+    .slots-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 640px) {
+      .slots-picker-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .booking-slot-cell {
+      border: 1.5px solid var(--cust-border);
+      border-radius: 10px;
+      padding: 11px 8px;
+      text-align: center;
+      background: var(--cust-surface);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .booking-slot-cell:hover:not(.booked) {
+      border-color: var(--cust-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+    }
+    .booking-slot-cell.selected {
+      border-color: var(--cust-primary);
+      background: var(--cust-primary-light);
+      box-shadow: 0 0 0 2px var(--cust-primary);
+    }
+    .booking-slot-cell.booked {
+      background: var(--surface-subtle);
+      opacity: 0.55;
+      cursor: not-allowed;
+      border-color: var(--cust-border);
+    }
+    .slot-cell-time {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--cust-text-main);
+    }
+    .slot-cell-tag {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 4px;
+      margin-top: 4px;
+      display: inline-block;
+    }
+    .tag-free {
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+    }
+    .tag-booked {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+    }
+    .tag-peak {
+      position: absolute;
+      top: -6px;
+      right: 6px;
+      background: #f59e0b;
+      color: #ffffff;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* Add-on Services */
+    .addon-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border: 1px solid var(--cust-border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .addon-item:hover {
+      background: var(--surface-subtle);
+    }
+
+    /* Order Summary Panel */
+    .order-summary-panel {
+      background: var(--cust-surface);
+      border: 1px solid var(--cust-border);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+      position: sticky;
+      top: 92px;
+    }
+    .summary-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--cust-text-main);
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--cust-border);
+      margin-bottom: 16px;
+    }
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+    .summary-label { color: var(--cust-text-muted); }
+    .summary-val { font-weight: 700; color: var(--cust-text-main); text-align: right; }
+    .summary-divider {
+      height: 1px;
+      background: var(--cust-border);
+      margin: 12px 0;
+    }
+
+    /* Deposit Highlight */
+    .deposit-highlight-box {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1.5px dashed rgba(245, 158, 11, 0.4);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin: 16px 0;
+      text-align: center;
+    }
+    .deposit-label { font-size: 11.5px; font-weight: 700; color: #b45309; text-transform: uppercase; letter-spacing: 0.5px; }
+    .deposit-val { font-size: 22px; font-weight: 900; color: #d97706; margin: 4px 0; }
+    .deposit-sub { font-size: 11.5px; color: var(--cust-text-muted); }
+
+    /* MODAL */
+    .slot-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(4, 20, 16, 0.8);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1050;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .slot-modal-overlay.active { display: flex; }
+    .vietqr-modal-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 520px;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+      text-align: center;
+      animation: modalSlideUp 0.22s ease-out;
+    }
+    @keyframes modalSlideUp {
+      from { opacity: 0; transform: scale(0.96) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .vietqr-qr-frame {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 16px;
+      display: inline-block;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      margin: 14px 0 16px;
+      border: 2px solid var(--primary);
+    }
+    .vietqr-qr-frame img {
+      width: 220px;
+      height: 220px;
+      display: block;
+      object-fit: contain;
+    }
+
     /* LUXURY FOOTER */
     .cust-footer-dark {
       background: #061813;
@@ -479,10 +405,10 @@
       gap: 40px;
       margin-bottom: 40px;
     }
-    @media (max-width: 1100px) {
-      .cust-footer-inner { grid-template-columns: 1fr 1fr; }
-    }
+    @media (max-width: 1100px) { .cust-footer-inner { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 768px) {
+      .booking-wrapper { grid-template-columns: 1fr; }
+      .order-summary-panel { position: static; }
       .cust-footer-inner { grid-template-columns: 1fr; }
     }
     .footer-col-title {
@@ -506,9 +432,7 @@
       text-decoration: none;
       transition: color 0.15s ease;
     }
-    .footer-links-list a:hover {
-      color: #10b981;
-    }
+    .footer-links-list a:hover { color: #10b981; }
     .footer-bottom-bar {
       max-width: 1320px;
       margin: 0 auto;
@@ -521,13 +445,11 @@
       flex-wrap: wrap;
       gap: 12px;
     }
-
   </style>
 </head>
 <body>
 
-  <!-- Customer Header -->
-    <!-- 1. TOP NAVBAR -->
+  <!-- 1. TOP NAVBAR -->
   <header class="cust-navbar">
     <div class="cust-nav-inner">
       <a href="/customer/home" class="cust-brand-wrap">
@@ -568,7 +490,6 @@
       </nav>
 
       <div class="cust-nav-actions">
-        <!-- THEME TOGGLE BUTTON -->
         <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Đổi giao diện Sáng / Tối" style="padding: 8px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--text-dark); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;">
           <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
             <circle cx="12" cy="12" r="5"></circle>
@@ -581,7 +502,6 @@
           </svg>
         </button>
 
-        <!-- DYNAMIC USER AUTH WIDGET -->
         <div id="navUserArea">
           <a href="/customer/auth" class="btn btn-primary" id="btnNavAuth" style="padding: 9px 18px; border-radius: 8px; font-size: 13.5px; font-weight: 600;">
             <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
@@ -592,374 +512,257 @@
     </div>
   </header>
 
-  <!-- Main Booking Area -->
-  <div class="booking-wrapper">
-    <!-- Left Column: Selection Controls -->
+  <!-- MAIN BOOKING WORKFLOW AREA -->
+  <main class="booking-wrapper">
+    <!-- LEFT COLUMN: SELECTION CONTROLS -->
     <div>
-      <!-- Lock 10 mins Timer Banner -->
-      <div class="lock-timer-banner">
-        <div class="lock-timer-info">
-          <svg class="svg-icon" style="color: #d97706; width: 20px; height: 20px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      <!-- Helpful Step Guide Banner -->
+      <div class="step-guide-banner">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <svg class="svg-icon" style="color: var(--primary); width: 22px; height: 22px; flex-shrink: 0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
           <div>
-            <strong style="color: #92400e; font-size: 13px;">Khóa Giữ Chỗ Tạm Thời 10 Phút</strong>
-            <div style="font-size: 11.5px; color: #b45309;">Slot sân đang chọn được giữ độc quyền trong lúc quý khách thanh toán cọc.</div>
-          </div>
-        </div>
-        <div class="lock-timer-digit" id="countdownClock">09:59</div>
-      </div>
-
-      <!-- Step 1: Branch & Date Filter -->
-      <div class="section-card">
-        <div class="card-header">
-          <div class="card-title">1. Chọn Chi Nhánh & Ngày Thi Đấu</div>
-        </div>
-        <div class="card-body">
-          <div class="form-row" style="margin-bottom: 0;">
-            <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label">Chi Nhánh Sân</label>
-              <select id="selBranch" class="form-control" onchange="updateBranchInfo()">
-                <option value="CN1 - Võ Văn Ngân, Thủ Đức" data-id="1">Chi nhánh 1 - Võ Văn Ngân, P. Linh Chiểu (8 sân)</option>
-                <option value="CN2 - Lê Văn Việt, Quận 9" data-id="2">Chi nhánh 2 - Lê Văn Việt, P. Tăng Nhơn Phú (6 sân)</option>
-                <option value="CN3 - Hoàng Diệu 2, Thủ Đức" data-id="3">Chi nhánh 3 - Hoàng Diệu 2, P. Linh Trung (6 sân)</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label">Ngày Thi Đấu</label>
-              <input type="date" id="selDate" class="form-control" value="2026-09-22" onchange="updateSummary()">
+            <strong style="color: var(--text-dark); font-size: 13.5px;">Quy Trình Đặt Sân & Khóa Slot Thời Gian Thực</strong>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+              Chọn Chi Nhánh & Ngày • Chọn Sân • Chọn Giờ Còn Trống • Bấm xác nhận để khóa slot và chuyển khoản cọc VietQR.
             </div>
           </div>
         </div>
+        <div style="font-size: 11.5px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--primary-border); white-space: nowrap;">
+          Khóa Slot 10 Phút Khi Đặt
+        </div>
       </div>
 
-      <!-- Step 2: Choose Court -->
+      <!-- STEP 1: BRANCH & DATE -->
       <div class="section-card">
-        <div class="card-header">
-          <div class="card-title">2. Chọn Sân Thi Đấu</div>
-          <span class="badge badge-success">Mặt thảm BWF tiêu chuẩn</span>
+        <div class="card-header-row">
+          <div class="card-step-title">
+            <span>1. Chọn Chi Nhánh & Ngày Thi Đấu</span>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="court-select-grid" id="courtsContainer">
-            <div class="court-chip-btn selected" onclick="selectCourt(1, 'Sân Số 01', 'Tiêu Chuẩn Enlio', 120000, this)">
-              <div class="court-chip-name">Sân Số 01</div>
-              <div class="court-chip-badge">Tiêu Chuẩn</div>
-            </div>
-            <div class="court-chip-btn" onclick="selectCourt(2, 'Sân Số 02', 'Tiêu Chuẩn Enlio', 120000, this)">
-              <div class="court-chip-name">Sân Số 02</div>
-              <div class="court-chip-badge">Tiêu Chuẩn</div>
-            </div>
-            <div class="court-chip-btn" onclick="selectCourt(3, 'Sân Số 03 VIP', 'Yonex Đỏ BWF', 150000, this)">
-              <div class="court-chip-name" style="color: var(--cust-accent);">Sân Số 03 ⭐</div>
-              <div class="court-chip-badge" style="color: var(--cust-accent); font-weight: 600;">VIP Yonex</div>
-            </div>
-            <div class="court-chip-btn" onclick="selectCourt(4, 'Sân Số 04', 'Tiêu Chuẩn Enlio', 120000, this)">
-              <div class="court-chip-name">Sân Số 04</div>
-              <div class="court-chip-badge">Tiêu Chuẩn</div>
-            </div>
-            <div class="court-chip-btn" onclick="selectCourt(5, 'Sân Số 05', 'Tiêu Chuẩn Enlio', 120000, this)">
-              <div class="court-chip-name">Sân Số 05</div>
-              <div class="court-chip-badge">Tiêu Chuẩn</div>
-            </div>
-            <div class="court-chip-btn" onclick="selectCourt(6, 'Sân Số 06', 'Tiêu Chuẩn Enlio', 120000, this)">
-              <div class="court-chip-name">Sân Số 06</div>
-              <div class="court-chip-badge">Tiêu Chuẩn</div>
-            </div>
+        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px;">
+          <div>
+            <label class="form-label" style="font-size: 12px; font-weight: 700; margin-bottom: 6px; display: block;">Chi Nhánh Arena</label>
+            <select id="selBranch" class="form-control" onchange="onBranchChanged()">
+              <option value="CN01" selected>CN01 - Võ Văn Ngân, TP. Thủ Đức (8 Sân BWF)</option>
+              <option value="CN02">CN02 - Nguyễn Thị Thập, Quận 7 (6 Sân BWF)</option>
+              <option value="CN03">CN03 - Điện Biên Phủ, Bình Thạnh (6 Sân BWF)</option>
+              <option value="CN04">CN04 - Quang Trung, Gò Vấp (6 Sân BWF)</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-size: 12px; font-weight: 700; margin-bottom: 6px; display: block;">Ngày Đặt Sân</label>
+            <input type="date" id="selDate" class="form-control" onchange="onDateChanged()">
           </div>
         </div>
       </div>
 
-      <!-- Step 3: Choose Time Slots -->
+      <!-- STEP 2: CHOOSE COURT -->
       <div class="section-card">
-        <div class="card-header">
-          <div class="card-title">3. Chọn Khung Giờ Thi Đấu</div>
-          <div style="font-size: 11.5px; color: var(--cust-text-muted); display: flex; gap: 12px;">
-            <span><span style="display:inline-block;width:9px;height:9px;background:var(--cust-primary);border-radius:2px;"></span> Đang chọn</span>
-            <span><span style="display:inline-block;width:9px;height:9px;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:2px;"></span> Đã kín</span>
-            <span style="color: var(--cust-accent);">⭐ 17h-21h: Giờ Vàng</span>
+        <div class="card-header-row">
+          <div class="card-step-title">
+            <span>2. Chọn Sân Thi Đấu Của Chi Nhánh</span>
           </div>
+          <span style="font-size: 11.5px; color: var(--primary); font-weight: 700;">Chuẩn thảm Yonex & Enlio BWF</span>
         </div>
-        <div class="card-body">
-          <div class="slots-picker-grid">
-            <div class="slot-cell" onclick="toggleSlot(this, '06:00 - 07:00', 80000)">
-              <div class="slot-time">06:00 - 07:00</div>
-              <div class="slot-rate">80.000đ</div>
-            </div>
-            <div class="slot-cell" onclick="toggleSlot(this, '07:00 - 08:00', 80000)">
-              <div class="slot-time">07:00 - 08:00</div>
-              <div class="slot-rate">80.000đ</div>
-            </div>
-            <div class="slot-cell booked">
-              <div class="slot-time">08:00 - 09:00</div>
-              <div class="slot-rate">Đã đặt</div>
-            </div>
-            <div class="slot-cell" onclick="toggleSlot(this, '09:00 - 10:00', 80000)">
-              <div class="slot-time">09:00 - 10:00</div>
-              <div class="slot-rate">80.000đ</div>
-            </div>
-            <div class="slot-cell" onclick="toggleSlot(this, '15:00 - 16:00', 80000)">
-              <div class="slot-time">15:00 - 16:00</div>
-              <div class="slot-rate">80.000đ</div>
-            </div>
-            <div class="slot-cell" onclick="toggleSlot(this, '16:00 - 17:00', 80000)">
-              <div class="slot-time">16:00 - 17:00</div>
-              <div class="slot-rate">80.000đ</div>
-            </div>
-            <!-- Peak hours -->
-            <div class="slot-cell selected" onclick="toggleSlot(this, '17:00 - 18:00', 120000)">
-              <div class="slot-time">17:00 - 18:00</div>
-              <div class="slot-rate slot-tag-gold">120.000đ ⭐</div>
-            </div>
-            <div class="slot-cell selected" onclick="toggleSlot(this, '18:00 - 19:00', 120000)">
-              <div class="slot-time">18:00 - 19:00</div>
-              <div class="slot-rate slot-tag-gold">120.000đ ⭐</div>
-            </div>
-            <div class="slot-cell booked">
-              <div class="slot-time">19:00 - 20:00</div>
-              <div class="slot-rate">Đã đặt</div>
-            </div>
-            <div class="slot-cell" onclick="toggleSlot(this, '20:00 - 21:00', 120000)">
-              <div class="slot-time">20:00 - 21:00</div>
-              <div class="slot-rate slot-tag-gold">120.000đ ⭐</div>
-            </div>
-            <div class="slot-cell" onclick="toggleSlot(this, '21:00 - 22:00', 80000)">
-              <div class="slot-time">21:00 - 22:00</div>
-              <div class="slot-rate">80.000đ</div>
-            </div>
+        <div class="court-select-grid" id="courtsContainer">
+          <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--text-muted);">
+            Đang nạp danh sách sân...
           </div>
         </div>
       </div>
 
-      <!-- Step 4: Add-on Services -->
+      <!-- STEP 3: CHOOSE TIME SLOTS -->
       <div class="section-card">
-        <div class="card-header">
-          <div class="card-title">4. Dịch Vụ & Tiện Ích Đi Kèm</div>
-          <span style="font-size: 11.5px; color: var(--cust-text-muted);">Tùy chọn tiện ích</span>
+        <div class="card-header-row">
+          <div class="card-step-title">
+            <span>3. Chọn Khung Giờ Thi Đấu (Lưới Realtime)</span>
+          </div>
+          <div style="font-size: 11.5px; color: var(--cust-text-muted); display: flex; gap: 12px; align-items: center;">
+            <span><span style="display:inline-block;width:9px;height:9px;background:var(--primary);border-radius:2px;"></span> Đang chọn</span>
+            <span><span style="display:inline-block;width:9px;height:9px;background:var(--surface-subtle);border:1px solid var(--border-subtle);border-radius:2px;"></span> Đã kín</span>
+            <span style="color: #d97706; font-weight: 700;">17h-21h: Giờ Vàng</span>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="service-addon-list">
-            <label class="addon-item">
-              <div class="addon-info">
-                <input type="checkbox" class="addon-checkbox" id="addonRacket" value="20000" onchange="updateSummary()">
-                <div>
-                  <div class="addon-name">Thuê Vợt Thi Đấu (Yonex Astrox / Nanoflare)</div>
-                  <div class="addon-desc">Căng sẵn 10.5kg, tặng quấn cán chống trơn mới 100%</div>
-                </div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;" id="slotPickerNotice">
+          Đang hiển thị lịch trống cho sân đã chọn...
+        </div>
+        <div class="slots-picker-grid" id="slotsContainer">
+          <!-- Dynamically populated from API -->
+        </div>
+      </div>
+
+      <!-- STEP 4: ADD-ON SERVICES -->
+      <div class="section-card">
+        <div class="card-header-row">
+          <div class="card-step-title">
+            <span>4. Dịch Vụ & Tiện Ích Đi Kèm (Tùy Chọn)</span>
+          </div>
+          <span style="font-size: 11.5px; color: var(--cust-text-muted);">Thanh toán cùng tiền sân</span>
+        </div>
+        <div>
+          <label class="addon-item">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <input type="checkbox" id="addonRacket" value="20000" onchange="updateSummary()" style="width: 17px; height: 17px;">
+              <div>
+                <div style="font-weight: 700; font-size: 13px; color: var(--cust-text-main);">Thuê Vợt Thi Đấu Yonex Astrox / Nanoflare</div>
+                <div style="font-size: 11.5px; color: var(--cust-text-muted);">Căng sẵn 10.5kg, tặng quấn cán chống trơn mới 100%</div>
               </div>
-              <div class="addon-price">+20.000 đ / cây</div>
-            </label>
+            </div>
+            <strong style="color: var(--primary); font-size: 12.5px;">+20.000 đ / cây</strong>
+          </label>
 
-            <label class="addon-item">
-              <div class="addon-info">
-                <input type="checkbox" class="addon-checkbox" id="addonShuttle" value="45000" checked onchange="updateSummary()">
-                <div>
-                  <div class="addon-name">Ống Cầu Lông Thi Đấu Yonex Aerosensa (3 quả)</div>
-                  <div class="addon-desc">Tốc độ chuẩn số 77, độ bền và quỹ đạo bay ổn định</div>
-                </div>
+          <label class="addon-item">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <input type="checkbox" id="addonShuttle" value="45000" onchange="updateSummary()" style="width: 17px; height: 17px;">
+              <div>
+                <div style="font-weight: 700; font-size: 13px; color: var(--cust-text-main);">Ống Cầu Lông Thi Đấu Yonex Aerosensa (3 quả)</div>
+                <div style="font-size: 11.5px; color: var(--cust-text-muted);">Tốc độ chuẩn 77, quỹ đạo bay ổn định chuẩn BWF</div>
               </div>
-              <div class="addon-price">+45.000 đ / ống</div>
-            </label>
+            </div>
+            <strong style="color: var(--primary); font-size: 12.5px;">+45.000 đ / ống</strong>
+          </label>
 
-            <label class="addon-item">
-              <div class="addon-info">
-                <input type="checkbox" class="addon-checkbox" id="addonDrink" value="30000" checked onchange="updateSummary()">
-                <div>
-                  <div class="addon-name">Combo 2 Chai Nước Điện Giải Pocari Sweat Ướp Lạnh</div>
-                  <div class="addon-desc">Bổ sung ion khoáng chất tức thì khi vận động</div>
-                </div>
+          <label class="addon-item">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <input type="checkbox" id="addonDrink" value="30000" onchange="updateSummary()" style="width: 17px; height: 17px;">
+              <div>
+                <div style="font-weight: 700; font-size: 13px; color: var(--cust-text-main);">Combo 2 Chai Nước Điện Giải Pocari Sweat Ướp Lạnh</div>
+                <div style="font-size: 11.5px; color: var(--cust-text-muted);">Bổ sung ion khoáng chất tức thì khi vận động</div>
               </div>
-              <div class="addon-price">+30.000 đ / 2 chai</div>
-            </label>
-          </div>
+            </div>
+            <strong style="color: var(--primary); font-size: 12.5px;">+30.000 đ / combo</strong>
+          </label>
         </div>
       </div>
     </div>
 
-    <!-- Right Column: Sticky Order Summary -->
+    <!-- RIGHT COLUMN: STICKY ORDER SUMMARY -->
     <div>
       <div class="order-summary-panel">
-        <div class="summary-header">
-          <div class="summary-title">Tóm Tắt Đơn Đặt Sân</div>
-          <div style="font-size: 11.5px; color: var(--cust-text-muted); margin-top: 2px;">Mã tạm: <span id="tempOrderId" style="font-family: monospace; font-weight: 700; color: var(--cust-primary-hover);">BK-20260922-4412</span></div>
+        <div class="summary-title">Tóm Tắt Đơn Đặt Sân</div>
+
+        <div class="summary-line">
+          <span class="summary-label">Chi nhánh:</span>
+          <span class="summary-val" id="sumBranch">CN01 - Thủ Đức</span>
         </div>
 
-        <div class="summary-body">
-          <div class="summary-line">
-            <span class="summary-label">Chi nhánh:</span>
-            <span class="summary-val" id="sumBranch">CN1 - Võ Văn Ngân, Thủ Đức</span>
+        <div class="summary-line">
+          <span class="summary-label">Sân đã chọn:</span>
+          <span class="summary-val" id="sumCourt">Chưa chọn sân</span>
+        </div>
+
+        <div class="summary-line">
+          <span class="summary-label">Ngày thi đấu:</span>
+          <span class="summary-val" id="sumDate">Hôm nay</span>
+        </div>
+
+        <div class="summary-line">
+          <span class="summary-label">Khung giờ:</span>
+          <span class="summary-val" id="sumSlots" style="color: var(--primary);">Chưa chọn giờ</span>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-line">
+          <span class="summary-label">Tiền thuê sân:</span>
+          <span class="summary-val" id="sumCourtPrice">0 đ</span>
+        </div>
+
+        <div class="summary-line">
+          <span class="summary-label">Dịch vụ đi kèm:</span>
+          <span class="summary-val" id="sumAddonPrice">0 đ</span>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-line" style="font-size: 14.5px;">
+          <span class="summary-label" style="font-weight: 700; color: var(--cust-text-main);">Tổng Dự Kiến:</span>
+          <span class="summary-val" id="sumTotalPrice" style="font-size: 17px; font-weight: 900; color: var(--cust-text-main);">0 đ</span>
+        </div>
+
+        <!-- Deposit highlight -->
+        <div class="deposit-highlight-box">
+          <div class="deposit-label">Tiền Cọc Giữ Chỗ (30%)</div>
+          <div class="deposit-val" id="sumDeposit">0 đ</div>
+          <div class="deposit-sub" id="depositRemainingText">70% còn lại thanh toán tại quầy POS khi nhận sân.</div>
+        </div>
+
+        <!-- Customer Inputs -->
+        <div style="background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+          <div style="margin-bottom: 8px;">
+            <label style="font-size: 11.5px; font-weight: 700; color: var(--cust-text-main); display: block; margin-bottom: 4px;">Họ tên người đặt (*):</label>
+            <input type="text" id="custNameInput" class="form-control" placeholder="vd: Nguyen Van A" style="font-size: 12.5px; padding: 7px 10px;">
           </div>
-
-          <div class="summary-line">
-            <span class="summary-label">Sân đã chọn:</span>
-            <span class="summary-val" id="sumCourt">Sân Số 01 (Tiêu Chuẩn)</span>
-          </div>
-
-          <div class="summary-line">
-            <span class="summary-label">Ngày thi đấu:</span>
-            <span class="summary-val" id="sumDate">22/09/2026</span>
-          </div>
-
-          <div class="summary-line">
-            <span class="summary-label">Khung giờ:</span>
-            <span class="summary-val" id="sumSlots">17:00 - 19:00 (2 giờ)</span>
-          </div>
-
-          <div class="summary-divider"></div>
-
-          <div class="summary-line">
-            <span class="summary-label">Tiền thuê sân:</span>
-            <span class="summary-val" id="sumCourtPrice">240.000 đ</span>
-          </div>
-
-          <div class="summary-line">
-            <span class="summary-label">Dịch vụ đi kèm:</span>
-            <span class="summary-val" id="sumAddonPrice">75.000 đ</span>
-          </div>
-
-          <div class="summary-line" style="color: #059669;">
-            <span class="summary-label" style="color: #059669;">Ưu đãi hội viên:</span>
-            <span class="summary-val" style="color: #059669;">-0 đ</span>
-          </div>
-
-          <div class="summary-divider"></div>
-
-          <div class="summary-line" style="font-size: 14px;">
-            <span class="summary-label" style="font-weight: 700; color: var(--cust-text-main);">Tổng Dự Kiến:</span>
-            <span class="summary-val" id="sumTotalPrice" style="font-size: 16px; font-weight: 800; color: var(--cust-text-main);">315.000 đ</span>
-          </div>
-
-          <!-- Deposit calculation box -->
-          <div class="deposit-highlight-box">
-            <div class="deposit-label">Tiền Cọc Giữ Chỗ (30%)</div>
-            <div class="deposit-val" id="sumDeposit">94.500 đ</div>
-            <div class="deposit-sub">70% còn lại (220.500 đ) thanh toán khi nhận sân tại quầy POS.</div>
-          </div>
-
-          <button type="button" class="btn btn-primary" onclick="proceedToPayment()" style="width: 100%; height: 42px; font-size: 13.5px; font-weight: 600; border-radius: 6px;">
-            Tiếp Tục Thanh Toán Cọc
-            <svg class="svg-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </button>
-
-          <div style="text-align: center; margin-top: 12px; font-size: 11px; color: var(--cust-text-muted); line-height: 1.4;">
-            ️ Hoàn cọc 100% nếu quý khách hủy trước giờ chơi từ 4 tiếng trở lên
+          <div>
+            <label style="font-size: 11.5px; font-weight: 700; color: var(--cust-text-main); display: block; margin-bottom: 4px;">Số điện thoại (*):</label>
+            <input type="tel" id="custPhoneInput" class="form-control" placeholder="vd: 0903123456" style="font-size: 12.5px; padding: 7px 10px;">
           </div>
         </div>
+
+        <button type="button" class="btn btn-primary" id="btnSubmitLockBooking" onclick="executeBookingLock()" disabled style="width: 100%; padding: 12px; font-size: 14px; font-weight: 700; border-radius: 10px;">
+          Xác Nhận Khóa Slot & Nhận Mã VietQR
+        </button>
+
+        <div style="text-align: center; margin-top: 12px; font-size: 11.5px; color: var(--cust-text-muted); line-height: 1.4;">
+          Chính sách: Khóa slot 10 phút để quét mã cọc. Hoàn tiền 100% tự động nếu báo hủy trước 4 giờ.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- VIETQR DEPOSIT PAYMENT MODAL (APPEARS ONLY AFTER LOCKING) -->
+  <div class="slot-modal-overlay" id="bookingVietqrModal">
+    <div class="vietqr-modal-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <span class="badge badge-green" style="font-size: 12px; padding: 4px 10px;">Khóa Giữ Chỗ Thành Công</span>
+        <button type="button" class="btn-icon" onclick="closeBookingVietQrModal()" style="border: none; background: transparent; cursor: pointer; color: var(--text-muted); font-size: 18px;">✕</button>
+      </div>
+
+      <h3 style="margin: 0 0 6px; font-size: 20px; font-weight: 800; color: var(--text-dark);">Quét Mã VietQR Chuyển Khoản Cọc</h3>
+      <p style="font-size: 12.5px; color: var(--text-muted); margin: 0 0 14px;">
+        Hệ thống đã khóa duy nhất slot này cho bạn trong <strong style="color: #ef4444;" id="bookingTimerText">10:00</strong>. Các slot và sân khác hoàn toàn không bị ảnh hưởng.
+      </p>
+
+      <div class="vietqr-qr-frame">
+        <img id="bookingQrImg" src="/images/vietqr-bank.png" alt="Mã VietQR Chuyển Khoản Cọc">
+      </div>
+
+      <div style="background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px 16px; text-align: left; font-size: 13px; margin-bottom: 18px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color: var(--text-muted);">Mã đơn đặt sân:</span>
+          <strong id="bkgBookingCode" style="color: var(--primary); font-family: monospace; font-size: 14px;">DS000000</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color: var(--text-muted);">Số tiền cọc (30%):</span>
+          <strong id="bkgDepositAmount" style="color: #d97706; font-size: 15px;">0 đ</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color: var(--text-muted);">Ngân hàng thụ hưởng:</span>
+          <strong id="bkgBankName">MBBank</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color: var(--text-muted);">Số tài khoản:</span>
+          <strong id="bkgAccountNo">0903123456</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-subtle); padding-top: 6px; margin-top: 6px;">
+          <span style="color: var(--text-muted);">Nội dung chuyển khoản:</span>
+          <span style="display: flex; align-items: center; gap: 6px;">
+            <strong id="bkgContent" style="color: #ef4444; font-family: monospace;">CK DS000000</strong>
+            <button type="button" class="btn btn-outline" style="padding: 2px 7px; font-size: 11px;" onclick="copyBkgContent()">Sao chép</button>
+          </span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeBookingVietQrModal()">Đóng</button>
+        <button type="button" class="btn btn-primary" style="flex: 1.3;" onclick="confirmBkgPayment()">
+          Tôi Đã Chuyển Khoản
+        </button>
       </div>
     </div>
   </div>
 
-  <script>
-    let selectedCourt = { id: 1, name: 'Sân Số 01', type: 'Tiêu Chuẩn Enlio', baseRate: 120000 };
-    let selectedSlots = [
-      { time: '17:00 - 18:00', price: 120000 },
-      { time: '18:00 - 19:00', price: 120000 }
-    ];
-
-    let remainingSeconds = 600;
-    const timerInterval = setInterval(() => {
-      if (remainingSeconds <= 0) {
-        clearInterval(timerInterval);
-        showToast('Hết thời gian giữ chỗ 10 phút! Vui lòng tải lại trang.', 'warning');
-        window.location.reload();
-        return;
-      }
-      remainingSeconds--;
-      const mins = Math.floor(remainingSeconds / 60);
-      const secs = remainingSeconds % 60;
-      document.getElementById('countdownClock').textContent = 
-        String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
-    }, 1000);
-
-    function selectCourt(id, name, type, rate, elem) {
-      document.querySelectorAll('.court-chip-btn').forEach(c => c.classList.remove('selected'));
-      elem.classList.add('selected');
-      selectedCourt = { id, name, type, baseRate: rate };
-      document.getElementById('sumCourt').textContent = name + ' (' + type + ')';
-      updateSummary();
-    }
-
-    function toggleSlot(elem, time, price) {
-      if (elem.classList.contains('booked')) return;
-      const idx = selectedSlots.findIndex(s => s.time === time);
-      if (idx >= 0) {
-        if (selectedSlots.length === 1) {
-          showToast('Bạn phải chọn ít nhất 1 khung giờ thi đấu!', 'info');
-          return;
-        }
-        selectedSlots.splice(idx, 1);
-        elem.classList.remove('selected');
-      } else {
-        selectedSlots.push({ time, price });
-        elem.classList.add('selected');
-      }
-      updateSummary();
-    }
-
-    function updateBranchInfo() {
-      const branchSel = document.getElementById('selBranch');
-      document.getElementById('sumBranch').textContent = branchSel.value;
-      updateSummary();
-    }
-
-    function updateSummary() {
-      const dateVal = document.getElementById('selDate').value;
-      if (dateVal) {
-        const parts = dateVal.split('-');
-        document.getElementById('sumDate').textContent = `${parts[2]}/${parts[1]}/${parts[0]}`;
-      }
-
-      const hoursCount = selectedSlots.length;
-      let courtTotal = 0;
-      selectedSlots.forEach(s => {
-        const rate = (selectedCourt.type.includes('Yonex') || selectedCourt.type.includes('VIP')) ? (s.price + 30000) : s.price;
-        courtTotal += rate;
-      });
-
-      const slotTimesText = selectedSlots.map(s => s.time.split(' - ')[0]).join(', ') + ` (${hoursCount} giờ)`;
-      document.getElementById('sumSlots').textContent = slotTimesText;
-      document.getElementById('sumCourtPrice').textContent = courtTotal.toLocaleString('vi-VN') + ' đ';
-
-      let addonTotal = 0;
-      if (document.getElementById('addonRacket').checked) addonTotal += 20000;
-      if (document.getElementById('addonShuttle').checked) addonTotal += 45000;
-      if (document.getElementById('addonDrink').checked) addonTotal += 30000;
-      document.getElementById('sumAddonPrice').textContent = addonTotal.toLocaleString('vi-VN') + ' đ';
-
-      const grandTotal = courtTotal + addonTotal;
-      document.getElementById('sumTotalPrice').textContent = grandTotal.toLocaleString('vi-VN') + ' đ';
-
-      const deposit30 = Math.round(grandTotal * 0.30);
-      const remaining70 = grandTotal - deposit30;
-      document.getElementById('sumDeposit').textContent = deposit30.toLocaleString('vi-VN') + ' đ';
-      document.querySelector('.deposit-sub').textContent = 
-        `70% còn lại (${remaining70.toLocaleString('vi-VN')} đ) thanh toán khi nhận sân tại quầy POS.`;
-    }
-
-    function proceedToPayment() {
-      const branch = document.getElementById('sumBranch').textContent;
-      const court = document.getElementById('sumCourt').textContent;
-      const date = document.getElementById('sumDate').textContent;
-      const slots = document.getElementById('sumSlots').textContent;
-      const total = document.getElementById('sumTotalPrice').textContent;
-      const deposit = document.getElementById('sumDeposit').textContent;
-      const tempId = document.getElementById('tempOrderId').textContent;
-
-      sessionStorage.setItem('ute_booking', JSON.stringify({
-        id: tempId,
-        branch,
-        court,
-        date,
-        slots,
-        total,
-        deposit,
-        customerName: 'Nguyễn Văn An',
-        customerPhone: '0912345678'
-      }));
-
-      window.location.href = '/customer/payment';
-    }
-
-    updateSummary();
-  </script>
-  
+  <!-- LUXURY FOOTER -->
   <footer class="cust-footer-dark">
     <div class="cust-footer-inner">
       <div>
@@ -1026,35 +829,378 @@
 
   <script src="/js/global-hub.js"></script>
   <script>
-    // Sync Nav User Profile
+    const TIME_SLOTS = [
+      '06:00 - 07:00', '07:00 - 08:00', '08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00',
+      '14:00 - 15:00', '15:00 - 16:00', '16:00 - 17:00', '17:00 - 18:00', '18:00 - 19:00',
+      '19:00 - 20:00', '20:00 - 21:00', '21:00 - 22:00'
+    ];
+
+    let branchCourts = [];
+    let selectedCourt = null;
+    let selectedSlots = [];
+    let modalTimerInterval = null;
+
+    function isSlotOverlapping(s1, s2) {
+      if (!s1 || !s2) return false;
+      if (s1.trim().toLowerCase() === s2.trim().toLowerCase()) return true;
+      const parseHours = (slot) => {
+        const m = slot.match(/(\d{1,2}):\d{2}\s*-\s*(\d{1,2}):\d{2}/);
+        return m ? [parseInt(m[1]), parseInt(m[2])] : [0, 0];
+      };
+      const [start1, end1] = parseHours(s1);
+      const [start2, end2] = parseHours(s2);
+      return Math.max(start1, start2) < Math.min(end1, end2);
+    }
+
+    async function loadBranchCourts(targetCourtCode = null) {
+      const branch = document.getElementById('selBranch').value;
+      const container = document.getElementById('courtsContainer');
+      container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--text-muted);">Đang tải danh sách sân...</div>';
+
+      try {
+        const res = await fetch(`/api/courts?branchCode=${branch}`);
+        branchCourts = await res.json() || [];
+
+        if (branchCourts.length === 0) {
+          container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 20px;">Không tìm thấy sân nào.</div>';
+          selectedCourt = null;
+          updateSummary();
+          return;
+        }
+
+        let html = '';
+        branchCourts.forEach((c, idx) => {
+          const isVip = (c.courtType && c.courtType.toLowerCase().includes('vip')) || (c.hourlyRate >= 110000);
+          const rateFormatted = (c.hourlyRate || 90000).toLocaleString('vi-VN');
+          html += `
+            <div class="court-chip-btn" id="chipCourt_${c.courtCode}" onclick="onSelectCourt('${c.courtCode}', '${c.courtName}', ${c.hourlyRate || 90000}, '${isVip ? 'VIP Yonex' : 'Tiêu Chuẩn'}')">
+              <div class="chip-name">${c.courtName}</div>
+              <div class="chip-desc">${isVip ? 'Thảm Yonex BWF' : 'Thảm Enlio BWF'}</div>
+              <div class="chip-rate">${rateFormatted} đ/h</div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+
+        // Auto select target court or first court
+        const initialCourt = (targetCourtCode && branchCourts.find(c => c.courtCode === targetCourtCode)) || branchCourts[0];
+        if (initialCourt) {
+          const isVip = (initialCourt.courtType && initialCourt.courtType.toLowerCase().includes('vip')) || (initialCourt.hourlyRate >= 110000);
+          onSelectCourt(initialCourt.courtCode, initialCourt.courtName, initialCourt.hourlyRate || 90000, isVip ? 'VIP Yonex' : 'Tiêu Chuẩn');
+        }
+      } catch (e) {
+        container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #ef4444;">Lỗi kết nối máy chủ.</div>';
+      }
+    }
+
+    function onSelectCourt(courtCode, courtName, hourlyRate, typeName) {
+      document.querySelectorAll('.court-chip-btn').forEach(b => b.classList.remove('selected'));
+      const chip = document.getElementById(`chipCourt_${courtCode}`);
+      if (chip) chip.classList.add('selected');
+
+      selectedCourt = {
+        courtCode,
+        courtName,
+        hourlyRate,
+        typeName
+      };
+
+      selectedSlots = [];
+      document.getElementById('sumCourt').textContent = `${courtName} (${typeName})`;
+      document.getElementById('slotPickerNotice').textContent = `Lịch khả dụng của ${courtName} ngày ${document.getElementById('selDate').value}:`;
+
+      loadSlotsForCourt();
+      updateSummary();
+    }
+
+    async function loadSlotsForCourt(preselectedSlot = null) {
+      if (!selectedCourt) return;
+      const branch = document.getElementById('selBranch').value;
+      const date = document.getElementById('selDate').value;
+      const container = document.getElementById('slotsContainer');
+      container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--text-muted);">Đang tải các slot khả dụng...</div>';
+
+      try {
+        const res = await fetch(`/api/bookings/slots?branchCode=${branch}&courtCode=${selectedCourt.courtCode}&date=${date}`);
+        const bookings = await res.json() || [];
+
+        let html = '';
+        TIME_SLOTS.forEach(slot => {
+          const isBooked = bookings.some(b => isSlotOverlapping(slot, b.timeSlot));
+          const startHour = parseInt(slot.split(':')[0]);
+          const isPeak = startHour >= 17 && startHour < 21;
+          const rate = isPeak ? Math.round(selectedCourt.hourlyRate * 1.25) : selectedCourt.hourlyRate;
+
+          if (isBooked) {
+            html += `
+              <div class="booking-slot-cell booked" title="Khung giờ này đã có người đặt trước">
+                <div class="slot-cell-time">${slot}</div>
+                <div class="slot-cell-tag tag-booked">Đã Đặt</div>
+              </div>
+            `;
+          } else {
+            const isSelected = selectedSlots.some(s => s.time === slot) || (preselectedSlot && preselectedSlot === slot);
+            html += `
+              <div class="booking-slot-cell ${isSelected ? 'selected' : ''}" id="slotEl_${startHour}" onclick="toggleSlotSelection('${slot}', ${rate}, this)">
+                ${isPeak ? '<span class="tag-peak">Giờ Vàng</span>' : ''}
+                <div class="slot-cell-time">${slot}</div>
+                <div class="slot-cell-tag tag-free">Trống • ${rate.toLocaleString()}đ</div>
+              </div>
+            `;
+          }
+        });
+        container.innerHTML = html;
+
+        if (preselectedSlot && !selectedSlots.some(s => s.time === preselectedSlot)) {
+          const startHour = parseInt(preselectedSlot.split(':')[0]);
+          const isPeak = startHour >= 17 && startHour < 21;
+          const rate = isPeak ? Math.round(selectedCourt.hourlyRate * 1.25) : selectedCourt.hourlyRate;
+          selectedSlots.push({ time: preselectedSlot, price: rate });
+          updateSummary();
+        }
+      } catch (e) {
+        container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #ef4444;">Lỗi tải lịch slot.</div>';
+      }
+    }
+
+    function toggleSlotSelection(time, price, el) {
+      const idx = selectedSlots.findIndex(s => s.time === time);
+      if (idx >= 0) {
+        selectedSlots.splice(idx, 1);
+        el.classList.remove('selected');
+      } else {
+        selectedSlots.push({ time, price });
+        el.classList.add('selected');
+      }
+      updateSummary();
+    }
+
+    function onBranchChanged() {
+      const branchSel = document.getElementById('selBranch');
+      document.getElementById('sumBranch').textContent = branchSel.options[branchSel.selectedIndex].text.split('(')[0];
+      selectedSlots = [];
+      loadBranchCourts();
+    }
+
+    function onDateChanged() {
+      const dateVal = document.getElementById('selDate').value;
+      if (dateVal) {
+        const parts = dateVal.split('-');
+        document.getElementById('sumDate').textContent = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+      selectedSlots = [];
+      loadSlotsForCourt();
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const dateVal = document.getElementById('selDate').value;
+      if (dateVal) {
+        const parts = dateVal.split('-');
+        document.getElementById('sumDate').textContent = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+
+      const branchSel = document.getElementById('selBranch');
+      document.getElementById('sumBranch').textContent = branchSel.options[branchSel.selectedIndex].text.split('(')[0];
+
+      if (selectedSlots.length === 0) {
+        document.getElementById('sumSlots').textContent = 'Chưa chọn giờ';
+        document.getElementById('sumCourtPrice').textContent = '0 đ';
+        document.getElementById('sumTotalPrice').textContent = '0 đ';
+        document.getElementById('sumDeposit').textContent = '0 đ';
+        document.getElementById('depositRemainingText').textContent = 'Vui lòng chọn ít nhất 1 khung giờ.';
+        document.getElementById('btnSubmitLockBooking').disabled = true;
+        return;
+      }
+
+      let courtTotal = 0;
+      selectedSlots.forEach(s => courtTotal += s.price);
+
+      const slotTimesText = selectedSlots.map(s => s.time).join(', ');
+      document.getElementById('sumSlots').textContent = `${slotTimesText} (${selectedSlots.length} giờ)`;
+      document.getElementById('sumCourtPrice').textContent = courtTotal.toLocaleString('vi-VN') + ' đ';
+
+      let addonTotal = 0;
+      if (document.getElementById('addonRacket')?.checked) addonTotal += 20000;
+      if (document.getElementById('addonShuttle')?.checked) addonTotal += 45000;
+      if (document.getElementById('addonDrink')?.checked) addonTotal += 30000;
+      document.getElementById('sumAddonPrice').textContent = addonTotal.toLocaleString('vi-VN') + ' đ';
+
+      const grandTotal = courtTotal + addonTotal;
+      const deposit30 = Math.round(grandTotal * 0.3);
+      const remaining70 = grandTotal - deposit30;
+
+      document.getElementById('sumTotalPrice').textContent = grandTotal.toLocaleString('vi-VN') + ' đ';
+      document.getElementById('sumDeposit').textContent = deposit30.toLocaleString('vi-VN') + ' đ';
+      document.getElementById('depositRemainingText').textContent = `70% còn lại (${remaining70.toLocaleString('vi-VN')} đ) thanh toán tại quầy POS.`;
+
+      document.getElementById('btnSubmitLockBooking').disabled = false;
+    }
+
+    async function executeBookingLock() {
+      if (!selectedCourt || selectedSlots.length === 0) {
+        showToast('Vui lòng chọn sân và ít nhất 1 khung giờ thi đấu!', 'warning');
+        return;
+      }
+
+      const name = document.getElementById('custNameInput').value.trim();
+      const phone = document.getElementById('custPhoneInput').value.trim();
+      if (!name || !phone) {
+        showToast('Vui lòng nhập họ tên và số điện thoại người đặt!', 'warning');
+        document.getElementById('custPhoneInput').focus();
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmitLockBooking');
+      btn.disabled = true;
+      btn.innerText = 'Đang khóa slot giữ chỗ...';
+
+      const branch = document.getElementById('selBranch').value;
+      const date = document.getElementById('selDate').value;
+
+      try {
+        // Lock primary slot or combined slot
+        const timeSlotString = selectedSlots.map(s => s.time).join(', ');
+        const payload = {
+          courtCode: selectedCourt.courtCode,
+          branchCode: branch,
+          date: date,
+          timeSlot: selectedSlots[0].time, // slot check
+          customerName: name,
+          customerPhone: phone
+        };
+
+        const res = await fetch('/api/bookings/slot-lock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          showToast(`Khóa thành công ${selectedCourt.courtName} lúc ${selectedSlots[0].time}!`, 'success');
+          openBookingVietQrModal(data);
+          loadSlotsForCourt();
+        } else {
+          showToast(data.message || 'Không thể khóa slot. Vui lòng chọn giờ khác!', 'error');
+        }
+      } catch (err) {
+        showToast('Lỗi máy chủ khi khóa slot!', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Xác Nhận Khóa Slot & Nhận Mã VietQR';
+      }
+    }
+
+    function openBookingVietQrModal(data) {
+      document.getElementById('bkgBookingCode').innerText = data.bookingCode;
+      document.getElementById('bkgDepositAmount').innerText = (data.depositAmount || 0).toLocaleString('vi-VN') + ' đ';
+      document.getElementById('bkgBankName').innerText = data.bankName || 'MBBank';
+      document.getElementById('bkgAccountNo').innerText = data.accountNo || '0903123456';
+      document.getElementById('bkgContent').innerText = `CK ${data.bookingCode}`;
+
+      const qrImg = document.getElementById('bookingQrImg');
+      if (qrImg) {
+        qrImg.src = data.qrUrl || `https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=${data.depositAmount}&addInfo=CK%20${data.bookingCode}&accountName=UTE%20BADMINTON%20CLUB`;
+      }
+
+      startBookingTimer(600);
+      const modal = document.getElementById('bookingVietqrModal');
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeBookingVietQrModal() {
+      if (modalTimerInterval) clearInterval(modalTimerInterval);
+      const modal = document.getElementById('bookingVietqrModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function startBookingTimer(seconds) {
+      if (modalTimerInterval) clearInterval(modalTimerInterval);
+      let remain = seconds;
+      const timerEl = document.getElementById('bookingTimerText');
+
+      modalTimerInterval = setInterval(() => {
+        remain--;
+        if (remain <= 0) {
+          clearInterval(modalTimerInterval);
+          if (timerEl) timerEl.innerText = '00:00 (Hết hạn)';
+        } else {
+          const m = String(Math.floor(remain / 60)).padStart(2, '0');
+          const s = String(remain % 60).padStart(2, '0');
+          if (timerEl) timerEl.innerText = `${m}:${s}`;
+        }
+      }, 1000);
+    }
+
+    function copyBkgContent() {
+      const code = document.getElementById('bkgContent').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast(`Đã sao chép: ${code}`, 'success');
+      });
+    }
+
+    async function confirmBkgPayment() {
+      const bookingCode = document.getElementById('bkgBookingCode').innerText;
+      showToast('Đang đối soát giao dịch VietQR...', 'info');
+
+      try {
+        await fetch('/api/webhook/vietqr', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: `CK ${bookingCode}`, amount: 30000 })
+        });
+
+        setTimeout(() => {
+          showToast(`Đã ghi nhận tiền cọc cho đơn ${bookingCode}!`, 'success');
+          closeBookingVietQrModal();
+          setTimeout(() => {
+            if (confirm('Đặt sân và cọc thành công! Bạn có muốn mở trang Lịch Sử & Check-in QR không?')) {
+              window.location.href = '/customer/history';
+            }
+          }, 600);
+        }, 1000);
+      } catch (e) {
+        closeBookingVietQrModal();
+      }
+    }
+
+    // Initialize Page
     document.addEventListener('DOMContentLoaded', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('selDate');
+      if (dateInput) {
+        dateInput.value = today;
+        dateInput.min = today;
+      }
+
+      // Prefill customer profile if logged in
       const rawUser = localStorage.getItem('utesport_user');
       if (rawUser) {
         try {
-          const user = JSON.parse(rawUser);
-          if (user && user.fullName) {
-            const userArea = document.getElementById('navUserArea');
-            if (userArea) {
-              userArea.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <a href="/customer/profile" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px var(--primary-glow);">
-                      ${user.fullName.substring(0, 2).toUpperCase()}
-                    </div>
-                    <div style="text-align: left;">
-                      <div style="font-size: 13px; font-weight: 700; color: var(--text-dark);">${user.fullName}</div>
-                      <div style="font-size: 11px; color: var(--primary); font-weight: 600;">Hội Viên VIP</div>
-                    </div>
-                  </a>
-                </div>
-              `;
-            }
-          }
+          const u = JSON.parse(rawUser);
+          if (u.fullName) document.getElementById('custNameInput').value = u.fullName;
+          if (u.phone) document.getElementById('custPhoneInput').value = u.phone;
         } catch(e) {}
       }
-    });
 
+      // Check query params (e.g. from home page)
+      const urlParams = new URLSearchParams(window.location.search);
+      const branchParam = urlParams.get('branch');
+      const courtParam = urlParams.get('courtId') || urlParams.get('courtCode');
+      const dateParam = urlParams.get('date');
+      const slotParam = urlParams.get('slot');
+
+      if (branchParam) {
+        const branchSel = document.getElementById('selBranch');
+        if (branchSel) branchSel.value = branchParam;
+      }
+      if (dateParam && dateInput) {
+        dateInput.value = dateParam;
+      }
+
+      loadBranchCourts(courtParam);
+    });
   </script>
 </body>
 </html>
-
