@@ -10,6 +10,14 @@
     s.src = '/js/auth-guard.js';
     document.head.appendChild(s);
   }
+
+  // Auto-load AI Chatbot widget on customer pages
+  const p = window.location.pathname.toLowerCase();
+  if ((p.startsWith('/customer/') || p === '/' || p.startsWith('/booking')) && !document.querySelector('script[src*="chatbot-widget.js"]')) {
+    const cb = document.createElement('script');
+    cb.src = '/js/chatbot-widget.js';
+    document.head.appendChild(cb);
+  }
 })();
 
 // 1. Theme Management (Light / Dark)

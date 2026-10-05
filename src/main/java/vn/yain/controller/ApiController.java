@@ -46,6 +46,9 @@ public class ApiController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    private vn.yain.service.ChatbotService chatbotService;
+
     // ==========================================
     // 1. AUTHENTICATION & JWT ENDPOINTS
     // ==========================================
@@ -241,5 +244,24 @@ public class ApiController {
             return equipmentRepository.findByBranchCode(branchCode);
         }
         return equipmentRepository.findAll();
+    }
+
+    // ==========================================
+    // 5. CHATBOT CONSULTATION ENDPOINT
+    // ==========================================
+
+    @PostMapping("/chatbot/message")
+    public ResponseEntity<?> sendChatMessage(@RequestBody Map<String, String> payload) {
+        String message = payload.get("message");
+        String sessionId = payload.get("sessionId");
+        vn.yain.dto.ChatMessageDto reply = chatbotService.processMessage(message, sessionId);
+        return ResponseEntity.ok(reply);
+    }
+
+    @PostMapping("/chatbot/reset")
+    public ResponseEntity<?> resetChatbotSession(@RequestBody Map<String, String> payload) {
+        String sessionId = payload.get("sessionId");
+        chatbotService.resetSession(sessionId);
+        return ResponseEntity.ok(Map.of("status", "success", "message", "Session reset"));
     }
 }
