@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
@@ -405,7 +405,7 @@
               </div>
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label">Số Điện Thoại</label>
-                <input type="text" class="form-control" value="0912345678" readonly style="background: #f1f5f9; cursor: not-allowed;">
+                <input type="text" class="form-control" id="profPhone" value="0912345678" readonly style="background: #f1f5f9; cursor: not-allowed;">
               </div>
             </div>
 
@@ -492,9 +492,42 @@
   </div>
 
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const raw = localStorage.getItem('utesport_user');
+      if (raw) {
+        try {
+          const user = JSON.parse(raw);
+          if (user.fullName) {
+            document.querySelectorAll('.card-holder-name').forEach(el => el.textContent = user.fullName.toUpperCase());
+            const profName = document.getElementById('profName');
+            if (profName) profName.value = user.fullName;
+          }
+          if (user.phone || user.username) {
+            const profPhone = document.getElementById('profPhone');
+            if (profPhone) profPhone.value = user.phone || user.username;
+          }
+          if (user.email) {
+            const profEmail = document.getElementById('profEmail');
+            if (profEmail) profEmail.value = user.email;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    });
+
     function handleProfileUpdate(e) {
       e.preventDefault();
       const name = document.getElementById('profName').value;
+      const raw = localStorage.getItem('utesport_user');
+      if (raw) {
+        try {
+          const user = JSON.parse(raw);
+          user.fullName = name;
+          localStorage.setItem('utesport_user', JSON.stringify(user));
+        } catch(e) {}
+      }
+      document.querySelectorAll('.card-holder-name').forEach(el => el.textContent = name.toUpperCase());
       showToast('Đã cập nhật thông tin hồ sơ cho ' + name + ' thành công!', 'success');
     }
   </script>

@@ -230,6 +230,24 @@
           <span class="menu-text">Kho vật tư</span>
         </a>
 
+        <a href="/manager/receipts" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span class="menu-text">Nhập kho</span>
+        </a>
+
+        <a href="/manager/staff" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span class="menu-text">Nhân viên & Ca</span>
+        </a>
+
         <a href="/manager/reports" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -246,11 +264,18 @@
       </div>
 
       <div class="sidebar-bottom">
-        <div class="user-avatar">QL</div>
+        <div class="user-avatar" id="sidebarAvatar">PB</div>
         <div class="user-meta">
-          <div class="user-name">Nguyễn Phước Thọ</div>
-          <div class="user-title">Quản lý trung tâm</div>
+          <div class="user-name" id="sidebarName">Trần Phúc Bảo</div>
+          <div class="user-title" id="sidebarTitle">Quản lý chi nhánh • CN Thủ Đức</div>
         </div>
+        <a href="/login" style="margin-left: auto; color: #94a3b8;" title="Đăng xuất">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </a>
       </div>
     </aside>
 

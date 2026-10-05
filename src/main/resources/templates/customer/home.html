@@ -1,557 +1,823 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UTE Badminton Club - Hệ Thống Đặt Sân Cầu Lông Trực Tuyến</title>
+  <title>UTE Sport Arena - Cổng Đặt Sân Cầu Lông Trực Tuyến Tiêu Chuẩn Quốc Tế</title>
   <link rel="stylesheet" href="/css/main.css">
   <style>
     /* =========================================================
-       CLEAN MINIMALIST LIGHT PALETTE (Harmonized with main.css)
+       LUXURY EMERALD DASHBOARD STYLING FOR CUSTOMER PORTAL
        ========================================================= */
     :root {
-      --cust-bg: var(--bg-page);
-      --cust-surface: var(--surface);
-      --cust-border: var(--border-subtle);
-      --cust-border-subtle: #eeeeef;
-      --cust-primary: var(--primary);
-      --cust-primary-hover: var(--primary-hover);
-      --cust-primary-light: var(--primary-light);
-      --cust-primary-border: var(--primary-border);
-      --cust-accent: var(--accent);
-      --cust-accent-light: var(--accent-light);
-      --cust-accent-border: var(--accent-border);
-      --cust-text-main: var(--text-dark);
-      --cust-text-body: var(--text-body);
-      --cust-text-muted: var(--text-muted);
-      --cust-text-light: var(--text-light);
+      --cust-hero-bg: radial-gradient(circle at 20% 30%, rgba(6, 78, 59, 0.95) 0%, rgba(4, 20, 16, 0.98) 100%);
+      --emerald-glow: rgba(16, 185, 129, 0.35);
+      --card-gradient: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    }
+
+    [data-theme="dark"] {
+      --card-gradient: linear-gradient(145deg, rgba(20, 35, 30, 0.95) 0%, rgba(13, 24, 20, 0.95) 100%);
     }
 
     body {
-      background-color: var(--cust-bg);
-      color: var(--cust-text-body);
+      background-color: var(--bg-page);
+      color: var(--text-dark);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       margin: 0;
       padding: 0;
       line-height: 1.5;
     }
 
-    /* Common Navbar */
-    .cust-header {
-      background: #ffffff;
-      border-bottom: 1px solid var(--cust-border);
+    /* LUXURY TOP NAVBAR */
+    .cust-navbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-subtle);
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
     }
-    .cust-nav-container {
-      max-width: 1240px;
+    .cust-nav-inner {
+      max-width: 1320px;
       margin: 0 auto;
       padding: 0 24px;
-      height: 68px;
+      height: 72px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
-    .cust-brand {
+    .cust-brand-wrap {
       display: flex;
       align-items: center;
       gap: 12px;
       text-decoration: none;
-      color: var(--cust-text-main);
+      color: var(--text-dark);
     }
-    .cust-brand-logo {
-      width: 40px;
-      height: 40px;
-      background: var(--cust-primary);
-      border-radius: 10px;
+    .cust-logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #ffffff;
-      box-shadow: 0 2px 6px rgba(13, 148, 136, 0.2);
+      box-shadow: 0 4px 14px var(--emerald-glow);
     }
     .cust-brand-title {
-      font-size: 16.5px;
+      font-size: 18px;
       font-weight: 800;
-      letter-spacing: -0.3px;
-      color: var(--cust-text-main);
+      letter-spacing: -0.4px;
+      color: var(--text-dark);
+      line-height: 1.2;
     }
     .cust-brand-sub {
       font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .cust-nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .cust-nav-link {
+      text-decoration: none;
+      font-size: 14px;
       font-weight: 600;
-      color: var(--cust-primary);
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+      position: relative;
+      padding: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cust-nav-link:hover, .cust-nav-link.active {
+      color: var(--primary);
+    }
+    .cust-nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px;
+      box-shadow: 0 2px 8px var(--emerald-glow);
+    }
+
+    .cust-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* DASHBOARD HERO BANNER (EMERALD SPORTS COMPLEX) */
+    .dashboard-hero-section {
+      position: relative;
+      background: var(--cust-hero-bg), url('/images/badminton_arena_hero.jpg') center/cover no-repeat;
+      background-blend-mode: overlay;
+      color: #ffffff;
+      padding: 56px 24px 72px;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .dashboard-hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.2) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-container {
+      max-width: 1320px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+    .hero-badge-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #6ee7b7;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 18px;
+    }
+    .hero-pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .hero-title {
+      font-size: 38px;
+      font-weight: 900;
+      line-height: 1.22;
+      letter-spacing: -0.8px;
+      margin: 0 0 16px;
+      color: #ffffff;
+    }
+    .hero-title span {
+      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-description {
+      font-size: 15px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 28px;
+      max-width: 620px;
+    }
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .btn-hero-primary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: none;
+      padding: 13px 26px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-hero-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(16, 185, 129, 0.5);
+    }
+    .btn-hero-outline {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 13px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+    }
+    .btn-hero-outline:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: #ffffff;
+    }
+
+    /* HERO CONSOLE CARD (QUICK COURT FINDER) */
+    .hero-finder-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 20px;
+      padding: 28px 26px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+      color: var(--text-dark);
+    }
+    [data-theme="dark"] .hero-finder-card {
+      background: rgba(15, 30, 26, 0.92);
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+    .finder-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .finder-card-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .finder-badge-live {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-light);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--primary-border);
+    }
+    .finder-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .finder-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .finder-form-group.full-width {
+      grid-column: span 2;
+    }
+    .finder-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .finder-input, .finder-select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--text-dark);
+      font-size: 13.5px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+    .finder-input:focus, .finder-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .btn-finder-submit {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+      transition: all 0.2s ease;
+    }
+    .btn-finder-submit:hover {
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
+      transform: translateY(-1px);
+    }
+
+    /* MAIN CONTAINER & DASHBOARD KPIS */
+    .dashboard-main-container {
+      max-width: 1320px;
+      margin: -32px auto 60px;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+    }
+    .dashboard-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .dash-kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 20px 22px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .dash-kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+    .dash-kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .dash-kpi-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    .cust-nav-links {
+    .dash-kpi-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .dash-kpi-value {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--text-dark);
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .dash-kpi-caption {
+      font-size: 12px;
+      color: var(--text-muted);
       display: flex;
       align-items: center;
-      gap: 24px;
+      gap: 5px;
     }
-    .cust-nav-item {
-      text-decoration: none;
+
+    /* SECTION CARD & TABS */
+    .dash-section-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+      margin-bottom: 32px;
+    }
+    .dash-tabs-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .dash-tabs-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dash-tab-btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
       font-size: 13.5px;
-      font-weight: 500;
-      color: var(--cust-text-muted);
-      transition: all 0.15s ease;
-      position: relative;
-      padding: 8px 0;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
     }
-    .cust-nav-item:hover {
-      color: var(--cust-text-main);
+    .dash-tab-btn:hover {
+      background: var(--surface-subtle);
+      color: var(--text-dark);
     }
-    .cust-nav-item.active {
-      color: var(--cust-primary);
-      font-weight: 600;
+    .dash-tab-btn.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary-border);
     }
-    .cust-nav-item.active::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--cust-primary);
-      border-radius: 2px;
-    }
-    .cust-user-actions {
+    .dash-branch-filter {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    /* Clean Minimalist Hero */
-    .hero-wrapper {
-      background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 100%);
-      border-bottom: 1px solid var(--cust-border);
-      padding: 56px 24px 72px;
-      text-align: center;
-      position: relative;
-    }
-    .hero-content {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-    .hero-badge-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #ffffff;
-      border: 1px solid var(--cust-primary-border);
-      padding: 5px 16px;
-      border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--cust-primary-hover);
-      box-shadow: 0 1px 3px rgba(13, 148, 136, 0.08);
-      margin-bottom: 18px;
-    }
-    .hero-headline {
-      font-size: 38px;
-      font-weight: 800;
-      letter-spacing: -0.8px;
-      line-height: 1.25;
-      color: var(--cust-text-main);
-      margin-bottom: 14px;
-    }
-    .hero-headline span {
-      color: var(--cust-primary);
-      position: relative;
-    }
-    .hero-subtitle {
-      font-size: 15.5px;
-      color: var(--cust-text-muted);
-      max-width: 650px;
-      margin: 0 auto 32px;
-      line-height: 1.6;
-    }
-
-    /* Clean Search Card Bar */
-    .search-card-bar {
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 4px 6px -2px rgba(15, 23, 42, 0.02);
-      padding: 18px 22px;
-      max-width: 1060px;
-      margin: -36px auto 36px;
-      position: relative;
-      z-index: 10;
-      border: 1px solid var(--cust-border);
+    /* COURTS SHOWCASE GRID */
+    .courts-card-grid {
       display: grid;
-      grid-template-columns: 1.6fr 1.1fr 1.1fr 1.1fr auto;
-      gap: 14px;
-      align-items: end;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
     }
-    .search-field {
+    .court-display-card {
+      background: var(--card-gradient);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+      transition: all 0.25s ease;
       display: flex;
       flex-direction: column;
-      gap: 5px;
-      text-align: left;
     }
-    .search-field label {
-      font-size: 11.5px;
-      font-weight: 600;
+    .court-display-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.09);
+      border-color: var(--primary);
+    }
+    .court-card-thumb-wrap {
+      height: 160px;
+      position: relative;
+      overflow: hidden;
+      background: #0f1e1a;
+    }
+    .court-card-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .court-display-card:hover .court-card-thumb-wrap img {
+      transform: scale(1.05);
+    }
+    .court-thumb-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.4px;
-      color: var(--cust-text-muted);
+      letter-spacing: 0.5px;
+      backdrop-filter: blur(8px);
+    }
+    .badge-vip {
+      background: rgba(245, 158, 11, 0.9);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+    }
+    .badge-standard {
+      background: rgba(16, 185, 129, 0.9);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+    }
+    .court-status-indicator {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #6ee7b7;
       display: flex;
       align-items: center;
       gap: 6px;
     }
-    .search-field select, .search-field input {
-      height: 40px;
-      padding: 0 12px;
-      border-radius: 6px;
-      border: 1px solid var(--cust-border);
-      background: #ffffff;
-      font-size: 13px;
-      font-family: inherit;
-      color: var(--cust-text-main);
-      outline: none;
-      transition: all 0.15s ease;
-      width: 100%;
-    }
-    .search-field select:focus, .search-field input:focus {
-      border-color: var(--cust-primary);
-      box-shadow: 0 0 0 2px var(--cust-primary-border);
-    }
-    .btn-search-hero {
-      height: 40px;
-      padding: 0 22px;
-      background: var(--cust-primary);
-      color: #ffffff;
-      font-weight: 600;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-size: 13px;
-      transition: background-color 0.15s ease;
-    }
-    .btn-search-hero:hover {
-      background: var(--cust-primary-hover);
-    }
-
-    /* Policy strip */
-    .policy-strip {
-      max-width: 1240px;
-      margin: 0 auto 40px;
-      padding: 0 24px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-    .policy-card {
-      background: #ffffff;
-      border: 1px solid var(--cust-border);
-      border-radius: 10px;
-      padding: 16px;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-    .policy-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      border-color: #cbd5e1;
-    }
-    .policy-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: var(--cust-primary-light);
-      color: var(--cust-primary);
-      border: 1px solid var(--cust-primary-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .policy-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--cust-text-main);
-      margin-bottom: 2px;
-    }
-    .policy-desc {
-      font-size: 11.5px;
-      color: var(--cust-text-muted);
-      line-height: 1.4;
-    }
-
-    /* Container Sections */
-    .container-section {
-      max-width: 1240px;
-      margin: 0 auto 50px;
-      padding: 0 24px;
-    }
-    .section-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .section-head-title h2 {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-      color: var(--cust-text-main);
-      margin-bottom: 2px;
-    }
-    .section-head-title p {
-      font-size: 12.5px;
-      color: var(--cust-text-muted);
-    }
-
-    /* Courts Grid */
-    .courts-showcase-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 18px;
-    }
-    .cust-court-card {
-      background: #ffffff;
-      border: 1px solid var(--cust-border);
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-      transition: all 0.18s ease;
-      display: flex;
-      flex-direction: column;
-    }
-    .cust-court-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
-      border-color: #cbd5e1;
-    }
-    .court-card-top {
-      padding: 14px 16px;
-      background: #fafafa;
-      border-bottom: 1px solid var(--cust-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .court-card-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--cust-text-main);
-    }
-    .court-card-sub {
-      font-size: 11.5px;
-      color: var(--cust-text-muted);
-    }
-    .court-card-body {
-      padding: 16px;
+    .court-info-body {
+      padding: 18px 20px;
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
-    .court-specs {
+    .court-name-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .court-item-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.3px;
+    }
+    .court-mat-type {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .court-amenities-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
     }
-    .court-spec-tag {
+    .amenity-tag {
       font-size: 11px;
+      font-weight: 600;
+      color: var(--text-body);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-subtle);
       padding: 3px 8px;
-      border-radius: 4px;
-      background: var(--cust-bg);
-      color: var(--cust-text-body);
-      border: 1px solid var(--cust-border);
-      display: flex;
+      border-radius: 6px;
+      display: inline-flex;
       align-items: center;
       gap: 4px;
     }
-    .court-price-box {
+    .court-price-row {
       display: flex;
       align-items: baseline;
       gap: 6px;
-      padding: 8px 12px;
-      background: var(--cust-primary-light);
-      border-radius: 6px;
-      border: 1px solid var(--cust-primary-border);
+      padding: 10px 14px;
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      border-radius: 8px;
+      margin-top: 4px;
     }
-    .price-num {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--cust-primary-hover);
+    .price-big {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--primary);
     }
-    .price-unit {
-      font-size: 11px;
-      color: var(--cust-text-muted);
+    .price-note {
+      font-size: 11.5px;
+      color: var(--text-muted);
     }
-    .slot-pills-row {
+    .slot-choice-wrap {
+      margin-top: 4px;
+    }
+    .slot-choice-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .slot-choice-pills {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
     }
-    .slot-pill {
-      font-size: 11px;
+    .slot-choice-btn {
+      font-size: 11.5px;
       font-weight: 600;
-      padding: 4px 8px;
-      border-radius: 4px;
-      background: #ffffff;
-      border: 1px solid var(--cust-border);
-      color: var(--cust-text-main);
+      padding: 5px 9px;
+      border-radius: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-dark);
       cursor: pointer;
       transition: all 0.15s ease;
     }
-    .slot-pill:hover, .slot-pill.active {
-      background: var(--cust-primary);
+    .slot-choice-btn:hover, .slot-choice-btn.selected {
+      background: var(--primary);
       color: #ffffff;
-      border-color: var(--cust-primary);
+      border-color: var(--primary);
     }
-    .court-card-footer {
-      padding: 12px 16px;
-      border-top: 1px solid var(--cust-border);
-      background: #ffffff;
+    .court-card-action {
+      padding: 14px 20px;
+      background: var(--surface);
+      border-top: 1px solid var(--border-subtle);
     }
-    .btn-book-court {
+    .btn-book-instant {
       width: 100%;
-      height: 36px;
-      background: var(--cust-primary);
+      padding: 10px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: #ffffff;
       border: none;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 12.5px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13.5px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      cursor: pointer;
       text-decoration: none;
-      transition: background-color 0.15s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+      transition: all 0.2s ease;
     }
-    .btn-book-court:hover {
-      background: var(--cust-primary-hover);
+    .btn-book-instant:hover {
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+      transform: translateY(-1px);
     }
 
-    /* Price Table */
-    .price-matrix-card {
-      background: #ffffff;
-      border: 1px solid var(--cust-border);
-      border-radius: 10px;
+    /* PRICING MATRIX STYLING */
+    .pricing-matrix-box {
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
       overflow: hidden;
-      margin-bottom: 36px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
-    .price-table {
+    .pricing-table-clean {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
-      font-size: 13px;
     }
-    .price-table th {
-      background: #fafafa;
-      padding: 12px 16px;
-      font-size: 11px;
+    .pricing-table-clean th {
+      background: var(--surface-subtle);
+      padding: 14px 18px;
+      font-size: 12px;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--cust-text-muted);
-      border-bottom: 1px solid var(--cust-border);
-      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
     }
-    .price-table td {
-      padding: 13px 16px;
-      border-bottom: 1px solid var(--cust-border);
-      color: var(--cust-text-main);
+    .pricing-table-clean td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 13.5px;
+      color: var(--text-dark);
+    }
+    .pricing-table-clean tr:last-child td {
+      border-bottom: none;
     }
 
-    /* Tournament CTA Light Banner */
-    .promo-banner-card {
-      background: linear-gradient(135deg, #f0fdfa 0%, #e6fffa 100%);
-      border: 1px solid var(--cust-primary-border);
-      border-radius: 12px;
-      padding: 30px 36px;
-      color: var(--cust-text-main);
+    /* TOURNAMENT PROMO BANNER */
+    .tournament-showcase-card {
+      background: linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(4, 20, 16, 0.98) 100%), url('/images/badminton_arena_hero.jpg') center/cover;
+      background-blend-mode: overlay;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 18px;
+      padding: 34px 38px;
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 30px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.15);
+      margin-bottom: 32px;
       flex-wrap: wrap;
-      gap: 20px;
-      box-shadow: 0 4px 12px rgba(13,148,136,0.06);
+    }
+    .tournament-info-col h3 {
+      font-size: 26px;
+      font-weight: 900;
+      margin: 8px 0;
+      letter-spacing: -0.5px;
     }
 
-    /* Minimalist Footer */
-    .cust-footer {
-      background: #ffffff;
-      color: var(--cust-text-muted);
-      padding: 44px 24px 20px;
-      font-size: 12.5px;
-      border-top: 1px solid var(--cust-border);
+    /* AMENITIES GRID */
+    .amenities-feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
     }
-    .footer-inner {
-      max-width: 1240px;
+    .amenity-feature-box {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 22px 20px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .amenity-feature-box:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+      border-color: var(--primary);
+    }
+    .amenity-icon-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    /* FOOTER */
+    .cust-footer-dark {
+      background: #061813;
+      color: #94a3b8;
+      padding: 56px 24px 28px;
+      border-top: 1px solid rgba(16, 185, 129, 0.2);
+      font-size: 13px;
+    }
+    .cust-footer-inner {
+      max-width: 1320px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 2fr 1.2fr 1fr 1.2fr;
-      gap: 32px;
-      margin-bottom: 32px;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
     }
-    .footer-col h4 {
-      color: var(--cust-text-main);
-      font-size: 13.5px;
+    .footer-col-title {
+      font-size: 14px;
       font-weight: 700;
-      margin-bottom: 12px;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 18px;
     }
-    .footer-col ul {
+    .footer-links-list {
       list-style: none;
+      padding: 0;
+      margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
-    .footer-col a {
-      color: var(--cust-text-muted);
+    .footer-links-list a {
+      color: #94a3b8;
       text-decoration: none;
-      transition: color 0.15s;
+      transition: color 0.15s ease;
     }
-    .footer-col a:hover {
-      color: var(--cust-primary);
+    .footer-links-list a:hover {
+      color: #10b981;
     }
-    .footer-bottom {
-      max-width: 1240px;
+    .footer-bottom-bar {
+      max-width: 1320px;
       margin: 0 auto;
-      padding-top: 18px;
-      border-top: 1px solid var(--cust-border);
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 11.5px;
+      font-size: 12px;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
-    @media (max-width: 960px) {
-      .search-card-bar { grid-template-columns: 1fr 1fr; }
-      .policy-strip { grid-template-columns: 1fr 1fr; }
-      .footer-inner { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 1100px) {
+      .hero-container { grid-template-columns: 1fr; }
+      .dashboard-kpi-grid { grid-template-columns: 1fr 1fr; }
+      .courts-card-grid { grid-template-columns: 1fr 1fr; }
+      .amenities-feature-grid { grid-template-columns: 1fr 1fr; }
+      .cust-footer-inner { grid-template-columns: 1fr 1fr; }
     }
-    @media (max-width: 640px) {
-      .search-card-bar { grid-template-columns: 1fr; }
-      .policy-strip { grid-template-columns: 1fr; }
-      .cust-nav-links { display: none; }
-      .footer-inner { grid-template-columns: 1fr; }
+    @media (max-width: 768px) {
+      .dashboard-kpi-grid { grid-template-columns: 1fr; }
+      .courts-card-grid { grid-template-columns: 1fr; }
+      .amenities-feature-grid { grid-template-columns: 1fr; }
+      .cust-nav-menu { display: none; }
+      .cust-footer-inner { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Clean Minimalist Header -->
-  <header class="cust-header">
-    <div class="cust-nav-container">
-      <a href="/customer/home" class="cust-brand">
-        <div class="cust-brand-logo">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; stroke: #ffffff;">
+  <!-- 1. TOP NAVBAR -->
+  <header class="cust-navbar">
+    <div class="cust-nav-inner">
+      <a href="/customer/home" class="cust-brand-wrap">
+        <div class="cust-logo-icon">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 22px; height: 22px; stroke-width: 2.2;">
             <circle cx="12" cy="12" r="10"></circle>
             <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
             <path d="M2 12h20"></path>
@@ -559,470 +825,754 @@
         </div>
         <div>
           <div class="cust-brand-title">UTE SPORT</div>
-          <div class="cust-brand-sub">Đặt Sân &amp; Khách Hàng</div>
+          <div class="cust-brand-sub">Hệ Thống Đặt Sân Cầu Lông Quốc Tế</div>
         </div>
       </a>
 
-      <nav class="cust-nav-links">
-        <a href="/customer/home" class="cust-nav-item active">Trang Chủ & Bảng Giá</a>
-        <a href="/customer/booking" class="cust-nav-item">Đặt Sân Giữ Chỗ</a>
-        <a href="/customer/tournaments" class="cust-nav-item">Giải Đấu Phong Trào</a>
-        <a href="/customer/history" class="cust-nav-item">Lịch Sử & Check-in QR</a>
-        <a href="/customer/profile" class="cust-nav-item">Hội Viên & Tích Điểm</a>
+      <nav class="cust-nav-menu">
+        <a href="/customer/home" class="cust-nav-link active">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+          Trang Chủ & Tổng Quan
+        </a>
+        <a href="/customer/booking" class="cust-nav-link">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          Đặt Sân Giữ Chỗ
+        </a>
+        <a href="/customer/tournaments" class="cust-nav-link">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+          Giải Đấu UTE Open
+        </a>
+        <a href="/customer/history" class="cust-nav-link">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Lịch Sử & Check-in QR
+        </a>
+        <a href="/customer/profile" class="cust-nav-link">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Thẻ Hội Viên VIP
+        </a>
       </nav>
 
-      <div class="cust-user-actions">
-        <a href="/customer/history" class="btn btn-outline" style="border-radius: 6px; height: 36px;">
-          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          Tra Cứu Đơn
-        </a>
-        <a href="/customer/auth" class="btn btn-primary" style="border-radius: 6px; height: 36px;">
-          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-          Đăng Ký / Đăng Nhập
-        </a>
+      <div class="cust-nav-actions">
+        <!-- THEME TOGGLE BUTTON -->
+        <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Đổi giao diện Sáng / Tối" style="padding: 8px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--text-dark); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;">
+          <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+          </svg>
+        </button>
+
+        <!-- DYNAMIC USER AUTH WIDGET -->
+        <div id="navUserArea">
+          <a href="/customer/auth" class="btn btn-primary" id="btnNavAuth" style="padding: 9px 18px; border-radius: 8px; font-size: 13.5px; font-weight: 600;">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            Đăng Nhập / Đăng Ký
+          </a>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- Clean Minimalist Hero Section -->
-  <section class="hero-wrapper">
-    <div class="hero-content">
-      <div class="hero-badge-pill">
-        <svg class="svg-icon" style="width: 14px; height: 14px; color: var(--cust-primary);" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-        Tiêu Chuẩn BWF Quốc Tế • Khóa Giữ Chỗ 10 Phút Tự Động
+  <!-- 2. DASHBOARD HERO COMMAND CENTER -->
+  <section class="dashboard-hero-section">
+    <div class="hero-container">
+      <div>
+        <div class="hero-badge-tag">
+          <span class="hero-pulse-dot"></span>
+          <span>BWF Standard • 4 Chi Nhánh • 26 Sân Thi Đấu Hoạt Động</span>
+        </div>
+        <h1 class="hero-title">
+          Hệ Thống Đặt Sân Cầu Lông<br>
+          <span>Khóa Giữ Chỗ 10 Phút & VietQR 1-Chạm</span>
+        </h1>
+        <p class="hero-description">
+          Trải nghiệm chuỗi sân cầu lông cao cấp chuẩn quốc tế: Mặt thảm Yonex & Enlio 5 lớp giảm chấn BWF, hệ thống đèn LED chống chói 500 Lux, điều hòa thông gió làm mát và chính sách hủy đơn hoàn cọc 100% tự động trước 4 giờ.
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="#bookingConsole" class="btn-hero-primary" onclick="scrollToConsole()">
+            <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <span>Đặt Sân Giữ Chỗ Ngay</span>
+          </a>
+          <a href="/customer/tournaments" class="btn-hero-outline">
+            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+            <span>Giải Đấu UTE Open 2026</span>
+          </a>
+        </div>
       </div>
-      <h1 class="hero-headline">
-        Đặt Sân Cầu Lông Trực Tuyến<br>
-        <span>Nhanh Chóng, Tiện Lợi & Minh Bạch</span>
-      </h1>
-      <p class="hero-subtitle">
-        Chuỗi 3 cụm sân chuyên nghiệp tại TP. Thủ Đức với thảm Yonex/Enlio tiêu chuẩn thi đấu, đèn LED chống chói mắt, giữ slot tự động và chính sách hoàn cọc 100% trước 4 giờ.
-      </p>
+
+      <!-- RIGHT COLUMN: QUICK COURT FINDER CONSOLE -->
+      <div class="hero-finder-card" id="bookingConsole">
+        <div class="finder-card-header">
+          <div class="finder-card-title">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary); width: 18px; height: 18px;">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span>Tra Cứu Lịch Sân Trống Nhanh</span>
+          </div>
+          <span class="finder-badge-live">Trực tuyến</span>
+        </div>
+
+        <form onsubmit="handleQuickSearch(event)">
+          <div class="finder-form-grid">
+            <div class="finder-form-group full-width">
+              <label class="finder-label">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; color: var(--primary);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                Chi Nhánh Chuỗi Sân
+              </label>
+              <select id="heroBranchSelect" class="finder-select" onchange="updateCourtsByBranch()">
+                <option value="CN01" selected>Chi nhánh 1 - Võ Văn Ngân, TP. Thủ Đức (8 Sân)</option>
+                <option value="CN02">Chi nhánh 2 - Nguyễn Thị Thập, Quận 7 (6 Sân)</option>
+                <option value="CN03">Chi nhánh 3 - Điện Biên Phủ, Bình Thạnh (6 Sân)</option>
+                <option value="CN04">Chi nhánh 4 - Quang Trung, Gò Vấp (6 Sân)</option>
+              </select>
+            </div>
+
+            <div class="finder-form-group">
+              <label class="finder-label">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; color: var(--primary);"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                Ngày Đặt Sân
+              </label>
+              <input type="date" id="heroBookingDate" class="finder-input">
+            </div>
+
+            <div class="finder-form-group">
+              <label class="finder-label">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; color: var(--primary);"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Khung Giờ
+              </label>
+              <select id="heroTimeSelect" class="finder-select">
+                <option value="peak" selected>Giờ Vàng (17:00 - 21:00)</option>
+                <option value="morning">Sáng Sớm (06:00 - 11:00)</option>
+                <option value="afternoon">Buổi Chiều (13:00 - 17:00)</option>
+                <option value="all">Tất Cả Khung Giờ</option>
+              </select>
+            </div>
+
+            <div class="finder-form-group full-width">
+              <label class="finder-label">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; color: var(--primary);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                Tiêu Chuẩn Mặt Thảm
+              </label>
+              <select id="heroCourtType" class="finder-select">
+                <option value="all" selected>Tất Cả Loại Sân (VIP & Tiêu Chuẩn)</option>
+                <option value="vip">Sân VIP Thảm Yonex BWF Tournament (120k/h)</option>
+                <option value="standard">Sân Tiêu Chuẩn Enlio Xanh Lá (80k - 90k/h)</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-finder-submit">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span>Tìm Slot Trống & Đặt Giữ Chỗ Ngay</span>
+          </button>
+        </form>
+      </div>
     </div>
   </section>
 
-  <!-- Quick Search Bar -->
-  <div class="search-card-bar">
-    <div class="search-field">
-      <label>
-        <svg class="svg-icon" style="width: 13px; height: 13px; color: var(--cust-primary);" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-        Chi Nhánh Chuỗi Sân
-      </label>
-      <select id="branchSelect">
-        <option value="1">Chi nhánh 1 - Võ Văn Ngân (Thủ Đức - 8 sân)</option>
-        <option value="2">Chi nhánh 2 - Lê Văn Việt (Quận 9 - 6 sân)</option>
-        <option value="3">Chi nhánh 3 - Hoàng Diệu 2 (Linh Chiểu - 6 sân)</option>
-      </select>
-    </div>
+  <!-- 3. DASHBOARD MAIN CONTENT & KPIS -->
+  <main class="dashboard-main-container">
 
-    <div class="search-field">
-      <label>
-        <svg class="svg-icon" style="width: 13px; height: 13px; color: var(--cust-primary);" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-        Ngày Chơi
-      </label>
-      <input type="date" id="bookingDate" value="2026-09-22">
-    </div>
-
-    <div class="search-field">
-      <label>
-        <svg class="svg-icon" style="width: 13px; height: 13px; color: var(--cust-primary);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-        Khung Giờ Dự Kiến
-      </label>
-      <select id="timeSlotFilter">
-        <option value="all">Tất cả khung giờ (06:00 - 22:00)</option>
-        <option value="peak" selected>Giờ Vàng (17:00 - 21:00)</option>
-        <option value="morning">Sáng sớm (06:00 - 11:00)</option>
-        <option value="afternoon">Chiều (13:00 - 17:00)</option>
-      </select>
-    </div>
-
-    <div class="search-field">
-      <label>
-        <svg class="svg-icon" style="width: 13px; height: 13px; color: var(--cust-primary);" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-        Loại Mặt Sân
-      </label>
-      <select id="courtTypeFilter">
-        <option value="all">Tất cả loại sân</option>
-        <option value="vip">Sân VIP Thảm Yonex BWF</option>
-        <option value="standard">Sân Tiêu chuẩn Enlio xanh</option>
-      </select>
-    </div>
-
-    <button type="button" class="btn-search-hero" onclick="applySearchFilter()">
-      <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      Tìm Sân Trống
-    </button>
-  </div>
-
-  <!-- Policy Highlights (4 commitments) -->
-  <div class="policy-strip">
-    <div class="policy-card">
-      <div class="policy-icon">
-        <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-      </div>
-      <div>
-        <div class="policy-title">Khóa Giữ Chỗ 10 Phút</div>
-        <div class="policy-desc">Giữ slot độc quyền 10 phút để quý khách hoàn tất thanh toán cọc.</div>
-      </div>
-    </div>
-
-    <div class="policy-card">
-      <div class="policy-icon">
-        <svg class="svg-icon" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-      </div>
-      <div>
-        <div class="policy-title">Cọc 30% Qua VietQR</div>
-        <div class="policy-desc">Khớp lệnh tự động qua VietQR/VNPay. 70% còn lại thanh toán tại quầy khi nhận sân.</div>
-      </div>
-    </div>
-
-    <div class="policy-card">
-      <div class="policy-icon">
-        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-      </div>
-      <div>
-        <div class="policy-title">Hủy Đơn Hoàn Cọc 100%</div>
-        <div class="policy-desc">Hủy trước giờ thi đấu từ 4 tiếng trở lên được hoàn 100% cọc tự động.</div>
-      </div>
-    </div>
-
-    <div class="policy-card">
-      <div class="policy-icon">
-        <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-      </div>
-      <div>
-        <div class="policy-title">Tích Điểm Hội Viên</div>
-        <div class="policy-desc">1.000đ = 1 điểm. Thăng hạng Bạc, Vàng, Kim Cương giảm giá tới 15% trọn đời.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Available Courts Matrix -->
-  <main class="container-section" id="courtsShowcase">
-    <div class="section-head">
-      <div class="section-head-title">
-        <h2>Danh Sách Sân Khả Dụng Hôm Nay</h2>
-        <p id="branchNotice">Chi nhánh 1 - Võ Văn Ngân, TP. Thủ Đức (Cập nhật thời gian thực)</p>
-      </div>
-      <div class="pill-group">
-        <button class="pill-btn active" onclick="filterView('all', this)">Tất Cả (8 sân)</button>
-        <button class="pill-btn" onclick="filterView('vip', this)">Sân VIP (2)</button>
-        <button class="pill-btn" onclick="filterView('standard', this)">Sân Tiêu Chuẩn (6)</button>
-      </div>
-    </div>
-
-    <div class="courts-showcase-grid">
-      <!-- Court 1 -->
-      <div class="cust-court-card" data-type="standard">
-        <div class="court-card-top">
-          <div>
-            <div class="court-card-title">Sân Số 01</div>
-            <div class="court-card-sub">Thảm Enlio BWF Xanh Lá</div>
-          </div>
-          <span class="badge badge-success">Sẵn sàng</span>
+    <!-- KPI STATS ROW (DASHBOARD STYLE) -->
+    <div class="dashboard-kpi-grid">
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-top">
+          <span class="dash-kpi-label">Sân Đang Sẵn Sàng</span>
+          <span class="dash-kpi-badge badge-green">Realtime</span>
         </div>
-        <div class="court-card-body">
-          <div class="court-specs">
-            <span class="court-spec-tag">🏟️ Đèn LED chống lóa</span>
-            <span class="court-spec-tag">📏 13.4m x 6.1m</span>
-            <span class="court-spec-tag">❄️ Quạt mát</span>
-          </div>
-          <div class="court-price-box">
-            <span class="price-num">80.000đ</span>
-            <span class="price-unit">/ giờ thường (Giờ vàng: 120.000đ)</span>
-          </div>
-          <div>
-            <div style="font-size: 11.5px; font-weight: 600; color: var(--cust-text-muted); margin-bottom: 6px;">Slot trống hôm nay:</div>
-            <div class="slot-pills-row">
-              <span class="slot-pill active">17:00 - 18:00</span>
-              <span class="slot-pill">18:00 - 19:00</span>
-              <span class="slot-pill">20:00 - 21:00</span>
+        <div class="dash-kpi-value" id="kpiAvailableCourts">18 / 26 Sân</div>
+        <div class="dash-kpi-caption">
+          <span style="color: var(--primary); font-weight: 700;">●</span>
+          <span>Cập nhật trực tiếp trên toàn chuỗi</span>
+        </div>
+      </div>
+
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-top">
+          <span class="dash-kpi-label">Khung Giờ Vàng</span>
+          <span class="dash-kpi-badge badge-amber">17:00 - 21:00</span>
+        </div>
+        <div class="dash-kpi-value">82% Lấp đầy</div>
+        <div class="dash-kpi-caption">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; color: #f59e0b;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>Khuyên đặt trước tối thiểu 2 giờ</span>
+        </div>
+      </div>
+
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-top">
+          <span class="dash-kpi-label">Giải Đấu Mùa Thu</span>
+          <span class="dash-kpi-badge badge-blue">UTE Cup 2026</span>
+        </div>
+        <div class="dash-kpi-value">25.000.000 đ</div>
+        <div class="dash-kpi-caption">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; color: #3b82f6;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <span>Tổng giải thưởng • 32 cặp VĐV</span>
+        </div>
+      </div>
+
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-top">
+          <span class="dash-kpi-label">Chính Sách Cọc & Hoàn</span>
+          <span class="dash-kpi-badge badge-green">100% An Tâm</span>
+        </div>
+        <div class="dash-kpi-value">Cọc 30% VietQR</div>
+        <div class="dash-kpi-caption">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; color: var(--primary);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <span>Hoàn tiền tự động trước 4 tiếng</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN SECTION CARD WITH TAB CONTROLS -->
+    <div class="dash-section-card">
+      <div class="dash-tabs-header">
+        <div class="dash-tabs-nav">
+          <button class="dash-tab-btn active" onclick="switchCustomerTab('tab-courts', this)">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>Sơ Đồ Sân Khả Dụng</span>
+          </button>
+          <button class="dash-tab-btn" onclick="switchCustomerTab('tab-pricing', this)">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            <span>Bảng Giá Khung Giờ Vàng</span>
+          </button>
+          <button class="dash-tab-btn" onclick="switchCustomerTab('tab-tournament', this)">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+            <span>Giải Đấu & Sự Kiện CLB</span>
+          </button>
+          <button class="dash-tab-btn" onclick="switchCustomerTab('tab-amenities', this)">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            <span>Tiện Ích Cao Cấp Arena</span>
+          </button>
+        </div>
+
+        <div class="dash-branch-filter">
+          <span style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Đang xem:</span>
+          <select id="dashBranchPicker" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;" onchange="filterBranchDisplay(this.value)">
+            <option value="CN01" selected>CN01 - Thủ Đức</option>
+            <option value="CN02">CN02 - Quận 7</option>
+            <option value="CN03">CN03 - Bình Thạnh</option>
+            <option value="CN04">CN04 - Gò Vấp</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- PANE 1: COURTS SHOWCASE -->
+      <div id="tab-courts" class="tab-pane active" style="display: block;">
+        <div class="courts-card-grid" id="courtsContainer">
+
+          <!-- COURT 1 -->
+          <div class="court-display-card" data-branch="CN01" data-type="vip">
+            <div class="court-card-thumb-wrap">
+              <img src="/images/badminton-court.jpg" alt="Sân 01 VIP Yonex">
+              <span class="court-thumb-badge badge-vip">👑 Sân VIP Yonex</span>
+              <div class="court-status-indicator">
+                <span class="hero-pulse-dot"></span> Sẵn sàng
+              </div>
+            </div>
+            <div class="court-info-body">
+              <div class="court-name-row">
+                <div class="court-item-title">Sân Số 01 (VIP Yonex)</div>
+                <div class="court-mat-type">Chi nhánh Thủ Đức</div>
+              </div>
+              <div class="court-amenities-tags">
+                <span class="amenity-tag">🏸 Thảm Yonex BWF 5 lớp</span>
+                <span class="amenity-tag">💡 LED 500 Lux chống lóa</span>
+                <span class="amenity-tag">💨 Quạt làm mát đối lưu</span>
+              </div>
+              <div class="court-price-row">
+                <span class="price-big">120.000 đ</span>
+                <span class="price-note">/ giờ (Cọc trước 30%: 36.000đ)</span>
+              </div>
+              <div class="slot-choice-wrap">
+                <div class="slot-choice-label">Slot trống hôm nay:</div>
+                <div class="slot-choice-pills">
+                  <button type="button" class="slot-choice-btn selected">17:00 - 18:00</button>
+                  <button type="button" class="slot-choice-btn">18:00 - 19:00</button>
+                  <button type="button" class="slot-choice-btn">20:00 - 21:00</button>
+                </div>
+              </div>
+            </div>
+            <div class="court-card-action">
+              <a href="/customer/booking?courtId=1&branch=CN01" class="btn-book-instant">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Khóa Giữ Chỗ 10 Phút</span>
+              </a>
             </div>
           </div>
-        </div>
-        <div class="court-card-footer">
-          <a href="/customer/booking?courtId=1&branchId=1" class="btn-book-court">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-            Chọn Sân & Giữ Chỗ
-          </a>
+
+          <!-- COURT 2 -->
+          <div class="court-display-card" data-branch="CN01" data-type="vip">
+            <div class="court-card-thumb-wrap">
+              <img src="/images/badminton-court.jpg" alt="Sân 02 VIP Yonex">
+              <span class="court-thumb-badge badge-vip">👑 Sân VIP Yonex</span>
+              <div class="court-status-indicator">
+                <span class="hero-pulse-dot"></span> Sẵn sàng
+              </div>
+            </div>
+            <div class="court-info-body">
+              <div class="court-name-row">
+                <div class="court-item-title">Sân Số 02 (VIP Yonex)</div>
+                <div class="court-mat-type">Chi nhánh Thủ Đức</div>
+              </div>
+              <div class="court-amenities-tags">
+                <span class="amenity-tag">🏸 Thảm Yonex BWF 5 lớp</span>
+                <span class="amenity-tag">💡 LED 500 Lux chống lóa</span>
+                <span class="amenity-tag">📹 Hỗ trợ camera quay lại</span>
+              </div>
+              <div class="court-price-row">
+                <span class="price-big">120.000 đ</span>
+                <span class="price-note">/ giờ (Cọc trước 30%: 36.000đ)</span>
+              </div>
+              <div class="slot-choice-wrap">
+                <div class="slot-choice-label">Slot trống hôm nay:</div>
+                <div class="slot-choice-pills">
+                  <button type="button" class="slot-choice-btn">16:00 - 17:00</button>
+                  <button type="button" class="slot-choice-btn selected">19:00 - 20:00</button>
+                  <button type="button" class="slot-choice-btn">21:00 - 22:00</button>
+                </div>
+              </div>
+            </div>
+            <div class="court-card-action">
+              <a href="/customer/booking?courtId=2&branch=CN01" class="btn-book-instant">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Khóa Giữ Chỗ 10 Phút</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- COURT 3 -->
+          <div class="court-display-card" data-branch="CN01" data-type="standard">
+            <div class="court-card-thumb-wrap">
+              <img src="/images/badminton-court.jpg" alt="Sân 03 Enlio">
+              <span class="court-thumb-badge badge-standard">Sân Tiêu Chuẩn</span>
+              <div class="court-status-indicator">
+                <span class="hero-pulse-dot"></span> Sẵn sàng
+              </div>
+            </div>
+            <div class="court-info-body">
+              <div class="court-name-row">
+                <div class="court-item-title">Sân Số 03 (Thảm Enlio)</div>
+                <div class="court-mat-type">Chi nhánh Thủ Đức</div>
+              </div>
+              <div class="court-amenities-tags">
+                <span class="amenity-tag">🏸 Thảm Enlio xanh lá</span>
+                <span class="amenity-tag">📏 Kích thước 13.4m x 6.1m</span>
+                <span class="amenity-tag">💨 Ghế nghỉ & quạt mát</span>
+              </div>
+              <div class="court-price-row">
+                <span class="price-big">90.000 đ</span>
+                <span class="price-note">/ giờ (Cọc trước 30%: 27.000đ)</span>
+              </div>
+              <div class="slot-choice-wrap">
+                <div class="slot-choice-label">Slot trống hôm nay:</div>
+                <div class="slot-choice-pills">
+                  <button type="button" class="slot-choice-btn selected">17:00 - 18:00</button>
+                  <button type="button" class="slot-choice-btn">18:00 - 19:00</button>
+                  <button type="button" class="slot-choice-btn">20:00 - 21:00</button>
+                </div>
+              </div>
+            </div>
+            <div class="court-card-action">
+              <a href="/customer/booking?courtId=3&branch=CN01" class="btn-book-instant">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Khóa Giữ Chỗ 10 Phút</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- COURT 4 -->
+          <div class="court-display-card" data-branch="CN01" data-type="standard">
+            <div class="court-card-thumb-wrap">
+              <img src="/images/badminton-court.jpg" alt="Sân 04 Enlio">
+              <span class="court-thumb-badge badge-standard">Sân Tiêu Chuẩn</span>
+              <div class="court-status-indicator">
+                <span class="hero-pulse-dot"></span> Sẵn sàng
+              </div>
+            </div>
+            <div class="court-info-body">
+              <div class="court-name-row">
+                <div class="court-item-title">Sân Số 04 (Thảm Enlio)</div>
+                <div class="court-mat-type">Chi nhánh Thủ Đức</div>
+              </div>
+              <div class="court-amenities-tags">
+                <span class="amenity-tag">🏸 Thảm Enlio xanh lá</span>
+                <span class="amenity-tag">💡 Ánh sáng đều không lóa</span>
+                <span class="amenity-tag">❄️ Khu vực ngồi rộng</span>
+              </div>
+              <div class="court-price-row">
+                <span class="price-big">90.000 đ</span>
+                <span class="price-note">/ giờ (Cọc trước 30%: 27.000đ)</span>
+              </div>
+              <div class="slot-choice-wrap">
+                <div class="slot-choice-label">Slot trống hôm nay:</div>
+                <div class="slot-choice-pills">
+                  <button type="button" class="slot-choice-btn">15:00 - 16:00</button>
+                  <button type="button" class="slot-choice-btn selected">18:00 - 19:00</button>
+                  <button type="button" class="slot-choice-btn">19:00 - 20:00</button>
+                </div>
+              </div>
+            </div>
+            <div class="court-card-action">
+              <a href="/customer/booking?courtId=4&branch=CN01" class="btn-book-instant">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Khóa Giữ Chỗ 10 Phút</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- COURT 5 -->
+          <div class="court-display-card" data-branch="CN01" data-type="standard">
+            <div class="court-card-thumb-wrap">
+              <img src="/images/badminton-court.jpg" alt="Sân 05 Tiêu chuẩn">
+              <span class="court-thumb-badge badge-standard">Sân Tiêu Chuẩn</span>
+              <div class="court-status-indicator">
+                <span class="hero-pulse-dot"></span> Sẵn sàng
+              </div>
+            </div>
+            <div class="court-info-body">
+              <div class="court-name-row">
+                <div class="court-item-title">Sân Số 05 (Tiêu Chuẩn)</div>
+                <div class="court-mat-type">Chi nhánh Thủ Đức</div>
+              </div>
+              <div class="court-amenities-tags">
+                <span class="amenity-tag">🏸 Thảm cao su đàn hồi</span>
+                <span class="amenity-tag">📏 13.4m x 6.1m</span>
+                <span class="amenity-tag">💨 Quạt gió êm dịu</span>
+              </div>
+              <div class="court-price-row">
+                <span class="price-big">80.000 đ</span>
+                <span class="price-note">/ giờ (Cọc trước 30%: 24.000đ)</span>
+              </div>
+              <div class="slot-choice-wrap">
+                <div class="slot-choice-label">Slot trống hôm nay:</div>
+                <div class="slot-choice-pills">
+                  <button type="button" class="slot-choice-btn selected">07:00 - 08:00</button>
+                  <button type="button" class="slot-choice-btn">08:00 - 09:00</button>
+                  <button type="button" class="slot-choice-btn">14:00 - 15:00</button>
+                </div>
+              </div>
+            </div>
+            <div class="court-card-action">
+              <a href="/customer/booking?courtId=5&branch=CN01" class="btn-book-instant">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Khóa Giữ Chỗ 10 Phút</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- COURT 6 -->
+          <div class="court-display-card" data-branch="CN01" data-type="standard">
+            <div class="court-card-thumb-wrap">
+              <img src="/images/badminton-court.jpg" alt="Sân 06 Tiêu chuẩn">
+              <span class="court-thumb-badge badge-standard">Sân Tiêu Chuẩn</span>
+              <div class="court-status-indicator">
+                <span class="hero-pulse-dot"></span> Sẵn sàng
+              </div>
+            </div>
+            <div class="court-info-body">
+              <div class="court-name-row">
+                <div class="court-item-title">Sân Số 06 (Tiêu Chuẩn)</div>
+                <div class="court-mat-type">Chi nhánh Thủ Đức</div>
+              </div>
+              <div class="court-amenities-tags">
+                <span class="amenity-tag">🏸 Thảm cao su đàn hồi</span>
+                <span class="amenity-tag">💡 Đèn LED phân bổ đều</span>
+                <span class="amenity-tag">❄️ Gần quầy nước</span>
+              </div>
+              <div class="court-price-row">
+                <span class="price-big">80.000 đ</span>
+                <span class="price-note">/ giờ (Cọc trước 30%: 24.000đ)</span>
+              </div>
+              <div class="slot-choice-wrap">
+                <div class="slot-choice-label">Slot trống hôm nay:</div>
+                <div class="slot-choice-pills">
+                  <button type="button" class="slot-choice-btn selected">09:00 - 10:00</button>
+                  <button type="button" class="slot-choice-btn">10:00 - 11:00</button>
+                  <button type="button" class="slot-choice-btn">17:00 - 18:00</button>
+                </div>
+              </div>
+            </div>
+            <div class="court-card-action">
+              <a href="/customer/booking?courtId=6&branch=CN01" class="btn-book-instant">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Khóa Giữ Chỗ 10 Phút</span>
+              </a>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <!-- Court 2 -->
-      <div class="cust-court-card" data-type="standard">
-        <div class="court-card-top">
-          <div>
-            <div class="court-card-title">Sân Số 02</div>
-            <div class="court-card-sub">Thảm Enlio BWF Xanh Lá</div>
-          </div>
-          <span class="badge badge-success">Sẵn sàng</span>
-        </div>
-        <div class="court-card-body">
-          <div class="court-specs">
-            <span class="court-spec-tag">🏟️ Đèn LED chống lóa</span>
-            <span class="court-spec-tag">📏 13.4m x 6.1m</span>
-            <span class="court-spec-tag">❄️ Quạt mát</span>
-          </div>
-          <div class="court-price-box">
-            <span class="price-num">80.000đ</span>
-            <span class="price-unit">/ giờ thường (Giờ vàng: 120.000đ)</span>
-          </div>
-          <div>
-            <div style="font-size: 11.5px; font-weight: 600; color: var(--cust-text-muted); margin-bottom: 6px;">Slot trống hôm nay:</div>
-            <div class="slot-pills-row">
-              <span class="slot-pill">18:00 - 19:00</span>
-              <span class="slot-pill active">19:00 - 20:00</span>
-              <span class="slot-pill">21:00 - 22:00</span>
-            </div>
-          </div>
-        </div>
-        <div class="court-card-footer">
-          <a href="/customer/booking?courtId=2&branchId=1" class="btn-book-court">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-            Chọn Sân & Giữ Chỗ
-          </a>
-        </div>
-      </div>
-
-      <!-- Court 3 (VIP) -->
-      <div class="cust-court-card" data-type="vip" style="border: 1px solid var(--cust-primary-border); box-shadow: 0 2px 6px rgba(13,148,136,0.06);">
-        <div class="court-card-top" style="background: var(--cust-primary-light);">
-          <div>
-            <div class="court-card-title" style="color: var(--cust-primary-hover); display: flex; align-items: center; gap: 6px;">
-              Sân Số 03 - VIP
-              <span class="badge badge-warning" style="font-size: 10px;">⭐ VIP Yonex</span>
-            </div>
-            <div class="court-card-sub">Thảm Yonex Đỏ Thi Đấu Quốc Tế</div>
-          </div>
-          <span class="badge badge-success">Sẵn sàng</span>
-        </div>
-        <div class="court-card-body">
-          <div class="court-specs">
-            <span class="court-spec-tag" style="background: var(--cust-accent-light); color: var(--cust-accent); border-color: var(--cust-accent-border);">🌟 Thảm Yonex</span>
-            <span class="court-spec-tag">🎥 Camera VAR</span>
-            <span class="court-spec-tag">❄️ Ghế ngồi riêng</span>
-          </div>
-          <div class="court-price-box" style="background: var(--cust-accent-light); border-color: var(--cust-accent-border);">
-            <span class="price-num" style="color: var(--cust-accent);">120.000đ</span>
-            <span class="price-unit" style="color: #9a3412;">/ giờ thường (Giờ vàng: 150.000đ)</span>
-          </div>
-          <div>
-            <div style="font-size: 11.5px; font-weight: 600; color: var(--cust-text-muted); margin-bottom: 6px;">Slot trống hôm nay:</div>
-            <div class="slot-pills-row">
-              <span class="slot-pill active">17:00 - 18:00</span>
-              <span class="slot-pill">19:00 - 20:00</span>
-              <span class="slot-pill">20:00 - 21:00</span>
-            </div>
-          </div>
-        </div>
-        <div class="court-card-footer">
-          <a href="/customer/booking?courtId=3&branchId=1" class="btn-book-court" style="background: var(--cust-accent);">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-            Chọn Sân VIP & Giữ Chỗ
-          </a>
+      <!-- PANE 2: PRICING MATRIX -->
+      <div id="tab-pricing" class="tab-pane" style="display: none;">
+        <div class="pricing-matrix-box">
+          <table class="pricing-table-clean">
+            <thead>
+              <tr>
+                <th>Phân Khung Giờ</th>
+                <th>Thời Gian Áp Dụng</th>
+                <th>Sân Tiêu Chuẩn Enlio</th>
+                <th>Sân VIP Yonex BWF</th>
+                <th>Ghi Chú Đặt Trước</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>🌅 Khung Giờ Sáng</strong></td>
+                <td>06:00 - 10:00 (Thứ 2 - CN)</td>
+                <td><strong style="color: var(--primary);">80.000 đ/h</strong></td>
+                <td><strong style="color: #d97706;">110.000 đ/h</strong></td>
+                <td>Slot thoáng, phù hợp tập luyện thể lực</td>
+              </tr>
+              <tr>
+                <td><strong>☀️ Khung Giờ Thường (Trưa/Chiều)</strong></td>
+                <td>10:00 - 16:00 (Thứ 2 - Thứ 6)</td>
+                <td><strong style="color: var(--primary);">70.000 đ/h</strong></td>
+                <td><strong style="color: #d97706;">100.000 đ/h</strong></td>
+                <td>Ưu đãi giảm 10k cho học sinh / sinh viên</td>
+              </tr>
+              <tr>
+                <td><strong>🔥 KHUNG GIỜ VÀNG (Cao Điểm)</strong></td>
+                <td>17:00 - 21:00 (Hàng ngày)</td>
+                <td><strong style="color: var(--primary);">90.000 đ/h</strong></td>
+                <td><strong style="color: #d97706;">120.000 đ/h</strong></td>
+                <td>Yêu cầu cọc 30% qua VietQR để giữ chỗ</td>
+              </tr>
+              <tr>
+                <td><strong>🌙 Khung Giờ Tối Muộn</strong></td>
+                <td>21:00 - 22:30 (Hàng ngày)</td>
+                <td><strong style="color: var(--primary);">80.000 đ/h</strong></td>
+                <td><strong style="color: #d97706;">110.000 đ/h</strong></td>
+                <td>Phù hợp giao lưu sau giờ làm việc</td>
+              </tr>
+              <tr>
+                <td><strong>🎉 Thứ 7, Chủ Nhật & Lễ Tết</strong></td>
+                <td>Toàn bộ khung giờ</td>
+                <td>Phụ thu <strong>+10.000 đ/h</strong></td>
+                <td>Phụ thu <strong>+15.000 đ/h</strong></td>
+                <td>Áp dụng bảng giá ngày lễ theo quy định</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- Court 4 -->
-      <div class="cust-court-card" data-type="standard">
-        <div class="court-card-top">
-          <div>
-            <div class="court-card-title">Sân Số 04</div>
-            <div class="court-card-sub">Thảm Enlio BWF Xanh Lá</div>
-          </div>
-          <span class="badge badge-success">Sẵn sàng</span>
-        </div>
-        <div class="court-card-body">
-          <div class="court-specs">
-            <span class="court-spec-tag">🏟️ Đèn LED chống lóa</span>
-            <span class="court-spec-tag">📏 13.4m x 6.1m</span>
-            <span class="court-spec-tag">❄️ Quạt mát</span>
-          </div>
-          <div class="court-price-box">
-            <span class="price-num">80.000đ</span>
-            <span class="price-unit">/ giờ thường (Giờ vàng: 120.000đ)</span>
-          </div>
-          <div>
-            <div style="font-size: 11.5px; font-weight: 600; color: var(--cust-text-muted); margin-bottom: 6px;">Slot trống hôm nay:</div>
-            <div class="slot-pills-row">
-              <span class="slot-pill">16:00 - 17:00</span>
-              <span class="slot-pill active">18:00 - 19:00</span>
-              <span class="slot-pill">19:00 - 20:00</span>
+      <!-- PANE 3: TOURNAMENT SHOWCASE -->
+      <div id="tab-tournament" class="tab-pane" style="display: none;">
+        <div class="tournament-showcase-card">
+          <div class="tournament-info-col">
+            <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
+              🏆 GIẢI ĐẤU TOÀN CHUỖI MÙA THU 2026
+            </span>
+            <h3>Giải Cầu Lông Đôi Nam Nữ UTE Open 2026</h3>
+            <p style="color: #cbd5e1; max-width: 650px; font-size: 13.5px; line-height: 1.6;">
+              Quy tụ 32 cặp vận động viên phong trào xuất sắc nhất các câu lạc bộ tại TP. Hồ Chí Minh. Thi đấu theo thể thức loại trực tiếp 3 set 21 điểm tại Sân VIP 01 - 04 Chi nhánh Thủ Đức.
+            </p>
+            <div style="display: flex; gap: 24px; margin-top: 14px; font-size: 13px;">
+              <div>📅 <strong>Khai mạc:</strong> 15/10/2026</div>
+              <div>💰 <strong>Giải Nhất:</strong> 12.000.000 đ + Cúp vô địch</div>
+              <div>🎯 <strong>Lệ phí:</strong> 300.000 đ / cặp</div>
             </div>
           </div>
-        </div>
-        <div class="court-card-footer">
-          <a href="/customer/booking?courtId=4&branchId=1" class="btn-book-court">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-            Chọn Sân & Giữ Chỗ
-          </a>
+          <div>
+            <a href="/customer/tournaments" class="btn btn-primary" style="padding: 14px 28px; font-size: 14px; font-weight: 700; border-radius: 10px; box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);">
+              Xem Chi Tiết & Đăng Ký
+            </a>
+          </div>
         </div>
       </div>
+
+      <!-- PANE 4: AMENITIES & SERVICES -->
+      <div id="tab-amenities" class="tab-pane" style="display: none;">
+        <div class="amenities-feature-grid">
+          <div class="amenity-feature-box">
+            <div class="amenity-icon-circle">
+              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 24px; height: 24px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            </div>
+            <h4 style="margin: 0 0 6px; font-size: 15px; font-weight: 700;">Khóa Giữ Chỗ 10 Phút</h4>
+            <p style="font-size: 12.5px; color: var(--text-muted); margin: 0; line-height: 1.5;">Hệ thống tự động khóa giữ slot 10 phút để người chơi an tâm quét mã chuyển khoản cọc VietQR.</p>
+          </div>
+
+          <div class="amenity-feature-box">
+            <div class="amenity-icon-circle">
+              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 24px; height: 24px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <h4 style="margin: 0 0 6px; font-size: 15px; font-weight: 700;">Máy Căng Vợt Điện Tử</h4>
+            <p style="font-size: 12.5px; color: var(--text-muted); margin: 0; line-height: 1.5;">Máy kéo Yonex Protech 8 chuẩn thi đấu quốc tế, độ chính xác 0.1 lbs, sẵn dây BG65, BG65Ti, Exbolt 63.</p>
+          </div>
+
+          <div class="amenity-feature-box">
+            <div class="amenity-icon-circle">
+              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 24px; height: 24px;"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+            </div>
+            <h4 style="margin: 0 0 6px; font-size: 15px; font-weight: 700;">Quầy Dịch Vụ F&B</h4>
+            <p style="font-size: 12.5px; color: var(--text-muted); margin: 0; line-height: 1.5;">Nước khoáng, Pocari Sweat, Revive, Bò húc ướp lạnh, cầu lông Ba Sao / Thành Công và phụ kiện quấn cán.</p>
+          </div>
+
+          <div class="amenity-feature-box">
+            <div class="amenity-icon-circle">
+              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 24px; height: 24px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <h4 style="margin: 0 0 6px; font-size: 15px; font-weight: 700;">Tắm Nóng Lạnh & Bãi Đỗ</h4>
+            <p style="font-size: 12.5px; color: var(--text-muted); margin: 0; line-height: 1.5;">Phòng thay đồ sạch sẽ, vòi sen nước nóng miễn phí, bãi giữ xe máy & ô tô rộng rãi có bảo vệ 24/7.</p>
+          </div>
+        </div>
+      </div>
+
     </div>
+
   </main>
 
-  <!-- Pricing Table Section -->
-  <section class="container-section">
-    <div class="section-head">
-      <div class="section-head-title">
-        <h2>Bảng Giá Thuê Sân & Dịch Vụ Niêm Yết</h2>
-        <p>Bảng giá chuẩn hóa, không phụ phí ẩn. Giảm thêm đến 15% cho hội viên có thẻ.</p>
-      </div>
-      <a href="/customer/booking" class="btn btn-primary" style="height: 36px;">Đặt Sân Ngay</a>
-    </div>
-
-    <div class="price-matrix-card">
-      <table class="price-table">
-        <thead>
-          <tr>
-            <th>Loại Mặt Sân</th>
-            <th>Giờ Thường (05:00 - 17:00)</th>
-            <th>Giờ Vàng (17:00 - 22:00)</th>
-            <th>Cuối Tuần (T7 - CN)</th>
-            <th>Tiện Ích Đi Kèm</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <strong style="color: var(--cust-text-main);">Sân Tiêu Chuẩn (Enlio BWF)</strong>
-              <div style="font-size: 11.5px; color: var(--cust-text-muted);">Sân số 01, 02, 04, 05, 06, 07</div>
-            </td>
-            <td><strong style="color: var(--cust-primary);">80.000 đ</strong> / giờ</td>
-            <td><strong style="color: var(--cust-accent);">120.000 đ</strong> / giờ</td>
-            <td><strong>120.000 đ</strong> / giờ</td>
-            <td>Đèn LED 500 Lux, quạt gió, ghế ngồi nghỉ</td>
-          </tr>
-          <tr>
-            <td>
-              <strong style="color: var(--cust-accent);">Sân VIP Yonex Đỏ Đạt Chuẩn</strong>
-              <div style="font-size: 11.5px; color: var(--cust-text-muted);">Sân số 03, Sân số 08</div>
-            </td>
-            <td><strong style="color: var(--cust-primary);">120.000 đ</strong> / giờ</td>
-            <td><strong style="color: var(--cust-accent);">150.000 đ</strong> / giờ</td>
-            <td><strong>150.000 đ</strong> / giờ</td>
-            <td>Camera Livestream, ghế ngồi máy lạnh, khăn lạnh</td>
-          </tr>
-          <tr>
-            <td>
-              <strong>Dịch vụ Thuê Vợt Thi Đấu</strong>
-              <div style="font-size: 11.5px; color: var(--cust-text-muted);">Yonex Astrox / Nanoflare / Lining</div>
-            </td>
-            <td colspan="3"><strong>20.000 đ</strong> / cây / buổi</td>
-            <td>Tặng quấn cán vợt mới 100%</td>
-          </tr>
-          <tr>
-            <td>
-              <strong>Ống Cầu Lông Thi Đấu</strong>
-              <div style="font-size: 11.5px; color: var(--cust-text-muted);">Yonex AS-40 / VinaStar (3 quả)</div>
-            </td>
-            <td colspan="3"><strong>45.000 đ</strong> / ống 3 quả</td>
-            <td>Độ bền cao, quỹ đạo bay chuẩn giải đấu</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- Tournament Promotion Light Banner -->
-  <section class="container-section">
-    <div class="promo-banner-card">
+  <!-- 4. LUXURY FOOTER -->
+  <footer class="cust-footer-dark">
+    <div class="cust-footer-inner">
       <div>
-        <span class="badge badge-success" style="margin-bottom: 10px;">SỰ KIỆN NỔI BẬT THÁNG 9</span>
-        <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 6px; color: var(--cust-text-main);">Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026</h3>
-        <p style="color: var(--cust-text-muted); font-size: 13.5px; max-width: 650px;">
-          Tổng giải thưởng lên tới 20.000.000đ cùng Cúp vô địch và vợt Yonex chính hãng. Còn 8 slot đăng ký cuối cùng trước khi đóng cổng!
-        </p>
-      </div>
-      <a href="/customer/tournaments" class="btn btn-primary" style="height: 40px; padding: 0 20px; font-size: 13px;">
-        Xem Điều Lệ & Đăng Ký
-        <svg class="svg-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-      </a>
-    </div>
-  </section>
-
-  <!-- Clean Minimalist Footer -->
-  <footer class="cust-footer">
-    <div class="footer-inner">
-      <div class="footer-col">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-          <div style="width: 28px; height: 28px; background: var(--cust-primary); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px;">🏸</div>
-          <span style="font-size: 15px; font-weight: 800; color: var(--cust-text-main);">UTE BADMINTON CLUB</span>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+          <div class="cust-logo-icon" style="width: 38px; height: 38px;">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+          </div>
+          <span style="font-size: 18px; font-weight: 900; color: #ffffff;">UTE SPORT ARENA</span>
         </div>
-        <p style="line-height: 1.5; margin-bottom: 12px;">
-          Hệ thống sân cầu lông tiêu chuẩn BWF tại TP. Thủ Đức. Đặt sân tự động 24/7 và minh bạch chính sách hoàn cọc.
+        <p style="line-height: 1.6; margin-bottom: 18px;">
+          Hệ thống chuỗi sân cầu lông tiêu chuẩn quốc tế BWF. Tiên phong ứng dụng công nghệ khóa giữ chỗ thời gian thực, đối soát thanh toán tự động VietQR và dịch vụ chăm sóc người chơi hàng đầu.
         </p>
-        <div style="font-size: 12px; color: var(--cust-text-body);">
-          Hotline: <strong style="color: var(--cust-primary);">1900 6868</strong> - (028) 3896 8641
+        <div>
+          <span style="color: #6ee7b7; font-weight: 700;">Hotline Đặt Sân:</span>
+          <strong style="color: #ffffff; font-size: 15px;"> 1900 6868 - 028 3722 1223</strong>
         </div>
       </div>
 
-      <div class="footer-col">
-        <h4>Hệ Thống Chi Nhánh</h4>
-        <ul>
-          <li>📍 <strong>CN 1:</strong> 01 Võ Văn Ngân, P. Linh Chiểu (8 sân)</li>
-          <li>📍 <strong>CN 2:</strong> 216 Lê Văn Việt, P. Tăng Nhơn Phú (6 sân)</li>
-          <li>📍 <strong>CN 3:</strong> 48 Hoàng Diệu 2, P. Linh Trung (6 sân)</li>
+      <div>
+        <div class="footer-col-title">Chi Nhánh Sân Cầu Lông</div>
+        <ul class="footer-links-list">
+          <li>• CN 1: Võ Văn Ngân, TP. Thủ Đức</li>
+          <li>• CN 2: Nguyễn Thị Thập, Quận 7</li>
+          <li>• CN 3: Điện Biên Phủ, Bình Thạnh</li>
+          <li>• CN 4: Quang Trung, Gò Vấp</li>
+          <li>• Giờ mở cửa: <strong>05:30 - 22:30</strong> (Thứ 2 - CN)</li>
         </ul>
       </div>
 
-      <div class="footer-col">
-        <h4>Cổng Khách Hàng</h4>
-        <ul>
-          <li><a href="/customer/home">Trang Chủ & Bảng Giá</a></li>
-          <li><a href="/customer/booking">Đặt Sân & Giữ Chỗ 10 Phút</a></li>
+      <div>
+        <div class="footer-col-title">Dịch Vụ & Hội Viên</div>
+        <ul class="footer-links-list">
+          <li><a href="/customer/booking">Đặt Sân Trực Tuyến</a></li>
+          <li><a href="/customer/tournaments">Đăng Ký Giải Đấu UTE</a></li>
+          <li><a href="/customer/profile">Tích Điểm Thẻ Hội Viên</a></li>
           <li><a href="/customer/history">Tra Cứu Lịch Sử & Check-in</a></li>
-          <li><a href="/customer/profile">Hội Viên & Tích Điểm</a></li>
-          <li><a href="/customer/tournaments">Đăng Ký Giải Đấu</a></li>
+          <li><a href="#">Chính Sách Hoàn Cọc 100%</a></li>
         </ul>
       </div>
 
-      <div class="footer-col">
-        <h4>Chính Sách &amp; Điều Khoản</h4>
-        <ul>
-          <li><a href="/customer/history">Chính Sách Hủy Sân &amp; Hoàn Tiền</a></li>
-          <li><a href="/customer/payment">Chính Sách Đặt Cọc 30%</a></li>
-          <li><a href="/customer/profile">Chính Sách Tích Điểm Hội Viên</a></li>
-          <li><a href="/login">Cổng Đăng Nhập Quản Trị Nội Bộ</a></li>
+      <div>
+        <div class="footer-col-title">Hệ Thống & Quản Trị</div>
+        <ul class="footer-links-list">
+          <li><a href="/login">Đăng Nhập Cán Bộ & Nhân Viên</a></li>
+          <li><a href="/pos/grid">Giao Diện Thu Ngân POS</a></li>
+          <li><a href="/manager/dashboard">Dashboard Quản Lý Chi Nhánh</a></li>
+          <li><a href="/director/dashboard">Dashboard Điều Hành Chuỗi</a></li>
+          <li><a href="/admin/users">Quản Trị Người Dùng & Phân Quyền</a></li>
         </ul>
       </div>
     </div>
 
-    <div class="footer-bottom">
-      <div>© 2026 UTE Sport Badminton Management System. All rights reserved.</div>
-      <div>Designed for Software Engineering Course 2026</div>
+    <div class="footer-bottom-bar">
+      <div>
+        © 2026 <strong>UTE Sport Badminton Management System</strong> • Nhóm 11 (Thọ - Bảo - Tâm - Hương)
+      </div>
+      <div style="display: flex; gap: 20px;">
+        <span>Tiêu chuẩn thảm thi đấu BWF</span>
+        <span>Thanh toán VietQR tự động</span>
+        <span>Hỗ trợ kỹ thuật 24/7</span>
+      </div>
     </div>
   </footer>
 
+  <!-- SCRIPT LOGIC -->
+  <script src="/js/global-hub.js"></script>
+  <script src="/js/auth-guard.js"></script>
   <script>
-    function applySearchFilter() {
-      const branchId = document.getElementById('branchSelect').value;
-      const notice = document.getElementById('branchNotice');
-      if (branchId === '1') {
-        notice.textContent = 'Chi nhánh 1 - Võ Văn Ngân, TP. Thủ Đức (Cập nhật thời gian thực)';
-      } else if (branchId === '2') {
-        notice.textContent = 'Chi nhánh 2 - Lê Văn Việt, TP. Thủ Đức (Cập nhật thời gian thực)';
-      } else {
-        notice.textContent = 'Chi nhánh 3 - Hoàng Diệu 2, TP. Thủ Đức (Cập nhật thời gian thực)';
-      }
-      document.getElementById('courtsShowcase').scrollIntoView({ behavior: 'smooth' });
+    // Tab switching for Customer Portal
+    function switchCustomerTab(tabId, btn) {
+      document.querySelectorAll('.dash-tab-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+      const target = document.getElementById(tabId);
+      if (target) target.style.display = 'block';
     }
 
-    function filterView(type, btn) {
-      document.querySelectorAll('.pill-group .pill-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    function scrollToConsole() {
+      const el = document.getElementById('bookingConsole');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 
-      const cards = document.querySelectorAll('.cust-court-card');
-      cards.forEach(card => {
-        if (type === 'all' || card.getAttribute('data-type') === type) {
-          card.style.display = 'flex';
+    // Set today date as default in hero finder
+    document.addEventListener('DOMContentLoaded', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('heroBookingDate');
+      if (dateInput) dateInput.value = today;
+
+      // Update Nav User Widget if logged in
+      const rawUser = localStorage.getItem('utesport_user');
+      if (rawUser) {
+        try {
+          const user = JSON.parse(rawUser);
+          if (user && user.fullName) {
+            const userArea = document.getElementById('navUserArea');
+            if (userArea) {
+              userArea.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <a href="/customer/profile" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px var(--primary-glow);">
+                      ${user.fullName.substring(0, 2).toUpperCase()}
+                    </div>
+                    <div style="text-align: left;">
+                      <div style="font-size: 13px; font-weight: 700; color: var(--text-dark);">${user.fullName}</div>
+                      <div style="font-size: 11px; color: var(--primary); font-weight: 600;">Hội Viên VIP</div>
+                    </div>
+                  </a>
+                </div>
+              `;
+            }
+          }
+        } catch(e) {}
+      }
+    });
+
+    function handleQuickSearch(e) {
+      e.preventDefault();
+      const branch = document.getElementById('heroBranchSelect').value;
+      const date = document.getElementById('heroBookingDate').value;
+      const time = document.getElementById('heroTimeSelect').value;
+      const type = document.getElementById('heroCourtType').value;
+
+      showToast(`Đang tìm kiếm sân trống cho ngày ${date}...`, 'info');
+      setTimeout(() => {
+        window.location.href = `/customer/booking?branch=${branch}&date=${date}&time=${time}&type=${type}`;
+      }, 700);
+    }
+
+    function filterBranchDisplay(branchCode) {
+      const cards = document.querySelectorAll('.court-display-card');
+      let count = 0;
+      cards.forEach(c => {
+        if (branchCode === 'ALL' || c.dataset.branch === branchCode) {
+          c.style.display = 'flex';
+          count++;
         } else {
-          card.style.display = 'none';
+          c.style.display = 'none';
         }
       });
+      document.getElementById('kpiAvailableCourts').innerText = `${count} / 26 Sân`;
+      showToast(`Đã lọc danh sách theo ${branchCode}!`, 'info');
     }
   </script>
-  <script src="/js/global-hub.js"></script>
 </body>
 </html>
-

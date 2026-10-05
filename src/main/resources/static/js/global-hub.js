@@ -3,6 +3,15 @@
  * Supports: Sidebar Toggle, Theme Toggle (Light/Dark), Tab Switching, Toast Alerts, Modal Controls
  */
 
+// 0. Auto-load RBAC Role Guard & User Sync
+(function () {
+  if (!window.RBAC && !document.querySelector('script[src*="auth-guard.js"]')) {
+    const s = document.createElement('script');
+    s.src = '/js/auth-guard.js';
+    document.head.appendChild(s);
+  }
+})();
+
 // 1. Theme Management (Light / Dark)
 function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme') || 'light';

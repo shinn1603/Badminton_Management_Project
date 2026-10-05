@@ -39,3 +39,6 @@ build/
 # Agent
 .agent/
 .antigravity/
+scratch/
+scratch_*/
+scratch_*.*

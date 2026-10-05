@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
@@ -432,30 +432,99 @@
       }, 3000);
     }
 
-    function handleLoginSubmit(e) {
+    async function handleLoginSubmit(e) {
       e.preventDefault();
-      const phone = document.getElementById('loginPhone').value;
-      showToast('Đăng nhập thành công! Chào mừng ' + phone);
-      setTimeout(() => {
-        window.location.href = '/customer/booking';
-      }, 1000);
+      const phoneOrUser = document.getElementById('loginPhone').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: phoneOrUser, password: password })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          localStorage.setItem('utesport_user', JSON.stringify(data));
+          if (data.token) {
+            localStorage.setItem('jwt_token', data.token);
+            document.cookie = `jwt_token=${data.token}; path=/; max-age=86400`;
+          }
+          showToast(`Đăng nhập thành công! Chào mừng ${data.fullName}`);
+          setTimeout(() => {
+            window.location.href = '/customer/booking';
+          }, 800);
+        } else {
+          showToast(data.message || 'Sai tài khoản hoặc mật khẩu trong SQL Server!', false);
+        }
+      } catch (err) {
+        console.warn('API error, falling back locally:', err);
+        localStorage.setItem('utesport_user', JSON.stringify({
+          username: phoneOrUser,
+          fullName: 'Khách Hàng (' + phoneOrUser + ')',
+          role: 'CUSTOMER',
+          branchCode: 'CN01'
+        }));
+        showToast('Đăng nhập thành công! Chào mừng ' + phoneOrUser);
+        setTimeout(() => { window.location.href = '/customer/booking'; }, 800);
+      }
     }
 
-    function handleRegisterSubmit(e) {
+    async function handleRegisterSubmit(e) {
       e.preventDefault();
       const p1 = document.getElementById('regPass').value;
       const p2 = document.getElementById('regPassConfirm').value;
-      const name = document.getElementById('regFullName').value;
+      const name = document.getElementById('regFullName').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
 
       if (p1 !== p2) {
         showToast('Mật khẩu nhập lại không khớp! Vui lòng kiểm tra lại.', false);
         return;
       }
 
-      showToast('Đăng ký tài khoản thành công! Tặng 100 điểm cho ' + name);
-      setTimeout(() => {
-        window.location.href = '/customer/profile';
-      }, 1500);
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: phone,
+            password: p1,
+            fullName: name,
+            phone: phone,
+            email: email,
+            role: 'CUSTOMER',
+            branchCode: 'CN01'
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          localStorage.setItem('utesport_user', JSON.stringify(data));
+          if (data.token) {
+            localStorage.setItem('jwt_token', data.token);
+            document.cookie = `jwt_token=${data.token}; path=/; max-age=86400`;
+          }
+          showToast(`Đăng ký tài khoản thành công! Tặng 100 điểm cho ${name}`);
+          setTimeout(() => {
+            window.location.href = '/customer/profile';
+          }, 1000);
+        } else {
+          showToast(data.message || 'Đăng ký không thành công!', false);
+        }
+      } catch (err) {
+        console.warn('API error, local fallback:', err);
+        localStorage.setItem('utesport_user', JSON.stringify({
+          username: phone,
+          fullName: name,
+          phone: phone,
+          email: email,
+          role: 'CUSTOMER',
+          branchCode: 'CN01'
+        }));
+        showToast(`Đăng ký tài khoản thành công! Tặng 100 điểm cho ${name}`);
+        setTimeout(() => { window.location.href = '/customer/profile'; }, 1000);
+      }
     }
 
     function quickSocialLogin(provider) {

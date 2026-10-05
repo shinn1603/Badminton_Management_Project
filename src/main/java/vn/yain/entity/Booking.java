@@ -59,4 +59,10 @@ public class Booking {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "check_in_time")
+    private LocalDateTime checkInTime;
+
+    @Column(name = "check_out_time")
+    private LocalDateTime checkOutTime;
 }

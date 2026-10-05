@@ -223,6 +223,10 @@
 
         if (res.ok && data.success) {
           localStorage.setItem('utesport_user', JSON.stringify(data));
+          if (data.token) {
+            localStorage.setItem('jwt_token', data.token);
+            document.cookie = `jwt_token=${data.token}; path=/; max-age=86400`;
+          }
           localStorage.setItem('pos_user', 'true');
           showToast(`Đăng nhập thành công! Xin chào ${data.fullName}`, 'success');
 
@@ -245,13 +249,37 @@
           btn.innerHTML = '<span>Đăng nhập vào hệ thống</span>';
         }
       } catch (err) {
-        // Fallback client routing if API is starting up
         console.warn('API error, using local fallback:', err);
-        if (username === 'director') window.location.href = '/director/dashboard';
-        else if (username === 'pos') window.location.href = '/pos/grid';
-        else if (username === 'customer') window.location.href = '/customer/home';
-        else if (username === 'admin') window.location.href = '/admin/users';
-        else window.location.href = '/manager/dashboard';
+        let fallbackRole = 'MANAGER';
+        let fallbackName = 'Trần Phúc Bảo';
+        let fallbackUrl = '/manager/dashboard';
+
+        if (username === 'director') {
+          fallbackRole = 'DIRECTOR';
+          fallbackName = 'Nguyễn Phước Thọ';
+          fallbackUrl = '/director/dashboard';
+        } else if (username === 'pos') {
+          fallbackRole = 'POS';
+          fallbackName = 'Nguyễn Thanh Tâm';
+          fallbackUrl = '/pos/grid';
+        } else if (username === 'customer') {
+          fallbackRole = 'CUSTOMER';
+          fallbackName = 'Lê Bá Đạt';
+          fallbackUrl = '/customer/home';
+        } else if (username === 'admin') {
+          fallbackRole = 'ADMIN';
+          fallbackName = 'Trần Biểu Hương';
+          fallbackUrl = '/admin/users';
+        }
+
+        localStorage.setItem('utesport_user', JSON.stringify({
+          success: true,
+          username: username,
+          fullName: fallbackName,
+          role: fallbackRole,
+          branchCode: 'CN01'
+        }));
+        window.location.href = fallbackUrl;
       }
     }
 

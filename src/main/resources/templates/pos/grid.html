@@ -27,30 +27,10 @@
       </div>
       
       <div class="sidebar-content">
-        <div class="menu-title">Nghiệp vụ quầy & Sân</div>
-        
-        <a href="/manager/dashboard" class="menu-item">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-          </svg>
-          <span class="menu-text">Tổng quan</span>
-        </a>
+      <div class="sidebar-content">
+        <div class="menu-title">Nghiệp vụ thu ngân POS</div>
 
-        <a href="/manager/bookings" class="menu-item">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          <span class="menu-text">Đặt sân</span>
-          <span class="menu-tag">7 đơn</span>
-        </a>
-
-        <a href="/pos/grid" class="menu-item active">
+        <a href="/pos/grid" class="menu-item active" title="Sơ đồ bàn cờ & Lưới đặt sân thời gian thực">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <line x1="12" y1="20" x2="12" y2="10"></line>
             <line x1="18" y1="20" x2="18" y2="4"></line>
@@ -59,36 +39,42 @@
           <span class="menu-text">Lưới đặt sân</span>
         </a>
 
-        <a href="/manager/courts" class="menu-item">
+        <a href="javascript:void(0)" onclick="openCreateBookingModal()" class="menu-item" title="Tiếp nhận khách & Đặt sân nhanh tại quầy (MH-NVQ03)">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
           </svg>
-          <span class="menu-text">Danh mục sân</span>
+          <span class="menu-text">Đặt sân tại quầy</span>
+          <span class="menu-tag" style="background: rgba(16, 185, 129, 0.15); color: var(--primary);">F2</span>
         </a>
 
-        <a href="/manager/pricing" class="menu-item">
+        <a href="javascript:void(0)" onclick="openCheckoutModal()" class="menu-item" title="Quầy dịch vụ F&B & Thuê dụng cụ (MH-NVQ05)">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <line x1="12" y1="1" x2="12" y2="23"></line>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
           </svg>
-          <span class="menu-text">Cấu hình giá</span>
+          <span class="menu-text">Quầy Dịch Vụ F&B</span>
+          <span class="menu-tag" style="background: rgba(59, 130, 246, 0.15); color: #2563eb;">F4</span>
         </a>
 
-        <a href="/manager/inventory" class="menu-item">
+        <a href="javascript:void(0)" onclick="document.getElementById('searchInput').focus(); showToast('Nhập số điện thoại hoặc tên khách để tra cứu nhanh', 'info');" class="menu-item" title="Tra cứu đơn đặt sân & Khách hàng (MH-NVQ07)">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <span class="menu-text">Kho vật tư</span>
+          <span class="menu-text">Tra cứu đơn sân</span>
         </a>
 
-        <a href="/manager/reports" class="menu-item">
+        <a href="javascript:void(0)" onclick="openShiftHandoverModal()" class="menu-item" title="Kết ca & Bàn giao ca trực thu ngân (XL-08)">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <line x1="18" y1="20" x2="18" y2="10"></line>
-            <line x1="12" y1="20" x2="12" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="14"></line>
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
           </svg>
-          <span class="menu-text">Báo cáo doanh thu</span>
+          <span class="menu-text">Bàn giao ca trực</span>
+          <span class="menu-tag" style="background: rgba(245, 158, 11, 0.15); color: #d97706;">XL-08</span>
         </a>
 
         <div class="sidebar-motto">
@@ -433,8 +419,137 @@
     </div>
   </div>
 
+  <!-- MODAL BÀN GIAO CA TRỰC THU NGÂN (XL-08) -->
+  <div class="modal-overlay" id="shiftHandoverModal">
+    <div class="modal-container" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--warning); display: inline-block; vertical-align: middle; margin-right: 6px;">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+          Bàn Giao Ca Trực Thu Ngân (XL-08)
+        </h3>
+        <button class="modal-close-btn" onclick="closeShiftHandoverModal()">✕</button>
+      </div>
+      <div class="modal-body" style="font-size: 13.5px;">
+        <div style="background: var(--surface-subtle); padding: 14px; border-radius: 10px; border: 1px solid var(--border-subtle); margin-bottom: 16px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px;">
+            <div><strong>Thu ngân:</strong> <span class="user-name">Nguyễn Thanh Tâm</span></div>
+            <div><strong>Ca trực:</strong> <span>Ca Sáng (06:00 - 14:00)</span></div>
+            <div><strong>Chi nhánh:</strong> <span id="handoverBranch">CN01 - Thủ Đức</span></div>
+            <div><strong>Thời gian chốt:</strong> <span id="handoverTime">Hôm nay</span></div>
+          </div>
+        </div>
+
+        <h4 style="font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Tổng hợp phát sinh trong ca</h4>
+        <div style="display: flex; flex-direction: column; gap: 6px; padding: 12px; background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 8px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-muted);">Tiền giờ thuê sân:</span>
+            <strong>2.100.000 đ</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-muted);">Dịch vụ nước & phụ kiện:</span>
+            <strong>850.000 đ</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px dashed var(--border-subtle); font-size: 14.5px;">
+            <strong>TỔNG DOANH THU CA:</strong>
+            <strong style="color: var(--primary);">2.950.000 đ</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12.5px; color: var(--text-muted); margin-top: 4px;">
+            <span>• Tiền mặt tại két: <strong>1.450.000 đ</strong></span>
+            <span>• Chuyển khoản VietQR: <strong>1.500.000 đ</strong></span>
+          </div>
+        </div>
+
+        <h4 style="font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Kiểm đếm tiền mặt thực tế & Đối soát</h4>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label">Tiền mặt thực tế đếm được trong két (*)</label>
+          <input type="number" id="actualCashInput" class="form-control" placeholder="vd: 1450000" value="1450000" oninput="calculateHandoverDifference()">
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2);">
+          <span>Trạng thái đối soát:</span>
+          <strong id="handoverDiffText" style="color: var(--primary);">Khớp sổ (Chênh lệch: 0 đ)</strong>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between;">
+        <button class="btn btn-outline" onclick="printHandoverReport()">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          <span>In biên bản kết ca</span>
+        </button>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-outline" onclick="closeShiftHandoverModal()">Đóng</button>
+          <button class="btn btn-primary" onclick="confirmShiftHandover()">Xác nhận kết ca</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- JAVASCRIPT LOGIC TÁCH RIÊNG HOÀN CHỈNH -->
   <script src="/js/pos-grid.js"></script>
+  <script src="/js/auth-guard.js"></script>
   <script src="/js/global-hub.js"></script>
+  <script>
+    function openShiftHandoverModal() {
+      const now = new Date();
+      document.getElementById('handoverTime').innerText = now.toLocaleString('vi-VN');
+      document.getElementById('shiftHandoverModal').classList.add('active');
+    }
+    function closeShiftHandoverModal() {
+      document.getElementById('shiftHandoverModal').classList.remove('active');
+    }
+    function calculateHandoverDifference() {
+      const expected = 1450000;
+      const actual = Number(document.getElementById('actualCashInput').value) || 0;
+      const diff = actual - expected;
+      const txt = document.getElementById('handoverDiffText');
+      if (diff === 0) {
+        txt.style.color = 'var(--primary)';
+        txt.innerText = 'Khớp sổ (Chênh lệch: 0 đ)';
+      } else if (diff > 0) {
+        txt.style.color = '#2563eb';
+        txt.innerText = `Thừa két: +${diff.toLocaleString('vi-VN')} đ`;
+      } else {
+        txt.style.color = '#ef4444';
+        txt.innerText = `Thiếu két: ${diff.toLocaleString('vi-VN')} đ`;
+      }
+    }
+    function printHandoverReport() {
+      const win = window.open('', '_blank', 'width=380,height=600');
+      win.document.write(`
+        <html><head><title>Biên Bản Bàn Giao Ca (XL-08)</title>
+        <style>body{font-family:'Courier New',monospace;padding:16px;line-height:1.4;font-size:12px;}.center{text-align:center;}.dash{border-bottom:1px dashed #000;margin:8px 0;}.row{display:flex;justify-content:space-between;}</style>
+        </head><body onload="window.print()">
+        <div class="center"><h3>UTE SPORT ARENA</h3><p>BIÊN BẢN BÀN GIAO CA THU NGÂN (XL-08)</p></div>
+        <div class="dash"></div>
+        <div>Thu ngân: <strong>Nguyễn Thanh Tâm</strong></div>
+        <div>Thời gian in: ${new Date().toLocaleString('vi-VN')}</div>
+        <div class="dash"></div>
+        <div class="row"><span>Doanh thu giờ sân:</span><strong>2.100.000 đ</strong></div>
+        <div class="row"><span>Doanh thu dịch vụ:</span><strong>850.000 đ</strong></div>
+        <div class="row"><span>Tổng thu:</span><strong>2.950.000 đ</strong></div>
+        <div class="dash"></div>
+        <div class="row"><span>Tiền mặt sổ sách:</span><span>1.450.000 đ</span></div>
+        <div class="row"><span>Tiền mặt thực tế:</span><span>${Number(document.getElementById('actualCashInput').value).toLocaleString('vi-VN')} đ</span></div>
+        <div class="row"><span>VietQR chuyển khoản:</span><span>1.500.000 đ</span></div>
+        <div class="dash"></div>
+        <div class="center" style="margin-top:20px;"><p>Người lập biểu &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Người nhận bàn giao<br>(Ký & ghi rõ họ tên) &nbsp;&nbsp;&nbsp;&nbsp; (Ký & ghi rõ họ tên)</p></div>
+        </body></html>
+      `);
+      win.document.close();
+    }
+    function confirmShiftHandover() {
+      showToast('Đã lưu biên bản kết ca thành công và khóa sổ phiên làm việc!', 'success');
+      setTimeout(() => {
+        closeShiftHandoverModal();
+        if (window.handleLogout) window.handleLogout();
+        else window.location.href = '/login';
+      }, 1200);
+    }
+  </script>
 </body>
 </html>
