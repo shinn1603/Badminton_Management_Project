@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import vn.yain.dto.CourtEventDto;
 import vn.yain.entity.*;
 import vn.yain.repository.*;
+import vn.yain.repository.CourtRepository;
+import vn.yain.repository.BookingRepository;
 import vn.yain.security.JwtTokenProvider;
 import vn.yain.service.BookingService;
 import vn.yain.service.CourtService;
@@ -50,6 +52,9 @@ public class ApiController {
 
     @Autowired
     private BookingRepository bookingRepository;
+
+    @Autowired
+    private CourtRepository courtRepository;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -370,6 +375,7 @@ public class ApiController {
             return ResponseEntity.ok(Map.of("success", true, "message", "Webhook received successfully"));
         } catch (Exception e) {
             return ResponseEntity.ok(Map.of("success", false, "error", e.getMessage()));
+        }
     }
 
     private boolean isSlotOverlapping(String s1, String s2) {
