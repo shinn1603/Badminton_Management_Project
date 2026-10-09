@@ -774,6 +774,104 @@ async function loadCourtsFromSql() {
   }
 }
 
+// ==========================================
+// GRID HORIZONTAL SCROLL & DRAG NAVIGATION
+// ==========================================
+function scrollGridHorizontal(offset) {
+  const scrollEl = document.querySelector('.matrix-scroll');
+  if (!scrollEl) return;
+  scrollEl.scrollBy({ left: offset, behavior: 'smooth' });
+}
+
+function jumpToGridTime(shiftPeriod) {
+  const scrollEl = document.querySelector('.matrix-scroll');
+  if (!scrollEl) return;
+
+  document.querySelectorAll('.btn-time-shift').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.querySelector(`.btn-time-shift[data-shift="${shiftPeriod}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  let targetLeft = 0;
+  if (shiftPeriod === 'morning') {
+    targetLeft = 0;
+  } else if (shiftPeriod === 'afternoon') {
+    targetLeft = 650;
+  } else if (shiftPeriod === 'evening') {
+    targetLeft = 1150;
+  }
+  scrollEl.scrollTo({ left: targetLeft, behavior: 'smooth' });
+}
+
+function initGridDragToScroll() {
+  const scrollEl = document.querySelector('.matrix-scroll');
+  if (!scrollEl) return;
+
+  let isDown = false;
+  let startX = 0;
+  let scrollLeftStart = 0;
+  let hasDragged = false;
+
+  scrollEl.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    isDown = true;
+    hasDragged = false;
+    startX = e.pageX - scrollEl.offsetLeft;
+    scrollLeftStart = scrollEl.scrollLeft;
+    scrollEl.style.cursor = 'grabbing';
+    scrollEl.style.userSelect = 'none';
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    const x = e.pageX - scrollEl.offsetLeft;
+    const walk = (x - startX);
+    if (Math.abs(walk) > 4) {
+      hasDragged = true;
+    }
+    scrollEl.scrollLeft = scrollLeftStart - walk;
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!isDown) return;
+    isDown = false;
+    scrollEl.style.cursor = 'grab';
+    scrollEl.style.removeProperty('user-select');
+  });
+
+  // Prevent click on child slot if user actually dragged
+  scrollEl.addEventListener('click', (e) => {
+    if (hasDragged) {
+      e.preventDefault();
+      e.stopPropagation();
+      hasDragged = false;
+    }
+  }, true);
+
+  // Wheel horizontal scroll support: roll mouse wheel to pan timetable
+  scrollEl.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && !e.ctrlKey) {
+      e.preventDefault();
+      scrollEl.scrollLeft += (e.deltaY * 1.2);
+    }
+  }, { passive: false });
+
+  // Sync active shift pill with scroll position
+  scrollEl.addEventListener('scroll', () => {
+    const sl = scrollEl.scrollLeft;
+    document.querySelectorAll('.btn-time-shift').forEach(b => b.classList.remove('active'));
+    if (sl < 400) {
+      const b = document.querySelector('.btn-time-shift[data-shift="morning"]');
+      if (b) b.classList.add('active');
+    } else if (sl < 900) {
+      const b = document.querySelector('.btn-time-shift[data-shift="afternoon"]');
+      if (b) b.classList.add('active');
+    } else {
+      const b = document.querySelector('.btn-time-shift[data-shift="evening"]');
+      if (b) b.classList.add('active');
+    }
+  }, { passive: true });
+}
+
 // KHỞI CHẠY
 window.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('utesport_theme') || 'light';
@@ -783,6 +881,7 @@ window.addEventListener('DOMContentLoaded', () => {
   goToToday();
   loadCourtsFromSql();
   loadDbProductsForPos();
+  initGridDragToScroll();
 
   document.addEventListener('click', function(e) {
     const container = document.getElementById('searchContainer');

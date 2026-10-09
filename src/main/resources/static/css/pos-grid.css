@@ -24,6 +24,7 @@
   flex-direction: column;
   gap: 14px;
   background-color: var(--bg-page);
+  min-height: 0;
 }
 
 /* TOOLBAR & CONTROLS */
@@ -122,6 +123,81 @@
 .legend-completed { background: #64748b; }
 .legend-maintenance { background: #94a3b8; }
 
+/* TIME SHIFT NAVIGATOR & SCROLL CONTROLS */
+.time-shift-navigator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--surface-subtle);
+  padding: 4px 8px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.time-shift-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 2px;
+}
+
+.btn-time-shift {
+  padding: 5px 11px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-body);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-time-shift:hover {
+  background: var(--surface);
+  color: var(--primary);
+  border-color: var(--border-subtle);
+}
+
+.btn-time-shift.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+.grid-scroll-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+  padding-left: 6px;
+  border-left: 1px solid var(--border-subtle);
+}
+
+.btn-grid-scroll-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-grid-scroll-btn:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary-border);
+}
+
 /* MATRIX GRID TABLE */
 .matrix-container {
   background: var(--surface);
@@ -129,19 +205,54 @@
   border: 1px solid var(--border-subtle);
   overflow: hidden;
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-sm);
+  position: relative;
 }
 
 .matrix-scroll {
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   flex: 1;
+  min-height: 0;
+  cursor: grab;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--surface-subtle);
+}
+
+.matrix-scroll:active {
+  cursor: grabbing;
+}
+
+.matrix-scroll::-webkit-scrollbar {
+  height: 10px;
+  width: 8px;
+}
+
+.matrix-scroll::-webkit-scrollbar-track {
+  background: var(--surface-subtle);
+  border-radius: 4px;
+}
+
+.matrix-scroll::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+  border: 2px solid var(--surface-subtle);
+}
+
+.matrix-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-hover);
 }
 
 .matrix-table {
-  width: 100%;
-  border-collapse: collapse;
+  min-width: 1720px;
+  width: max-content;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: left;
 }
 
@@ -151,16 +262,27 @@
   padding: 6px 8px;
 }
 
+.matrix-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--surface-subtle);
+}
+
 .matrix-th-corner {
   background: var(--surface-subtle);
   font-size: 12px;
   font-weight: 700;
-  color: var(--text-muted);
-  min-width: 150px;
+  color: var(--text-dark);
+  width: 160px;
+  min-width: 160px;
+  max-width: 160px;
   text-align: center;
-  position: sticky;
+  position: sticky !important;
   left: 0;
-  z-index: 5;
+  top: 0;
+  z-index: 10 !important;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 .matrix-th-time {
@@ -168,7 +290,8 @@
   font-size: 12px;
   font-weight: 700;
   text-align: center;
-  min-width: 110px;
+  width: 130px;
+  min-width: 130px;
   color: var(--text-dark);
   padding: 10px 8px;
 }
@@ -178,10 +301,14 @@
   font-weight: 600;
   font-size: 13px;
   text-align: center;
-  position: sticky;
+  width: 160px;
+  min-width: 160px;
+  max-width: 160px;
+  position: sticky !important;
   left: 0;
-  z-index: 4;
+  z-index: 6;
   border-right: 2px solid var(--border-subtle);
+  box-shadow: 3px 0 6px rgba(0, 0, 0, 0.05);
 }
 
 .court-info .court-name {

@@ -186,6 +186,22 @@
               <option value="CN02">Chi nhánh 2 - Quận 7</option>
               <option value="CN03">Chi nhánh 3 - Bình Thạnh</option>
             </select>
+
+            <!-- BỘ ĐIỀU HƯỚNG KHUNG GIỜ & CUỘN LƯỚI -->
+            <div class="time-shift-navigator">
+              <span class="time-shift-label">Khung giờ:</span>
+              <button type="button" class="btn-time-shift active" data-shift="morning" onclick="jumpToGridTime('morning')">Sáng (06h - 11h)</button>
+              <button type="button" class="btn-time-shift" data-shift="afternoon" onclick="jumpToGridTime('afternoon')">Chiều (14h - 17h)</button>
+              <button type="button" class="btn-time-shift" data-shift="evening" onclick="jumpToGridTime('evening')">Tối (17h - 22h)</button>
+              <div class="grid-scroll-actions">
+                <button type="button" class="btn-grid-scroll-btn" onclick="scrollGridHorizontal(-350)" title="Cuộn bảng sang trái">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <button type="button" class="btn-grid-scroll-btn" onclick="scrollGridHorizontal(350)" title="Cuộn bảng sang phải">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+              </div>
+            </div>
           </div>
 
           <!-- LEGEND -->
