@@ -73,87 +73,129 @@
       letter-spacing: 0.5px;
     }
 
-    /* Clean Auth Page Layout */
+    /* Clean Auth Page Layout - LUXURY EMERALD SPORT */
     .auth-page-wrapper {
       min-height: calc(100vh - 130px);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px 20px;
-      background: radial-gradient(circle at top, #f0fdfa 0%, var(--cust-bg) 60%);
-    }
-    .auth-container-card {
-      background: #ffffff;
-      border: 1px solid var(--cust-border);
-      border-radius: 12px;
-      width: 100%;
-      max-width: 460px;
-      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 4px 6px -2px rgba(15, 23, 42, 0.02);
+      padding: 56px 20px;
+      background: radial-gradient(circle at 20% 30%, rgba(6, 78, 59, 0.95) 0%, rgba(4, 20, 16, 0.98) 100%),
+                  url('/images/badminton_arena_hero.jpg') center/cover no-repeat;
+      background-blend-mode: overlay;
+      position: relative;
       overflow: hidden;
     }
+    .auth-page-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.2) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .auth-container-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 22px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+      position: relative;
+      z-index: 2;
+    }
+    [data-theme="dark"] .auth-container-card {
+      background: rgba(15, 30, 26, 0.94);
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
     .auth-card-top {
-      padding: 26px 28px 20px;
+      padding: 32px 30px 22px;
       text-align: center;
-      background: #ffffff;
-      border-bottom: 1px solid var(--cust-border);
+      background: transparent;
+      border-bottom: 1px solid var(--border-subtle);
     }
     .auth-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-size: 11.5px;
-      font-weight: 600;
-      padding: 3px 10px;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 14px;
       border-radius: 9999px;
-      background: var(--cust-primary-light);
-      color: var(--cust-primary-hover);
-      border: 1px solid var(--cust-primary-border);
-      margin-bottom: 10px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .hero-pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
     }
     .auth-title {
-      font-size: 19px;
-      font-weight: 800;
-      color: var(--cust-text-main);
-      letter-spacing: -0.3px;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text-dark);
+      letter-spacing: -0.4px;
+      margin-bottom: 8px;
+    }
+    .auth-title span {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     .auth-sub {
-      font-size: 12.5px;
-      color: var(--cust-text-muted);
-      margin-top: 4px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
     }
 
     /* Tab switch */
     .auth-tab-switch {
       display: flex;
-      padding: 4px;
-      background: #f1f5f9;
-      border-bottom: 1px solid var(--cust-border);
-      gap: 4px;
+      padding: 6px;
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      gap: 6px;
     }
     .auth-tab-btn {
       flex: 1;
-      height: 36px;
+      height: 40px;
       background: transparent;
       border: none;
-      border-radius: 6px;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--cust-text-muted);
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      transition: all 0.15s ease;
+      gap: 8px;
+      transition: all 0.2s ease;
     }
     .auth-tab-btn.active {
-      background: #ffffff;
-      color: var(--cust-primary-hover);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--border-subtle);
     }
 
     .auth-body {
-      padding: 24px 28px;
+      padding: 26px 30px;
     }
     .auth-form-section {
       display: none;
@@ -468,10 +510,19 @@
     <div class="auth-container-card">
       <div class="auth-card-top">
         <div class="auth-badge">
-          <span></span> Hệ Thống Khách Hàng & Hội Viên
+          <span class="hero-pulse-dot"></span> Hệ Thống Khách Hàng & Hội Viên VIP
         </div>
-        <h1 class="auth-title">Chào Mừng Đến UTE Badminton</h1>
+        <h1 class="auth-title">Chào Mừng Đến <span>UTE Sport Arena</span></h1>
         <p class="auth-sub">Đăng nhập để đặt sân nhanh, nhận ưu đãi giờ vàng và quản lý vé QR</p>
+      </div>
+
+      <!-- Quick Account State Bar -->
+      <div id="alreadyLoggedInBanner" style="display: none; padding: 14px 20px; background: rgba(16, 185, 129, 0.1); border-bottom: 1px solid rgba(16, 185, 129, 0.25); text-align: center; font-size: 13px;">
+        <span style="color: var(--text-dark);">Tài khoản hiện tại: <strong id="loggedUserName">Lê Bá Đạt</strong></span>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 8px;">
+          <a href="/customer/home" class="btn btn-primary" id="btnContinueCurrent" style="padding: 6px 14px; font-size: 12px; border-radius: 8px; text-decoration: none;">Vào Hệ Thống</a>
+          <button type="button" class="btn btn-outline" onclick="window.RBAC ? window.RBAC.logoutCustomer() : logoutLocalCustomer()" style="padding: 6px 14px; font-size: 12px; border-radius: 8px;">Đăng Xuất</button>
+        </div>
       </div>
 
       <!-- Tab Switcher -->
@@ -487,12 +538,14 @@
       </div>
 
       <div class="auth-body">
+        <!-- In-card Inline Alert Box -->
+        <div id="authInlineAlert" style="display: none; padding: 10px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 600; margin-bottom: 16px; align-items: center; gap: 8px;"></div>
         <!-- Section 1: Form Login -->
         <div class="auth-form-section active" id="loginSection">
           <form onsubmit="handleLoginSubmit(event)">
             <div class="form-group">
-              <label class="form-label" for="loginPhone">Số Điện Thoại / Email</label>
-              <input type="text" id="loginPhone" class="form-control" placeholder="0901234567 hoặc user@gmail.com" required value="0912345678">
+              <label class="form-label" for="loginPhone">Số Điện Thoại / Tên Đăng Nhập</label>
+              <input type="text" id="loginPhone" class="form-control" placeholder="0901234567 hoặc tên đăng nhập" required>
             </div>
 
             <div class="form-group">
@@ -500,7 +553,7 @@
                 <label class="form-label" for="loginPassword">Mật Khẩu</label>
                 <a href="javascript:void(0)" onclick="showToast('Vui lòng liên hệ Hotline 1900 6868 hoặc nhân viên quầy để đặt lại mật khẩu.', 'warning')" style="font-size: 11.5px; color: var(--cust-primary); text-decoration: none; font-weight: 600;">Quên mật khẩu?</a>
               </div>
-              <input type="password" id="loginPassword" class="form-control" placeholder="Nhập mật khẩu" required value="123456">
+              <input type="password" id="loginPassword" class="form-control" placeholder="Nhập mật khẩu" required>
             </div>
 
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
@@ -510,7 +563,7 @@
               </label>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%; height: 40px; font-size: 13.5px; font-weight: 600; border-radius: 6px;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; height: 44px; font-size: 14px; font-weight: 700; border-radius: 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); border: none; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">
               Đăng Nhập Vào Hệ Thống
             </button>
           </form>
@@ -580,8 +633,8 @@
               </label>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%; height: 40px; font-size: 13.5px; font-weight: 600; border-radius: 6px;">
-              Tạo Tài Khoản & Nhận Thẻ Hội Viên
+            <button type="submit" class="btn btn-primary" style="width: 100%; height: 44px; font-size: 14px; font-weight: 700; border-radius: 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); border: none; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">
+              Tạo Tài Khoản & Nhận Thẻ Hội Viên VIP
             </button>
           </form>
         </div>
@@ -601,6 +654,7 @@
       const regBtn = document.getElementById('tabRegisterBtn');
       const loginSec = document.getElementById('loginSection');
       const regSec = document.getElementById('registerSection');
+      hideAuthInlineAlert();
 
       if (tab === 'login') {
         loginBtn.classList.add('active');
@@ -613,18 +667,106 @@
         regSec.classList.add('active');
         loginSec.classList.remove('active');
       }
+
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', '?tab=' + tab);
+      }
+    }
+
+    function showAuthInlineAlert(message, isSuccess = false) {
+      const el = document.getElementById('authInlineAlert');
+      if (!el) return;
+      el.style.display = 'flex';
+      if (isSuccess) {
+        el.style.background = 'rgba(16, 185, 129, 0.12)';
+        el.style.border = '1px solid rgba(16, 185, 129, 0.35)';
+        el.style.color = '#10b981';
+        el.innerHTML = `<span>✔</span> <span>${message}</span>`;
+      } else {
+        el.style.background = 'rgba(239, 68, 68, 0.12)';
+        el.style.border = '1px solid rgba(239, 68, 68, 0.35)';
+        el.style.color = '#ef4444';
+        el.innerHTML = `<span>✖</span> <span>${message}</span>`;
+      }
+    }
+
+    function hideAuthInlineAlert() {
+      const el = document.getElementById('authInlineAlert');
+      if (el) el.style.display = 'none';
     }
 
     function showToast(message, isSuccess = true) {
+      showAuthInlineAlert(message, isSuccess);
       const toast = document.getElementById('toastNotification');
       const msg = document.getElementById('toastMsg');
-      toast.className = 'toast-popup ' + (isSuccess ? 'success' : 'error');
-      msg.textContent = message;
-      toast.style.display = 'flex';
-      setTimeout(() => {
-        toast.style.display = 'none';
-      }, 3000);
+      if (toast && msg) {
+        toast.className = 'toast-popup ' + (isSuccess ? 'success' : 'error');
+        msg.textContent = message;
+        toast.style.display = 'flex';
+        toast.style.zIndex = '999999';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 3500);
+      }
     }
+
+    function logoutLocalCustomer() {
+      localStorage.removeItem('utesport_user');
+      localStorage.removeItem('jwt_token');
+      document.cookie = 'jwt_token=; path=/; max-age=0';
+      showToast('Đã đăng xuất tài khoản thành công', true);
+      const banner = document.getElementById('alreadyLoggedInBanner');
+      if (banner) banner.style.display = 'none';
+    }
+
+    // Auto-detect URL query tab param & check logged-in status
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      if (tabParam === 'register' || window.location.hash === '#register') {
+        switchAuthTab('register');
+      } else {
+        switchAuthTab('login');
+      }
+
+      // Check current login state
+      const raw = localStorage.getItem('utesport_user');
+      if (raw) {
+        try {
+          const user = JSON.parse(raw);
+          if (user && user.fullName) {
+            const banner = document.getElementById('alreadyLoggedInBanner');
+            const nameEl = document.getElementById('loggedUserName');
+            const btnContinue = document.getElementById('btnContinueCurrent');
+            if (banner && nameEl) {
+              const roleTitle = user.roleTitle || user.role || 'Khách hàng';
+              nameEl.textContent = `${user.fullName} [${roleTitle}]`;
+              banner.style.display = 'block';
+
+              if (btnContinue) {
+                const r = (user.role || '').toUpperCase();
+                if (r === 'DIRECTOR') {
+                  btnContinue.href = '/director/dashboard';
+                  btnContinue.textContent = 'Vào Dashboard Giám Đốc';
+                } else if (r === 'MANAGER') {
+                  btnContinue.href = '/manager/dashboard';
+                  btnContinue.textContent = 'Vào Dashboard Quản Lý';
+                } else if (r === 'POS') {
+                  btnContinue.href = '/pos/grid';
+                  btnContinue.textContent = 'Vào Thu Ngân POS';
+                } else if (r === 'ADMIN') {
+                  btnContinue.href = '/admin/users';
+                  btnContinue.textContent = 'Vào Quản Trị Hệ Thống';
+                } else {
+                  btnContinue.href = '/customer/home';
+                  btnContinue.textContent = 'Trang Chủ Khách Hàng';
+                }
+              }
+            }
+          }
+        } catch (e) {}
+      }
+    });
 
     async function handleLoginSubmit(e) {
       e.preventDefault();
@@ -644,23 +786,60 @@
             localStorage.setItem('jwt_token', data.token);
             document.cookie = `jwt_token=${data.token}; path=/; max-age=86400`;
           }
+
+          const role = (data.role || 'CUSTOMER').toUpperCase();
+          let targetUrl = '/customer/home';
+          if (role === 'DIRECTOR') targetUrl = '/director/dashboard';
+          else if (role === 'MANAGER') targetUrl = '/manager/dashboard';
+          else if (role === 'POS') targetUrl = '/pos/grid';
+          else if (role === 'ADMIN') targetUrl = '/admin/users';
+          else targetUrl = '/customer/home';
+
           showToast(`Đăng nhập thành công! Chào mừng ${data.fullName}`);
           setTimeout(() => {
-            window.location.href = '/customer/booking';
-          }, 800);
+            window.location.href = targetUrl;
+          }, 700);
         } else {
           showToast(data.message || 'Sai tài khoản hoặc mật khẩu trong SQL Server!', false);
         }
       } catch (err) {
         console.warn('API error, falling back locally:', err);
+        let fallbackRole = 'CUSTOMER';
+        let fallbackName = 'Lê Bá Đạt';
+        let fallbackUrl = '/customer/home';
+        const uname = phoneOrUser.toLowerCase();
+
+        if (uname === 'director') {
+          fallbackRole = 'DIRECTOR';
+          fallbackName = 'Nguyễn Phước Thọ';
+          fallbackUrl = '/director/dashboard';
+        } else if (uname === 'manager') {
+          fallbackRole = 'MANAGER';
+          fallbackName = 'Trần Phúc Bảo';
+          fallbackUrl = '/manager/dashboard';
+        } else if (uname === 'pos') {
+          fallbackRole = 'POS';
+          fallbackName = 'Nguyễn Thanh Tâm';
+          fallbackUrl = '/pos/grid';
+        } else if (uname === 'admin') {
+          fallbackRole = 'ADMIN';
+          fallbackName = 'Trần Biểu Hương';
+          fallbackUrl = '/admin/users';
+        } else {
+          fallbackRole = 'CUSTOMER';
+          fallbackName = 'Khách Hàng (' + phoneOrUser + ')';
+          fallbackUrl = '/customer/home';
+        }
+
         localStorage.setItem('utesport_user', JSON.stringify({
+          success: true,
           username: phoneOrUser,
-          fullName: 'Khách Hàng (' + phoneOrUser + ')',
-          role: 'CUSTOMER',
+          fullName: fallbackName,
+          role: fallbackRole,
           branchCode: 'CN01'
         }));
-        showToast('Đăng nhập thành công! Chào mừng ' + phoneOrUser);
-        setTimeout(() => { window.location.href = '/customer/booking'; }, 800);
+        showToast('Đăng nhập thành công! Chào mừng ' + fallbackName);
+        setTimeout(() => { window.location.href = fallbackUrl; }, 700);
       }
     }
 

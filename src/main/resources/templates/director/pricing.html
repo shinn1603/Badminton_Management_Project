@@ -1,10 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Phê duyệt chính sách giá & Khuyến mãi - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
+  <script src="/js/auth-guard.js"></script>
   <style>
     .chart-tab-bar {
       display: inline-flex;
@@ -113,7 +114,12 @@
           <span class="menu-text">Phê duyệt giải đấu</span>
         </a>
 
-        <div class="menu-title" style="margin-top: 14px;">Nghiệp vụ quầy & Sân</div>
+        <div class="menu-title" style="margin-top: 14px;">Quản lý sân & Quầy</div>
+
+        <a href="/manager/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span class="menu-text">Vận hành chi nhánh</span>
+        </a>
 
         <a href="/booking/grid" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
@@ -164,11 +170,18 @@
       </div>
 
       <div class="sidebar-bottom">
-        <div class="user-avatar">GD</div>
+        <div class="user-avatar" id="sidebarAvatar">GD</div>
         <div class="user-meta">
-          <span class="user-name">Nguyễn Phước Thọ</span>
-          <span class="user-title">Giám đốc chuỗi</span>
+          <span class="user-name" id="sidebarName">Nguyễn Phước Thọ</span>
+          <span class="user-title" id="sidebarTitle">Giám đốc chuỗi</span>
         </div>
+        <a href="/login" style="margin-left: auto; color: #94a3b8;" title="Đăng xuất">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </a>
       </div>
     </aside>
 
@@ -188,7 +201,7 @@
         </div>
 
         <div class="header-right">
-          <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Chuyá»ƒn Ä‘á»•i giao diá»‡n SÃ¡ng / Tá»‘i" style="padding: 6px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--text-dark); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; margin-right: 6px;">
+          <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Đổi giao diện Sáng / Tối" style="padding: 6px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--text-dark); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; margin-right: 6px;">
             <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
           </button>
           <div class="search-box">
@@ -202,6 +215,17 @@
       </header>
 
       <div class="main-content">
+        <!-- LUXURY HERO BANNER -->
+        <div class="hero-banner" style="margin-bottom: 24px;">
+          <div class="hero-banner-content">
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
+              <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
+              Ban Giám Đốc Phê Duyệt Giá Toàn Hệ Thống
+            </div>
+            <h1 class="hero-title" style="margin-bottom: 8px;">Chính Sách Bảng Giá & Khuyến Mãi Chuỗi</h1>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Thẩm định đề xuất giá sân giờ vàng, duyệt voucher ưu đãi và chiến dịch chiết khấu hội viên VIP</p>
+          </div>
+        </div>
         <div class="chart-tab-bar" style="margin-bottom: 18px;">
           <button class="chart-tab-btn active" onclick="switchPricingTab(1)">Đề xuất bảng giá giờ chơi (3)</button>
           <button class="chart-tab-btn" onclick="switchPricingTab(2)">Duyệt chương trình khuyến mãi & Voucher (2)</button>

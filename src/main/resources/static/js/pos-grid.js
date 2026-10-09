@@ -336,13 +336,21 @@ function recalculatePrice() {
 function submitBookingForm() {
   const name = document.getElementById('bookingCustName').value.trim();
   const phone = document.getElementById('bookingCustPhone').value.trim();
-  if (!name || !phone) return alert('Vui lòng nhập họ tên và số điện thoại.');
+  if (!name || !phone) {
+    if (typeof showToast === 'function') showToast('Vui lòng nhập họ tên và số điện thoại.', 'warning');
+    else alert('Vui lòng nhập họ tên và số điện thoại.');
+    return;
+  }
 
   const courtName = document.getElementById('bookingCourtSelect').value;
   const startTime = document.getElementById('bookingStartTime').value;
   const endTime = document.getElementById('bookingEndTime').value;
 
-  if (startTime >= endTime) return alert('Giờ kết thúc phải diễn ra sau giờ bắt đầu!');
+  if (startTime >= endTime) {
+    if (typeof showToast === 'function') showToast('Giờ kết thúc phải diễn ra sau giờ bắt đầu!', 'warning');
+    else alert('Giờ kết thúc phải diễn ra sau giờ bắt đầu!');
+    return;
+  }
 
   let targetSlots = [];
   timeSlots.forEach(slot => {
@@ -350,7 +358,11 @@ function submitBookingForm() {
     if (slotStart >= startTime && slotEnd <= endTime) targetSlots.push(slot);
   });
 
-  if (targetSlots.length === 0) return alert('Không tìm thấy khung giờ phù hợp!');
+  if (targetSlots.length === 0) {
+    if (typeof showToast === 'function') showToast('Không tìm thấy khung giờ phù hợp!', 'warning');
+    else alert('Không tìm thấy khung giờ phù hợp!');
+    return;
+  }
 
   const total = Number(document.getElementById('displayTotalRental').textContent.replace(/\D/g, ''));
   const deposit = Number(document.getElementById('displayDepositRequired').textContent.replace(/\D/g, ''));
@@ -363,13 +375,38 @@ function submitBookingForm() {
     });
   });
 
+  // Sync to Backend API
+  const genCode = 'DS' + Math.floor(100000 + Math.random() * 900000);
+  fetch('/api/bookings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      bookingCode: genCode,
+      courtCode: courtName.includes('01') ? 'CL01' : courtName.includes('02') ? 'CL02' : 'CL03',
+      branchCode: 'CN01',
+      customerName: name,
+      customerPhone: phone,
+      bookingDate: currentDateStr,
+      timeSlot: `${startTime} - ${endTime}`,
+      totalPrice: total,
+      depositAmount: deposit,
+      status: 'Đã cọc 30%',
+      paymentMethod: 'Tiền mặt tại quầy'
+    })
+  }).catch(() => {});
+
   renderGridForDate(currentDateStr);
-  alert(`✅ Đã đặt thành công ${targetSlots.length} khung giờ cho khách: ${name}`);
+  if (typeof showToast === 'function') {
+    showToast(`Đã đặt thành công ${targetSlots.length} khung giờ cho khách: ${name}!`, 'success');
+  } else {
+    alert(`Đã đặt thành công ${targetSlots.length} khung giờ cho khách: ${name}!`);
+  }
   closeCreateBookingModal();
 }
 
 function openDetailModal(element, code, court, time, customer, phone, status, price, deposit = 0) {
   activeSlotCell = element;
+  activeSlotCell.dataset.code = code || 'DS0102';
   activeSlotCell.dataset.price = price;
   activeSlotCell.dataset.deposit = deposit || Math.round(price * 0.3);
   activeSlotCell.dataset.customer = customer;
@@ -417,6 +454,16 @@ function openCheckoutModal(element) {
   document.getElementById('checkoutModal').classList.add('active');
 }
 
+const productCodeMap = {
+  'Nước Revive': 'P01',
+  'Pocari Sweat': 'P02',
+  'Nước Pocari Sweat': 'P02',
+  'Nước suối Aquafina': 'P03',
+  'Thuê Vợt Yonex Astrox': 'P07',
+  'Ống Cầu Hải Yến (12 quả)': 'P05',
+  'Quấn cán vợt VS': 'P07'
+};
+
 function quickAddProduct(name, price) {
   const existing = posItems.find(i => i.name === name);
   if (existing) existing.qty += 1;
@@ -426,6 +473,18 @@ function quickAddProduct(name, price) {
     const court = activeSlotCell.dataset.court;
     const timeObj = activeSlotCell.dataset.time;
     updateDataStore(court, timeObj, { posItems: [...posItems] });
+
+    const bCode = activeSlotCell.dataset.code || 'DS0102';
+    const pCode = productCodeMap[name] || 'P01';
+    fetch(`/api/bookings/${bCode}/order-service`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productCode: pCode, quantity: 1 })
+    }).then(r => r.json()).then(data => {
+      if (data.success && window.showToast) {
+        showToast(`Đã xuất [${name}] và trừ tồn kho thực tế!`, 'info');
+      }
+    }).catch(e => console.warn('Lỗi đồng bộ dịch vụ:', e));
   }
   renderInvoice();
 }
@@ -527,7 +586,11 @@ function renderInvoice() {
 }
 
 function submitCheckout() {
-  alert('✅ Đã xuất Hóa đơn K80 và thanh toán thành công!');
+  if (typeof showToast === 'function') {
+    showToast('Đã xuất Hóa đơn K80 và thanh toán thành công!', 'success');
+  } else {
+    alert('Đã xuất Hóa đơn K80 và thanh toán thành công!');
+  }
   if (activeSlotCell) {
     const court = activeSlotCell.dataset.court;
     const timeObj = activeSlotCell.dataset.time;

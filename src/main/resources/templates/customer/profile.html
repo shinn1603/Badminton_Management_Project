@@ -120,15 +120,26 @@
 
     /* Elegant Executive Member Card */
     .digital-card {
-      background: linear-gradient(135deg, #0f766e 0%, #115e59 60%, #134e4a 100%);
-      border-radius: 14px;
-      padding: 22px;
+      background: radial-gradient(circle at 20% 30%, #064e3b 0%, #022c22 70%, #011c15 100%);
+      border-radius: 18px;
+      padding: 26px 24px;
       color: #ffffff;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 10px 25px -5px rgba(13, 148, 136, 0.25);
-      border: 1px solid rgba(255,255,255,0.2);
-      margin-bottom: 20px;
+      box-shadow: 0 16px 36px rgba(6, 78, 59, 0.4);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      margin-bottom: 22px;
+    }
+    .digital-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+      pointer-events: none;
     }
     .card-brand-row {
       display: flex;
@@ -141,7 +152,7 @@
       color: #92400e;
       font-size: 11px;
       font-weight: 800;
-      padding: 3px 10px;
+      padding: 4px 12px;
       border-radius: 9999px;
       letter-spacing: 0.5px;
       text-transform: uppercase;
@@ -149,14 +160,16 @@
       align-items: center;
       gap: 4px;
       border: 1px solid #fde68a;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.25);
     }
     .card-number {
       font-family: monospace;
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 19px;
+      font-weight: 800;
       letter-spacing: 2.5px;
-      color: #f0fdfa;
+      color: #a7f3d0;
       margin-bottom: 22px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
     .card-footer-row {
       display: flex;
@@ -165,30 +178,31 @@
     }
     .card-holder-name {
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     /* Progress card */
     .tier-progress-card {
-      background: #ffffff;
-      border: 1px solid var(--cust-border);
-      border-radius: 10px;
-      padding: 18px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
       margin-bottom: 20px;
     }
     .progress-bar-bg {
-      height: 7px;
-      background: #f1f5f9;
+      height: 8px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-subtle);
       border-radius: 9999px;
       overflow: hidden;
-      margin: 10px 0 6px;
+      margin: 12px 0 8px;
     }
     .progress-bar-fill {
       height: 100%;
-      background: var(--cust-primary);
+      background: linear-gradient(90deg, #10b981 0%, #059669 100%);
       border-radius: 9999px;
       width: 60%;
     }
@@ -197,22 +211,22 @@
     .tier-benefits-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
     }
     .tier-benefit-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 12px;
-      border-radius: 6px;
-      background: #fafafa;
-      border: 1px solid var(--cust-border);
-      font-size: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-subtle);
+      font-size: 12.5px;
     }
     .tier-benefit-item.current {
-      background: var(--cust-primary-light);
-      border-color: var(--cust-primary-border);
-      font-weight: 600;
+      background: var(--primary-light);
+      border-color: var(--primary-border);
+      font-weight: 700;
       color: var(--cust-primary-hover);
     }
 

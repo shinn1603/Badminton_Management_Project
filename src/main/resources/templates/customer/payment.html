@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
@@ -115,69 +115,70 @@
 
     /* VietQR Display Box */
     .qr-showcase-box {
-      background: #ffffff;
-      border: 1px solid var(--cust-border);
-      border-radius: 10px;
-      padding: 22px;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 26px;
       text-align: center;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     }
     .qr-frame {
       display: inline-block;
-      padding: 14px;
+      padding: 16px;
       background: #ffffff;
-      border: 2px dashed var(--cust-primary);
-      border-radius: 10px;
-      margin: 14px 0;
+      border: 2px solid var(--primary);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+      margin: 16px 0;
     }
     .qr-code-img {
-      width: 190px;
-      height: 190px;
+      width: 200px;
+      height: 200px;
       display: block;
       margin: 0 auto;
     }
     .bank-info-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 12.5px;
-      margin-top: 14px;
+      font-size: 13px;
+      margin-top: 16px;
       text-align: left;
     }
     .bank-info-table td {
-      padding: 7px 10px;
-      border-bottom: 1px solid var(--cust-border);
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border-subtle);
     }
     .bank-info-table td:first-child {
-      color: var(--cust-text-muted);
+      color: var(--text-muted);
       width: 40%;
     }
     .bank-info-table td:last-child {
-      font-weight: 600;
-      color: var(--cust-text-main);
+      font-weight: 700;
+      color: var(--text-dark);
     }
     .btn-copy-tag {
-      background: #f1f5f9;
-      border: 1px solid var(--cust-border);
-      border-radius: 4px;
-      padding: 2px 6px;
-      font-size: 10px;
-      font-weight: 600;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 700;
       cursor: pointer;
-      color: var(--cust-primary-hover);
+      color: var(--primary);
       margin-left: 6px;
     }
 
     /* Invoice Card */
     .invoice-card {
-      background: #ffffff;
-      border: 1px solid var(--cust-border);
-      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     }
     .invoice-top {
-      background: #fafafa;
-      border-bottom: 1px solid var(--cust-border);
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--border-subtle);
       padding: 16px 20px;
     }
     .invoice-code {
@@ -762,29 +763,8 @@
   <script>
     // Sync Nav User Profile
     document.addEventListener('DOMContentLoaded', () => {
-      const rawUser = localStorage.getItem('utesport_user');
-      if (rawUser) {
-        try {
-          const user = JSON.parse(rawUser);
-          if (user && user.fullName) {
-            const userArea = document.getElementById('navUserArea');
-            if (userArea) {
-              userArea.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <a href="/customer/profile" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px var(--primary-glow);">
-                      ${user.fullName.substring(0, 2).toUpperCase()}
-                    </div>
-                    <div style="text-align: left;">
-                      <div style="font-size: 13px; font-weight: 700; color: var(--text-dark);">${user.fullName}</div>
-                      <div style="font-size: 11px; color: var(--primary); font-weight: 600;">Hội Viên VIP</div>
-                    </div>
-                  </a>
-                </div>
-              `;
-            }
-          }
-        } catch(e) {}
+      if (window.RBAC && window.RBAC.syncNavUserArea) {
+        window.RBAC.syncNavUserArea();
       }
     });
 

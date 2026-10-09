@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lập phiếu nhập kho - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
+  <script src="/js/auth-guard.js"></script>
+  <script src="/js/global-hub.js"></script>
   <style>
     .split-layout {
       display: grid;
@@ -83,14 +85,7 @@
           <span class="menu-tag">7 mới</span>
         </a>
 
-        <a href="/pos/grid" class="menu-item">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <line x1="12" y1="20" x2="12" y2="10"></line>
-            <line x1="18" y1="20" x2="18" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="16"></line>
-          </svg>
-          <span class="menu-text">Lịch sân (POS)</span>
-        </a>
+
 
         <a href="/manager/courts" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
@@ -217,6 +212,18 @@
 
       <!-- PAGE CONTENT -->
       <main class="page-content">
+        <!-- LUXURY HERO BANNER -->
+        <div class="hero-banner" style="margin-bottom: 24px;">
+          <div class="hero-banner-content">
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
+              <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
+              Quy Trình Nhập Kho Vật Tư & Phụ Kiện (XL-10)
+            </div>
+            <h1 class="hero-title" style="margin-bottom: 8px;">Nhập Kho Hàng Hóa & Cập Nhật Tồn Kho</h1>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Lập phiếu nhập kho từ nhà cung cấp, ghi nhận số lượng, đơn giá và tự động cộng dồn số dư tồn kho thời gian thực</p>
+          </div>
+        </div>
+
         <div class="split-layout">
           <!-- BÊN TRÁI: FORM LẬP PHIẾU NHẬP -->
           <div class="section-card">
@@ -328,34 +335,9 @@
                     <th>Trạng thái</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="receiptsTableBody">
                   <tr>
-                    <td><strong>PN-260901</strong></td>
-                    <td>28/09/2026</td>
-                    <td>Đại lý Tuấn Anh</td>
-                    <td style="text-align: right; font-weight: 800; color: var(--primary);">2.400.000 đ</td>
-                    <td><span class="badge badge-green">Đã nhập kho</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>PN-260902</strong></td>
-                    <td>22/09/2026</td>
-                    <td>Yonex Việt Nam</td>
-                    <td style="text-align: right; font-weight: 800; color: var(--primary);">8.750.000 đ</td>
-                    <td><span class="badge badge-green">Đã nhập kho</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>PN-260903</strong></td>
-                    <td>15/09/2026</td>
-                    <td>Cầu Lông Thành Công</td>
-                    <td style="text-align: right; font-weight: 800; color: var(--primary);">3.500.000 đ</td>
-                    <td><span class="badge badge-green">Đã nhập kho</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>PN-260904</strong></td>
-                    <td>10/09/2026</td>
-                    <td>Phụ Kiện Thể Thao VS</td>
-                    <td style="text-align: right; font-weight: 800; color: var(--primary);">1.050.000 đ</td>
-                    <td><span class="badge badge-green">Đã nhập kho</span></td>
+                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">Đang tải danh sách phiếu nhập kho...</td>
                   </tr>
                 </tbody>
               </table>
@@ -368,6 +350,50 @@
 
   <script src="/js/global-hub.js"></script>
   <script>
+    let availableProducts = [
+      { productCode: 'P01', productName: 'Nước Revive Chanh Muối 500ml', costPrice: 8000 },
+      { productCode: 'P02', productName: 'Nước Pocari Sweat 500ml', costPrice: 11000 },
+      { productCode: 'P03', productName: 'Nước suối Aquafina 500ml', costPrice: 5000 },
+      { productCode: 'P04', productName: 'Nước tăng lực Bò Húc Red Bull', costPrice: 12000 },
+      { productCode: 'P05', productName: 'Ống Cầu Hải Yến Đỏ (12 quả)', costPrice: 145000 },
+      { productCode: 'P06', productName: 'Ống Cầu Thành Công 77', costPrice: 175000 },
+      { productCode: 'P07', productName: 'Quấn cán vợt VS', costPrice: 7000 },
+      { productCode: 'P08', productName: 'Khăn lau mồ hôi Yonex', costPrice: 25000 }
+    ];
+
+    async function loadProducts() {
+      try {
+        const res = await fetch('/api/products');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            availableProducts = data;
+          }
+        }
+      } catch (e) {
+        console.warn('Sử dụng danh sách sản phẩm dự phòng:', e);
+      }
+    }
+
+    function renderProductSelectOptions(selectedCode) {
+      return availableProducts.map(p => `
+        <option value="${p.productCode}" data-cost="${p.costPrice || 0}" ${p.productCode === selectedCode ? 'selected' : ''}>
+          ${p.productName}
+        </option>
+      `).join('');
+    }
+
+    function handleProductChange(selectEl) {
+      const selectedCode = selectEl.value;
+      const prod = availableProducts.find(p => p.productCode === selectedCode);
+      const row = selectEl.closest('.receipt-item-row');
+      const costInput = row.querySelectorAll('input')[1];
+      if (prod && costInput) {
+        costInput.value = prod.costPrice || 0;
+      }
+      calcTotals();
+    }
+
     function calcTotals() {
       const rows = document.querySelectorAll('.receipt-item-row');
       let totalQty = 0;
@@ -392,35 +418,106 @@
       document.getElementById('grandTotal').innerText = totalSum.toLocaleString('vi-VN') + ' đ';
     }
 
-    function addReceiptRow() {
+    function addReceiptRow(defaultCode = 'P01', defaultQty = 10) {
       const container = document.getElementById('receiptItemsContainer');
+      const prod = availableProducts.find(p => p.productCode === defaultCode) || availableProducts[0];
       const div = document.createElement('div');
       div.className = 'receipt-item-row';
       div.innerHTML = `
-        <select class="form-control" onchange="calcTotals()">
-          <option value="11000">Nước Pocari Sweat 500ml</option>
-          <option value="8000">Nước Revive Chanh Muối 500ml</option>
-          <option value="5000">Nước suối Aquafina 500ml</option>
-          <option value="175000">Ống Cầu Thành Công 77</option>
-          <option value="145000">Ống Cầu Hải Yến Đỏ</option>
-          <option value="7000">Quấn cán vợt VS</option>
+        <select class="form-control" onchange="handleProductChange(this)">
+          ${renderProductSelectOptions(defaultCode)}
         </select>
-        <input type="number" class="form-control" placeholder="SL" value="10" min="1" oninput="calcTotals()">
-        <input type="number" class="form-control" placeholder="Giá nhập" value="11000" step="1000" oninput="calcTotals()">
-        <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); text-align: right;" class="item-subtotal">110.000 đ</div>
+        <input type="number" class="form-control" placeholder="SL" value="${defaultQty}" min="1" oninput="calcTotals()">
+        <input type="number" class="form-control" placeholder="Giá nhập" value="${prod.costPrice || 8000}" step="1000" oninput="calcTotals()">
+        <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); text-align: right;" class="item-subtotal">0 đ</div>
         <button type="button" class="btn-icon" style="color: #ef4444;" onclick="this.parentElement.remove(); calcTotals();">✕</button>
       `;
       container.appendChild(div);
       calcTotals();
     }
 
-    function submitReceipt(e) {
-      e.preventDefault();
-      const grandTotal = document.getElementById('grandTotal').innerText;
-      const supplier = document.getElementById('supplierSelect').value;
-
-      showToast(`Đã lập thành công phiếu nhập kho từ "${supplier}" với tổng giá trị ${grandTotal}!`, 'success');
+    async function loadReceiptHistory() {
+      const tbody = document.getElementById('receiptsTableBody');
+      try {
+        const res = await fetch('/api/inventory/receipts?branchCode=CN01');
+        if (res.ok) {
+          const receipts = await res.json();
+          if (!receipts || receipts.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 16px;">Chưa có phiếu nhập kho nào</td></tr>';
+            return;
+          }
+          tbody.innerHTML = receipts.map(r => `
+            <tr>
+              <td><strong>${r.receiptCode}</strong></td>
+              <td>${r.receiptDate ? (r.receiptDate.split('T')[0] || r.receiptDate) : 'Hôm nay'}</td>
+              <td>${r.supplierName || 'Nhà cung cấp'}</td>
+              <td style="text-align: right; font-weight: 800; color: var(--primary);">${(Number(r.totalAmount) || 0).toLocaleString('vi-VN')} đ</td>
+              <td><span class="badge badge-green">Đã nhập kho</span></td>
+            </tr>
+          `).join('');
+        }
+      } catch (e) {
+        console.warn('Lỗi tải lịch sử phiếu nhập:', e);
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 16px;">Không thể tải lịch sử</td></tr>';
+      }
     }
+
+    async function submitReceipt(e) {
+      e.preventDefault();
+      const rows = document.querySelectorAll('.receipt-item-row');
+      const items = [];
+
+      rows.forEach(r => {
+        const productCode = r.querySelector('select').value;
+        const qty = Number(r.querySelectorAll('input')[0].value) || 0;
+        const unitPrice = Number(r.querySelectorAll('input')[1].value) || 0;
+        if (qty > 0 && productCode) {
+          items.push({ productCode, quantity: qty, unitPrice });
+        }
+      });
+
+      if (items.length === 0) {
+        showToast('Vui lòng thêm ít nhất một mặt hàng nhập kho!', 'warning');
+        return;
+      }
+
+      const supplierName = document.getElementById('supplierSelect').value;
+      const receiptDate = document.getElementById('receiptDate').value;
+      const payload = {
+        supplierName: supplierName,
+        branchCode: 'CN01',
+        staffCode: 'NS02',
+        notes: 'Phiếu nhập kho ngày ' + receiptDate,
+        items: items
+      };
+
+      try {
+        const res = await fetch('/api/inventory/intake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`Nhập kho thành công phiếu [${data.receipt.receiptCode}]! Tồn kho đã được cập nhật.`, 'success');
+          loadReceiptHistory();
+        } else {
+          showToast(data.message || 'Lỗi lập phiếu nhập kho', 'error');
+        }
+      } catch (err) {
+        showToast('Lỗi gửi dữ liệu nhập kho: ' + err.message, 'error');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('receiptDate').value = new Date().toISOString().split('T')[0];
+      await loadProducts();
+      const container = document.getElementById('receiptItemsContainer');
+      container.innerHTML = '';
+      addReceiptRow('P01', 50);
+      addReceiptRow('P05', 20);
+      loadReceiptHistory();
+    });
   </script>
 </body>
 </html>

@@ -1,10 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Phân quyền phạm vi dữ liệu theo chi nhánh - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
+  <script src="/js/auth-guard.js"></script>
 </head>
 <body>
 
@@ -24,8 +25,79 @@
         </div>
       </div>
 
-      <div class="sidebar-content">
-        <div class="menu-title">Quản trị hệ thống</div>
+      <div class="sidebar-content" id="sidebarContent">
+        <div class="menu-title">Giám đốc điều hành</div>
+        
+        <a href="/director/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span class="menu-text">Doanh thu toàn chuỗi</span>
+        </a>
+
+        <a href="/director/dashboard#comparison-section" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+            <path d="M9 22v-4h6v4"></path>
+            <path d="M8 6h.01"></path>
+            <path d="M16 6h.01"></path>
+            <path d="M8 10h.01"></path>
+            <path d="M16 10h.01"></path>
+            <path d="M8 14h.01"></path>
+            <path d="M16 14h.01"></path>
+          </svg>
+          <span class="menu-text">So sánh chi nhánh</span>
+        </a>
+
+        <a href="/director/branches" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span class="menu-text">Quản lý chi nhánh</span>
+        </a>
+
+        <a href="/director/pricing" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          <span class="menu-text">Chính sách giá & KM</span>
+        </a>
+
+        <a href="/director/tournaments" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+            <path d="M4 22h16"></path>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+          </svg>
+          <span class="menu-text">Phê duyệt giải đấu</span>
+        </a>
+
+        <div class="menu-title" style="margin-top: 14px;">Quản lý sân & Quầy</div>
+
+        <a href="/manager/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span class="menu-text">Vận hành chi nhánh</span>
+        </a>
+
+        <a href="/booking/grid" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+            <line x1="10" y1="4" x2="10" y2="22"></line>
+          </svg>
+          <span class="menu-text">Lưới đặt sân</span>
+        </a>
+
+        <div class="menu-title" style="margin-top: 14px;">Quản trị hệ thống</div>
 
         <a href="/admin/users" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
@@ -60,45 +132,21 @@
           </svg>
           <span class="menu-text">Nhật ký hoạt động</span>
         </a>
-
-        <div class="menu-title" style="margin-top: 14px;">Giám đốc điều hành</div>
-        
-        <a href="/director/dashboard" class="menu-item">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <line x1="18" y1="20" x2="18" y2="10"></line>
-            <line x1="12" y1="20" x2="12" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="14"></line>
-          </svg>
-          <span class="menu-text">Doanh thu toàn chuỗi</span>
-        </a>
-
-        <a href="/director/branches" class="menu-item">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-          </svg>
-          <span class="menu-text">Quản lý chi nhánh</span>
-        </a>
-
-        <div class="menu-title" style="margin-top: 14px;">Nghiệp vụ quầy & Sân</div>
-
-        <a href="/booking/grid" class="menu-item">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          <span class="menu-text">Lưới đặt sân</span>
-        </a>
       </div>
 
       <div class="sidebar-bottom">
-        <div class="user-avatar">AD</div>
+        <div class="user-avatar" id="sidebarAvatar">AD</div>
         <div class="user-meta">
-          <span class="user-name">Quản trị viên</span>
-          <span class="user-title">Quản trị hệ thống</span>
+          <span class="user-name" id="sidebarName">Trần Biểu Hương</span>
+          <span class="user-title" id="sidebarTitle">Quản trị hệ thống</span>
         </div>
+        <a href="/login" style="margin-left: auto; color: #94a3b8;" title="Đăng xuất">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </a>
       </div>
     </aside>
 
@@ -133,6 +181,18 @@
       </header>
 
       <div class="main-content">
+        <!-- LUXURY HERO BANNER -->
+        <div class="hero-banner" style="margin-bottom: 24px;">
+          <div class="hero-banner-content">
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
+              <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
+              Ma Trận Phân Quyền & Phạm Vi Dữ Liệu
+            </div>
+            <h1 class="hero-title" style="margin-bottom: 8px;">Phân Quyền Truy Cập & Giới Hạn Chi Nhánh</h1>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Thiết lập ma trận phân quyền chi tiết cho Ban giám đốc, Quản lý chi nhánh, Thu ngân POS và Kỹ thuật viên</p>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-header">
             <div>
@@ -147,14 +207,119 @@
                 <tr>
                   <th>Nhân sự & Tài khoản</th>
                   <th>Vai trò chức danh</th>
-                  <th style="text-align: center;">Toàn chuỗi (All)</th>
+                  <th style="text-align: center;">Toàn chuỗi (ALL)</th>
                   <th style="text-align: center;">CN1 (Thủ Đức)</th>
                   <th style="text-align: center;">CN2 (Quận 9)</th>
                   <th style="text-align: center;">CN3 (Bình Thạnh)</th>
+                  <th style="text-align: center;">CN4 (Gò Vấp)</th>
                   <th>Quyền hạn tác nghiệp</th>
                 </tr>
               </thead>
               <tbody>
+                <tr>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Nguyễn Phước Thọ</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">director • ID: NS01</div>
+                  </td>
+                  <td>
+                    <span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;">Giám đốc chuỗi</span>
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked disabled style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked disabled style="width: 16px; height: 16px;">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked disabled style="width: 16px; height: 16px;">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked disabled style="width: 16px; height: 16px;">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked disabled style="width: 16px; height: 16px;">
+                  </td>
+                  <td style="font-size: 12px; color: var(--text-muted);">Toàn quyền điều hành chuỗi sân, duyệt giá & giải đấu</td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Trần Biểu Hương</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">admin • Quản trị kỹ thuật</div>
+                  </td>
+                  <td>
+                    <span class="badge" style="background: #fdf2f8; color: #be185d; border: 1px solid #fbcfe8;">Quản trị hệ thống</span>
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked disabled style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked disabled style="width: 16px; height: 16px;">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked disabled style="width: 16px; height: 16px;">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked disabled style="width: 16px; height: 16px;">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked disabled style="width: 16px; height: 16px;">
+                  </td>
+                  <td style="font-size: 12px; color: var(--text-muted);">Quản trị tài khoản, an toàn dữ liệu và sao lưu hệ thống</td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Trần Phúc Bảo</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">manager • ID: NS02</div>
+                  </td>
+                  <td>
+                    <span class="badge" style="background: #f0fdfa; color: #0f766e; border: 1px solid #99f6e4;">Quản lý CN1</span>
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="font-size: 12px; color: var(--text-muted);">Quản lý sân, kho vật tư và duyệt báo cáo CN1 Thủ Đức</td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Nguyễn Thanh Tâm</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">pos • ID: NS03</div>
+                  </td>
+                  <td>
+                    <span class="badge" style="background: #f4f4f5; color: #52525b; border: 1px solid #e4e4e7;">Thu ngân POS</span>
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" disabled style="width: 16px; height: 16px;">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="font-size: 12px; color: var(--text-muted);">Đặt sân quầy POS, thu cọc và in hóa đơn CN1 Thủ Đức</td>
+                </tr>
+
                 <tr>
                   <td>
                     <div style="font-weight: 600; color: var(--text-dark);">Võ Hoàng Nam</div>
@@ -175,59 +340,16 @@
                   <td style="text-align: center;">
                     <input type="checkbox" checked disabled style="width: 16px; height: 16px;">
                   </td>
-                  <td style="font-size: 12px; color: var(--text-muted);">Xem toàn bộ báo cáo, duyệt giá & giải đấu</td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked disabled style="width: 16px; height: 16px;">
+                  </td>
+                  <td style="font-size: 12px; color: var(--text-muted);">Đồng điều hành chuỗi & đối tác chiến lược</td>
                 </tr>
 
                 <tr>
                   <td>
                     <div style="font-weight: 600; color: var(--text-dark);">Nguyễn Văn Quản</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">quan.nv • ID: NS02</div>
-                  </td>
-                  <td>
-                    <span class="badge" style="background: #f0fdfa; color: #0f766e; border: 1px solid #99f6e4;">Quản lý CN1</span>
-                  </td>
-                  <td style="text-align: center;">
-                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
-                  </td>
-                  <td style="text-align: center;">
-                    <input type="checkbox" checked style="width: 16px; height: 16px; accent-color: var(--primary);">
-                  </td>
-                  <td style="text-align: center;">
-                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
-                  </td>
-                  <td style="text-align: center;">
-                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
-                  </td>
-                  <td style="font-size: 12px; color: var(--text-muted);">Quản lý sân, kho vật tư và duyệt báo cáo CN1</td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <div style="font-weight: 600; color: var(--text-dark);">Lê Thị Mai</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">mai.lt • ID: NS03</div>
-                  </td>
-                  <td>
-                    <span class="badge" style="background: #f4f4f5; color: #52525b; border: 1px solid #e4e4e7;">Thu ngân</span>
-                  </td>
-                  <td style="text-align: center;">
-                    <input type="checkbox" disabled style="width: 16px; height: 16px;">
-                  </td>
-                  <td style="text-align: center;">
-                    <input type="checkbox" checked style="width: 16px; height: 16px; accent-color: var(--primary);">
-                  </td>
-                  <td style="text-align: center;">
-                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
-                  </td>
-                  <td style="text-align: center;">
-                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
-                  </td>
-                  <td style="font-size: 12px; color: var(--text-muted);">Đặt sân tại quầy POS, thu cọc và in hóa đơn CN1</td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <div style="font-weight: 600; color: var(--text-dark);">Trần Hữu Nam</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">nam.th • ID: NS04</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">quan.nv • ID: NS05</div>
                   </td>
                   <td>
                     <span class="badge" style="background: #f0fdfa; color: #0f766e; border: 1px solid #99f6e4;">Quản lý CN2</span>
@@ -244,13 +366,16 @@
                   <td style="text-align: center;">
                     <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
                   </td>
-                  <td style="font-size: 12px; color: var(--text-muted);">Quản lý sân, kho vật tư và duyệt báo cáo CN2</td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="font-size: 12px; color: var(--text-muted);">Quản lý sân, kho vật tư và duyệt báo cáo CN2 Quận 9</td>
                 </tr>
 
                 <tr>
                   <td>
-                    <div style="font-weight: 600; color: var(--text-dark);">Lê Hoàng Khang</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">khang.lh • ID: NS05</div>
+                    <div style="font-weight: 600; color: var(--text-dark);">Trần Hữu Nam</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">nam.th • ID: NS06</div>
                   </td>
                   <td>
                     <span class="badge" style="background: #f0fdfa; color: #0f766e; border: 1px solid #99f6e4;">Quản lý CN3</span>
@@ -267,7 +392,62 @@
                   <td style="text-align: center;">
                     <input type="checkbox" checked style="width: 16px; height: 16px; accent-color: var(--primary);">
                   </td>
-                  <td style="font-size: 12px; color: var(--text-muted);">Quản lý sân, kho vật tư và duyệt báo cáo CN3</td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="font-size: 12px; color: var(--text-muted);">Quản lý sân, kho vật tư và duyệt báo cáo CN3 Bình Thạnh</td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Lê Hoàng Khang</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">khang.lh • ID: NS07</div>
+                  </td>
+                  <td>
+                    <span class="badge" style="background: #f0fdfa; color: #0f766e; border: 1px solid #99f6e4;">Quản lý CN4</span>
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="font-size: 12px; color: var(--text-muted);">Quản lý sân, kho vật tư và duyệt báo cáo CN4 Gò Vấp</td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-dark);">Lê Thị Mai</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">mai.lt • ID: NS04</div>
+                  </td>
+                  <td>
+                    <span class="badge" style="background: #f4f4f5; color: #52525b; border: 1px solid #e4e4e7;">Thu ngân</span>
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" disabled style="width: 16px; height: 16px;">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" checked style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="text-align: center;">
+                    <input type="checkbox" style="width: 16px; height: 16px; accent-color: var(--primary);">
+                  </td>
+                  <td style="font-size: 12px; color: var(--text-muted);">Thu ngân tại quầy & giao ca chi nhánh 1</td>
                 </tr>
               </tbody>
             </table>
@@ -286,7 +466,7 @@
     function savePermissions() {
       if (window.showToast) { showToast('Đã cập nhật phân quyền chi nhánh thành công', 'success'); }
     }
-      function toggleTheme() {
+    function toggleTheme() {
       const current = document.documentElement.getAttribute('data-theme') || 'light';
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);

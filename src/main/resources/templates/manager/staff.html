@@ -5,15 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản lý nhân sự & Phân ca - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
+  <script src="/js/auth-guard.js"></script>
+  <script src="/js/global-hub.js"></script>
   <style>
     .schedule-table {
       width: 100%;
       border-collapse: collapse;
+      table-layout: fixed;
     }
 
     .schedule-table th, .schedule-table td {
       border: 1px solid var(--border-subtle);
-      padding: 12px;
+      padding: 10px 8px;
       text-align: center;
       vertical-align: top;
     }
@@ -26,37 +29,104 @@
     }
 
     .schedule-cell {
-      min-height: 80px;
+      min-height: 110px;
       display: flex;
       flex-direction: column;
       gap: 6px;
+      height: 100%;
     }
 
     .staff-badge-shift {
       background: var(--primary-light);
       color: var(--primary-hover);
       border: 1px solid var(--primary-border);
-      padding: 6px 10px;
+      padding: 5px 8px;
       border-radius: 6px;
       font-size: 11.5px;
       font-weight: 700;
-      cursor: pointer;
       text-align: left;
       transition: all 0.15s ease;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: relative;
     }
 
     .staff-badge-shift:hover {
-      transform: scale(1.02);
       border-color: var(--primary);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.06);
     }
 
     .staff-badge-shift.shift-night {
       background: rgba(59, 130, 246, 0.1);
       color: #2563eb;
       border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .staff-badge-shift .btn-del-shift {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-left: 6px;
+      border: none;
+      line-height: 1;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .staff-badge-shift .btn-del-shift:hover {
+      background: #ef4444;
+      color: #ffffff;
+      transform: scale(1.15);
+    }
+
+    .btn-add-shift-cell {
+      width: 100%;
+      padding: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px dashed var(--border-subtle);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-top: auto;
+    }
+
+    .btn-add-shift-cell:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--surface-subtle);
+    }
+
+    .btn-delete-staff {
+      padding: 4px 8px;
+      font-size: 11px;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+
+    .btn-delete-staff:hover {
+      background: #ef4444;
+      color: #ffffff;
     }
   </style>
 </head>
@@ -101,15 +171,6 @@
           </svg>
           <span class="menu-text">Đặt sân</span>
           <span class="menu-tag">7 mới</span>
-        </a>
-
-        <a href="/pos/grid" class="menu-item">
-          <svg class="svg-icon" viewBox="0 0 24 24">
-            <line x1="12" y1="20" x2="12" y2="10"></line>
-            <line x1="18" y1="20" x2="18" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="16"></line>
-          </svg>
-          <span class="menu-text">Lịch sân (POS)</span>
         </a>
 
         <a href="/manager/courts" class="menu-item">
@@ -204,7 +265,7 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" placeholder="Tìm kiếm nhân viên, chức vụ, số điện thoại...">
+            <input type="text" id="staffSearchInput" placeholder="Tìm kiếm nhân viên, chức vụ, số điện thoại..." oninput="handleStaffSearch()">
           </div>
         </div>
 
@@ -237,6 +298,18 @@
 
       <!-- PAGE CONTENT -->
       <main class="page-content">
+        <!-- LUXURY HERO BANNER -->
+        <div class="hero-banner" style="margin-bottom: 24px;">
+          <div class="hero-banner-content">
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
+              <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
+              Đội Ngũ Nhân Sự & Phân Ca Chi Nhánh
+            </div>
+            <h1 class="hero-title" style="margin-bottom: 8px;">Quản Lý Nhân Viên & Lịch Trực Ca</h1>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Điều phối nhân viên lễ tân, thu ngân quầy, kỹ thuật viên mặt sân và theo dõi phân ca hàng tuần chi nhánh Thủ Đức</p>
+          </div>
+        </div>
+
         <!-- KPI METRICS -->
         <div class="kpi-grid">
           <div class="kpi-card-unified">
@@ -246,60 +319,68 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: var(--primary);">8 nhân viên</div>
-            <div class="kpi-trend positive">1 Quản lý, 4 Thu ngân POS, 3 Kỹ thuật sân</div>
+            <div class="kpi-val" id="kpiTotalStaff" style="color: var(--primary);">6 nhân viên</div>
+            <div class="kpi-trend positive" id="kpiStaffBreakdown">1 Quản lý, 2 Thu ngân, 1 Lễ tân, 2 Kỹ thuật</div>
           </div>
 
           <div class="kpi-card-unified">
             <div class="kpi-header">
-              <span class="kpi-label">Đang trong ca trực hôm nay</span>
+              <span class="kpi-label">Đang trong ca sáng hôm nay</span>
               <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
                 <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #3b82f6;">3 nhân sự</div>
-            <div class="kpi-trend positive">Ca sáng (05:00 - 13:30): 2 POS, 1 Kỹ thuật</div>
+            <div class="kpi-val" id="kpiTodayMorning" style="color: #3b82f6;">2 nhân sự</div>
+            <div class="kpi-trend positive">Ca sáng (05:00 - 13:30): Thứ Tư</div>
           </div>
 
           <div class="kpi-card-unified">
             <div class="kpi-header">
-              <span class="kpi-label">Ca chiều tối (13:30 - 22:30)</span>
+              <span class="kpi-label">Ca chiều tối hôm nay (13:30 - 22:30)</span>
               <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
                 <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #f59e0b;">4 nhân sự</div>
+            <div class="kpi-val" id="kpiTodayNight" style="color: #f59e0b;">3 nhân sự</div>
             <div class="kpi-trend">Tăng cường ca tối phục vụ giờ cao điểm</div>
           </div>
 
           <div class="kpi-card-unified">
             <div class="kpi-header">
-              <span class="kpi-label">Tỷ lệ chuyên cần tuần này</span>
+              <span class="kpi-label">Tỷ lệ phủ ca tuần</span>
               <div class="kpi-icon-wrap" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;">
                 <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
               </div>
             </div>
             <div class="kpi-val" style="color: #8b5cf6;">100%</div>
-            <div class="kpi-trend positive">Không có ca vắng hoặc đi trễ</div>
+            <div class="kpi-trend positive">14/14 ca trực đều có nhân sự trực chiến</div>
           </div>
         </div>
 
         <!-- MA TRẬN PHÂN CA TUẦN -->
         <div class="section-card" style="margin-bottom: 24px;">
-          <div class="section-header-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div class="section-header-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
             <div class="section-title-wrap">
               <h3>Lịch phân ca trực tuần (Thứ 2 - Chủ Nhật)</h3>
               <p>Chi nhánh Thủ Đức • Ca Sáng: 05h00 - 13h30 | Ca Tối: 13h30 - 22h30</p>
             </div>
             <div style="display: flex; gap: 8px;">
-              <button class="btn btn-outline" onclick="showToast('Đã lưu và áp dụng lịch ca trực tuần thành công!', 'success')">
+              <button class="btn btn-outline" onclick="openAssignShiftModal()" title="Thêm nhân viên vào ca">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Phân Công Ca</span>
+              </button>
+              <button class="btn btn-outline" onclick="resetScheduleToDefault()" title="Khôi phục phân ca gốc">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+                <span>Đặt Lại</span>
+              </button>
+              <button class="btn btn-primary" onclick="saveShiftSchedule()">
                 <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
                 <span>Lưu Lịch Ca</span>
               </button>
             </div>
           </div>
 
-          <div class="table-container">
+          <div class="table-container" style="overflow-x: auto;">
             <table class="schedule-table">
               <thead>
                 <tr>
@@ -313,111 +394,8 @@
                   <th>Chủ Nhật (04/10)</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td style="font-weight: 800; background: var(--surface-subtle); vertical-align: middle;">
-                    <div>Ca Sáng</div>
-                    <div style="font-size: 11px; color: var(--text-muted); font-weight: normal;">05:00 - 13:30</div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift"><span>Tâm (POS)</span><span>🏸</span></div>
-                      <div class="staff-badge-shift"><span>Huy (Kỹ thuật)</span><span>⚙️</span></div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift"><span>Tâm (POS)</span><span>🏸</span></div>
-                      <div class="staff-badge-shift"><span>Nam (Thu ngân)</span><span>💰</span></div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift" style="border: 2px solid var(--primary);"><span>Tâm (POS)</span><span class="badge badge-green" style="font-size: 9px;">HÔM NAY</span></div>
-                      <div class="staff-badge-shift"><span>Huy (Kỹ thuật)</span><span>⚙️</span></div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift"><span>Nam (Thu ngân)</span><span>💰</span></div>
-                      <div class="staff-badge-shift"><span>Vinh (Kỹ thuật)</span><span>⚙️</span></div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift"><span>Tâm (POS)</span><span>🏸</span></div>
-                      <div class="staff-badge-shift"><span>Nam (Thu ngân)</span><span>💰</span></div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift"><span>Tâm (POS)</span><span>🏸</span></div>
-                      <div class="staff-badge-shift"><span>Huy (Kỹ thuật)</span><span>⚙️</span></div>
-                      <div class="staff-badge-shift"><span>Linh (Lễ tân)</span><span>✨</span></div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift"><span>Nam (Thu ngân)</span><span>💰</span></div>
-                      <div class="staff-badge-shift"><span>Vinh (Kỹ thuật)</span><span>⚙️</span></div>
-                      <div class="staff-badge-shift"><span>Linh (Lễ tân)</span><span>✨</span></div>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="font-weight: 800; background: var(--surface-subtle); vertical-align: middle;">
-                    <div>Ca Tối</div>
-                    <div style="font-size: 11px; color: var(--text-muted); font-weight: normal;">13:30 - 22:30</div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift shift-night"><span>Linh (Lễ tân)</span><span>✨</span></div>
-                      <div class="staff-badge-shift shift-night"><span>Bảo (Quản lý)</span><span>👑</span></div>
-                      <div class="staff-badge-shift shift-night"><span>Vinh (Kỹ thuật)</span><span>⚙️</span></div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift shift-night"><span>Linh (Lễ tân)</span><span>✨</span></div>
-                      <div class="staff-badge-shift shift-night"><span>Huy (Kỹ thuật)</span><span>⚙️</span></div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift shift-night" style="border: 2px solid #2563eb;"><span>Linh (Lễ tân)</span><span class="badge badge-blue" style="font-size: 9px;">CA TỐI</span></div>
-                      <div class="staff-badge-shift shift-night"><span>Bảo (Quản lý)</span><span>👑</span></div>
-                      <div class="staff-badge-shift shift-night"><span>Vinh (Kỹ thuật)</span><span>⚙️</span></div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift shift-night"><span>Tâm (POS)</span><span>🏸</span></div>
-                      <div class="staff-badge-shift shift-night"><span>Huy (Kỹ thuật)</span><span>⚙️</span></div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift shift-night"><span>Linh (Lễ tân)</span><span>✨</span></div>
-                      <div class="staff-badge-shift shift-night"><span>Bảo (Quản lý)</span><span>👑</span></div>
-                      <div class="staff-badge-shift shift-night"><span>Vinh (Kỹ thuật)</span><span>⚙️</span></div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift shift-night"><span>Nam (Thu ngân)</span><span>💰</span></div>
-                      <div class="staff-badge-shift shift-night"><span>Bảo (Quản lý)</span><span>👑</span></div>
-                      <div class="staff-badge-shift shift-night"><span>Vinh (Kỹ thuật)</span><span>⚙️</span></div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="schedule-cell">
-                      <div class="staff-badge-shift shift-night"><span>Tâm (POS)</span><span>🏸</span></div>
-                      <div class="staff-badge-shift shift-night"><span>Bảo (Quản lý)</span><span>👑</span></div>
-                      <div class="staff-badge-shift shift-night"><span>Huy (Kỹ thuật)</span><span>⚙️</span></div>
-                    </div>
-                  </td>
-                </tr>
+              <tbody id="shiftMatrixTbody">
+                <!-- RENDERED DYNAMICALLY VIA JAVASCRIPT -->
               </tbody>
             </table>
           </div>
@@ -425,12 +403,21 @@
 
         <!-- DANH SÁCH NHÂN SỰ -->
         <div class="section-card">
-          <div class="section-header-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div class="section-header-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
             <div class="section-title-wrap">
               <h3>Danh sách nhân sự chi nhánh Thủ Đức</h3>
-              <p>Hồ sơ nhân viên, phân quyền ca và thông tin liên hệ</p>
+              <p>Hồ sơ nhân viên, chức vụ và trạng thái làm việc tại cơ sở</p>
             </div>
-            <button class="btn btn-primary" onclick="openStaffModal()">+ Thêm nhân sự mới</button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <select id="roleFilterSelect" class="form-control" style="width: 180px; padding: 6px 10px; font-size: 12.5px;" onchange="handleStaffSearch()">
+                <option value="">Tất cả vai trò</option>
+                <option value="Quản lý chi nhánh">Quản lý chi nhánh</option>
+                <option value="Thu ngân POS quầy">Thu ngân POS quầy</option>
+                <option value="Lễ tân & Dịch vụ">Lễ tân & Dịch vụ</option>
+                <option value="Kỹ thuật & Bảo dưỡng sân">Kỹ thuật sân</option>
+              </select>
+              <button class="btn btn-primary" onclick="openStaffModal()">+ Thêm nhân sự mới</button>
+            </div>
           </div>
 
           <div class="table-container">
@@ -444,60 +431,11 @@
                   <th>Số điện thoại</th>
                   <th>Email</th>
                   <th>Trạng thái</th>
-                  <th style="text-align: right;">Thao tác</th>
+                  <th style="text-align: right; width: 140px;">Thao tác</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td style="text-align: center;">1</td>
-                  <td><strong>NV-01</strong></td>
-                  <td><strong>Trần Phúc Bảo</strong></td>
-                  <td><span class="badge badge-purple">Quản lý chi nhánh</span></td>
-                  <td>0903123456</td>
-                  <td>manager@utesport.vn</td>
-                  <td><span class="badge badge-green">Đang làm việc</span></td>
-                  <td style="text-align: right;"><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openStaffModal('NV-01', 'Trần Phúc Bảo', 'Quản lý chi nhánh')">Sửa</button></td>
-                </tr>
-                <tr>
-                  <td style="text-align: center;">2</td>
-                  <td><strong>NV-02</strong></td>
-                  <td><strong>Nguyễn Thanh Tâm</strong></td>
-                  <td><span class="badge badge-blue">Thu ngân POS quầy</span></td>
-                  <td>0904555666</td>
-                  <td>pos@utesport.vn</td>
-                  <td><span class="badge badge-green">Đang trong ca sáng</span></td>
-                  <td style="text-align: right;"><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openStaffModal('NV-02', 'Nguyễn Thanh Tâm', 'Thu ngân POS quầy')">Sửa</button></td>
-                </tr>
-                <tr>
-                  <td style="text-align: center;">3</td>
-                  <td><strong>NV-03</strong></td>
-                  <td><strong>Bùi Khánh Linh</strong></td>
-                  <td><span class="badge badge-amber">Lễ tân & Dịch vụ</span></td>
-                  <td>0909111222</td>
-                  <td>linh.bk@utesport.vn</td>
-                  <td><span class="badge badge-blue">Ca tối</span></td>
-                  <td style="text-align: right;"><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openStaffModal('NV-03', 'Bùi Khánh Linh', 'Lễ tân & Dịch vụ')">Sửa</button></td>
-                </tr>
-                <tr>
-                  <td style="text-align: center;">4</td>
-                  <td><strong>NV-04</strong></td>
-                  <td><strong>Nguyễn Hoàng Nam</strong></td>
-                  <td><span class="badge badge-blue">Thu ngân quầy</span></td>
-                  <td>0903888777</td>
-                  <td>nam.nh@utesport.vn</td>
-                  <td><span class="badge badge-green">Đang làm việc</span></td>
-                  <td style="text-align: right;"><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openStaffModal('NV-04', 'Nguyễn Hoàng Nam', 'Thu ngân quầy')">Sửa</button></td>
-                </tr>
-                <tr>
-                  <td style="text-align: center;">5</td>
-                  <td><strong>NV-05</strong></td>
-                  <td><strong>Phạm Gia Huy</strong></td>
-                  <td><span class="badge badge-purple">Kỹ thuật & Bảo dưỡng sân</span></td>
-                  <td>0988777666</td>
-                  <td>huy.pg@utesport.vn</td>
-                  <td><span class="badge badge-green">Đang trong ca sáng</span></td>
-                  <td style="text-align: right;"><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openStaffModal('NV-05', 'Phạm Gia Huy', 'Kỹ thuật sân')">Sửa</button></td>
-                </tr>
+              <tbody id="staffTableTbody">
+                <!-- RENDERED DYNAMICALLY VIA JAVASCRIPT -->
               </tbody>
             </table>
           </div>
@@ -506,7 +444,7 @@
     </div>
   </div>
 
-  <!-- MODAL THÊM / SỬA NHÂN VIÊN -->
+  <!-- MODAL 1: THÊM / SỬA NHÂN VIÊN -->
   <div class="modal-overlay" id="staffModal">
     <div class="modal-card">
       <div class="modal-header">
@@ -514,16 +452,17 @@
         <button class="modal-close-btn" onclick="closeStaffModal()">✕</button>
       </div>
       <div class="modal-body">
+        <input type="hidden" id="editStaffIndex" value="-1">
         <div class="form-group">
-          <label class="form-label">Mã nhân viên</label>
-          <input type="text" class="form-control" id="inpStaffCode" placeholder="Ví dụ: NV-06">
+          <label class="form-label">Mã nhân viên <span style="color: #ef4444;">*</span></label>
+          <input type="text" class="form-control" id="inpStaffCode" placeholder="Ví dụ: NV-07">
         </div>
         <div class="form-group">
-          <label class="form-label">Họ và tên nhân viên</label>
+          <label class="form-label">Họ và tên nhân viên <span style="color: #ef4444;">*</span></label>
           <input type="text" class="form-control" id="inpStaffName" placeholder="Ví dụ: Lê Minh Hoàng">
         </div>
         <div class="form-group">
-          <label class="form-label">Chức vụ</label>
+          <label class="form-label">Chức vụ / Vai trò</label>
           <select class="form-control" id="inpStaffRole">
             <option value="Thu ngân POS quầy">Thu ngân POS quầy</option>
             <option value="Lễ tân & Dịch vụ">Lễ tân & Dịch vụ</option>
@@ -532,13 +471,75 @@
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Số điện thoại liên hệ</label>
+          <label class="form-label">Số điện thoại liên hệ <span style="color: #ef4444;">*</span></label>
           <input type="text" class="form-control" id="inpStaffPhone" placeholder="Ví dụ: 0901234567">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email làm việc</label>
+          <input type="email" class="form-control" id="inpStaffEmail" placeholder="Ví dụ: hoang.lm@utesport.vn">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Trạng thái làm việc</label>
+          <select class="form-control" id="inpStaffStatus">
+            <option value="Đang làm việc">Đang làm việc</option>
+            <option value="Tạm nghỉ phép">Tạm nghỉ phép</option>
+          </select>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeStaffModal()">Hủy bỏ</button>
         <button class="btn btn-primary" onclick="saveStaff()">Lưu hồ sơ nhân sự</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: PHÂN CÔNG CA TRỰC -->
+  <div class="modal-overlay" id="assignShiftModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Phân công nhân sự vào ca trực</h3>
+        <button class="modal-close-btn" onclick="closeAssignShiftModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Ngày trong tuần</label>
+          <select class="form-control" id="inpShiftDay">
+            <option value="mon">Thứ Hai (28/09)</option>
+            <option value="tue">Thứ Ba (29/09)</option>
+            <option value="wed">Thứ Tư (30/09) - Hôm nay</option>
+            <option value="thu">Thứ Năm (01/10)</option>
+            <option value="fri">Thứ Sáu (02/10)</option>
+            <option value="sat">Thứ Bảy (03/10)</option>
+            <option value="sun">Chủ Nhật (04/10)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ca trực</label>
+          <select class="form-control" id="inpShiftType">
+            <option value="morning">Ca Sáng (05:00 - 13:30)</option>
+            <option value="night">Ca Tối (13:30 - 22:30)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Chọn nhân sự chi nhánh</label>
+          <select class="form-control" id="inpShiftStaffSelect">
+            <!-- POPULATED DYNAMICALLY -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vai trò đảm nhiệm trong ca</label>
+          <select class="form-control" id="inpShiftStaffDuty">
+            <option value="POS|🏸">Thu ngân POS quầy</option>
+            <option value="Thu ngân|💰">Thu ngân quầy</option>
+            <option value="Lễ tân|✨">Lễ tân & Đón khách</option>
+            <option value="Kỹ thuật|⚙️">Kỹ thuật & Mặt sân</option>
+            <option value="Quản lý|👑">Quản lý ca trực</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeAssignShiftModal()">Hủy bỏ</button>
+        <button class="btn btn-primary" onclick="confirmAssignShift()">Xác nhận phân ca</button>
       </div>
     </div>
   </div>
@@ -559,18 +560,357 @@
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
-    function openStaffModal(code, name, role) {
+    // ==========================================
+    // INITIAL SEED DATA
+    // ==========================================
+    const DEFAULT_STAFF_LIST = [
+      { id: 'NV-01', name: 'Trần Phúc Bảo', shortName: 'Bảo', role: 'Quản lý chi nhánh', phone: '0903123456', email: 'manager@utesport.vn', status: 'Đang làm việc' },
+      { id: 'NV-02', name: 'Nguyễn Thanh Tâm', shortName: 'Tâm', role: 'Thu ngân POS quầy', phone: '0904555666', email: 'pos@utesport.vn', status: 'Đang làm việc' },
+      { id: 'NV-03', name: 'Bùi Khánh Linh', shortName: 'Linh', role: 'Lễ tân & Dịch vụ', phone: '0909111222', email: 'linh.bk@utesport.vn', status: 'Đang làm việc' },
+      { id: 'NV-04', name: 'Nguyễn Hoàng Nam', shortName: 'Nam', role: 'Thu ngân POS quầy', phone: '0903888777', email: 'nam.nh@utesport.vn', status: 'Đang làm việc' },
+      { id: 'NV-05', name: 'Phạm Gia Huy', shortName: 'Huy', role: 'Kỹ thuật & Bảo dưỡng sân', phone: '0988777666', email: 'huy.pg@utesport.vn', status: 'Đang làm việc' },
+      { id: 'NV-06', name: 'Trịnh Gia Vinh', shortName: 'Vinh', role: 'Kỹ thuật & Bảo dưỡng sân', phone: '0977222333', email: 'vinh.tg@utesport.vn', status: 'Đang làm việc' }
+    ];
+
+    const DEFAULT_SCHEDULE = {
+      mon: {
+        morning: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: '⚙️' } ],
+        night: [ { staffId: 'NV-03', duty: 'Lễ tân', icon: '✨' }, { staffId: 'NV-01', duty: 'Quản lý', icon: '👑' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: '⚙️' } ]
+      },
+      tue: {
+        morning: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-04', duty: 'Thu ngân', icon: '💰' } ],
+        night: [ { staffId: 'NV-03', duty: 'Lễ tân', icon: '✨' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: '⚙️' } ]
+      },
+      wed: {
+        morning: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: '⚙️' } ],
+        night: [ { staffId: 'NV-03', duty: 'Lễ tân', icon: '✨' }, { staffId: 'NV-01', duty: 'Quản lý', icon: '👑' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: '⚙️' } ]
+      },
+      thu: {
+        morning: [ { staffId: 'NV-04', duty: 'Thu ngân', icon: '💰' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: '⚙️' } ],
+        night: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: '⚙️' } ]
+      },
+      fri: {
+        morning: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-04', duty: 'Thu ngân', icon: '💰' } ],
+        night: [ { staffId: 'NV-03', duty: 'Lễ tân', icon: '✨' }, { staffId: 'NV-01', duty: 'Quản lý', icon: '👑' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: '⚙️' } ]
+      },
+      sat: {
+        morning: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: '⚙️' }, { staffId: 'NV-03', duty: 'Lễ tân', icon: '✨' } ],
+        night: [ { staffId: 'NV-04', duty: 'Thu ngân', icon: '💰' }, { staffId: 'NV-01', duty: 'Quản lý', icon: '👑' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: '⚙️' } ]
+      },
+      sun: {
+        morning: [ { staffId: 'NV-04', duty: 'Thu ngân', icon: '💰' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: '⚙️' }, { staffId: 'NV-03', duty: 'Lễ tân', icon: '✨' } ],
+        night: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-01', duty: 'Quản lý', icon: '👑' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: '⚙️' } ]
+      }
+    };
+
+    const DAYS_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+    // Local state
+    let staffList = JSON.parse(localStorage.getItem('branch_staff_list')) || DEFAULT_STAFF_LIST;
+    let shiftSchedule = JSON.parse(localStorage.getItem('branch_shift_schedule')) || DEFAULT_SCHEDULE;
+
+    function saveState() {
+      localStorage.setItem('branch_staff_list', JSON.stringify(staffList));
+      localStorage.setItem('branch_shift_schedule', JSON.stringify(shiftSchedule));
+    }
+
+    function getStaffById(id) {
+      return staffList.find(s => s.id === id);
+    }
+
+    // ==========================================
+    // RENDER SHIFT SCHEDULE MATRIX
+    // ==========================================
+    function renderShiftMatrix() {
+      const tbody = document.getElementById('shiftMatrixTbody');
+      if (!tbody) return;
+
+      const shifts = [
+        { key: 'morning', label: 'Ca Sáng', time: '05:00 - 13:30', isNight: false },
+        { key: 'night', label: 'Ca Tối', time: '13:30 - 22:30', isNight: true }
+      ];
+
+      let html = '';
+
+      shifts.forEach(shift => {
+        html += `<tr>`;
+        html += `
+          <td style="font-weight: 800; background: var(--surface-subtle); vertical-align: middle;">
+            <div>${shift.label}</div>
+            <div style="font-size: 11px; color: var(--text-muted); font-weight: normal;">${shift.time}</div>
+          </td>
+        `;
+
+        DAYS_ORDER.forEach(dayKey => {
+          const isToday = (dayKey === 'wed');
+          const dayShifts = (shiftSchedule[dayKey] && shiftSchedule[dayKey][shift.key]) || [];
+
+          html += `<td><div class="schedule-cell">`;
+
+          dayShifts.forEach((item, idx) => {
+            const staff = getStaffById(item.staffId);
+            const displayName = staff ? staff.shortName : item.staffId;
+            const dutyText = item.duty || 'Trực';
+            const icon = item.icon || '🏸';
+
+            const nightClass = shift.isNight ? 'shift-night' : '';
+            const todayStyle = (isToday && !shift.isNight && idx === 0) ? 'border: 2px solid var(--primary);' : (isToday && shift.isNight && idx === 0) ? 'border: 2px solid #2563eb;' : '';
+
+            let todayTag = '';
+            if (isToday && idx === 0) {
+              todayTag = shift.isNight 
+                ? `<span class="badge badge-blue" style="font-size: 9px; padding: 2px 4px; margin-right: 4px;">CA TỐI</span>` 
+                : `<span class="badge badge-green" style="font-size: 9px; padding: 2px 4px; margin-right: 4px;">HÔM NAY</span>`;
+            }
+
+            html += `
+              <div class="staff-badge-shift ${nightClass}" style="${todayStyle}" title="${staff ? staff.name : ''}">
+                <div style="display: flex; align-items: center; gap: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <span>${displayName} (${dutyText})</span>
+                  <span>${icon}</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                  ${todayTag}
+                  <button type="button" class="btn-del-shift" onclick="removeStaffFromShift('${dayKey}', '${shift.key}', '${item.staffId}')" title="Xóa nhân viên khỏi ca này">✕</button>
+                </div>
+              </div>
+            `;
+          });
+
+          html += `
+            <button type="button" class="btn-add-shift-cell" onclick="openAssignShiftModal('${dayKey}', '${shift.key}')">
+              <span>+ Thêm</span>
+            </button>
+          `;
+
+          html += `</div></td>`;
+        });
+
+        html += `</tr>`;
+      });
+
+      tbody.innerHTML = html;
+      updateKPIs();
+    }
+
+    // ==========================================
+    // RENDER STAFF TABLE
+    // ==========================================
+    function renderStaffTable(filterKeyword = '', filterRole = '') {
+      const tbody = document.getElementById('staffTableTbody');
+      if (!tbody) return;
+
+      const keyword = filterKeyword.toLowerCase().trim();
+      const filtered = staffList.filter(s => {
+        const matchesKeyword = !keyword || 
+          s.name.toLowerCase().includes(keyword) || 
+          s.id.toLowerCase().includes(keyword) || 
+          s.phone.includes(keyword) || 
+          (s.email && s.email.toLowerCase().includes(keyword));
+        const matchesRole = !filterRole || s.role === filterRole;
+        return matchesKeyword && matchesRole;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Không tìm thấy nhân viên nào phù hợp</td></tr>`;
+        return;
+      }
+
+      let html = '';
+      filtered.forEach((staff, idx) => {
+        let roleBadge = 'badge-blue';
+        if (staff.role.includes('Quản lý')) roleBadge = 'badge-purple';
+        else if (staff.role.includes('Lễ tân')) roleBadge = 'badge-amber';
+        else if (staff.role.includes('Kỹ thuật')) roleBadge = 'badge-purple';
+
+        html += `
+          <tr>
+            <td style="text-align: center;">${idx + 1}</td>
+            <td><strong>${staff.id}</strong></td>
+            <td><strong>${staff.name}</strong></td>
+            <td><span class="badge ${roleBadge}">${staff.role}</span></td>
+            <td>${staff.phone}</td>
+            <td>${staff.email || '-'}</td>
+            <td><span class="badge ${staff.status === 'Đang làm việc' ? 'badge-green' : 'badge-amber'}">${staff.status}</span></td>
+            <td style="text-align: right; white-space: nowrap;">
+              <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px; margin-right: 6px;" onclick="openStaffModal('${staff.id}')">Sửa</button>
+              <button class="btn-delete-staff" onclick="deleteStaff('${staff.id}')">Xóa</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+      updateKPIs();
+    }
+
+    function handleStaffSearch() {
+      const keyword = (document.getElementById('staffSearchInput')?.value || '');
+      const role = (document.getElementById('roleFilterSelect')?.value || '');
+      renderStaffTable(keyword, role);
+    }
+
+    // ==========================================
+    // UPDATE KPI SUMMARY CARDS
+    // ==========================================
+    function updateKPIs() {
+      const totalStaffEl = document.getElementById('kpiTotalStaff');
+      const breakdownEl = document.getElementById('kpiStaffBreakdown');
+      const morningEl = document.getElementById('kpiTodayMorning');
+      const nightEl = document.getElementById('kpiTodayNight');
+
+      if (totalStaffEl) {
+        totalStaffEl.innerText = `${staffList.length} nhân viên`;
+      }
+
+      if (breakdownEl) {
+        const managers = staffList.filter(s => s.role.includes('Quản lý')).length;
+        const cashiers = staffList.filter(s => s.role.includes('Thu ngân')).length;
+        const reception = staffList.filter(s => s.role.includes('Lễ tân')).length;
+        const tech = staffList.filter(s => s.role.includes('Kỹ thuật')).length;
+        breakdownEl.innerText = `${managers} Quản lý, ${cashiers} Thu ngân, ${reception} Lễ tân, ${tech} Kỹ thuật`;
+      }
+
+      if (morningEl) {
+        const wedMorningCount = (shiftSchedule.wed && shiftSchedule.wed.morning) ? shiftSchedule.wed.morning.length : 0;
+        morningEl.innerText = `${wedMorningCount} nhân sự`;
+      }
+
+      if (nightEl) {
+        const wedNightCount = (shiftSchedule.wed && shiftSchedule.wed.night) ? shiftSchedule.wed.night.length : 0;
+        nightEl.innerText = `${wedNightCount} nhân sự`;
+      }
+    }
+
+    // ==========================================
+    // SHIFT ASSIGNMENT MODAL & ACTIONS
+    // ==========================================
+    function openAssignShiftModal(dayKey = 'wed', shiftKey = 'morning') {
+      const modal = document.getElementById('assignShiftModal');
+      document.getElementById('inpShiftDay').value = dayKey;
+      document.getElementById('inpShiftType').value = shiftKey;
+
+      // Populate staff dropdown
+      const select = document.getElementById('inpShiftStaffSelect');
+      select.innerHTML = '';
+      staffList.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `${s.name} (${s.id}) - ${s.role}`;
+        select.appendChild(opt);
+      });
+
+      // Default duty based on selected staff
+      updateDutyRecommendation();
+      select.onchange = updateDutyRecommendation;
+
+      modal.classList.add('open');
+    }
+
+    function updateDutyRecommendation() {
+      const staffId = document.getElementById('inpShiftStaffSelect').value;
+      const staff = getStaffById(staffId);
+      const dutySelect = document.getElementById('inpShiftStaffDuty');
+      if (staff && dutySelect) {
+        if (staff.role.includes('Thu ngân')) dutySelect.value = 'POS|🏸';
+        else if (staff.role.includes('Lễ tân')) dutySelect.value = 'Lễ tân|✨';
+        else if (staff.role.includes('Kỹ thuật')) dutySelect.value = 'Kỹ thuật|⚙️';
+        else if (staff.role.includes('Quản lý')) dutySelect.value = 'Quản lý|👑';
+      }
+    }
+
+    function closeAssignShiftModal() {
+      document.getElementById('assignShiftModal').classList.remove('open');
+    }
+
+    function confirmAssignShift() {
+      const day = document.getElementById('inpShiftDay').value;
+      const shift = document.getElementById('inpShiftType').value;
+      const staffId = document.getElementById('inpShiftStaffSelect').value;
+      const [duty, icon] = document.getElementById('inpShiftStaffDuty').value.split('|');
+
+      if (!staffId) {
+        showToast('Vui lòng chọn nhân viên!', 'warning');
+        return;
+      }
+
+      if (!shiftSchedule[day]) shiftSchedule[day] = { morning: [], night: [] };
+      if (!shiftSchedule[day][shift]) shiftSchedule[day][shift] = [];
+
+      // Check if already assigned to this exact shift
+      const exists = shiftSchedule[day][shift].some(item => item.staffId === staffId);
+      if (exists) {
+        showToast('Nhân viên này đã có tên trong ca trực được chọn!', 'warning');
+        return;
+      }
+
+      shiftSchedule[day][shift].push({ staffId, duty, icon });
+      saveState();
+      renderShiftMatrix();
+      closeAssignShiftModal();
+
+      const staff = getStaffById(staffId);
+      const staffName = staff ? staff.name : staffId;
+      showToast(`Đã phân công ${staffName} vào ca trực thành công!`, 'success');
+    }
+
+    function removeStaffFromShift(day, shift, staffId) {
+      if (!shiftSchedule[day] || !shiftSchedule[day][shift]) return;
+      
+      const staff = getStaffById(staffId);
+      const staffName = staff ? staff.name : staffId;
+
+      shiftSchedule[day][shift] = shiftSchedule[day][shift].filter(item => item.staffId !== staffId);
+      saveState();
+      renderShiftMatrix();
+      showToast(`Đã gỡ ${staffName} khỏi ca trực!`, 'info');
+    }
+
+    function saveShiftSchedule() {
+      saveState();
+      showToast('Đã lưu và áp dụng lịch ca trực tuần chi nhánh thành công!', 'success');
+    }
+
+    function resetScheduleToDefault() {
+      if (!confirm('Khôi phục lại phân ca trực tuần mặc định? Các chỉnh sửa phân ca hiện tại sẽ được cài lại.')) return;
+      shiftSchedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
+      saveState();
+      renderShiftMatrix();
+      showToast('Đã cài lại lịch phân ca trực mặc định!', 'info');
+    }
+
+    // ==========================================
+    // STAFF CRUD MODAL & ACTIONS
+    // ==========================================
+    function openStaffModal(staffId = null) {
       const modal = document.getElementById('staffModal');
-      if (code) {
-        document.getElementById('modalTitle').innerText = 'Cập nhật nhân viên: ' + code;
-        document.getElementById('inpStaffCode').value = code;
-        document.getElementById('inpStaffName').value = name;
-        document.getElementById('inpStaffRole').value = role;
+      const idxInput = document.getElementById('editStaffIndex');
+
+      if (staffId) {
+        const staff = getStaffById(staffId);
+        if (!staff) return;
+        document.getElementById('modalTitle').innerText = 'Cập nhật nhân viên: ' + staff.id;
+        idxInput.value = staff.id;
+        document.getElementById('inpStaffCode').value = staff.id;
+        document.getElementById('inpStaffCode').disabled = true;
+        document.getElementById('inpStaffName').value = staff.name;
+        document.getElementById('inpStaffRole').value = staff.role;
+        document.getElementById('inpStaffPhone').value = staff.phone;
+        document.getElementById('inpStaffEmail').value = staff.email || '';
+        document.getElementById('inpStaffStatus').value = staff.status || 'Đang làm việc';
       } else {
         document.getElementById('modalTitle').innerText = 'Thêm nhân sự mới vào chi nhánh';
-        document.getElementById('inpStaffCode').value = 'NV-06';
+        idxInput.value = '-1';
+        // Auto suggest next code
+        const nextNum = staffList.length + 1;
+        document.getElementById('inpStaffCode').value = 'NV-0' + nextNum;
+        document.getElementById('inpStaffCode').disabled = false;
         document.getElementById('inpStaffName').value = '';
+        document.getElementById('inpStaffPhone').value = '';
+        document.getElementById('inpStaffEmail').value = '';
+        document.getElementById('inpStaffStatus').value = 'Đang làm việc';
       }
+
       modal.classList.add('open');
     }
 
@@ -579,15 +919,102 @@
     }
 
     function saveStaff() {
-      const name = document.getElementById('inpStaffName').value.trim();
+      const editId = document.getElementById('editStaffIndex').value;
       const code = document.getElementById('inpStaffCode').value.trim();
-      if (!name) {
-        showToast('Vui lòng nhập họ tên nhân viên!', 'warning');
+      const name = document.getElementById('inpStaffName').value.trim();
+      const role = document.getElementById('inpStaffRole').value;
+      const phone = document.getElementById('inpStaffPhone').value.trim();
+      const email = document.getElementById('inpStaffEmail').value.trim();
+      const status = document.getElementById('inpStaffStatus').value;
+
+      if (!code) {
+        showToast('Vui lòng nhập mã nhân viên!', 'warning');
         return;
       }
-      showToast(`Đã lưu hồ sơ nhân sự: ${name} (${code}) thành công!`, 'success');
+      if (!name) {
+        showToast('Vui lòng nhập họ và tên nhân viên!', 'warning');
+        return;
+      }
+      if (!phone) {
+        showToast('Vui lòng nhập số điện thoại!', 'warning');
+        return;
+      }
+
+      // Compute short name for badges
+      const nameParts = name.split(' ');
+      const shortName = nameParts[nameParts.length - 1];
+
+      if (editId !== '-1') {
+        // Edit existing staff
+        const staff = getStaffById(editId);
+        if (staff) {
+          staff.name = name;
+          staff.shortName = shortName;
+          staff.role = role;
+          staff.phone = phone;
+          staff.email = email;
+          staff.status = status;
+        }
+        showToast(`Đã cập nhật hồ sơ nhân viên ${name} (${code})!`, 'success');
+      } else {
+        // Check duplicate code
+        if (getStaffById(code)) {
+          showToast(`Mã nhân viên ${code} đã tồn tại! Vui lòng chọn mã khác.`, 'warning');
+          return;
+        }
+        staffList.push({
+          id: code,
+          name,
+          shortName,
+          role,
+          phone,
+          email: email || `${code.toLowerCase()}@utesport.vn`,
+          status
+        });
+        showToast(`Đã thêm nhân viên ${name} (${code}) vào chi nhánh!`, 'success');
+      }
+
+      saveState();
+      renderStaffTable();
+      renderShiftMatrix();
       closeStaffModal();
     }
+
+    function deleteStaff(staffId) {
+      const staff = getStaffById(staffId);
+      if (!staff) return;
+
+      const confirmMsg = `Bạn có chắc chắn muốn xóa nhân viên "${staff.name}" (${staff.id})?\n\nNhân viên này cũng sẽ được gỡ khỏi tất cả các ca trực đã phân công trong tuần.`;
+      if (!confirm(confirmMsg)) return;
+
+      // 1. Remove from staff list
+      staffList = staffList.filter(s => s.id !== staffId);
+
+      // 2. Prune from all shifts in schedule
+      DAYS_ORDER.forEach(day => {
+        if (shiftSchedule[day]) {
+          if (shiftSchedule[day].morning) {
+            shiftSchedule[day].morning = shiftSchedule[day].morning.filter(item => item.staffId !== staffId);
+          }
+          if (shiftSchedule[day].night) {
+            shiftSchedule[day].night = shiftSchedule[day].night.filter(item => item.staffId !== staffId);
+          }
+        }
+      });
+
+      saveState();
+      renderStaffTable();
+      renderShiftMatrix();
+      showToast(`Đã xóa nhân viên ${staff.name} và cập nhật lại lịch phân ca!`, 'success');
+    }
+
+    // ==========================================
+    // INITIALIZATION ON PAGE LOAD
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      renderShiftMatrix();
+      renderStaffTable();
+    });
   </script>
 </body>
 </html>

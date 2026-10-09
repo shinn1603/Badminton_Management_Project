@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # CƠ SỞ DỮ LIỆU SQL SERVER 2022
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: badminton_sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    restart: unless-stopped
+
+  # ỨNG DỤNG WEB SPRING BOOT
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: badminton_web_app
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=badminton_management;encrypt=false;trustServerCertificate=true
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=YourStrong@Passw0rd
+      - CLOUDINARY_CLOUD_NAME=utesport-arena
+      - CLOUDINARY_API_KEY=348571948271842
+      - CLOUDINARY_API_SECRET=XyZ9876543210-abcdef
+    depends_on:
+      - sqlserver
+
+volumes:
+  mssql_data:

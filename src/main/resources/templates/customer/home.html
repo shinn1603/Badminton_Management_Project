@@ -2183,30 +2183,9 @@
       const matrixDateInput = document.getElementById('matrixViewDate');
       if (matrixDateInput) matrixDateInput.value = today;
 
-      // Update Nav User Widget if logged in
-      const rawUser = localStorage.getItem('utesport_user');
-      if (rawUser) {
-        try {
-          const user = JSON.parse(rawUser);
-          if (user && user.fullName) {
-            const userArea = document.getElementById('navUserArea');
-            if (userArea) {
-              userArea.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <a href="/customer/profile" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px var(--primary-glow);">
-                      ${user.fullName.substring(0, 2).toUpperCase()}
-                    </div>
-                    <div style="text-align: left;">
-                      <div style="font-size: 13px; font-weight: 700; color: var(--text-dark);">${user.fullName}</div>
-                      <div style="font-size: 11px; color: var(--primary); font-weight: 600;">Hội Viên VIP</div>
-                    </div>
-                  </a>
-                </div>
-              `;
-            }
-          }
-        } catch(e) {}
+      // Update Nav User Widget via centralized RBAC
+      if (window.RBAC && window.RBAC.syncNavUserArea) {
+        window.RBAC.syncNavUserArea();
       }
 
       // Initial court load for CN01

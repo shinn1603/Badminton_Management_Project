@@ -123,4 +123,37 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    public User saveOrUpdateUser(Map<String, String> payload) {
+        String username = payload.get("username");
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Tên đăng nhập không được để trống!");
+        }
+        Optional<User> existing = userRepository.findByUsername(username.trim());
+        User u = existing.orElseGet(User::new);
+        u.setUsername(username.trim());
+        if (payload.containsKey("password") && payload.get("password") != null && !payload.get("password").isBlank()) {
+            u.setPassword(payload.get("password").trim());
+        } else if (u.getPassword() == null) {
+            u.setPassword("123456");
+        }
+        if (payload.containsKey("fullName")) u.setFullName(payload.get("fullName"));
+        if (payload.containsKey("role")) u.setRole(payload.get("role").toUpperCase());
+        if (payload.containsKey("branchCode")) u.setBranchCode(payload.get("branchCode"));
+        if (payload.containsKey("phone")) u.setPhone(payload.get("phone"));
+        if (payload.containsKey("email")) u.setEmail(payload.get("email"));
+        if (payload.containsKey("status")) u.setStatus(payload.get("status"));
+        return userRepository.save(u);
+    }
+
+    public User toggleUserStatus(String username) {
+        User u = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy người dùng: " + username));
+        if ("Hoạt động".equalsIgnoreCase(u.getStatus())) {
+            u.setStatus("Khóa");
+        } else {
+            u.setStatus("Hoạt động");
+        }
+        return userRepository.save(u);
+    }
 }

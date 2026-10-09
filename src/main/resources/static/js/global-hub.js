@@ -11,9 +11,10 @@
     document.head.appendChild(s);
   }
 
-  // Auto-load AI Chatbot widget on customer pages
+  // Auto-load AI Chatbot widget on customer browsing pages (exclude auth / login screens)
   const p = window.location.pathname.toLowerCase();
-  if ((p.startsWith('/customer/') || p === '/' || p.startsWith('/booking')) && !document.querySelector('script[src*="chatbot-widget.js"]')) {
+  const isAuthPage = p.startsWith('/customer/auth') || p.startsWith('/customer/login') || p === '/login';
+  if (!isAuthPage && (p.startsWith('/customer/') || p === '/' || p.startsWith('/booking')) && !document.querySelector('script[src*="chatbot-widget.js"]')) {
     const cb = document.createElement('script');
     cb.src = '/js/chatbot-widget.js';
     document.head.appendChild(cb);
@@ -49,7 +50,7 @@ function updateThemeIcon(theme) {
   });
 })();
 
-// 2. Sidebar Toggle
+// 2. Sidebar Toggle & State
 function toggleSidebar() {
   const sidebar = document.getElementById('appSidebar') || document.querySelector('.sidebar');
   if (sidebar) {
@@ -58,6 +59,73 @@ function toggleSidebar() {
     localStorage.setItem('sidebar_collapsed', isCollapsed ? 'true' : 'false');
   }
 }
+
+// 2.1 Sidebar Scroll Memory & Active Route Synchronization
+(function initSidebarScrollAndActive() {
+  function getScrollContainer() {
+    return document.querySelector('.sidebar-content') || document.getElementById('sidebarContent') || document.getElementById('appSidebar') || document.querySelector('.sidebar');
+  }
+
+  function restoreScroll() {
+    const sc = getScrollContainer();
+    if (!sc) return;
+    const saved = sessionStorage.getItem('sidebar_scroll_top');
+    if (saved !== null) {
+      sc.scrollTop = parseInt(saved, 10);
+    }
+  }
+
+  function saveScroll() {
+    const sc = getScrollContainer();
+    if (sc) {
+      sessionStorage.setItem('sidebar_scroll_top', sc.scrollTop);
+    }
+  }
+
+  function syncActiveMenuItem() {
+    const currentPath = window.location.pathname.toLowerCase();
+    const currentHash = window.location.hash.toLowerCase();
+    const menuItems = document.querySelectorAll('.sidebar .menu-item');
+    if (!menuItems || menuItems.length === 0) return;
+
+    let matchedItem = null;
+    menuItems.forEach(item => {
+      const href = (item.getAttribute('href') || '').toLowerCase();
+      if (!href) return;
+      if (currentHash && href.includes(currentHash)) {
+        matchedItem = item;
+      } else if (!matchedItem && href.split('#')[0] === currentPath) {
+        matchedItem = item;
+      }
+    });
+
+    if (matchedItem) {
+      menuItems.forEach(i => i.classList.remove('active'));
+      matchedItem.classList.add('active');
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    const a = e.target.closest('a');
+    if (a && a.closest('.sidebar')) {
+      saveScroll();
+    }
+  });
+
+  window.addEventListener('beforeunload', saveScroll);
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      syncActiveMenuItem();
+      restoreScroll();
+      setTimeout(restoreScroll, 60);
+    });
+  } else {
+    syncActiveMenuItem();
+    restoreScroll();
+    setTimeout(restoreScroll, 60);
+  }
+})();
 
 // 3. Tab Switching
 function switchTab(tabId, btnElement) {
@@ -90,7 +158,7 @@ function selectPeriod(btnElement, period) {
   showToast(`Đã lọc báo cáo theo: ${btnElement.innerText.trim()}`, 'info');
 }
 
-// 5. Toast Notification System
+// 5. Toast & In-Modal Prominent Notification System
 function showToast(message, type = 'success') {
   let container = document.getElementById('toastContainer');
   if (!container) {
@@ -100,21 +168,59 @@ function showToast(message, type = 'success') {
     document.body.appendChild(container);
   }
 
+  container.style.zIndex = '999999';
+
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
   
-  const icon = type === 'success' ? '✔' : type === 'error' ? '✖' : 'ℹ';
+  const icon = type === 'success' ? '✔' : type === 'error' ? '✖' : type === 'warning' ? '⚠' : 'ℹ';
   toast.innerHTML = `
-    <span style="font-weight: 700; color: var(--primary);">${icon}</span>
-    <span>${message}</span>
+    <span style="font-weight: 800; font-size: 15px; color: ${type === 'error' || type === 'warning' ? '#ef4444' : 'var(--primary)'};">${icon}</span>
+    <span style="flex: 1; line-height: 1.4;">${message}</span>
   `;
 
   container.appendChild(toast);
 
+  // If a modal dialog is currently open, inject an alert directly into the active modal
+  const activeModal = document.querySelector('.modal-overlay.active, .modal-overlay.open, .slot-modal-overlay.active, .modal.show, [class*="modal"][class*="active"], [class*="modal"][class*="open"]');
+  if (activeModal && (type === 'warning' || type === 'error')) {
+    const targetCard = activeModal.querySelector('.modal-body, .modal-card, .modal-container, .vietqr-modal-card') || activeModal;
+    let inlineAlert = targetCard.querySelector('.modal-inline-alert');
+    if (!inlineAlert) {
+      inlineAlert = document.createElement('div');
+      inlineAlert.className = `modal-inline-alert ${type}`;
+      targetCard.insertBefore(inlineAlert, targetCard.firstChild);
+    } else {
+      inlineAlert.className = `modal-inline-alert ${type}`;
+    }
+    inlineAlert.innerHTML = `
+      <span style="font-size: 14px; font-weight: 800;">⚠</span>
+      <span style="flex: 1;">${message}</span>
+    `;
+
+    // Highlight any empty required input inside the modal
+    const emptyInputs = targetCard.querySelectorAll('input:required, input[placeholder*="*"], input[type="text"], input[type="tel"]');
+    emptyInputs.forEach(inp => {
+      if (!inp.value.trim()) {
+        inp.classList.add('input-error-highlight');
+        inp.focus();
+        setTimeout(() => inp.classList.remove('input-error-highlight'), 3500);
+      }
+    });
+
+    setTimeout(() => {
+      if (inlineAlert && inlineAlert.parentNode) {
+        inlineAlert.style.opacity = '0';
+        inlineAlert.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => inlineAlert.remove(), 300);
+      }
+    }, 4500);
+  }
+
   setTimeout(() => {
     toast.style.opacity = '0';
-    toast.style.transform = 'translateY(10px)';
+    toast.style.transform = 'translateY(-10px)';
     toast.style.transition = 'all 0.3s ease';
     setTimeout(() => toast.remove(), 300);
-  }, 3500);
+  }, 3800);
 }

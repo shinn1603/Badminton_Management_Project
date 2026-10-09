@@ -264,4 +264,23 @@ class ApiControllerTest {
                 .andExpect(jsonPath("$.handoverCode", startsWith("BG")))
                 .andExpect(jsonPath("$.status", is("CLOSED")));
     }
+
+    @Test
+    @DisplayName("API Cloudinary: Upload anh san va san pham")
+    void testApiUploadImage() throws Exception {
+        org.springframework.mock.web.MockMultipartFile file = new org.springframework.mock.web.MockMultipartFile(
+                "file",
+                "court-sample.jpg",
+                "image/jpeg",
+                "sample court photo bytes".getBytes()
+        );
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart("/api/upload/image")
+                        .file(file)
+                        .param("folder", "courts"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.url", notNullValue()))
+                .andExpect(jsonPath("$.folder", is("courts")));
+    }
 }

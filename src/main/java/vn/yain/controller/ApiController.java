@@ -20,6 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
+import vn.yain.service.CloudinaryService;
 
 @RestController
 @RequestMapping("/api")
@@ -67,6 +69,9 @@ public class ApiController {
 
     @Autowired
     private vn.yain.service.ShiftService shiftService;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     // ==========================================
     // 1. AUTHENTICATION & JWT ENDPOINTS
@@ -130,6 +135,31 @@ public class ApiController {
                 "role", role,
                 "valid", true
         ));
+    }
+
+    @GetMapping("/admin/users")
+    public List<User> getAdminUsers() {
+        return userService.getAllUsers();
+    }
+
+    @PostMapping("/admin/users")
+    public ResponseEntity<?> saveAdminUser(@RequestBody Map<String, String> payload) {
+        try {
+            User u = userService.saveOrUpdateUser(payload);
+            return ResponseEntity.ok(Map.of("success", true, "user", u));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/admin/users/{username}/toggle-status")
+    public ResponseEntity<?> toggleAdminUserStatus(@PathVariable String username) {
+        try {
+            User u = userService.toggleUserStatus(username);
+            return ResponseEntity.ok(Map.of("success", true, "status", u.getStatus()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
     }
 
     // ==========================================
@@ -540,6 +570,22 @@ public class ApiController {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi máy chủ: " + e.getMessage()));
+        }
+    }
+
+    // ==========================================
+    // 8. CLOUDINARY IMAGE UPLOAD (WEEK 2 GOAL)
+    // ==========================================
+    @PostMapping("/upload/image")
+    public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file,
+                                         @RequestParam(value = "folder", defaultValue = "general") String folder) {
+        try {
+            String url = cloudinaryService.uploadImage(file, folder);
+            return ResponseEntity.ok(Map.of("success", true, "url", url, "folder", folder));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi upload ảnh: " + e.getMessage()));
         }
     }
 }

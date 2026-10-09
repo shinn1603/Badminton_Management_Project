@@ -5,6 +5,7 @@
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('/css/chatbot-widget.css');
 
 /* --- DESIGN TOKENS --- */
 :root {
@@ -553,7 +554,7 @@ textarea {
   gap: 24px;
 }
 
-/* --- HERO BANNER (AS IN REFERENCE IMAGE 4) --- */
+/* --- HERO BANNER (EMERALD LUXURY SPORT ARENA) --- */
 .hero-banner {
   position: relative;
   border-radius: var(--radius-xl);
@@ -564,10 +565,19 @@ textarea {
   flex-direction: column;
   justify-content: flex-end;
   min-height: 200px;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: linear-gradient(180deg, rgba(6, 32, 25, 0.35) 0%, rgba(6, 32, 25, 0.88) 100%),
-    url('/images/arena-hero.jpg') center/cover no-repeat;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: radial-gradient(circle at 20% 30%, rgba(6, 78, 59, 0.95) 0%, rgba(4, 20, 16, 0.98) 100%),
+    url('/images/badminton_arena_hero.jpg') center/cover no-repeat;
+  background-blend-mode: overlay;
+}
+
+.hero-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.2) 0%, transparent 60%);
+  pointer-events: none;
 }
 
 .hero-banner-content {
@@ -1279,31 +1289,39 @@ textarea {
   background: var(--surface-subtle);
 }
 
-/* --- TOAST SYSTEM --- */
+/* --- TOAST SYSTEM & PROMINENT MODAL NOTIFICATIONS --- */
 .toast-container {
   position: fixed;
-  bottom: 24px;
+  top: 24px;
   right: 24px;
-  z-index: 150;
+  z-index: 999999 !important;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  pointer-events: none;
+  max-width: 440px;
+  width: calc(100% - 48px);
 }
 
 .toast {
-  padding: 12px 18px;
+  padding: 14px 20px;
   border-radius: var(--radius-md);
   background: var(--surface);
   border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
   font-size: 13.5px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-dark);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  min-width: 260px;
+  min-width: 280px;
+  pointer-events: auto;
+  position: relative;
+  z-index: 999999 !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .toast-success {
@@ -1314,8 +1332,61 @@ textarea {
   border-left: 4px solid var(--danger);
 }
 
+.toast-warning {
+  border-left: 4px solid var(--warning, #f59e0b);
+}
+
 .toast-info {
   border-left: 4px solid var(--secondary);
+}
+
+.toast-popup {
+  z-index: 999999 !important;
+}
+
+/* Modal Inline Alert - Highlights right inside the active dialog */
+.modal-inline-alert {
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: modalAlertShake 0.35s ease-in-out;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.modal-inline-alert.warning,
+.modal-inline-alert.error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #ef4444;
+}
+
+.modal-inline-alert.success {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
+}
+
+.modal-inline-alert.info {
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  color: #0284c7;
+}
+
+@keyframes modalAlertShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.input-error-highlight {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25) !important;
+  animation: modalAlertShake 0.35s ease-in-out;
 }
 
 @keyframes toastSlideIn {

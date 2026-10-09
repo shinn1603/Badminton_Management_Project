@@ -119,6 +119,78 @@
       .cust-nav-menu { display: none; }
     }
 
+    /* LUXURY HERO STYLES - EMERALD SPORT ARENA */
+    .booking-hero-box {
+      background: radial-gradient(circle at 20% 30%, rgba(6, 78, 59, 0.95) 0%, rgba(4, 20, 16, 0.98) 100%),
+                  url('/images/badminton_arena_hero.jpg') center/cover no-repeat;
+      background-blend-mode: overlay;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.25);
+      color: #ffffff;
+      padding: 42px 24px 44px;
+      position: relative;
+      overflow: hidden;
+    }
+    .booking-hero-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.2) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .booking-hero-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-badge-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      font-size: 12px;
+      font-weight: 700;
+      color: #6ee7b7;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 12px;
+    }
+    .hero-pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .hero-title {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -0.6px;
+      margin: 0 0 10px;
+      color: #ffffff;
+    }
+    .hero-title span {
+      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      color: #cbd5e1;
+      font-size: 14px;
+      margin: 0;
+      max-width: 680px;
+      line-height: 1.6;
+    }
+
     /* Page Layout */
     .booking-wrapper {
       max-width: 1240px;
@@ -134,7 +206,7 @@
     .step-guide-banner {
       background: rgba(16, 185, 129, 0.08);
       border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 14px 18px;
       margin-bottom: 20px;
       display: flex;
@@ -143,14 +215,15 @@
       gap: 16px;
     }
 
-    /* Section Cards */
+    /* Section Cards - SOFT GLASSMORPHISM */
     .section-card {
       background: var(--cust-surface);
       border: 1px solid var(--cust-border);
-      border-radius: 14px;
-      padding: 22px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      backdrop-filter: blur(12px);
     }
     .card-header-row {
       display: flex;
@@ -511,6 +584,21 @@
       </div>
     </div>
   </header>
+
+  <!-- LUXURY HERO BANNER - EMERALD SPORT -->
+  <section class="booking-hero-box">
+    <div class="booking-hero-inner">
+      <div class="hero-badge-tag">
+        <span class="hero-pulse-dot"></span> Đặt Sân Thi Đấu Tiêu Chuẩn Quốc Tế BWF
+      </div>
+      <h1 class="hero-title">
+        Đặt Sân & <span>Khóa Slot Thời Gian Thực</span>
+      </h1>
+      <p class="hero-sub">
+        Hệ thống tự động đồng bộ lịch trống, giữ chỗ 10 phút chống xung đột, hỗ trợ thanh toán VietQR đa ngân hàng.
+      </p>
+    </div>
+  </section>
 
   <!-- MAIN BOOKING WORKFLOW AREA -->
   <main class="booking-wrapper">
@@ -1142,24 +1230,32 @@
 
     async function confirmBkgPayment() {
       const bookingCode = document.getElementById('bkgBookingCode').innerText;
-      showToast('Đang đối soát giao dịch VietQR...', 'info');
+      showToast('Đang đối soát giao dịch VietQR và cập nhật cơ sở dữ liệu...', 'info');
 
       try {
-        await fetch('/api/webhook/vietqr', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content: `CK ${bookingCode}`, amount: 30000 })
-        });
+        const depAmount = Number(document.getElementById('bkgDepositAmount').innerText.replace(/\D/g, '')) || 30000;
+        await Promise.all([
+          fetch('/api/webhook/vietqr', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: `CK ${bookingCode}`, amount: depAmount })
+          }),
+          fetch(`/api/bookings/${bookingCode}/deposit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: depAmount, paymentMethod: 'VietQR Pro' })
+          })
+        ]);
 
         setTimeout(() => {
-          showToast(`Đã ghi nhận tiền cọc cho đơn ${bookingCode}!`, 'success');
+          showToast(`Đã ghi nhận tiền cọc cho đơn ${bookingCode} trong cơ sở dữ liệu!`, 'success');
           closeBookingVietQrModal();
           setTimeout(() => {
-            if (confirm('Đặt sân và cọc thành công! Bạn có muốn mở trang Lịch Sử & Check-in QR không?')) {
+            if (confirm('Đặt sân và thanh toán cọc thành công! Bạn có muốn chuyển đến trang Lịch Sử & Check-in QR ngay không?')) {
               window.location.href = '/customer/history';
             }
           }, 600);
-        }, 1000);
+        }, 800);
       } catch (e) {
         closeBookingVietQrModal();
       }

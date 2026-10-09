@@ -7,10 +7,11 @@
 (function () {
   'use strict';
 
-  // Only initialize on Customer portal pages
+  // Only initialize on Customer browsing pages (exclude auth / login screens)
   const path = window.location.pathname.toLowerCase();
+  const isAuthPage = path.startsWith('/customer/auth') || path.startsWith('/customer/login') || path === '/login';
   const isCustomerPage = path.startsWith('/customer/') || path === '/' || path.startsWith('/booking');
-  if (!isCustomerPage) return;
+  if (isAuthPage || !isCustomerPage) return;
 
   function initChatbot() {
     if (document.getElementById('ute-chatbot-toggle')) return;
@@ -104,12 +105,23 @@
 
     let isFirstOpen = true;
 
+    // Restore state from sessionStorage without flickering
+    const savedOpen = sessionStorage.getItem('chatbot_open') === 'true';
+    if (savedOpen) {
+      chatWin.classList.add('open');
+      isFirstOpen = false;
+      if (msgList.children.length === 0) {
+        sendMessage('');
+      }
+    }
+
     // Toggle logic
     function toggleChat() {
       const isOpen = chatWin.classList.toggle('open');
+      sessionStorage.setItem('chatbot_open', isOpen ? 'true' : 'false');
       if (isOpen) {
         inputField.focus();
-        if (isFirstOpen) {
+        if (isFirstOpen && msgList.children.length === 0) {
           isFirstOpen = false;
           sendMessage('');
         }
@@ -117,7 +129,10 @@
     }
 
     toggleBtn.addEventListener('click', toggleChat);
-    closeBtn.addEventListener('click', () => chatWin.classList.remove('open'));
+    closeBtn.addEventListener('click', () => {
+      chatWin.classList.remove('open');
+      sessionStorage.setItem('chatbot_open', 'false');
+    });
 
     // Reset Chat logic
     resetBtn.addEventListener('click', async () => {

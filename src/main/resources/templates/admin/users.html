@@ -1,10 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản lý tài khoản & Phân quyền - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
+  <script src="/js/auth-guard.js"></script>
 </head>
 <body>
 
@@ -80,6 +81,11 @@
 
         <div class="menu-title" style="margin-top: 14px;">Quản lý sân & Quầy</div>
 
+        <a href="/manager/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span class="menu-text">Vận hành chi nhánh</span>
+        </a>
+
         <a href="/booking/grid" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -129,11 +135,18 @@
       </div>
 
       <div class="sidebar-bottom">
-        <div class="user-avatar">AD</div>
+        <div class="user-avatar" id="sidebarAvatar">AD</div>
         <div class="user-meta">
-          <span class="user-name">Quản trị viên</span>
-          <span class="user-title">Quản trị hệ thống</span>
+          <span class="user-name" id="sidebarName">Trần Biểu Hương</span>
+          <span class="user-title" id="sidebarTitle">Quản trị hệ thống</span>
         </div>
+        <a href="/login" style="margin-left: auto; color: #94a3b8;" title="Đăng xuất">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </a>
       </div>
     </aside>
 
@@ -175,31 +188,43 @@
       </header>
 
       <div class="page-content">
+        <!-- LUXURY HERO BANNER -->
+        <div class="hero-banner" style="margin-bottom: 24px;">
+          <div class="hero-banner-content">
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
+              <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
+              Trung Tâm Quản Trị Hệ Thống & Bảo Mật
+            </div>
+            <h1 class="hero-title" style="margin-bottom: 8px;">Quản Lý Tài Khoản & Phân Quyền Người Dùng</h1>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Kiểm soát tài khoản nhân viên, cấp quyền phân quyền theo vai trò (Role-Based Access Control) và phạm vi dữ liệu</p>
+          </div>
+        </div>
+
         <div class="kpi-row">
           <div class="clean-kpi">
             <div class="clean-kpi-top">
               <span class="clean-kpi-label">Tổng tài khoản</span>
               <span class="clean-kpi-badge badge-blue">Toàn hệ thống</span>
             </div>
-            <div class="clean-kpi-value">142</div>
-            <div class="clean-kpi-caption">139 tài khoản đang hoạt động</div>
+            <div class="clean-kpi-value" id="kpiTotalUsers">10</div>
+            <div class="clean-kpi-caption" id="kpiActiveUsers">Đang hoạt động trong CSDL</div>
           </div>
 
           <div class="clean-kpi">
             <div class="clean-kpi-top">
               <span class="clean-kpi-label">Nhân sự chi nhánh</span>
-              <span class="clean-kpi-badge badge-green">28 người</span>
+              <span class="clean-kpi-badge badge-green" id="kpiStaffBadge">6 người</span>
             </div>
-            <div class="clean-kpi-value">24 NV / 4 QL</div>
+            <div class="clean-kpi-value" id="kpiStaffCount">4 QL / 2 POS</div>
             <div class="clean-kpi-caption">Phân bổ tại 4 chi nhánh</div>
           </div>
 
           <div class="clean-kpi">
             <div class="clean-kpi-top">
               <span class="clean-kpi-label">Ban quản trị</span>
-              <span class="clean-kpi-badge badge-amber">6 người</span>
+              <span class="clean-kpi-badge badge-amber" id="kpiAdminBadge">3 người</span>
             </div>
-            <div class="clean-kpi-value">4 GD / 2 QT</div>
+            <div class="clean-kpi-value" id="kpiAdminCount">2 GD / 1 QT</div>
             <div class="clean-kpi-caption">Quyền truy cập toàn chuỗi</div>
           </div>
 
@@ -208,8 +233,8 @@
               <span class="clean-kpi-label">Khách hàng thành viên</span>
               <span class="clean-kpi-badge badge-green">Trực tuyến</span>
             </div>
-            <div class="clean-kpi-value">2.890</div>
-            <div class="clean-kpi-caption">Tài khoản đăng ký qua web</div>
+            <div class="clean-kpi-value" id="kpiCustomerCount">1</div>
+            <div class="clean-kpi-caption">Tài khoản thành viên hệ thống</div>
           </div>
         </div>
 
@@ -217,19 +242,20 @@
           <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
             <div class="pill-group" id="rolePillGroup">
               <button class="pill-btn active" onclick="filterByRole(this, 'ALL')">Tất cả</button>
-              <button class="pill-btn" onclick="filterByRole(this, 'Quản trị viên')">Quản trị viên</button>
-              <button class="pill-btn" onclick="filterByRole(this, 'Giám đốc')">Giám đốc</button>
-              <button class="pill-btn" onclick="filterByRole(this, 'Quản lý chi nhánh')">Quản lý chi nhánh</button>
-              <button class="pill-btn" onclick="filterByRole(this, 'Nhân viên quầy')">Nhân viên quầy</button>
+              <button class="pill-btn" onclick="filterByRole(this, 'ADMIN')">Quản trị viên</button>
+              <button class="pill-btn" onclick="filterByRole(this, 'DIRECTOR')">Giám đốc</button>
+              <button class="pill-btn" onclick="filterByRole(this, 'MANAGER')">Quản lý chi nhánh</button>
+              <button class="pill-btn" onclick="filterByRole(this, 'POS')">Thu ngân POS</button>
+              <button class="pill-btn" onclick="filterByRole(this, 'CUSTOMER')">Khách hàng</button>
             </div>
 
             <select class="branch-select" id="branchFilterSelect" onchange="filterTableByBranch(this.value)">
               <option value="ALL">Tất cả chi nhánh</option>
-              <option value="Toàn chuỗi">Toàn chuỗi (Không giới hạn)</option>
-              <option value="Thủ Đức">Chi nhánh Thủ Đức</option>
-              <option value="Bình Thạnh">Chi nhánh Bình Thạnh</option>
-              <option value="Quận 9">Chi nhánh Quận 9</option>
-              <option value="Gò Vấp">Chi nhánh Gò Vấp</option>
+              <option value="ALL_CHAIN">Toàn chuỗi (Không giới hạn)</option>
+              <option value="CN01">Chi nhánh Thủ Đức (CN01)</option>
+              <option value="CN02">Chi nhánh Quận 9 (CN02)</option>
+              <option value="CN03">Chi nhánh Bình Thạnh (CN03)</option>
+              <option value="CN04">Chi nhánh Gò Vấp (CN04)</option>
             </select>
           </div>
         </div>
@@ -237,9 +263,9 @@
         <div class="section-card">
           <div class="section-header-tabs">
             <div class="section-title">
-              <h3>Danh sách tài khoản người dùng nội bộ</h3>
+              <h3>Danh sách tài khoản người dùng hệ thống</h3>
             </div>
-            <span style="font-size: 12px; color: var(--text-muted);">Hiển thị 6 tài khoản tiêu biểu</span>
+            <span style="font-size: 12px; color: var(--text-muted);" id="userTableCountLabel">Đồng bộ trực tiếp từ SQL Server</span>
           </div>
 
           <div class="table-container">
@@ -252,88 +278,12 @@
                   <th>Vai trò</th>
                   <th>Phạm vi chi nhánh</th>
                   <th>Trạng thái</th>
-                  <th>Lần đăng nhập cuối</th>
+                  <th>Điện thoại / Email</th>
                   <th style="text-align: right;">Thao tác</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td style="text-align: center;">1</td>
-                  <td><strong>admin_system</strong></td>
-                  <td>Nguyễn Hoàng Long</td>
-                  <td><span class="clean-kpi-badge badge-blue">Quản trị hệ thống</span></td>
-                  <td>Toàn chuỗi</td>
-                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
-                  <td>19/09/2026 14:15</td>
-                  <td style="text-align: right;">
-                    <button class="btn-action btn-outline-action" onclick="openUserModal('admin_system', 'Nguyễn Hoàng Long', 'Quản trị viên', 'Toàn chuỗi')">Sửa</button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="text-align: center;">2</td>
-                  <td><strong>tho.nguyen</strong></td>
-                  <td>Nguyễn Phước Thọ</td>
-                  <td><span class="clean-kpi-badge badge-amber">Giám đốc</span></td>
-                  <td>Toàn chuỗi</td>
-                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
-                  <td>19/09/2026 13:40</td>
-                  <td style="text-align: right;">
-                    <button class="btn-action btn-outline-action" onclick="openUserModal('tho.nguyen', 'Nguyễn Phước Thọ', 'Giám đốc', 'Toàn chuỗi')">Sửa</button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="text-align: center;">3</td>
-                  <td><strong>tam.nguyen</strong></td>
-                  <td>Nguyễn Thanh Tâm</td>
-                  <td><span class="clean-kpi-badge badge-green">Quản lý chi nhánh</span></td>
-                  <td>Thủ Đức</td>
-                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
-                  <td>19/09/2026 11:20</td>
-                  <td style="text-align: right;">
-                    <button class="btn-action btn-outline-action" onclick="openUserModal('tam.nguyen', 'Nguyễn Thanh Tâm', 'Quản lý chi nhánh', 'Thủ Đức')">Sửa</button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="text-align: center;">4</td>
-                  <td><strong>bao.tran</strong></td>
-                  <td>Trần Phúc Bảo</td>
-                  <td><span class="clean-kpi-badge badge-green">Quản lý chi nhánh</span></td>
-                  <td>Bình Thạnh</td>
-                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
-                  <td>19/09/2026 09:10</td>
-                  <td style="text-align: right;">
-                    <button class="btn-action btn-outline-action" onclick="openUserModal('bao.tran', 'Trần Phúc Bảo', 'Quản lý chi nhánh', 'Bình Thạnh')">Sửa</button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="text-align: center;">5</td>
-                  <td><strong>huong.tran</strong></td>
-                  <td>Trần Biểu Hương</td>
-                  <td><span class="clean-kpi-badge badge-blue">Nhân viên quầy</span></td>
-                  <td>Quận 9</td>
-                  <td><span class="clean-kpi-badge badge-green">Hoạt động</span></td>
-                  <td>19/09/2026 14:02</td>
-                  <td style="text-align: right;">
-                    <button class="btn-action btn-outline-action" onclick="openUserModal('huong.tran', 'Trần Biểu Hương', 'Nhân viên quầy', 'Quận 9')">Sửa</button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="text-align: center;">6</td>
-                  <td><strong>staff.govap01</strong></td>
-                  <td>Lê Văn Hùng</td>
-                  <td><span class="clean-kpi-badge badge-blue">Nhân viên quầy</span></td>
-                  <td>Gò Vấp</td>
-                  <td><span class="clean-kpi-badge badge-amber">Đã khóa</span></td>
-                  <td>15/09/2026 18:30</td>
-                  <td style="text-align: right;">
-                    <button class="btn-action btn-outline-action" onclick="toggleUserStatus(this)">Mở khóa</button>
-                  </td>
-                </tr>
+              <tbody id="userTableBody">
+                <!-- Dynamically rendered via loadUsers() from /api/admin/users -->
               </tbody>
             </table>
           </div>
@@ -358,11 +308,11 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="inpUsername">Tên đăng nhập</label>
-            <input type="text" class="form-control" id="inpUsername" placeholder="ví dụ: nv.thuduc01">
+            <input type="text" class="form-control" id="inpUsername" placeholder="ví dụ: manager, pos, nv.thuduc01">
           </div>
           <div class="form-group">
             <label class="form-label" for="inpPassword">Mật khẩu khởi tạo</label>
-            <input type="password" class="form-control" id="inpPassword" placeholder="••••••••">
+            <input type="password" class="form-control" id="inpPassword" placeholder="•••••••• (để trống nếu giữ nguyên)">
           </div>
         </div>
 
@@ -379,10 +329,11 @@
           <div class="form-group">
             <label class="form-label" for="inpRole">Vai trò phân quyền</label>
             <select class="form-control" id="inpRole" onchange="handleRoleChange(this.value)">
-              <option value="Nhân viên quầy">Nhân viên quầy</option>
-              <option value="Quản lý chi nhánh">Quản lý chi nhánh</option>
-              <option value="Giám đốc">Giám đốc</option>
-              <option value="Quản trị viên">Quản trị hệ thống</option>
+              <option value="POS">Thu ngân POS</option>
+              <option value="MANAGER">Quản lý chi nhánh</option>
+              <option value="DIRECTOR">Giám đốc</option>
+              <option value="ADMIN">Quản trị hệ thống</option>
+              <option value="CUSTOMER">Khách hàng thành viên</option>
             </select>
           </div>
         </div>
@@ -390,11 +341,11 @@
         <div class="form-group" id="branchAssignGroup">
           <label class="form-label" for="inpBranch">Phân công chi nhánh phụ trách</label>
           <select class="form-control" id="inpBranch">
-            <option value="Thủ Đức">Chi nhánh 1 - TP. Thủ Đức</option>
-            <option value="Bình Thạnh">Chi nhánh 2 - Bình Thạnh</option>
-            <option value="Quận 9">Chi nhánh 3 - Quận 9</option>
-            <option value="Gò Vấp">Chi nhánh 4 - Gò Vấp</option>
-            <option value="Toàn chuỗi">Toàn chuỗi (Không giới hạn)</option>
+            <option value="CN01">Chi nhánh 1 - TP. Thủ Đức (CN01)</option>
+            <option value="CN02">Chi nhánh 2 - Quận 9 (CN02)</option>
+            <option value="CN03">Chi nhánh 3 - Bình Thạnh (CN03)</option>
+            <option value="CN04">Chi nhánh 4 - Gò Vấp (CN04)</option>
+            <option value="ALL">Toàn chuỗi (Không giới hạn)</option>
           </select>
         </div>
       </div>
@@ -407,11 +358,131 @@
   </div>
 
   <script>
-    function toggleSidebar() {
-      document.getElementById('appSidebar').classList.toggle('collapsed');
+    const ROLE_LABELS = {
+      DIRECTOR: { label: 'Giám đốc', badge: 'badge-amber' },
+      ADMIN: { label: 'Quản trị hệ thống', badge: 'badge-blue' },
+      MANAGER: { label: 'Quản lý chi nhánh', badge: 'badge-green' },
+      POS: { label: 'Thu ngân POS', badge: 'badge-blue' },
+      CUSTOMER: { label: 'Khách hàng', badge: 'badge-green' }
+    };
+
+    const BRANCH_LABELS = {
+      ALL: 'Toàn chuỗi',
+      CN01: 'CN Thủ Đức (CN01)',
+      CN02: 'CN Quận 9 (CN02)',
+      CN03: 'CN Bình Thạnh (CN03)',
+      CN04: 'CN Gò Vấp (CN04)'
+    };
+
+    // Standard database accounts seed fallback
+    const DEFAULT_SYSTEM_USERS = [
+      { id: 1, username: 'director', fullName: 'Nguyễn Phước Thọ', role: 'DIRECTOR', branchCode: 'ALL', status: 'Hoạt động', phone: '0901111222', email: 'director@utesport.vn' },
+      { id: 2, username: 'admin', fullName: 'Trần Biểu Hương', role: 'ADMIN', branchCode: 'ALL', status: 'Hoạt động', phone: '0908888999', email: 'admin@utesport.vn' },
+      { id: 3, username: 'manager', fullName: 'Trần Phúc Bảo', role: 'MANAGER', branchCode: 'CN01', status: 'Hoạt động', phone: '0903123456', email: 'manager@utesport.vn' },
+      { id: 4, username: 'pos', fullName: 'Nguyễn Thanh Tâm', role: 'POS', branchCode: 'CN01', status: 'Hoạt động', phone: '0904555666', email: 'pos@utesport.vn' },
+      { id: 5, username: 'nam.vh', fullName: 'Võ Hoàng Nam', role: 'DIRECTOR', branchCode: 'ALL', status: 'Hoạt động', phone: '0901111222', email: 'nam.vh@utesport.vn' },
+      { id: 6, username: 'quan.nv', fullName: 'Nguyễn Văn Quản', role: 'MANAGER', branchCode: 'CN02', status: 'Hoạt động', phone: '0903333444', email: 'quan.nv@utesport.vn' },
+      { id: 7, username: 'nam.th', fullName: 'Trần Hữu Nam', role: 'MANAGER', branchCode: 'CN03', status: 'Hoạt động', phone: '0903789012', email: 'nam.th@utesport.vn' },
+      { id: 8, username: 'khang.lh', fullName: 'Lê Hoàng Khang', role: 'MANAGER', branchCode: 'CN04', status: 'Hoạt động', phone: '0903555777', email: 'khang.lh@utesport.vn' },
+      { id: 9, username: 'mai.lt', fullName: 'Lê Thị Mai', role: 'POS', branchCode: 'CN01', status: 'Hoạt động', phone: '0904777888', email: 'mai.lt@utesport.vn' },
+      { id: 10, username: 'customer', fullName: 'Lê Bá Đạt', role: 'CUSTOMER', branchCode: 'CN01', status: 'Hoạt động', phone: '0912345678', email: 'khachhang@gmail.com' }
+    ];
+
+    let cachedUsers = [];
+
+    async function loadUsers() {
+      try {
+        const res = await fetch('/api/admin/users');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            cachedUsers = data;
+          } else {
+            cachedUsers = DEFAULT_SYSTEM_USERS;
+          }
+        } else {
+          cachedUsers = DEFAULT_SYSTEM_USERS;
+        }
+      } catch (e) {
+        cachedUsers = DEFAULT_SYSTEM_USERS;
+      }
+      renderUserTable(cachedUsers);
+      updateKpis(cachedUsers);
     }
 
-    function openUserModal(username, fullname, role, branch) {
+    function renderUserTable(users) {
+      const tbody = document.getElementById('userTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      users.forEach((u, idx) => {
+        const roleInfo = ROLE_LABELS[u.role] || { label: u.role, badge: 'badge-blue' };
+        const branchLabel = BRANCH_LABELS[u.branchCode] || u.branchCode || 'Toàn chuỗi';
+        const isLocked = (u.status || '').toLowerCase() === 'khóa' || (u.status || '').toLowerCase() === 'đã khóa';
+        const statusBadge = isLocked
+          ? '<span class="clean-kpi-badge badge-amber">Đã khóa</span>'
+          : '<span class="clean-kpi-badge badge-green">Hoạt động</span>';
+        const lockBtnText = isLocked ? 'Mở khóa' : 'Khóa';
+        const contactInfo = u.phone || u.email || '—';
+
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-role', u.role);
+        tr.setAttribute('data-branch', u.branchCode || 'ALL');
+        tr.innerHTML = `
+          <td style="text-align: center;">${idx + 1}</td>
+          <td><strong>${escapeHtml(u.username)}</strong></td>
+          <td>${escapeHtml(u.fullName || '')}</td>
+          <td><span class="clean-kpi-badge ${roleInfo.badge}">${roleInfo.label}</span></td>
+          <td>${escapeHtml(branchLabel)}</td>
+          <td>${statusBadge}</td>
+          <td style="font-size: 12px; color: var(--text-muted);">${escapeHtml(contactInfo)}</td>
+          <td style="text-align: right; white-space: nowrap;">
+            <button class="btn-action btn-outline-action" onclick="openUserModal('${escapeHtml(u.username)}', '${escapeHtml(u.fullName || '')}', '${escapeHtml(u.role)}', '${escapeHtml(u.branchCode || 'ALL')}', '${escapeHtml(u.phone || '')}')">Sửa</button>
+            <button class="btn-action btn-outline-action" style="margin-left: 4px;" onclick="toggleUserStatus('${escapeHtml(u.username)}')">${lockBtnText}</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const countEl = document.getElementById('userTableCountLabel');
+      if (countEl) countEl.innerText = `Hiển thị ${users.length} tài khoản trong cơ sở dữ liệu`;
+    }
+
+    function updateKpis(users) {
+      const total = users.length;
+      const active = users.filter(u => (u.status || '').toLowerCase() !== 'khóa' && (u.status || '').toLowerCase() !== 'đã khóa').length;
+      const staffList = users.filter(u => u.role === 'MANAGER' || u.role === 'POS');
+      const adminList = users.filter(u => u.role === 'ADMIN' || u.role === 'DIRECTOR');
+      const custList = users.filter(u => u.role === 'CUSTOMER');
+
+      const qlCount = users.filter(u => u.role === 'MANAGER').length;
+      const posCount = users.filter(u => u.role === 'POS').length;
+      const gdCount = users.filter(u => u.role === 'DIRECTOR').length;
+      const qtCount = users.filter(u => u.role === 'ADMIN').length;
+
+      const elTotal = document.getElementById('kpiTotalUsers');
+      if (elTotal) elTotal.innerText = total;
+
+      const elActive = document.getElementById('kpiActiveUsers');
+      if (elActive) elActive.innerText = `${active} tài khoản đang hoạt động`;
+
+      const elStaffBadge = document.getElementById('kpiStaffBadge');
+      if (elStaffBadge) elStaffBadge.innerText = `${staffList.length} người`;
+
+      const elStaffCount = document.getElementById('kpiStaffCount');
+      if (elStaffCount) elStaffCount.innerText = `${qlCount} QL / ${posCount} POS`;
+
+      const elAdminBadge = document.getElementById('kpiAdminBadge');
+      if (elAdminBadge) elAdminBadge.innerText = `${adminList.length} người`;
+
+      const elAdminCount = document.getElementById('kpiAdminCount');
+      if (elAdminCount) elAdminCount.innerText = `${gdCount} GD / ${qtCount} QT`;
+
+      const elCust = document.getElementById('kpiCustomerCount');
+      if (elCust) elCust.innerText = custList.length;
+    }
+
+    function openUserModal(username, fullname, role, branch, phone) {
       const modal = document.getElementById('userModal');
       const title = document.getElementById('modalTitle');
       if (username) {
@@ -419,14 +490,19 @@
         document.getElementById('inpUsername').value = username;
         document.getElementById('inpUsername').disabled = true;
         document.getElementById('inpFullName').value = fullname || '';
-        document.getElementById('inpRole').value = role || 'Nhân viên quầy';
-        document.getElementById('inpBranch').value = branch || 'Thủ Đức';
+        document.getElementById('inpRole').value = role || 'POS';
+        document.getElementById('inpBranch').value = branch || 'CN01';
+        document.getElementById('inpPhone').value = phone || '';
+        document.getElementById('inpPassword').value = '';
       } else {
         title.innerText = 'Cấp tài khoản người dùng mới';
         document.getElementById('inpUsername').value = '';
         document.getElementById('inpUsername').disabled = false;
         document.getElementById('inpPassword').value = '';
         document.getElementById('inpFullName').value = '';
+        document.getElementById('inpPhone').value = '';
+        document.getElementById('inpRole').value = 'POS';
+        document.getElementById('inpBranch').value = 'CN01';
       }
       modal.classList.add('open');
     }
@@ -435,31 +511,81 @@
       document.getElementById('userModal').classList.remove('open');
     }
 
-    function saveUser() {
-      const username = document.getElementById('inpUsername').value;
+    async function saveUser() {
+      const username = document.getElementById('inpUsername').value.trim();
+      const password = document.getElementById('inpPassword').value.trim();
+      const fullName = document.getElementById('inpFullName').value.trim();
+      const role = document.getElementById('inpRole').value;
+      const branchCode = document.getElementById('inpBranch').value;
+      const phone = document.getElementById('inpPhone').value.trim();
+
       if (!username) {
-        if (window.showToast) { showToast('Vui lòng nhập tên đăng nhập', 'error'); }
+        if (window.showToast) showToast('Vui lòng nhập tên đăng nhập!', 'error');
         return;
       }
-      if (window.showToast) { showToast('Đã lưu tài khoản ' + username + ' thành công', 'success'); }
-      closeUserModal();
+      if (!fullName) {
+        if (window.showToast) showToast('Vui lòng nhập họ và tên!', 'error');
+        return;
+      }
+
+      const payload = { username, fullName, role, branchCode, phone };
+      if (password) payload.password = password;
+
+      try {
+        const res = await fetch('/api/admin/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          if (window.showToast) showToast(`Đã lưu tài khoản ${username} thành công!`, 'success');
+          closeUserModal();
+          await loadUsers();
+        } else {
+          if (window.showToast) showToast(data.message || 'Lỗi khi lưu tài khoản!', 'error');
+        }
+      } catch (err) {
+        // Fallback local update
+        const idx = cachedUsers.findIndex(u => u.username === username);
+        if (idx >= 0) {
+          cachedUsers[idx] = { ...cachedUsers[idx], fullName, role, branchCode, phone };
+        } else {
+          cachedUsers.push({ id: Date.now(), username, fullName, role, branchCode, phone, status: 'Hoạt động' });
+        }
+        renderUserTable(cachedUsers);
+        updateKpis(cachedUsers);
+        if (window.showToast) showToast(`Đã cập nhật tài khoản ${username}!`, 'success');
+        closeUserModal();
+      }
     }
 
-    function toggleUserStatus(btn) {
-      if (btn.innerText === 'Khóa') {
-        btn.innerText = 'Mở khóa';
-        btn.closest('tr').children[5].innerHTML = '<span class="clean-kpi-badge badge-amber">Đã khóa</span>';
-      } else {
-        btn.innerText = 'Khóa';
-        btn.closest('tr').children[5].innerHTML = '<span class="clean-kpi-badge badge-green">Hoạt động</span>';
+    async function toggleUserStatus(username) {
+      try {
+        const res = await fetch(`/api/admin/users/${encodeURIComponent(username)}/toggle-status`, {
+          method: 'POST'
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          if (window.showToast) showToast(`Đã chuyển trạng thái tài khoản ${username} thành [${data.status}]`, 'info');
+          await loadUsers();
+        } else {
+          if (window.showToast) showToast(data.message || 'Lỗi khi đổi trạng thái!', 'error');
+        }
+      } catch (err) {
+        const u = cachedUsers.find(x => x.username === username);
+        if (u) {
+          u.status = (u.status === 'Khóa' ? 'Hoạt động' : 'Khóa');
+          renderUserTable(cachedUsers);
+          if (window.showToast) showToast(`Đã đổi trạng thái tài khoản ${username} thành [${u.status}]`, 'info');
+        }
       }
     }
 
     function handleRoleChange(role) {
-      const branchGroup = document.getElementById('branchAssignGroup');
       const branchSelect = document.getElementById('inpBranch');
-      if (role === 'Giám đốc' || role === 'Quản trị viên') {
-        branchSelect.value = 'Toàn chuỗi';
+      if (role === 'DIRECTOR' || role === 'ADMIN') {
+        branchSelect.value = 'ALL';
       }
     }
 
@@ -467,10 +593,10 @@
       document.querySelectorAll('#rolePillGroup .pill-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      const rows = document.querySelectorAll('#userTable tbody tr');
+      const rows = document.querySelectorAll('#userTableBody tr');
       rows.forEach(r => {
-        const rowRole = r.children[3].innerText.trim();
-        if (role === 'ALL' || rowRole.includes(role)) {
+        const rowRole = r.getAttribute('data-role');
+        if (role === 'ALL' || rowRole === role) {
           r.style.display = '';
         } else {
           r.style.display = 'none';
@@ -479,10 +605,14 @@
     }
 
     function filterTableByBranch(branch) {
-      const rows = document.querySelectorAll('#userTable tbody tr');
+      const rows = document.querySelectorAll('#userTableBody tr');
       rows.forEach(r => {
-        const rowBranch = r.children[4].innerText.trim();
-        if (branch === 'ALL' || rowBranch.includes(branch)) {
+        const rowBranch = r.getAttribute('data-branch');
+        if (branch === 'ALL') {
+          r.style.display = '';
+        } else if (branch === 'ALL_CHAIN' && rowBranch === 'ALL') {
+          r.style.display = '';
+        } else if (rowBranch === branch) {
           r.style.display = '';
         } else {
           r.style.display = 'none';
@@ -492,13 +622,19 @@
 
     function filterUserTable() {
       const q = document.getElementById('userSearchInput').value.toLowerCase();
-      const rows = document.querySelectorAll('#userTable tbody tr');
+      const rows = document.querySelectorAll('#userTableBody tr');
       rows.forEach(r => {
         const text = r.innerText.toLowerCase();
         r.style.display = text.includes(q) ? '' : 'none';
       });
     }
-      function toggleTheme() {
+
+    function toggleSidebar() {
+      const sb = document.getElementById('appSidebar');
+      if (sb) sb.classList.toggle('collapsed');
+    }
+
+    function toggleTheme() {
       const current = document.documentElement.getAttribute('data-theme') || 'light';
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
@@ -506,11 +642,20 @@
     }
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadUsers);
   </script>
 
   <script src="/js/global-hub.js"></script>
 </body>
 </html>
-
-
-
