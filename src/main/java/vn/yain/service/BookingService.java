@@ -16,7 +16,9 @@ import vn.yain.repository.PaymentRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -56,7 +58,7 @@ public class BookingService {
         if (booking.getStatus() == null) {
             booking.setStatus("Chờ cọc 30%");
         }
-        if (booking.getDepositAmount() == null && booking.getTotalPrice() != null) {
+        if ((booking.getDepositAmount() == null || booking.getDepositAmount().compareTo(BigDecimal.ZERO) == 0) && booking.getTotalPrice() != null) {
             // Default 30% deposit calculation
             booking.setDepositAmount(booking.getTotalPrice().multiply(new BigDecimal("0.3")));
         }
@@ -178,5 +180,78 @@ public class BookingService {
         });
 
         return saved;
+    }
+
+    /**
+     * Court Transfer / Change Court & Time Slot (XL-06)
+     */
+    public Map<String, Object> transferCourt(String bookingCode, String targetCourtCode, String newTimeSlot) {
+        Booking booking = bookingRepository.findByBookingCode(bookingCode)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn đặt sân: " + bookingCode));
+
+        String oldCourtCode = booking.getCourtCode();
+        if (oldCourtCode.equalsIgnoreCase(targetCourtCode) && (newTimeSlot == null || newTimeSlot.equalsIgnoreCase(booking.getTimeSlot()))) {
+            throw new IllegalArgumentException("Sân đích và khung giờ trùng với sân hiện tại!");
+        }
+
+        Court targetCourt = courtRepository.findByCourtCode(targetCourtCode)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sân đích: " + targetCourtCode));
+
+        if ("Bảo trì".equalsIgnoreCase(targetCourt.getStatus())) {
+            throw new IllegalStateException("Sân đích đang bảo trì, không thể chuyển!");
+        }
+
+        String effectiveSlot = (newTimeSlot != null && !newTimeSlot.trim().isEmpty()) ? newTimeSlot.trim() : booking.getTimeSlot();
+
+        // Check if target court has conflicting active booking
+        List<Booking> conflicts = bookingRepository.findByCourtCodeAndBookingDate(targetCourtCode, booking.getBookingDate());
+        boolean hasConflict = conflicts.stream().anyMatch(b -> 
+            !b.getBookingCode().equalsIgnoreCase(bookingCode) &&
+            b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus()) &&
+            effectiveSlot.equalsIgnoreCase(b.getTimeSlot())
+        );
+        if (hasConflict) {
+            throw new IllegalStateException("Sân đích đã được đặt trong khung giờ " + effectiveSlot + "!");
+        }
+
+        // Calculate price difference
+        BigDecimal oldHourly = booking.getHourlyPrice() != null ? booking.getHourlyPrice() : BigDecimal.ZERO;
+        BigDecimal newHourly = targetCourt.getHourlyRate() != null ? targetCourt.getHourlyRate() : oldHourly;
+        BigDecimal priceDifference = newHourly.subtract(oldHourly);
+
+        booking.setCourtCode(targetCourtCode);
+        booking.setTimeSlot(effectiveSlot);
+        booking.setHourlyPrice(newHourly);
+        if (booking.getTotalPrice() != null) {
+            booking.setTotalPrice(booking.getTotalPrice().add(priceDifference));
+        } else {
+            booking.setTotalPrice(newHourly);
+        }
+        booking.setNotes((booking.getNotes() != null ? booking.getNotes() + " | " : "") + 
+                "Chuyển từ " + oldCourtCode + " sang " + targetCourtCode + " (Chênh lệch: " + priceDifference + "đ)");
+        Booking updatedBooking = bookingRepository.save(booking);
+
+        // Update court statuses and broadcast
+        courtRepository.findByCourtCode(oldCourtCode).ifPresent(c -> {
+            c.setStatus("Trống");
+            courtRepository.save(c);
+            courtService.updateCourtStatus(oldCourtCode, "Trống");
+        });
+
+        String newCourtStatus = "Đang sử dụng".equalsIgnoreCase(booking.getStatus()) ? "Đang sử dụng" : "Đã đặt trước";
+        targetCourt.setStatus(newCourtStatus);
+        courtRepository.save(targetCourt);
+        courtService.updateCourtStatus(targetCourtCode, newCourtStatus);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("bookingCode", bookingCode);
+        result.put("oldCourtCode", oldCourtCode);
+        result.put("newCourtCode", targetCourtCode);
+        result.put("timeSlot", effectiveSlot);
+        result.put("priceDifference", priceDifference);
+        result.put("newTotalPrice", booking.getTotalPrice());
+        result.put("message", "Chuyển sân thành công! " + (priceDifference.compareTo(BigDecimal.ZERO) > 0 ? "Thu thêm: " + priceDifference + "đ" : (priceDifference.compareTo(BigDecimal.ZERO) < 0 ? "Hoàn lại: " + priceDifference.abs() + "đ" : "Không chênh lệch giá")));
+        return result;
     }
 }

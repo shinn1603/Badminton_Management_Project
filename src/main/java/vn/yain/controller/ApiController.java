@@ -62,6 +62,12 @@ public class ApiController {
     @Autowired
     private vn.yain.service.ChatbotService chatbotService;
 
+    @Autowired
+    private vn.yain.service.WarehouseService warehouseService;
+
+    @Autowired
+    private vn.yain.service.ShiftService shiftService;
+
     // ==========================================
     // 1. AUTHENTICATION & JWT ENDPOINTS
     // ==========================================
@@ -224,6 +230,40 @@ public class ApiController {
             return ResponseEntity.ok(Map.of("success", true, "booking", updated));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    // ==========================================
+    // 3.1. COURT TRANSFER (XL-06)
+    // ==========================================
+    @PostMapping("/bookings/{code}/transfer")
+    public ResponseEntity<?> transferCourt(@PathVariable String code, @RequestBody Map<String, String> payload) {
+        try {
+            String targetCourtCode = payload.get("targetCourtCode");
+            String newTimeSlot = payload.get("newTimeSlot");
+            Map<String, Object> result = bookingService.transferCourt(code, targetCourtCode, newTimeSlot);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi máy chủ: " + e.getMessage()));
+        }
+    }
+
+    // ==========================================
+    // 3.2. EXTRA SERVICES & POS ORDER (XL-05)
+    // ==========================================
+    @PostMapping("/bookings/{code}/order-service")
+    public ResponseEntity<?> orderService(@PathVariable String code, @RequestBody Map<String, Object> payload) {
+        try {
+            String productCode = (String) payload.get("productCode");
+            int quantity = Integer.parseInt(payload.getOrDefault("quantity", 1).toString());
+            Map<String, Object> result = warehouseService.orderServiceForBooking(code, productCode, quantity);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi máy chủ: " + e.getMessage()));
         }
     }
 
@@ -449,5 +489,57 @@ public class ApiController {
         String sessionId = payload.get("sessionId");
         chatbotService.resetSession(sessionId);
         return ResponseEntity.ok(Map.of("status", "success", "message", "Session reset"));
+    }
+
+    // ==========================================
+    // 6. INVENTORY INTAKE & WAREHOUSE (XL-10)
+    // ==========================================
+
+    @PostMapping("/inventory/intake")
+    public ResponseEntity<?> createStockIntake(@RequestBody Map<String, Object> payload) {
+        try {
+            String supplierName = (String) payload.get("supplierName");
+            String branchCode = (String) payload.get("branchCode");
+            String staffCode = (String) payload.get("staffCode");
+            String notes = (String) payload.get("notes");
+            List<Map<String, Object>> items = (List<Map<String, Object>>) payload.get("items");
+            StockReceipt receipt = warehouseService.createStockReceipt(supplierName, branchCode, staffCode, items, notes);
+            return ResponseEntity.ok(Map.of("success", true, "receipt", receipt));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi máy chủ: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/inventory/receipts")
+    public ResponseEntity<?> getStockReceipts(@RequestParam(required = false) String branchCode) {
+        return ResponseEntity.ok(warehouseService.getReceiptsByBranch(branchCode));
+    }
+
+    // ==========================================
+    // 7. CASHIER SHIFT HANDOVER (XL-08)
+    // ==========================================
+
+    @GetMapping("/shifts/summary")
+    public ResponseEntity<?> getShiftSummary(@RequestParam(required = false) String staffCode,
+                                            @RequestParam(required = false) String branchCode) {
+        return ResponseEntity.ok(shiftService.getShiftSummary(staffCode, branchCode));
+    }
+
+    @PostMapping("/shifts/close")
+    public ResponseEntity<?> closeShift(@RequestBody Map<String, Object> payload) {
+        try {
+            String staffCode = (String) payload.get("staffCode");
+            String branchCode = (String) payload.get("branchCode");
+            String notes = (String) payload.get("notes");
+            BigDecimal actualCash = new BigDecimal(payload.get("actualCash").toString());
+            Map<String, Object> result = shiftService.closeShift(staffCode, branchCode, actualCash, notes);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi máy chủ: " + e.getMessage()));
+        }
     }
 }
