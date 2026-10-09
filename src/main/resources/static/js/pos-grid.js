@@ -808,27 +808,36 @@ function initGridDragToScroll() {
 
   let isDown = false;
   let startX = 0;
+  let startY = 0;
   let scrollLeftStart = 0;
+  let scrollTopStart = 0;
   let hasDragged = false;
 
   scrollEl.addEventListener('mousedown', (e) => {
     if (e.button !== 0) return;
     isDown = true;
     hasDragged = false;
-    startX = e.pageX - scrollEl.offsetLeft;
+    startX = e.pageX;
+    startY = e.pageY;
     scrollLeftStart = scrollEl.scrollLeft;
+    scrollTopStart = window.pageYOffset || document.documentElement.scrollTop;
     scrollEl.style.cursor = 'grabbing';
     scrollEl.style.userSelect = 'none';
   });
 
   window.addEventListener('mousemove', (e) => {
     if (!isDown) return;
-    const x = e.pageX - scrollEl.offsetLeft;
-    const walk = (x - startX);
-    if (Math.abs(walk) > 4) {
+    const walkX = e.pageX - startX;
+    const walkY = e.pageY - startY;
+
+    if (Math.abs(walkX) > 4 || Math.abs(walkY) > 4) {
       hasDragged = true;
     }
-    scrollEl.scrollLeft = scrollLeftStart - walk;
+
+    scrollEl.scrollLeft = scrollLeftStart - walkX;
+    if (Math.abs(walkY) > 4) {
+      window.scrollTo({ top: scrollTopStart - walkY, behavior: 'auto' });
+    }
   });
 
   window.addEventListener('mouseup', () => {
@@ -847,12 +856,18 @@ function initGridDragToScroll() {
     }
   }, true);
 
-  // Wheel horizontal scroll support: roll mouse wheel to pan timetable
+  // Wheel scroll support:
+  // - Shift + Wheel: scroll timetable horizontally
+  // - Trackpad horizontal swipe: scroll timetable horizontally
+  // - Normal Wheel: ALLOW natural vertical scrolling of the entire page up/down!
   scrollEl.addEventListener('wheel', (e) => {
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && !e.ctrlKey) {
+    if (e.shiftKey) {
       e.preventDefault();
-      scrollEl.scrollLeft += (e.deltaY * 1.2);
+      scrollEl.scrollLeft += (e.deltaY || e.deltaX) * 1.2;
+    } else if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+      scrollEl.scrollLeft += e.deltaX;
     }
+    // Normal vertical wheel is NOT intercepted, browser scrolls page up/down smoothly!
   }, { passive: false });
 
   // Sync active shift pill with scroll position
