@@ -7,47 +7,47 @@
 (function () {
   'use strict';
 
-  // Role permissions definitions
+  // Role permissions definitions - Strict Role Isolation
   const ROLE_CONFIG = {
     POS: {
       roleTitle: 'Thu ngân POS',
       defaultName: 'Nguyễn Thanh Tâm',
       branchCode: 'CN01',
       branchName: 'CN Thủ Đức',
-      allowedPrefixes: ['/pos/', '/booking/grid', '/login'],
+      allowedPrefixes: ['/pos/', '/login'],
       prohibitedPrefixes: ['/manager/', '/director/', '/admin/'],
       homeUrl: '/pos/grid',
-      deniedMessage: 'Tài khoản Thu ngân (POS) không có quyền truy cập phân hệ Quản trị / Quản lý!'
+      deniedMessage: 'Tài khoản Thu ngân (POS) chỉ có quyền sử dụng phân hệ Bán hàng & Lịch sân tại quầy!'
     },
     MANAGER: {
       roleTitle: 'Quản lý chi nhánh',
       defaultName: 'Trần Phúc Bảo',
       branchCode: 'CN01',
       branchName: 'CN Thủ Đức',
-      allowedPrefixes: ['/manager/', '/pos/grid', '/booking/grid', '/login'],
-      prohibitedPrefixes: ['/director/', '/admin/'],
+      allowedPrefixes: ['/manager/', '/login'],
+      prohibitedPrefixes: ['/director/', '/admin/', '/pos/'],
       homeUrl: '/manager/dashboard',
-      deniedMessage: 'Tài khoản Quản lý chi nhánh không có quyền truy cập phân hệ Giám đốc / Quản trị!'
+      deniedMessage: 'Tài khoản Quản lý chi nhánh chỉ có quyền quản lý phân hệ Chi nhánh Thủ Đức!'
     },
     DIRECTOR: {
       roleTitle: 'Giám đốc chuỗi',
       defaultName: 'Nguyễn Phước Thọ',
       branchCode: 'ALL',
       branchName: 'Toàn hệ thống',
-      allowedPrefixes: ['/director/', '/admin/', '/manager/', '/pos/', '/booking/grid', '/login'],
-      prohibitedPrefixes: [],
+      allowedPrefixes: ['/director/', '/login'],
+      prohibitedPrefixes: ['/admin/', '/manager/', '/pos/'],
       homeUrl: '/director/dashboard',
-      deniedMessage: 'Truy cập bị từ chối!'
+      deniedMessage: 'Tài khoản Giám Đốc chỉ quản lý phân hệ Ban Điều Hành chuỗi!'
     },
     ADMIN: {
       roleTitle: 'Quản trị hệ thống',
       defaultName: 'Trần Biểu Hương',
       branchCode: 'ALL',
       branchName: 'Trung tâm kỹ thuật',
-      allowedPrefixes: ['/admin/', '/director/', '/manager/', '/pos/', '/booking/grid', '/login'],
-      prohibitedPrefixes: [],
+      allowedPrefixes: ['/admin/', '/login'],
+      prohibitedPrefixes: ['/director/', '/manager/', '/pos/'],
       homeUrl: '/admin/users',
-      deniedMessage: 'Truy cập bị từ chối!'
+      deniedMessage: 'Tài khoản Quản trị viên chỉ quản trị phân hệ Cấu hình & Tài khoản hệ thống!'
     },
     CUSTOMER: {
       roleTitle: 'Hội viên trực tuyến',
@@ -169,22 +169,28 @@
         window.location.href = '/login';
         return;
       }
-      // Restrict external customer accounts from internal staff portals
+      // Strict role isolation: Each role can ONLY access its own subsystem
       if (currentUser.role === 'CUSTOMER') {
         alert('Tài khoản Khách Hàng không có quyền truy cập khu vực quản trị nội bộ!');
         window.location.href = '/customer/home';
         return;
       }
-      // Hierarchy enforcement:
-      // DIRECTOR and ADMIN have full access to all areas (no restrictions)
-      // MANAGER cannot access DIRECTOR or ADMIN
-      if (currentUser.role === 'MANAGER' && (target === 'DIRECTOR' || target === 'ADMIN')) {
+      if (currentUser.role === 'DIRECTOR' && target !== 'DIRECTOR') {
+        alert(ROLE_CONFIG.DIRECTOR.deniedMessage);
+        window.location.href = '/director/dashboard';
+        return;
+      }
+      if (currentUser.role === 'ADMIN' && target !== 'ADMIN') {
+        alert(ROLE_CONFIG.ADMIN.deniedMessage);
+        window.location.href = '/admin/users';
+        return;
+      }
+      if (currentUser.role === 'MANAGER' && target !== 'MANAGER') {
         alert(ROLE_CONFIG.MANAGER.deniedMessage);
         window.location.href = '/manager/dashboard';
         return;
       }
-      // POS cannot access MANAGER, DIRECTOR or ADMIN
-      if (currentUser.role === 'POS' && (target === 'MANAGER' || target === 'DIRECTOR' || target === 'ADMIN')) {
+      if (currentUser.role === 'POS' && target !== 'POS') {
         alert(ROLE_CONFIG.POS.deniedMessage);
         window.location.href = '/pos/grid';
         return;
@@ -215,12 +221,18 @@
         el.textContent = titleLabel;
       });
 
-      // Role-based navigation visibility based on top-down hierarchy:
-      // DIRECTOR and ADMIN: Full access to all dashboards (Director, Manager, POS, Admin)
-      // MANAGER: Access to Manager and POS, hide Director and Admin links
-      // POS: Access to POS only, hide Manager, Director and Admin links
-      if (currentUser.role === 'MANAGER') {
-        document.querySelectorAll('a[href^="/director/"], a[href^="/admin/"]').forEach(el => {
+      // Strict role isolation in UI navigation:
+      // Each role ONLY sees its own navigation links without cross-interference
+      if (currentUser.role === 'DIRECTOR') {
+        document.querySelectorAll('a[href^="/admin/"], a[href^="/manager/"], a[href^="/pos/"]').forEach(el => {
+          el.style.display = 'none';
+        });
+      } else if (currentUser.role === 'ADMIN') {
+        document.querySelectorAll('a[href^="/director/"], a[href^="/manager/"], a[href^="/pos/"]').forEach(el => {
+          el.style.display = 'none';
+        });
+      } else if (currentUser.role === 'MANAGER') {
+        document.querySelectorAll('a[href^="/director/"], a[href^="/admin/"], a[href^="/pos/"]').forEach(el => {
           el.style.display = 'none';
         });
       } else if (currentUser.role === 'POS') {
