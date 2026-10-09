@@ -41,6 +41,12 @@ public class ApiController {
     private ProductRepository productRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @Autowired
     private BranchRepository branchRepository;
 
     @Autowired
@@ -129,12 +135,199 @@ public class ApiController {
 
         String username = jwtTokenProvider.getUsernameFromToken(token);
         String role = jwtTokenProvider.getRoleFromToken(token);
+        User u = userRepository.findByUsername(username).orElse(null);
+        String fullName = u != null ? u.getFullName() : username;
+        String phone = u != null && u.getPhone() != null ? u.getPhone() : "";
+        String email = u != null && u.getEmail() != null ? u.getEmail() : "";
+
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("username", username);
+        resp.put("fullName", fullName);
+        resp.put("phone", phone);
+        resp.put("email", email);
+        resp.put("role", role);
+        resp.put("valid", true);
+        if (u != null) {
+            resp.put("userId", u.getId());
+            resp.put("branchCode", u.getBranchCode());
+        }
+        return ResponseEntity.ok(resp);
+    }
+
+    @GetMapping("/customer/profile")
+    public ResponseEntity<?> getCustomerProfile(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Vui lòng đăng nhập để xem thông tin hội viên!"));
+        }
+
+        String token = authHeader.substring(7);
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!"));
+        }
+
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        User u = userRepository.findByUsername(username).orElse(null);
+        if (u == null) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Không tìm thấy thông tin tài khoản!"));
+        }
+
+        Customer cust = null;
+        if (u.getPhone() != null && !u.getPhone().trim().isEmpty()) {
+            cust = customerRepository.findByPhone(u.getPhone().trim()).orElse(null);
+        }
+        if (cust == null) {
+            cust = customerRepository.findByCustomerCode(u.getUsername()).orElse(null);
+        }
+
+        List<Booking> userBookings = new ArrayList<>();
+        if (u.getPhone() != null && !u.getPhone().trim().isEmpty()) {
+            userBookings = bookingRepository.findByCustomerPhoneOrderByBookingDateDesc(u.getPhone().trim());
+        }
+        if (userBookings.isEmpty() && u.getFullName() != null) {
+            userBookings = bookingRepository.findByCustomerNameContainingIgnoreCase(u.getFullName().trim());
+        }
+
+        BigDecimal totalSpent = BigDecimal.ZERO;
+        long totalMinutes = 0;
+        for (Booking b : userBookings) {
+            if (b.getTotalPrice() != null) {
+                totalSpent = totalSpent.add(b.getTotalPrice());
+            }
+            if (b.getTimeSlot() != null && b.getTimeSlot().contains("-")) {
+                int[] hrs = parseSlotHours(b.getTimeSlot());
+                totalMinutes += Math.max(0, (hrs[1] - hrs[0]) * 60L);
+            }
+        }
+        BigDecimal totalHours = BigDecimal.valueOf(totalMinutes / 60.0);
+        if (cust != null && cust.getTotalPlayHours() != null && cust.getTotalPlayHours().compareTo(totalHours) > 0) {
+            totalHours = cust.getTotalPlayHours();
+        }
+
+        int points = cust != null && cust.getRewardPoints() != null ? cust.getRewardPoints() : 0;
+        if (points == 0 && totalSpent.compareTo(BigDecimal.ZERO) > 0) {
+            points = totalSpent.divide(BigDecimal.valueOf(1000), 0, java.math.RoundingMode.FLOOR).intValue();
+        }
+
+        String tier = "Đồng";
+        double hoursVal = totalHours.doubleValue();
+        if (hoursVal >= 80) tier = "Kim Cương";
+        else if (hoursVal >= 40) tier = "Vàng";
+        else if (hoursVal >= 20) tier = "Bạc";
+        else tier = "Đồng";
+
+        if (cust != null && cust.getMembershipTier() != null && !cust.getMembershipTier().isBlank()) {
+            tier = cust.getMembershipTier();
+        }
+
+        String customerCode = cust != null && cust.getCustomerCode() != null 
+            ? cust.getCustomerCode() 
+            : ("KH" + String.format("%04d", u.getId()));
+
+        String cardNumber = "MB • 8892 • " + String.format("%04d", u.getId()) + " • 9988";
+        String joinDate = u.getCreatedAt() != null 
+            ? u.getCreatedAt().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) 
+            : "15/01/2025";
+
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("fullName", u.getFullName());
+        resp.put("phone", u.getPhone() != null ? u.getPhone() : "");
+        resp.put("email", u.getEmail() != null ? u.getEmail() : "");
+        resp.put("customerCode", customerCode);
+        resp.put("cardNumber", cardNumber);
+        resp.put("membershipTier", tier);
+        resp.put("rewardPoints", points);
+        resp.put("totalPlayHours", totalHours.setScale(1, java.math.RoundingMode.HALF_UP));
+        resp.put("totalSpent", totalSpent);
+        resp.put("savings", totalSpent.multiply(new BigDecimal("0.10")));
+        resp.put("joinDate", joinDate);
+        resp.put("tournamentCount", tournamentRepository.count());
+        resp.put("bookingCount", userBookings.size());
+        resp.put("recentBookings", userBookings);
+
+        return ResponseEntity.ok(resp);
+    }
+
+    @PutMapping("/customer/profile")
+    public ResponseEntity<?> updateCustomerProfile(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestBody Map<String, String> payload) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Chưa đăng nhập!"));
+        }
+
+        String token = authHeader.substring(7);
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Token không hợp lệ!"));
+        }
+
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        User u = userRepository.findByUsername(username).orElse(null);
+        if (u == null) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Tài khoản không tồn tại!"));
+        }
+
+        String newName = payload.get("fullName");
+        String newPhone = payload.get("phone");
+        String newEmail = payload.get("email");
+
+        if (newName != null && !newName.trim().isEmpty()) {
+            u.setFullName(newName.trim());
+        }
+        if (newPhone != null && !newPhone.trim().isEmpty()) {
+            u.setPhone(newPhone.trim());
+        }
+        if (newEmail != null) {
+            u.setEmail(newEmail.trim());
+        }
+        userRepository.save(u);
+
+        if (u.getPhone() != null && !u.getPhone().trim().isEmpty()) {
+            Optional<Customer> cOpt = customerRepository.findByPhone(u.getPhone().trim());
+            if (cOpt.isPresent()) {
+                Customer c = cOpt.get();
+                if (newName != null) c.setFullName(newName.trim());
+                if (newEmail != null) c.setEmail(newEmail.trim());
+                customerRepository.save(c);
+            }
+        }
+
         return ResponseEntity.ok(Map.of(
                 "success", true,
-                "username", username,
-                "role", role,
-                "valid", true
+                "message", "Cập nhật hồ sơ thành công!",
+                "fullName", u.getFullName(),
+                "phone", u.getPhone() != null ? u.getPhone() : "",
+                "email", u.getEmail() != null ? u.getEmail() : ""
         ));
+    }
+
+    @GetMapping("/customer/my-bookings")
+    public ResponseEntity<?> getMyBookings(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Chưa đăng nhập!"));
+        }
+
+        String token = authHeader.substring(7);
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Token không hợp lệ!"));
+        }
+
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        User u = userRepository.findByUsername(username).orElse(null);
+        if (u == null) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+
+        List<Booking> bookings = new ArrayList<>();
+        if (u.getPhone() != null && !u.getPhone().trim().isEmpty()) {
+            bookings = bookingRepository.findByCustomerPhoneOrderByBookingDateDesc(u.getPhone().trim());
+        }
+        if (bookings.isEmpty() && u.getFullName() != null) {
+            bookings = bookingRepository.findByCustomerNameContainingIgnoreCase(u.getFullName().trim());
+        }
+
+        return ResponseEntity.ok(bookings);
     }
 
     @GetMapping("/admin/users")
@@ -390,6 +583,21 @@ public class ApiController {
 
             Booking saved = bookingRepository.save(booking);
 
+            bookingService.broadcastBookingEvent(vn.yain.dto.BookingNotificationDto.builder()
+                    .eventType("NEW_BOOKING")
+                    .bookingCode(bookingCode)
+                    .courtCode(courtCode)
+                    .branchCode(branchCode)
+                    .customerName(customerName)
+                    .customerPhone(customerPhone)
+                    .timeSlot(timeSlot)
+                    .totalPrice(totalPrice)
+                    .depositAmount(deposit)
+                    .status("Chờ cọc 30%")
+                    .message("Đơn đặt sân mới trực tuyến [" + bookingCode + "] - Sân " + courtCode + " (" + timeSlot + ")")
+                    .timestamp(java.time.LocalDateTime.now())
+                    .build());
+
             // Dynamic VietQR payment URL (MBBank)
             String qrUrl = String.format(
                     "https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=%d&addInfo=CK%%20%s&accountName=UTE%%20BADMINTON%%20CLUB",
@@ -437,8 +645,7 @@ public class ApiController {
                 Optional<Booking> opt = bookingRepository.findByBookingCode(bookingCode);
                 if (opt.isPresent()) {
                     Booking b = opt.get();
-                    b.setStatus("Đã cọc 30%");
-                    bookingRepository.save(b);
+                    bookingService.confirmDeposit(bookingCode, b.getDepositAmount(), "Chuyển khoản VietQR", "SEPAY-" + bookingCode);
                     return ResponseEntity.ok(Map.of("success", true, "message", "Auto-confirmed deposit for " + bookingCode));
                 }
             }
@@ -477,6 +684,67 @@ public class ApiController {
     @GetMapping("/products")
     public List<Product> getProducts() {
         return productRepository.findAll();
+    }
+
+    @PostMapping("/products")
+    public ResponseEntity<?> createProduct(@RequestBody Product product) {
+        if (product.getProductName() == null || product.getProductName().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Tên sản phẩm không được để trống!"));
+        }
+        if (product.getProductCode() == null || product.getProductCode().trim().isEmpty()) {
+            product.setProductCode("P" + String.format("%02d", (productRepository.count() + 1)));
+        }
+        if (product.getCategory() == null || product.getCategory().trim().isEmpty()) {
+            product.setCategory("Cầu lông");
+        }
+        if (product.getUnit() == null || product.getUnit().trim().isEmpty()) {
+            product.setUnit("Ống");
+        }
+        if (product.getCostPrice() == null) product.setCostPrice(BigDecimal.ZERO);
+        if (product.getUnitPrice() == null) product.setUnitPrice(BigDecimal.ZERO);
+        if (product.getStockQuantity() == null) product.setStockQuantity(0);
+        if (product.getMinQuantity() == null) product.setMinQuantity(10);
+        if (product.getBranchCode() == null || product.getBranchCode().trim().isEmpty()) {
+            product.setBranchCode("CN01");
+        }
+
+        if (productRepository.findByProductCode(product.getProductCode().trim()).isPresent()) {
+            product.setProductCode(product.getProductCode().trim() + "_" + (System.currentTimeMillis() % 1000));
+        }
+
+        Product saved = productRepository.save(product);
+        return ResponseEntity.ok(Map.of("success", true, "product", saved, "message", "Đã lưu mặt hàng vào cơ sở dữ liệu thành công!"));
+    }
+
+    @PutMapping("/products/{id}")
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product payload) {
+        Optional<Product> pOpt = productRepository.findById(id);
+        if (pOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Không tìm thấy sản phẩm ID: " + id));
+        }
+        Product p = pOpt.get();
+        if (payload.getProductName() != null && !payload.getProductName().trim().isEmpty()) {
+            p.setProductName(payload.getProductName().trim());
+        }
+        if (payload.getCategory() != null) p.setCategory(payload.getCategory());
+        if (payload.getUnit() != null) p.setUnit(payload.getUnit());
+        if (payload.getCostPrice() != null) p.setCostPrice(payload.getCostPrice());
+        if (payload.getUnitPrice() != null) p.setUnitPrice(payload.getUnitPrice());
+        if (payload.getStockQuantity() != null) p.setStockQuantity(payload.getStockQuantity());
+        if (payload.getMinQuantity() != null) p.setMinQuantity(payload.getMinQuantity());
+        if (payload.getBranchCode() != null) p.setBranchCode(payload.getBranchCode());
+
+        Product updated = productRepository.save(p);
+        return ResponseEntity.ok(Map.of("success", true, "product", updated, "message", "Đã cập nhật sản phẩm thành công!"));
+    }
+
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+        if (!productRepository.existsById(id)) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Không tìm thấy sản phẩm!"));
+        }
+        productRepository.deleteById(id);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Đã xóa sản phẩm khỏi cơ sở dữ liệu thành công!"));
     }
 
     @GetMapping("/branches")
@@ -570,6 +838,93 @@ public class ApiController {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi máy chủ: " + e.getMessage()));
+        }
+    }
+
+    // ==========================================
+    // 7.1 STAFF & WEEKLY SHIFT SCHEDULE (XL-08)
+    // ==========================================
+
+    @GetMapping("/staff")
+    public List<Staff> getStaffList(@RequestParam(required = false) String branchCode) {
+        return shiftService.getAllStaff(branchCode);
+    }
+
+    @PostMapping("/staff")
+    public ResponseEntity<?> saveStaff(@RequestBody Staff staff) {
+        try {
+            Staff saved = shiftService.saveStaff(staff);
+            return ResponseEntity.ok(Map.of("success", true, "staff", saved));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/staff/{staffCode}")
+    public ResponseEntity<?> deleteStaff(@PathVariable String staffCode) {
+        try {
+            shiftService.deleteStaff(staffCode);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Đã xóa nhân viên thành công!"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/shifts/week")
+    public ResponseEntity<?> getWeeklySchedule(@RequestParam(required = false) String branchCode) {
+        return ResponseEntity.ok(shiftService.getWeeklySchedule(branchCode));
+    }
+
+    @PostMapping("/shifts/assign")
+    public ResponseEntity<?> assignShift(@RequestBody Map<String, String> payload) {
+        try {
+            String day = payload.get("day");
+            String shift = payload.get("shift");
+            String staffCode = payload.get("staffCode");
+            String duty = payload.get("duty");
+            String icon = payload.get("icon");
+            String branchCode = payload.get("branchCode");
+            shiftService.assignShift(day, shift, staffCode, duty, icon, branchCode);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Phân ca trực thành công!"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/shifts/remove")
+    public ResponseEntity<?> removeShift(@RequestBody Map<String, String> payload) {
+        try {
+            String day = payload.get("day");
+            String shift = payload.get("shift");
+            String staffCode = payload.get("staffCode");
+            shiftService.removeShift(day, shift, staffCode);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Đã gỡ nhân viên khỏi ca trực!"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/shifts/week/save")
+    public ResponseEntity<?> saveWeeklySchedule(@RequestBody Map<String, Object> payload) {
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> schedule = (Map<String, Object>) payload.get("schedule");
+            String branchCode = (String) payload.getOrDefault("branchCode", "CN01");
+            shiftService.saveWeeklySchedule(schedule, branchCode);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Đã lưu lịch phân ca trực tuần!"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/shifts/week/reset")
+    public ResponseEntity<?> resetWeeklySchedule(@RequestBody(required = false) Map<String, String> payload) {
+        try {
+            String branchCode = payload != null ? payload.getOrDefault("branchCode", "CN01") : "CN01";
+            shiftService.resetWeeklySchedule(branchCode);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Đã cài lại lịch phân ca trực mặc định!"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
     }
 

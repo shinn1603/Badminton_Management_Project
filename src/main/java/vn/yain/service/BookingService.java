@@ -1,8 +1,10 @@
 package vn.yain.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.yain.dto.BookingNotificationDto;
 import vn.yain.dto.CourtEventDto;
 import vn.yain.entity.Booking;
 import vn.yain.entity.Court;
@@ -40,6 +42,9 @@ public class BookingService {
     @Autowired
     private CourtService courtService;
 
+    @Autowired(required = false)
+    private SimpMessagingTemplate messagingTemplate;
+
     public List<Booking> getAllBookings() {
         return bookingRepository.findAllByOrderByCreatedAtDesc();
     }
@@ -71,6 +76,21 @@ public class BookingService {
             courtRepository.save(court);
         });
 
+        broadcastBookingEvent(BookingNotificationDto.builder()
+                .eventType("NEW_BOOKING")
+                .bookingCode(saved.getBookingCode())
+                .courtCode(saved.getCourtCode())
+                .branchCode(saved.getBranchCode())
+                .customerName(saved.getCustomerName())
+                .customerPhone(saved.getCustomerPhone())
+                .timeSlot(saved.getTimeSlot())
+                .totalPrice(saved.getTotalPrice())
+                .depositAmount(saved.getDepositAmount())
+                .status(saved.getStatus())
+                .message("Đơn đặt sân mới [" + saved.getBookingCode() + "] - Sân " + saved.getCourtCode() + " (" + saved.getTimeSlot() + ")")
+                .timestamp(LocalDateTime.now())
+                .build());
+
         return saved;
     }
 
@@ -97,6 +117,21 @@ public class BookingService {
         payment.setStatus("Thành công");
         paymentRepository.save(payment);
 
+        broadcastBookingEvent(BookingNotificationDto.builder()
+                .eventType("DEPOSIT_CONFIRMED")
+                .bookingCode(updated.getBookingCode())
+                .courtCode(updated.getCourtCode())
+                .branchCode(updated.getBranchCode())
+                .customerName(updated.getCustomerName())
+                .customerPhone(updated.getCustomerPhone())
+                .timeSlot(updated.getTimeSlot())
+                .totalPrice(updated.getTotalPrice())
+                .depositAmount(updated.getDepositAmount())
+                .status(updated.getStatus())
+                .message("Đã nhận tiền cọc cho đơn [" + updated.getBookingCode() + "] - Sân " + updated.getCourtCode())
+                .timestamp(LocalDateTime.now())
+                .build());
+
         return updated;
     }
 
@@ -116,6 +151,17 @@ public class BookingService {
             courtRepository.save(court);
             courtService.updateCourtStatus(court.getCourtCode(), "Đang sử dụng");
         });
+
+        broadcastBookingEvent(BookingNotificationDto.builder()
+                .eventType("CHECKED_IN")
+                .bookingCode(updated.getBookingCode())
+                .courtCode(updated.getCourtCode())
+                .branchCode(updated.getBranchCode())
+                .customerName(updated.getCustomerName())
+                .status(updated.getStatus())
+                .message("Khách đã nhận sân [" + updated.getCourtCode() + "] - Đơn [" + updated.getBookingCode() + "]")
+                .timestamp(LocalDateTime.now())
+                .build());
 
         return updated;
     }
@@ -161,6 +207,17 @@ public class BookingService {
             courtService.updateCourtStatus(court.getCourtCode(), "Trống");
         });
 
+        broadcastBookingEvent(BookingNotificationDto.builder()
+                .eventType("CHECKED_OUT")
+                .bookingCode(bookingCode)
+                .courtCode(booking.getCourtCode())
+                .branchCode(booking.getBranchCode())
+                .customerName(booking.getCustomerName())
+                .status("Hoàn thành")
+                .message("Hoàn tất thanh toán & trả sân [" + booking.getCourtCode() + "] - Đơn [" + bookingCode + "]")
+                .timestamp(LocalDateTime.now())
+                .build());
+
         return savedInvoice;
     }
 
@@ -178,6 +235,17 @@ public class BookingService {
         courtRepository.findByCourtCode(booking.getCourtCode()).ifPresent(court -> {
             courtService.updateCourtStatus(court.getCourtCode(), "Trống");
         });
+
+        broadcastBookingEvent(BookingNotificationDto.builder()
+                .eventType("BOOKING_CANCELLED")
+                .bookingCode(bookingCode)
+                .courtCode(saved.getCourtCode())
+                .branchCode(saved.getBranchCode())
+                .customerName(saved.getCustomerName())
+                .status(saved.getStatus())
+                .message("Đã hủy đơn đặt sân [" + bookingCode + "]")
+                .timestamp(LocalDateTime.now())
+                .build());
 
         return saved;
     }
@@ -243,6 +311,18 @@ public class BookingService {
         courtRepository.save(targetCourt);
         courtService.updateCourtStatus(targetCourtCode, newCourtStatus);
 
+        broadcastBookingEvent(BookingNotificationDto.builder()
+                .eventType("COURT_TRANSFERRED")
+                .bookingCode(bookingCode)
+                .courtCode(targetCourtCode)
+                .branchCode(booking.getBranchCode())
+                .customerName(booking.getCustomerName())
+                .timeSlot(effectiveSlot)
+                .status(booking.getStatus())
+                .message("Đã chuyển đơn [" + bookingCode + "] sang sân " + targetCourtCode)
+                .timestamp(LocalDateTime.now())
+                .build());
+
         Map<String, Object> result = new HashMap<>();
         result.put("success", true);
         result.put("bookingCode", bookingCode);
@@ -253,5 +333,19 @@ public class BookingService {
         result.put("newTotalPrice", booking.getTotalPrice());
         result.put("message", "Chuyển sân thành công! " + (priceDifference.compareTo(BigDecimal.ZERO) > 0 ? "Thu thêm: " + priceDifference + "đ" : (priceDifference.compareTo(BigDecimal.ZERO) < 0 ? "Hoàn lại: " + priceDifference.abs() + "đ" : "Không chênh lệch giá")));
         return result;
+    }
+
+    public void broadcastBookingEvent(BookingNotificationDto event) {
+        if (messagingTemplate != null) {
+            try {
+                messagingTemplate.convertAndSend("/topic/bookings", event);
+                messagingTemplate.convertAndSend("/topic/notifications", event);
+                if (event.getBranchCode() != null && !event.getBranchCode().trim().isEmpty()) {
+                    messagingTemplate.convertAndSend("/topic/bookings/" + event.getBranchCode(), event);
+                }
+            } catch (Exception e) {
+                // Non-blocking fallback if socket broker is initializing
+            }
+        }
     }
 }

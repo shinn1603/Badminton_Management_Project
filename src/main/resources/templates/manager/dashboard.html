@@ -140,12 +140,6 @@
           </svg>
           <span class="menu-text">Báo cáo doanh thu</span>
         </a>
-
-
-        <div class="sidebar-motto">
-          <div class="sidebar-motto-title">Thể thao kiến tạo</div>
-          <div class="sidebar-motto-sub">kết nối cuộc sống</div>
-        </div>
       </div>
 
       <div class="sidebar-bottom">
@@ -642,13 +636,6 @@
                     <span class="badge badge-in-use">Đang chơi</span>
                   </div>
                 </div>
-
-                <!-- Promo Banner in Right Column (IMAGE 1) -->
-                <div class="promo-mini-banner">
-                  <div class="promo-mini-text">
-                    Thể thao kiến tạo<br>phiên bản tốt hơn của bạn.
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -969,6 +956,11 @@
     // Run charts and real SQL load
     window.addEventListener('DOMContentLoaded', () => {
       renderCharts();
+      loadRealSqlData();
+    });
+
+    // Realtime reactive reload on WebSocket booking events
+    window.addEventListener('badminton:booking-event', () => {
       loadRealSqlData();
     });
   </script>

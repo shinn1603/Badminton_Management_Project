@@ -40,7 +40,7 @@
           <span class="menu-text">Lưới đặt sân</span>
         </a>
 
-        <a href="javascript:void(0)" onclick="openCreateBookingModal()" class="menu-item" title="Tiếp nhận khách & Đặt sân nhanh tại quầy (MH-NVQ03)">
+        <a href="javascript:void(0)" onclick="openCreateBookingModal()" class="menu-item" title="Đặt sân tại quầy">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -51,7 +51,7 @@
           <span class="menu-tag" style="background: rgba(16, 185, 129, 0.15); color: var(--primary);">F2</span>
         </a>
 
-        <a href="javascript:void(0)" onclick="openCheckoutModal()" class="menu-item" title="Quầy dịch vụ F&B & Thuê dụng cụ (MH-NVQ05)">
+        <a href="javascript:void(0)" onclick="openCheckoutModal()" class="menu-item" title="Quầy dịch vụ F&B và dụng cụ">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <circle cx="9" cy="21" r="1"></circle>
             <circle cx="20" cy="21" r="1"></circle>
@@ -61,7 +61,7 @@
           <span class="menu-tag" style="background: rgba(59, 130, 246, 0.15); color: #2563eb;">F4</span>
         </a>
 
-        <a href="javascript:void(0)" onclick="document.getElementById('searchInput').focus(); showToast('Nhập số điện thoại hoặc tên khách để tra cứu nhanh', 'info');" class="menu-item" title="Tra cứu đơn đặt sân & Khách hàng (MH-NVQ07)">
+        <a href="javascript:void(0)" onclick="document.getElementById('searchInput').focus(); showToast('Nhập số điện thoại hoặc tên khách để tra cứu nhanh', 'info');" class="menu-item" title="Tra cứu đơn đặt sân">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -69,20 +69,14 @@
           <span class="menu-text">Tra cứu đơn sân</span>
         </a>
 
-        <a href="javascript:void(0)" onclick="openShiftHandoverModal()" class="menu-item" title="Kết ca & Bàn giao ca trực thu ngân (XL-08)">
+        <a href="javascript:void(0)" onclick="openShiftHandoverModal()" class="menu-item" title="Bàn giao ca trực thu ngân">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
           </svg>
           <span class="menu-text">Bàn giao ca trực</span>
-          <span class="menu-tag" style="background: rgba(245, 158, 11, 0.15); color: #d97706;">XL-08</span>
+          <span class="menu-tag" style="background: rgba(245, 158, 11, 0.15); color: #d97706;">Ca trực</span>
         </a>
-
-
-        <div class="sidebar-motto">
-          <div class="sidebar-motto-title">Thể thao kiến tạo</div>
-          <div class="sidebar-motto-sub">kết nối cuộc sống</div>
-        </div>
       </div>
 
       <div class="sidebar-bottom">
@@ -121,7 +115,18 @@
         </div>
 
         <div class="header-right" style="display: flex; align-items: center; gap: 12px;">
-
+          <!-- TÌM KIẾM ĐẶT SÂN / KHÁCH HÀNG -->
+          <div class="search-box" id="searchContainer">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--text-muted); flex-shrink: 0;">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="searchInput" placeholder="Tìm khách, SĐT..." oninput="handleSearch()" autocomplete="off">
+            <div class="search-dropdown" id="searchResultsDropdown">
+              <div class="search-dropdown-header">KẾT QUẢ TÌM KIẾM ĐẶT SÂN</div>
+              <ul class="search-results-list" id="searchResultsList"></ul>
+            </div>
+          </div>
 
           <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Đổi giao diện Sáng / Tối">
             <svg class="svg-icon" viewBox="0 0 24 24">
@@ -135,17 +140,10 @@
             </svg>
           </button>
 
-          <!-- TÌM KIẾM ĐẶT SÂN / KHÁCH HÀNG -->
-          <div class="search-box" id="searchContainer">
-            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--text-muted); flex-shrink: 0;">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" id="searchInput" placeholder="Tìm khách, SĐT..." oninput="handleSearch()" autocomplete="off">
-            <div class="search-dropdown" id="searchResultsDropdown">
-              <div class="search-dropdown-header">KẾT QUẢ TÌM KIẾM ĐẶT SÂN</div>
-              <ul class="search-results-list" id="searchResultsList"></ul>
-            </div>
+          <!-- USER PILL WIDGET -->
+          <div class="user-pill-header" id="headerUserWidget" title="Tài khoản đang đăng nhập">
+            <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;">TN</div>
+            <div style="font-size: 12.5px; font-weight: 600; color: var(--text-dark);">Thu ngân POS</div>
           </div>
         </div>
       </header>
@@ -157,18 +155,18 @@
           <div>
             <div style="display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 3px;">
               <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
-              Lưới Bàn Cờ Thời Gian Thực & Tiếp Nhận Khách (MH-NVQ01)
+              Sơ Đồ Thời Gian Thực
             </div>
-            <div style="font-size: 15px; font-weight: 800; color: #ffffff;">Sơ Đồ Lưới Đặt Sân Theo Giờ — Chi Nhánh Thủ Đức</div>
+            <div style="font-size: 15px; font-weight: 800; color: #ffffff;">Lưới Đặt Sân Theo Giờ - Chi Nhánh Thủ Đức</div>
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
             <button type="button" class="btn btn-primary" onclick="openCreateBookingModal()" style="font-size: 12px; padding: 6px 14px;">
               <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              <span>+ Đặt sân tại quầy (F2)</span>
+              <span>+ Đặt sân tại quầy</span>
             </button>
             <button type="button" class="btn btn-outline" onclick="openShiftHandoverModal()" style="font-size: 12px; padding: 6px 14px; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.25); color: #ffffff;">
               <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-              <span>Bàn giao ca (XL-08)</span>
+              <span>Bàn giao ca</span>
             </button>
           </div>
         </div>
@@ -329,7 +327,7 @@
               <polyline points="21 16 21 21 16 21"></polyline>
               <line x1="15" y1="15" x2="21" y2="21"></line>
             </svg>
-            Chuyển sân (XL-06)
+            Chuyển sân
           </button>
           <button class="btn btn-primary" onclick="checkInBooking()">Nhận sân (Check-in)</button>
         </div>
@@ -348,7 +346,7 @@
             <polyline points="21 16 21 21 16 21"></polyline>
             <line x1="15" y1="15" x2="21" y2="21"></line>
           </svg>
-          Chuyển Sân Cho Khách (XL-06)
+          Chuyển Sân Thi Đấu
         </h3>
         <button class="modal-close-btn" onclick="closeTransferModal()">✕</button>
       </div>
@@ -405,7 +403,7 @@
 
   <!-- MODAL POS, DỊCH VỤ & THANH TOÁN (MH-NVQ05, MH-NVQ06) -->
   <div class="modal-overlay" id="checkoutModal">
-    <div class="modal-container" style="max-width: 780px;">
+    <div class="modal-container" style="max-width: 840px;">
       <div class="modal-header">
         <h3 class="modal-title">
           <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary); display: inline-block; vertical-align: middle; margin-right: 6px;">
@@ -416,39 +414,32 @@
         </h3>
         <button class="modal-close-btn" onclick="closeCheckoutModal()">✕</button>
       </div>
-      <div class="modal-body" style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px;">
-        <!-- LEFT: TOUCHPAD PRODUCTS -->
+      <div class="modal-body" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px;">
+        <!-- LEFT: TOUCHPAD PRODUCTS DYNAMIC FROM DB -->
         <div>
-          <label class="form-label" style="margin-bottom: 8px; font-weight: 700;">Menu POS Nhanh (1 chạm để thêm):</label>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px;">
-            <button type="button" class="btn btn-outline" style="padding: 10px; font-size: 12px; display: flex; flex-direction: column; align-items: flex-start; text-align: left;" onclick="quickAddProduct('Nước Revive', 15000)">
-              <strong>Nước bù khoáng Revive</strong>
-              <span style="color: var(--primary); font-weight: 700; margin-top: 2px;">15.000đ</span>
-            </button>
-            <button type="button" class="btn btn-outline" style="padding: 10px; font-size: 12px; display: flex; flex-direction: column; align-items: flex-start; text-align: left;" onclick="quickAddProduct('Nước Pocari Sweat', 18000)">
-              <strong>Pocari Sweat 500ml</strong>
-              <span style="color: var(--primary); font-weight: 700; margin-top: 2px;">18.000đ</span>
-            </button>
-            <button type="button" class="btn btn-outline" style="padding: 10px; font-size: 12px; display: flex; flex-direction: column; align-items: flex-start; text-align: left;" onclick="quickAddProduct('Nước suối Aquafina', 10000)">
-              <strong>Nước suối Aquafina</strong>
-              <span style="color: var(--primary); font-weight: 700; margin-top: 2px;">10.000đ</span>
-            </button>
-            <button type="button" class="btn btn-outline" style="padding: 10px; font-size: 12px; display: flex; flex-direction: column; align-items: flex-start; text-align: left;" onclick="quickAddProduct('Thuê Vợt Yonex Astrox', 25000)">
-              <strong>Thuê Vợt Yonex Astrox</strong>
-              <span style="color: var(--primary); font-weight: 700; margin-top: 2px;">25.000đ / cây</span>
-            </button>
-            <button type="button" class="btn btn-outline" style="padding: 10px; font-size: 12px; display: flex; flex-direction: column; align-items: flex-start; text-align: left;" onclick="quickAddProduct('Ống Cầu Hải Yến (12 quả)', 180000)">
-              <strong>Ống Cầu Hải Yến Đỏ</strong>
-              <span style="color: var(--primary); font-weight: 700; margin-top: 2px;">180.000đ</span>
-            </button>
-            <button type="button" class="btn btn-outline" style="padding: 10px; font-size: 12px; display: flex; flex-direction: column; align-items: flex-start; text-align: left;" onclick="quickAddProduct('Quấn cán vợt VS', 15000)">
-              <strong>Quấn cán vợt VS xịn</strong>
-              <span style="color: var(--primary); font-weight: 700; margin-top: 2px;">15.000đ</span>
-            </button>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label class="form-label" style="margin: 0; font-weight: 700;">Dịch Vụ & Sản Phẩm (Kho CSDL):</label>
+            <span style="font-size: 11px; color: var(--text-muted);" id="posProductCount">Đang tải CSDL...</span>
           </div>
 
-          <label class="form-label" style="font-weight: 700;">Hóa Đơn Chi Tiết:</label>
-          <div style="max-height: 180px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: 8px;">
+          <!-- Product Search & Category Filters -->
+          <div style="margin-bottom: 8px;">
+            <input type="text" id="posProductSearch" class="form-control" placeholder="Tìm sản phẩm / ống cầu..." oninput="filterPosSearch(this.value)" style="padding: 6px 10px; font-size: 12px; margin-bottom: 6px;">
+            <div id="posCatPills" style="display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px;">
+              <button type="button" class="btn btn-xs btn-primary pos-cat-btn" data-cat="all" onclick="filterPosCat('all')">Tất cả</button>
+              <button type="button" class="btn btn-xs btn-outline pos-cat-btn" data-cat="Dụng cụ" onclick="filterPosCat('Dụng cụ')">Cầu & Vợt</button>
+              <button type="button" class="btn btn-xs btn-outline pos-cat-btn" data-cat="Nước giải khát" onclick="filterPosCat('Nước giải khát')">Nước uống</button>
+              <button type="button" class="btn btn-xs btn-outline pos-cat-btn" data-cat="Phụ kiện" onclick="filterPosCat('Phụ kiện')">Phụ kiện</button>
+            </div>
+          </div>
+
+          <!-- Dynamic Products Grid -->
+          <div id="posProductGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 4px; margin-bottom: 12px;">
+            <!-- Populated dynamically via loadDbProductsForPos() -->
+          </div>
+
+          <label class="form-label" style="font-weight: 700; margin-bottom: 6px;">Chi Tiết Dịch Vụ Đã Thêm:</label>
+          <div style="max-height: 160px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: 8px;">
             <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
               <thead style="background: var(--surface-subtle); position: sticky; top: 0;">
                 <tr>
@@ -456,6 +447,7 @@
                   <th style="padding: 6px 8px; text-align: center;">SL</th>
                   <th style="padding: 6px 8px; text-align: right;">Đơn giá</th>
                   <th style="padding: 6px 8px; text-align: right;">Tiền</th>
+                  <th style="padding: 6px 4px; text-align: center; width: 32px;"></th>
                 </tr>
               </thead>
               <tbody id="invoiceBody"></tbody>
@@ -530,7 +522,7 @@
             <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
           </svg>
-          Bàn Giao Ca Trực Thu Ngân (XL-08)
+          Bàn Giao Ca Trực Thu Ngân
         </h3>
         <button class="modal-close-btn" onclick="closeShiftHandoverModal()">✕</button>
       </div>
@@ -664,10 +656,10 @@
       const tfRev = document.getElementById('shiftTransferRevenue').innerText;
 
       win.document.write(`
-        <html><head><title>Biên Bản Bàn Giao Ca (XL-08)</title>
+        <html><head><title>Biên Bản Bàn Giao Ca</title>
         <style>body{font-family:'Courier New',monospace;padding:16px;line-height:1.4;font-size:12px;}.center{text-align:center;}.dash{border-bottom:1px dashed #000;margin:8px 0;}.row{display:flex;justify-content:space-between;}</style>
         </head><body onload="window.print()">
-        <div class="center"><h3>UTE SPORT ARENA</h3><p>BIÊN BẢN BÀN GIAO CA THU NGÂN (XL-08)</p></div>
+        <div class="center"><h3>UTE SPORT ARENA</h3><p>BIÊN BẢN BÀN GIAO CA THU NGÂN</p></div>
         <div class="dash"></div>
         <div>Thu ngân: <strong>Nguyễn Thanh Tâm (NS03)</strong></div>
         <div>Thời gian in: ${new Date().toLocaleString('vi-VN')}</div>

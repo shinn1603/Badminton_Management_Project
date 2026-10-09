@@ -432,7 +432,104 @@ function checkInBooking() {
   closeDetailModal();
 }
 
-// CHECKOUT & POS SERVICES MODAL
+// CHECKOUT & POS SERVICES MODAL (DYNAMIC DB INTEGRATED)
+let dbProductsCache = [];
+let currentPosFilterCat = 'all';
+let currentPosSearchTerm = '';
+
+function loadDbProductsForPos() {
+  fetch('/api/products')
+    .then(r => r.json())
+    .then(list => {
+      if (Array.isArray(list) && list.length > 0) {
+        dbProductsCache = list;
+      }
+      renderPosProductGrid();
+    })
+    .catch(err => {
+      console.warn('Không tải được danh sách sản phẩm từ CSDL:', err);
+      if (!dbProductsCache.length) {
+        dbProductsCache = [
+          { productCode: 'P01', productName: 'Nước bù khoáng Revive', category: 'Nước giải khát', price: 15000, currentStock: 80 },
+          { productCode: 'P02', productName: 'Pocari Sweat 500ml', category: 'Nước giải khát', price: 18000, currentStock: 45 },
+          { productCode: 'P03', productName: 'Nước suối Aquafina', category: 'Nước giải khát', price: 10000, currentStock: 120 },
+          { productCode: 'P05', productName: 'Ống Cầu Hải Yến Đỏ (12 quả)', category: 'Dụng cụ', price: 180000, currentStock: 25 },
+          { productCode: 'P06', productName: 'Ống Cầu Yonex AS-50', category: 'Dụng cụ', price: 420000, currentStock: 15 },
+          { productCode: 'P07', productName: 'Thuê Vợt Yonex Astrox', category: 'Dụng cụ', price: 25000, currentStock: 10 },
+          { productCode: 'P08', productName: 'Quấn cán vợt VS xịn', category: 'Phụ kiện', price: 15000, currentStock: 50 }
+        ];
+      }
+      renderPosProductGrid();
+    });
+}
+
+function filterPosCat(category) {
+  currentPosFilterCat = category;
+  document.querySelectorAll('.pos-cat-btn').forEach(btn => {
+    if (btn.getAttribute('data-cat') === category) {
+      btn.className = 'btn btn-xs btn-primary pos-cat-btn';
+    } else {
+      btn.className = 'btn btn-xs btn-outline pos-cat-btn';
+    }
+  });
+  renderPosProductGrid();
+}
+
+function filterPosSearch(term) {
+  currentPosSearchTerm = (term || '').trim().toLowerCase();
+  renderPosProductGrid();
+}
+
+function renderPosProductGrid() {
+  const container = document.getElementById('posProductGrid');
+  const countBadge = document.getElementById('posProductCount');
+  if (!container) return;
+
+  const filtered = dbProductsCache.filter(p => {
+    const pCat = p.category || '';
+    const matchCat = currentPosFilterCat === 'all' || 
+      pCat.toLowerCase().includes(currentPosFilterCat.toLowerCase()) ||
+      (currentPosFilterCat === 'Dụng cụ' && (pCat === 'Dụng cụ' || pCat === 'Cầu lông'));
+    const matchSearch = !currentPosSearchTerm || 
+      (p.productName && p.productName.toLowerCase().includes(currentPosSearchTerm)) || 
+      (p.productCode && p.productCode.toLowerCase().includes(currentPosSearchTerm));
+    return matchCat && matchSearch;
+  });
+
+  if (countBadge) {
+    countBadge.innerText = `${filtered.length} / ${dbProductsCache.length} mặt hàng CSDL`;
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="grid-column: 1 / -1; padding: 14px; text-align: center; color: var(--text-muted); font-size: 11.5px; background: var(--surface-subtle); border-radius: 6px;">Không tìm thấy mặt hàng nào phù hợp trong kho CSDL.</div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(p => {
+    const rawPrice = (p.unitPrice !== undefined && p.unitPrice !== null) ? p.unitPrice : (p.price || 0);
+    const rawStock = (p.stockQuantity !== undefined && p.stockQuantity !== null) ? p.stockQuantity : (p.currentStock !== undefined ? p.currentStock : null);
+    const priceFormatted = Number(rawPrice).toLocaleString('vi-VN') + 'đ';
+    const isOutOfStock = (rawStock !== null && rawStock <= 0);
+    const stockBadge = isOutOfStock 
+      ? `<span style="color: var(--danger); font-size: 10px; font-weight: bold;">Hết hàng</span>`
+      : `<span style="color: var(--text-muted); font-size: 10px;">Kho: ${rawStock ?? 'Sẵn'}</span>`;
+
+    const safeName = (p.productName || '').replace(/'/g, "\\'");
+    return `
+      <button type="button" class="btn btn-outline" 
+              style="padding: 8px; font-size: 11.5px; display: flex; flex-direction: column; align-items: flex-start; text-align: left; position: relative; border-radius: 6px; border: 1px solid var(--border-subtle); background: var(--surface); cursor: pointer; transition: all 0.15s ease;"
+              onclick="quickAddProduct('${p.productCode}', '${safeName}', ${rawPrice}, ${rawStock ?? 999})"
+              title="${p.productName} (${p.productCode})">
+        <strong style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-size: 11.5px; color: var(--text-dark);">${p.productName}</strong>
+        <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 4px; align-items: center;">
+          <span style="color: var(--primary); font-weight: 700; font-size: 11.5px;">${priceFormatted}</span>
+          ${stockBadge}
+        </div>
+      </button>
+    `;
+  }).join('');
+}
+
 function openCheckoutModal(element) {
   if (element) {
     activeSlotCell = element;
@@ -450,6 +547,7 @@ function openCheckoutModal(element) {
     posItems = [];
   }
 
+  loadDbProductsForPos();
   renderInvoice();
   document.getElementById('checkoutModal').classList.add('active');
 }
@@ -464,10 +562,53 @@ const productCodeMap = {
   'Quấn cán vợt VS': 'P07'
 };
 
-function quickAddProduct(name, price) {
-  const existing = posItems.find(i => i.name === name);
-  if (existing) existing.qty += 1;
-  else posItems.push({ name, price, qty: 1 });
+function removePosItem(name) {
+  const idx = posItems.findIndex(i => i.name === name);
+  if (idx !== -1) {
+    if (posItems[idx].qty > 1) {
+      posItems[idx].qty -= 1;
+    } else {
+      posItems.splice(idx, 1);
+    }
+  }
+  if (activeSlotCell) {
+    const court = activeSlotCell.dataset.court;
+    const timeObj = activeSlotCell.dataset.time;
+    updateDataStore(court, timeObj, { posItems: [...posItems] });
+  }
+  renderInvoice();
+}
+
+function quickAddProduct(codeOrName, name, price, stock) {
+  let itemCode = codeOrName;
+  let itemName = name;
+  let itemPrice = price;
+
+  // Compatibility: if called with 2 arguments (name, price)
+  if (arguments.length === 2) {
+    itemName = codeOrName;
+    itemPrice = name;
+    const found = dbProductsCache.find(p => p.productName === itemName);
+    itemCode = found ? found.productCode : (productCodeMap[itemName] || 'P01');
+  }
+
+  const existing = posItems.find(i => i.name === itemName);
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    posItems.push({ code: itemCode, name: itemName, price: Number(itemPrice) || 0, qty: 1 });
+  }
+
+  // Deduct 1 in local cache for immediate UI feedback
+  const prodInCache = dbProductsCache.find(p => p.productCode === itemCode || p.productName === itemName);
+  if (prodInCache) {
+    if (typeof prodInCache.stockQuantity === 'number') {
+      prodInCache.stockQuantity = Math.max(0, prodInCache.stockQuantity - 1);
+    } else if (typeof prodInCache.currentStock === 'number') {
+      prodInCache.currentStock = Math.max(0, prodInCache.currentStock - 1);
+    }
+    renderPosProductGrid();
+  }
 
   if (activeSlotCell) {
     const court = activeSlotCell.dataset.court;
@@ -475,16 +616,19 @@ function quickAddProduct(name, price) {
     updateDataStore(court, timeObj, { posItems: [...posItems] });
 
     const bCode = activeSlotCell.dataset.code || 'DS0102';
-    const pCode = productCodeMap[name] || 'P01';
     fetch(`/api/bookings/${bCode}/order-service`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productCode: pCode, quantity: 1 })
+      body: JSON.stringify({ productCode: itemCode, quantity: 1 })
     }).then(r => r.json()).then(data => {
       if (data.success && window.showToast) {
-        showToast(`Đã xuất [${name}] và trừ tồn kho thực tế!`, 'info');
+        showToast(`Đã xuất [${itemName}] và trừ tồn kho CSDL!`, 'info');
       }
     }).catch(e => console.warn('Lỗi đồng bộ dịch vụ:', e));
+  } else {
+    if (window.showToast) {
+      showToast(`Đã thêm: ${itemName}`, 'info');
+    }
   }
   renderInvoice();
 }
@@ -563,12 +707,16 @@ function renderInvoice() {
   posItems.forEach(item => {
     const lineTotal = item.price * item.qty;
     serviceSubtotal += lineTotal;
+    const safeName = (item.name || '').replace(/'/g, "\\'");
     tbody.innerHTML += `
       <tr>
         <td style="padding: 6px 8px; border-bottom: 1px solid var(--border-subtle);">${item.name}</td>
         <td style="padding: 6px 8px; border-bottom: 1px solid var(--border-subtle); text-align: center;">${item.qty}</td>
         <td style="padding: 6px 8px; border-bottom: 1px solid var(--border-subtle); text-align: right;">${item.price.toLocaleString('vi-VN')} đ</td>
         <td style="padding: 6px 8px; border-bottom: 1px solid var(--border-subtle); text-align: right; font-weight: bold;">${lineTotal.toLocaleString('vi-VN')} đ</td>
+        <td style="padding: 6px 4px; border-bottom: 1px solid var(--border-subtle); text-align: center;">
+          <button type="button" class="btn btn-xs btn-outline" style="padding: 2px 6px; color: var(--danger); line-height: 1; border-color: transparent;" onclick="removePosItem('${safeName}')" title="Bớt 1 / Xóa món">✕</button>
+        </td>
       </tr>
     `;
   });
@@ -634,6 +782,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initAppData();
   goToToday();
   loadCourtsFromSql();
+  loadDbProductsForPos();
 
   document.addEventListener('click', function(e) {
     const container = document.getElementById('searchContainer');
@@ -649,4 +798,11 @@ window.addEventListener('DOMContentLoaded', () => {
       renderGridForDate(e.target.value);
     });
   }
+
+  // React to realtime booking events from WebSocket
+  window.addEventListener('badminton:booking-event', function(e) {
+    if (currentDateStr) {
+      renderGridForDate(currentDateStr);
+    }
+  });
 });

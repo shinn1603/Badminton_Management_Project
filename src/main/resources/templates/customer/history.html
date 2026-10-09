@@ -466,30 +466,30 @@
         </div>
         <div>
           <div class="cust-brand-title">UTE SPORT</div>
-          <div class="cust-brand-sub">Hệ Thống Đặt Sân Cầu Lông Quốc Tế</div>
+          <div class="cust-brand-sub">Hệ Thống Sân Cầu Lông</div>
         </div>
       </a>
 
       <nav class="cust-nav-menu">
         <a href="/customer/home" class="cust-nav-link">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-          Trang Chủ & Tổng Quan
+          Trang chủ
         </a>
         <a href="/customer/booking" class="cust-nav-link">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-          Đặt Sân Giữ Chỗ
+          Đặt sân
         </a>
         <a href="/customer/tournaments" class="cust-nav-link">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
-          Giải Đấu UTE Open
+          Giải đấu
         </a>
         <a href="/customer/history" class="cust-nav-link active">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          Lịch Sử & Check-in QR
+          Lịch sử đặt
         </a>
         <a href="/customer/profile" class="cust-nav-link">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          Thẻ Hội Viên VIP
+          Hội viên
         </a>
       </nav>
 
@@ -523,40 +523,38 @@
       <div style="position: relative; z-index: 2;">
         <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 12px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 14px;">
           <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 10px #10b981; display: inline-block;"></span>
-          <span>Vé Điện Tử & Xác Thực QR Chuẩn BWF</span>
+          <span>Vé Điện Tử QR</span>
         </div>
         <h1>Lịch Sử Đặt Sân & <span>Vé Check-in QR</span></h1>
-        <p>Tra cứu mã đặt sân, xuất mã QR quét nhận sân tại quầy POS thu ngân và chủ động quản lý hủy hoặc hoàn cọc tự động.</p>
+        <p>Quản lý các lượt đặt sân, xuất mã QR check-in và kiểm tra trạng thái thanh toán.</p>
       </div>
     </div>
 
     <div class="page-title-box">
       <div>
-        <h2 style="font-size: 18px; font-weight: 800; color: var(--text-dark); margin: 0;">Danh Sách Lượt Đặt Sân Của Bạn</h2>
+        <h2 style="font-size: 18px; font-weight: 800; color: var(--text-dark); margin: 0;">Đơn Đặt Sân Của Bạn</h2>
       </div>
 
       <div class="pill-group">
-        <button class="pill-btn active" id="pillAll" onclick="filterHistory('all', this)">Tất Cả (<span id="cntAll">3</span>)</button>
-        <button class="pill-btn" id="pillUpcoming" onclick="filterHistory('upcoming', this)">Sắp Tới (<span id="cntUpcoming">1</span>)</button>
-        <button class="pill-btn" id="pillCompleted" onclick="filterHistory('completed', this)">Đã Chơi (<span id="cntCompleted">1</span>)</button>
-        <button class="pill-btn" id="pillCancelled" onclick="filterHistory('cancelled', this)">Đã Hủy (<span id="cntCancelled">1</span>)</button>
+        <button class="pill-btn active" id="pillAll" onclick="filterHistory('all', this)">Tất Cả (<span id="cntAll">0</span>)</button>
+        <button class="pill-btn" id="pillUpcoming" onclick="filterHistory('upcoming', this)">Sắp Tới (<span id="cntUpcoming">0</span>)</button>
+        <button class="pill-btn" id="pillCompleted" onclick="filterHistory('completed', this)">Đã Chơi (<span id="cntCompleted">0</span>)</button>
+        <button class="pill-btn" id="pillCancelled" onclick="filterHistory('cancelled', this)">Đã Hủy (<span id="cntCancelled">0</span>)</button>
       </div>
     </div>
 
     <!-- Policy Alert -->
-    <div class="policy-alert-box">
+    <div class="policy-alert-box" style="display: flex; align-items: center; gap: 10px;">
       <svg class="svg-icon" style="width: 18px; height: 18px; flex-shrink: 0; color: var(--cust-primary);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-      <div>
-        <strong>Chính Sách Hủy Đặt Sân & Hoàn Tiền Cọc:</strong><br>
-        - Quý khách được phép hủy đặt sân và nhận <strong>hoàn 100% tiền cọc</strong> nếu hủy trước giờ bắt đầu thi đấu <strong>tối thiểu 4 tiếng</strong>.<br>
-        - Nếu hủy trong vòng dưới 4 tiếng, hệ thống không áp dụng hoàn cọc nhằm bù đắp chi phí giữ chỗ cho chi nhánh.
+      <div style="font-size: 12.5px;">
+        <strong>Chính sách hoàn cọc:</strong> Hoàn 100% tiền cọc tự động khi hủy trước giờ chơi tối thiểu 4 tiếng.
       </div>
     </div>
 
     <!-- Booking List Container -->
     <div id="bookingListContainer">
       <div id="loadingBookings" style="text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13.5px;">
-        Đang đồng bộ danh sách đơn đặt sân từ cơ sở dữ liệu...
+        Đang tải danh sách đặt sân...
       </div>
     </div>
   </div>
@@ -663,66 +661,38 @@
       });
     }
 
+    // Auth Guard: Require login to view history
+    const hToken = localStorage.getItem('jwt_token');
+    const hUser = localStorage.getItem('utesport_user');
+    if (!hToken && !hUser) {
+      window.location.href = '/customer/auth?redirect=' + encodeURIComponent(window.location.pathname);
+    }
+
     async function loadBookingsFromDb() {
       const container = document.getElementById('bookingListContainer');
+      const curToken = localStorage.getItem('jwt_token');
       try {
-        const res = await fetch('/api/bookings');
+        const res = await fetch('/api/customer/my-bookings', {
+          headers: curToken ? { 'Authorization': 'Bearer ' + curToken } : {}
+        });
+
+        if (res.status === 401) {
+          window.location.href = '/customer/auth?redirect=/customer/history';
+          return;
+        }
+
         if (res.ok) {
           const list = await res.json();
-          if (Array.isArray(list) && list.length > 0) {
-            allBookingsData = list;
-            renderBookingsList(list);
-            return;
-          }
+          allBookingsData = Array.isArray(list) ? list : [];
+          renderBookingsList(allBookingsData);
+          return;
         }
       } catch (err) {
-        console.warn('Lỗi kết nối cơ sở dữ liệu bookings, sử dụng dữ liệu mẫu:', err);
+        console.warn('Lỗi kết nối cơ sở dữ liệu bookings:', err);
       }
 
-      // Default mock bookings if DB is empty
-      const defaultList = [
-        {
-          bookingCode: 'DS104821',
-          courtCode: 'CL01',
-          branchCode: 'CN01',
-          bookingDate: '2026-09-22',
-          timeSlot: '17:00 - 19:00',
-          totalPrice: 315000,
-          depositAmount: 94500,
-          status: 'Đã cọc 30%',
-          customerName: 'Lê Bá Đạt',
-          customerPhone: '0912345678',
-          createdAt: '18:30 22/09/2026'
-        },
-        {
-          bookingCode: 'DS104719',
-          courtCode: 'CL03',
-          branchCode: 'CN01',
-          bookingDate: '2026-09-20',
-          timeSlot: '19:00 - 21:00',
-          totalPrice: 350000,
-          depositAmount: 105000,
-          status: 'Đã hoàn thành',
-          customerName: 'Lê Bá Đạt',
-          customerPhone: '0912345678',
-          createdAt: '19:00 20/09/2026'
-        },
-        {
-          bookingCode: 'DS104552',
-          courtCode: 'CL02',
-          branchCode: 'CN02',
-          bookingDate: '2026-09-15',
-          timeSlot: '18:00 - 19:00',
-          totalPrice: 240000,
-          depositAmount: 72000,
-          status: 'Đã hủy',
-          customerName: 'Lê Bá Đạt',
-          customerPhone: '0912345678',
-          createdAt: '18:00 15/09/2026'
-        }
-      ];
-      allBookingsData = defaultList;
-      renderBookingsList(defaultList);
+      allBookingsData = [];
+      renderBookingsList([]);
     }
 
     function renderBookingsList(list) {
@@ -993,15 +963,7 @@
   </footer>
 
   <script src="/js/global-hub.js"></script>
-  <script>
-    // Sync Nav User Profile
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.RBAC && window.RBAC.syncNavUserArea) {
-        window.RBAC.syncNavUserArea();
-      }
-    });
-
-  </script>
+  <script src="/js/auth-guard.js"></script>
 </body>
 </html>
 

@@ -283,4 +283,50 @@ class ApiControllerTest {
                 .andExpect(jsonPath("$.url", notNullValue()))
                 .andExpect(jsonPath("$.folder", is("courts")));
     }
+
+    @Test
+    @DisplayName("API Staff & WorkShifts: Quan ly nhan su va xem lich truc tuan")
+    void testApiStaffAndShifts_Success() throws Exception {
+        // 1. Lay danh sach nhan su
+        mockMvc.perform(get("/api/staff?branchCode=CN01"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", notNullValue()));
+
+        // 2. Them nhan vien moi
+        Map<String, String> staffPayload = new HashMap<>();
+        staffPayload.put("staffCode", "NV-TEST-01");
+        staffPayload.put("branchCode", "CN01");
+        staffPayload.put("fullName", "Nhan Vien Test");
+        staffPayload.put("position", "Thu ngan POS quầy");
+        staffPayload.put("phone", "0909999888");
+        staffPayload.put("email", "test@utesport.vn");
+
+        mockMvc.perform(post("/api/staff")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(staffPayload)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.staff.staffCode", is("NV-TEST-01")));
+
+        // 3. Lay lich truc tuan
+        mockMvc.perform(get("/api/shifts/week?branchCode=CN01"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.schedule.mon", notNullValue()));
+
+        // 4. Phan ca truc
+        Map<String, String> assignPayload = new HashMap<>();
+        assignPayload.put("day", "mon");
+        assignPayload.put("shift", "morning");
+        assignPayload.put("staffCode", "NV-TEST-01");
+        assignPayload.put("duty", "POS");
+        assignPayload.put("icon", "POS");
+        assignPayload.put("branchCode", "CN01");
+
+        mockMvc.perform(post("/api/shifts/assign")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(assignPayload)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)));
+    }
 }

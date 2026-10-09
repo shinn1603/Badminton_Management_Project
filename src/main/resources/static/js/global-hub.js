@@ -224,3 +224,120 @@ function showToast(message, type = 'success') {
     setTimeout(() => toast.remove(), 300);
   }, 3800);
 }
+
+// ==========================================
+// 6. REAL-TIME WEBSOCKET HUB (STOMP OVER WS)
+// Subscribes to /topic/bookings, /topic/notifications, /topic/courts
+// Broadcasts live toast alerts and dispatches DOM events
+// ==========================================
+(function initRealtimeWebSocketHub() {
+  let ws = null;
+  let heartbeatTimer = null;
+  let reconnectTimer = null;
+  let isConnected = false;
+
+  function connect() {
+    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+      return;
+    }
+
+    try {
+      const isHttps = window.location.protocol === 'https:';
+      const wsProto = isHttps ? 'wss:' : 'ws:';
+      const host = window.location.host;
+      if (!host) return;
+
+      const wsUrl = `${wsProto}//${host}/ws-court/websocket`;
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = function () {
+        const connectFrame = "CONNECT\naccept-version:1.2,1.1,1.0\nheart-beat:10000,10000\n\n\0";
+        ws.send(connectFrame);
+      };
+
+      ws.onmessage = function (event) {
+        const data = event.data;
+        if (!data) return;
+
+        if (data === '\n' || data === '\r\n') return;
+
+        if (data.startsWith('CONNECTED')) {
+          isConnected = true;
+
+          ws.send("SUBSCRIBE\nid:sub-bookings\ndestination:/topic/bookings\n\n\0");
+          ws.send("SUBSCRIBE\nid:sub-notifications\ndestination:/topic/notifications\n\n\0");
+          ws.send("SUBSCRIBE\nid:sub-courts\ndestination:/topic/courts\n\n\0");
+
+          clearInterval(heartbeatTimer);
+          heartbeatTimer = setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+              ws.send('\n');
+            }
+          }, 10000);
+
+        } else if (data.startsWith('MESSAGE')) {
+          const bodyIndex = data.indexOf('\n\n');
+          if (bodyIndex !== -1) {
+            let body = data.substring(bodyIndex + 2);
+            if (body.endsWith('\0')) {
+              body = body.substring(0, body.length - 1);
+            }
+            try {
+              const payload = JSON.parse(body);
+              handleIncomingNotification(payload);
+            } catch (err) {
+              // Non-JSON payload
+            }
+          }
+        }
+      };
+
+      ws.onclose = function () {
+        isConnected = false;
+        clearInterval(heartbeatTimer);
+        scheduleReconnect();
+      };
+
+      ws.onerror = function () {
+        isConnected = false;
+      };
+    } catch (e) {
+      scheduleReconnect();
+    }
+  }
+
+  function scheduleReconnect() {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(connect, 6000);
+  }
+
+  function handleIncomingNotification(payload) {
+    if (!payload) return;
+
+    window.dispatchEvent(new CustomEvent('badminton:booking-event', { detail: payload }));
+    window.dispatchEvent(new CustomEvent('badminton:notification', { detail: payload }));
+
+    const path = window.location.pathname.toLowerCase();
+    const isDashboardOrPos = path.startsWith('/manager') || path.startsWith('/pos') || path.startsWith('/director');
+
+    if (payload.message) {
+      if (isDashboardOrPos) {
+        const toastType = payload.eventType === 'BOOKING_CANCELLED' ? 'warning' : 'success';
+        showToast(payload.message, toastType);
+      }
+    } else if (payload.bookingCode) {
+      if (isDashboardOrPos) {
+        showToast(`Đơn đặt sân mới [${payload.bookingCode}] - Sân ${payload.courtCode || ''}`, 'success');
+      }
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(connect, 600);
+    });
+  } else {
+    setTimeout(connect, 600);
+  }
+})();
+

@@ -425,30 +425,30 @@
         </div>
         <div>
           <div class="cust-brand-title">UTE SPORT</div>
-          <div class="cust-brand-sub">Hệ Thống Đặt Sân Cầu Lông Quốc Tế</div>
+          <div class="cust-brand-sub">Hệ Thống Sân Cầu Lông</div>
         </div>
       </a>
 
       <nav class="cust-nav-menu">
         <a href="/customer/home" class="cust-nav-link">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-          Trang Chủ & Tổng Quan
+          Trang chủ
         </a>
         <a href="/customer/booking" class="cust-nav-link">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-          Đặt Sân Giữ Chỗ
+          Đặt sân
         </a>
         <a href="/customer/tournaments" class="cust-nav-link">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
-          Giải Đấu UTE Open
+          Giải đấu
         </a>
         <a href="/customer/history" class="cust-nav-link">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          Lịch Sử & Check-in QR
+          Lịch sử đặt
         </a>
         <a href="/customer/profile" class="cust-nav-link active">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          Thẻ Hội Viên VIP
+          Hội viên
         </a>
       </nav>
 
@@ -484,24 +484,23 @@
       <div class="digital-card">
         <div class="card-brand-row">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 20px;"></span>
-            <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.5px;">UTE SPORT VIP</span>
+            <span style="font-size: 14px; font-weight: 800; letter-spacing: 0.5px;">UTE SPORT</span>
           </div>
-          <div class="card-tier-badge">
-            <span></span> Hạng Vàng
+          <div class="card-tier-badge" id="profCardTierBadge">
+            <span id="profCardTier">Hội viên</span>
           </div>
         </div>
 
-        <div class="card-number">MB • 8892 • 1024 • 9988</div>
+        <div class="card-number" id="profCardNumber">MB • 8892 • .... • ....</div>
 
         <div class="card-footer-row">
           <div>
-            <div style="font-size: 10px; color: #ccfbf1; text-transform: uppercase;">Chủ thẻ hội viên</div>
-            <div class="card-holder-name">NGUYỄN VĂN AN</div>
+            <div style="font-size: 10px; color: #ccfbf1; text-transform: uppercase;">Chủ thẻ</div>
+            <div class="card-holder-name" id="profCardHolder">---</div>
           </div>
           <div style="text-align: right;">
-            <div style="font-size: 10px; color: #ccfbf1; text-transform: uppercase;">Gia nhập từ</div>
-            <div style="font-size: 12px; font-weight: 600;">15/01/2025</div>
+            <div style="font-size: 10px; color: #ccfbf1; text-transform: uppercase;">Ngày tham gia</div>
+            <div style="font-size: 12px; font-weight: 600;" id="profJoinDate">---</div>
           </div>
         </div>
       </div>
@@ -509,52 +508,52 @@
       <!-- Tier Progress -->
       <div class="tier-progress-card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <strong style="font-size: 13px; color: var(--cust-text-main);">Tiến Trình Lên Hạng Kim Cương</strong>
-          <span style="font-size: 12px; font-weight: 700; color: var(--cust-primary-hover);">48 / 80 Giờ (60%)</span>
+          <strong style="font-size: 13px; color: var(--cust-text-main);" id="profTierProgressTitle">Tiến Trình Nâng Hạng</strong>
+          <span style="font-size: 12px; font-weight: 700; color: var(--cust-primary-hover);" id="profTierProgressLabel">0 / 20 Giờ</span>
         </div>
         <div class="progress-bar-bg">
-          <div class="progress-bar-fill"></div>
+          <div class="progress-bar-fill" id="profTierProgressFill" style="width: 10%;"></div>
         </div>
-        <div style="font-size: 11.5px; color: var(--cust-text-muted); line-height: 1.4;">
-          Bạn chỉ cần chơi thêm <strong>32 giờ</strong> nữa để lên <strong>Hạng Kim Cương</strong> (Giảm 15% trọn đời + miễn phí thuê vợt).
+        <div style="font-size: 11.5px; color: var(--cust-text-muted); line-height: 1.4;" id="profTierProgressDesc">
+          Tích lũy giờ chơi để nâng hạng thẻ và nhận thêm ưu đãi.
         </div>
       </div>
 
       <!-- Tiers Ladder & Benefits -->
       <div class="section-card">
         <div class="card-header">
-          <div class="card-title">Bảng Quyền Lợi Các Hạng Thẻ</div>
+          <div class="card-title">Quyền Lợi Hạng Thẻ</div>
         </div>
         <div class="card-body">
           <div class="tier-benefits-list">
             <div class="tier-benefit-item">
               <div>
-                <strong> Hạng Đồng (0 - 19h)</strong>
-                <div style="font-size: 11px; color: var(--cust-text-muted);">Tích điểm 1% hóa đơn</div>
+                <strong>Hạng Đồng (0 - 19h)</strong>
+                <div style="font-size: 11px; color: var(--cust-text-muted);">Tích điểm 1%</div>
               </div>
               <span class="badge">Cơ bản</span>
             </div>
 
             <div class="tier-benefit-item">
               <div>
-                <strong> Hạng Bạc (20 - 39h)</strong>
-                <div style="font-size: 11px; color: var(--cust-text-muted);">Giảm 5% giá sân, ưu tiên giữ chỗ</div>
+                <strong>Hạng Bạc (20 - 39h)</strong>
+                <div style="font-size: 11px; color: var(--cust-text-muted);">Giảm 5% giá sân</div>
               </div>
               <span class="badge badge-blue">Đã qua</span>
             </div>
 
             <div class="tier-benefit-item current">
               <div>
-                <strong> Hạng Vàng (40 - 79h)</strong>
-                <div style="font-size: 11px;">Giảm 10% giá sân + 2 nước/tháng</div>
+                <strong>Hạng Vàng (40 - 79h)</strong>
+                <div style="font-size: 11px;">Giảm 10% giá sân</div>
               </div>
               <span class="badge badge-success">Hiện tại</span>
             </div>
 
             <div class="tier-benefit-item">
               <div>
-                <strong> Hạng Kim Cương (≥ 80h)</strong>
-                <div style="font-size: 11px; color: var(--cust-text-muted);">Giảm 15% trọn đời + Miễn phí vợt Yonex</div>
+                <strong>Hạng Kim Cương (≥ 80h)</strong>
+                <div style="font-size: 11px; color: var(--cust-text-muted);">Giảm 15% giá sân</div>
               </div>
               <span class="badge" style="background: #e0e7ff; color: #4338ca;">Mục tiêu</span>
             </div>
@@ -567,61 +566,61 @@
     <div>
       <div class="stats-card-grid">
         <div class="stat-mini-box">
-          <div style="font-size: 11px; color: var(--cust-text-muted); text-transform: uppercase; font-weight: 600;">Điểm Thưởng Khả Dụng</div>
-          <div class="stat-num" style="color: var(--cust-primary-hover);">1.250 <span style="font-size: 13px; font-weight: normal;">pts</span></div>
-          <div style="font-size: 11px; color: var(--cust-text-muted);">1.000đ tiêu dùng = 1 điểm</div>
+          <div style="font-size: 11px; color: var(--cust-text-muted); text-transform: uppercase; font-weight: 600;">Điểm Tích Lũy</div>
+          <div class="stat-num" style="color: var(--cust-primary-hover);" id="profPoints">0 <span style="font-size: 13px; font-weight: normal;">pts</span></div>
+          <div style="font-size: 11px; color: var(--cust-text-muted);">1.000đ = 1 điểm</div>
         </div>
 
         <div class="stat-mini-box">
-          <div style="font-size: 11px; color: var(--cust-text-muted); text-transform: uppercase; font-weight: 600;">Tổng Giờ Đã Chơi</div>
-          <div class="stat-num" style="color: var(--cust-text-main);">48 <span style="font-size: 13px; font-weight: normal;">giờ</span></div>
-          <div style="font-size: 11px; color: var(--cust-text-muted);">Tương đương 26 trận đấu</div>
+          <div style="font-size: 11px; color: var(--cust-text-muted); text-transform: uppercase; font-weight: 600;">Tổng Giờ Chơi</div>
+          <div class="stat-num" style="color: var(--cust-text-main);" id="profHours">0 <span style="font-size: 13px; font-weight: normal;">giờ</span></div>
+          <div style="font-size: 11px; color: var(--cust-text-muted);" id="profBookingCount">0 lượt đặt sân</div>
         </div>
 
         <div class="stat-mini-box">
-          <div style="font-size: 11px; color: var(--cust-text-muted); text-transform: uppercase; font-weight: 600;">Tiết Kiệm Ưu Đãi Thẻ</div>
-          <div class="stat-num" style="color: #059669;">1.250.000 <span style="font-size: 13px; font-weight: normal;">đ</span></div>
-          <div style="font-size: 11px; color: var(--cust-text-muted);">Chiết khấu hạng thẻ Vàng 10%</div>
+          <div style="font-size: 11px; color: var(--cust-text-muted); text-transform: uppercase; font-weight: 600;">Tiết Kiệm Ưu Đãi</div>
+          <div class="stat-num" style="color: #059669;" id="profSavings">0 <span style="font-size: 13px; font-weight: normal;">đ</span></div>
+          <div style="font-size: 11px; color: var(--cust-text-muted);" id="profSavingsDesc">Chiết khấu theo hạng thẻ</div>
         </div>
 
         <div class="stat-mini-box">
           <div style="font-size: 11px; color: var(--cust-text-muted); text-transform: uppercase; font-weight: 600;">Giải Đấu Tham Gia</div>
-          <div class="stat-num" style="color: #2563eb;">2 <span style="font-size: 13px; font-weight: normal;">giải</span></div>
-          <div style="font-size: 11px; color: var(--cust-text-muted);">Hạng Ba UTE Cup 2025</div>
+          <div class="stat-num" style="color: #2563eb;" id="profTournaments">0 <span style="font-size: 13px; font-weight: normal;">giải</span></div>
+          <div style="font-size: 11px; color: var(--cust-text-muted);">Giải đấu CLB</div>
         </div>
       </div>
 
       <!-- Edit Profile Form -->
       <div class="section-card">
         <div class="card-header">
-          <div class="card-title">Cập Nhật Thông Tin Cá Nhân</div>
+          <div class="card-title">Thông Tin Cá Nhân</div>
         </div>
         <div class="card-body">
           <form onsubmit="handleProfileUpdate(event)">
             <div class="form-row">
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label">Họ và Tên</label>
-                <input type="text" class="form-control" id="profName" value="Nguyễn Văn An" required>
+                <input type="text" class="form-control" id="profName" value="" placeholder="Họ và tên thành viên" required>
               </div>
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label">Số Điện Thoại</label>
-                <input type="text" class="form-control" id="profPhone" value="0912345678" readonly style="background: #f1f5f9; cursor: not-allowed;">
+                <input type="text" class="form-control" id="profPhone" value="" placeholder="Số điện thoại" required>
               </div>
             </div>
 
             <div class="form-row" style="margin-top: 12px;">
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label">Email Nhận Hóa Đơn & Vé QR</label>
-                <input type="email" class="form-control" id="profEmail" value="nguyenvanan.ute@gmail.com" required>
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="profEmail" value="" placeholder="email@example.com">
               </div>
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label">Ngày Sinh</label>
-                <input type="date" class="form-control" id="profBirth" value="2002-08-15">
+                <label class="form-label">Mã Hội Viên</label>
+                <input type="text" class="form-control" id="profCode" value="" readonly style="background: var(--surface-subtle); cursor: not-allowed;">
               </div>
             </div>
 
             <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--cust-border);">
-              <div style="font-size: 12.5px; font-weight: 700; margin-bottom: 8px;">Đổi Mật Khẩu (Để trống nếu không đổi)</div>
+              <div style="font-size: 12.5px; font-weight: 700; margin-bottom: 8px;">Đổi Mật Khẩu (Tùy chọn)</div>
               <div class="form-row">
                 <div class="form-group" style="margin-bottom: 0;">
                   <label class="form-label">Mật khẩu mới</label>
@@ -636,7 +635,7 @@
 
             <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
               <button type="submit" class="btn btn-primary" style="height: 38px; padding: 0 20px; font-weight: 600; border-radius: 6px;">
-                Lưu Thay Đổi Hồ Sơ
+                Lưu Thay Đổi
               </button>
             </div>
           </form>
@@ -646,43 +645,22 @@
       <!-- Point History Table -->
       <div class="section-card">
         <div class="card-header">
-          <div class="card-title">Lịch Sử Biến Động Điểm Thưởng</div>
-          <span style="font-size: 11.5px; color: var(--cust-text-muted);">Giao dịch gần đây</span>
+          <div class="card-title">Lịch Sử Hoạt Động & Đặt Sân</div>
+          <span style="font-size: 11.5px; color: var(--cust-text-muted);">Dữ liệu hệ thống</span>
         </div>
         <div class="table-container">
           <table class="clean-table">
             <thead>
               <tr>
                 <th>Ngày</th>
-                <th>Hoạt Động</th>
-                <th>Mã Đơn / Sự Kiện</th>
-                <th style="text-align: right;">Biến Động</th>
+                <th>Hoạt Động / Sân</th>
+                <th>Mã Đơn Đặt</th>
+                <th style="text-align: right;">Điểm & Chi Phí</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="profTransactionBody">
               <tr>
-                <td>20/09/2026</td>
-                <td>Tích điểm đặt sân 2 giờ</td>
-                <td><span style="font-family: monospace;">BK-20260920-1192</span></td>
-                <td style="text-align: right; color: var(--cust-primary-hover); font-weight: 700;">+350 pts</td>
-              </tr>
-              <tr>
-                <td>15/09/2026</td>
-                <td>Đánh giá chất lượng sân 5 sao</td>
-                <td>Đánh giá dịch vụ</td>
-                <td style="text-align: right; color: var(--cust-primary-hover); font-weight: 700;">+50 pts</td>
-              </tr>
-              <tr>
-                <td>01/09/2026</td>
-                <td>Đổi voucher giảm giá 50.000đ</td>
-                <td>VOUCHER-50K</td>
-                <td style="text-align: right; color: #dc2626; font-weight: 700;">-500 pts</td>
-              </tr>
-              <tr>
-                <td>15/08/2026</td>
-                <td>Quà tặng sinh nhật Hội viên Vàng</td>
-                <td>Quà sinh nhật CLB</td>
-                <td style="text-align: right; color: var(--cust-accent); font-weight: 700;">+300 pts</td>
+                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">Đang tải lịch sử hoạt động...</td>
               </tr>
             </tbody>
           </table>
@@ -692,43 +670,206 @@
   </div>
 
   <script>
+    // Strict member auth guard: Must be logged in to access profile
+    const token = localStorage.getItem('jwt_token');
+    const rawUser = localStorage.getItem('utesport_user');
+    if (!token && !rawUser) {
+      window.location.href = '/customer/auth?redirect=' + encodeURIComponent(window.location.pathname);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-      const raw = localStorage.getItem('utesport_user');
-      if (raw) {
-        try {
-          const user = JSON.parse(raw);
-          if (user.fullName) {
-            document.querySelectorAll('.card-holder-name').forEach(el => el.textContent = user.fullName.toUpperCase());
-            const profName = document.getElementById('profName');
-            if (profName) profName.value = user.fullName;
-          }
-          if (user.phone || user.username) {
-            const profPhone = document.getElementById('profPhone');
-            if (profPhone) profPhone.value = user.phone || user.username;
-          }
-          if (user.email) {
-            const profEmail = document.getElementById('profEmail');
-            if (profEmail) profEmail.value = user.email;
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      }
+      loadProfileData();
     });
 
-    function handleProfileUpdate(e) {
-      e.preventDefault();
-      const name = document.getElementById('profName').value;
+    async function loadProfileData() {
+      const curToken = localStorage.getItem('jwt_token');
+      try {
+        const res = await fetch('/api/customer/profile', {
+          headers: curToken ? { 'Authorization': 'Bearer ' + curToken } : {}
+        });
+
+        if (res.status === 401) {
+          window.location.href = '/customer/auth?redirect=/customer/profile';
+          return;
+        }
+
+        if (res.ok) {
+          const data = await res.json();
+          renderProfileData(data);
+        } else {
+          fallbackRenderFromStorage();
+        }
+      } catch (err) {
+        console.warn('Lỗi kết nối API profile, tải bộ nhớ đệm:', err);
+        fallbackRenderFromStorage();
+      }
+    }
+
+    function renderProfileData(data) {
+      if (!data) return;
+
+      // Card
+      const name = (data.fullName || 'Thành Viên UTE').toUpperCase();
+      document.querySelectorAll('.card-holder-name').forEach(el => el.textContent = name);
+      const cardNum = document.getElementById('profCardNumber');
+      if (cardNum) cardNum.textContent = data.cardNumber || 'MB • 8892 • 1024 • 9988';
+      const tierEl = document.getElementById('profCardTier');
+      if (tierEl) tierEl.textContent = 'Hạng ' + (data.membershipTier || 'Đồng');
+      const joinEl = document.getElementById('profJoinDate');
+      if (joinEl) joinEl.textContent = data.joinDate || '---';
+
+      // Stats
+      const pts = document.getElementById('profPoints');
+      if (pts) pts.innerHTML = Number(data.rewardPoints || 0).toLocaleString('vi-VN') + ' <span style="font-size: 13px; font-weight: normal;">pts</span>';
+      const hrs = document.getElementById('profHours');
+      if (hrs) hrs.innerHTML = (data.totalPlayHours || 0) + ' <span style="font-size: 13px; font-weight: normal;">giờ</span>';
+      const bCount = document.getElementById('profBookingCount');
+      if (bCount) bCount.textContent = (data.bookingCount || 0) + ' lượt đặt sân';
+      const sav = document.getElementById('profSavings');
+      if (sav) sav.innerHTML = Number(data.savings || 0).toLocaleString('vi-VN') + ' <span style="font-size: 13px; font-weight: normal;">đ</span>';
+      const tourn = document.getElementById('profTournaments');
+      if (tourn) tourn.innerHTML = (data.tournamentCount || 0) + ' <span style="font-size: 13px; font-weight: normal;">giải</span>';
+
+      // Tier progress calculation
+      const hoursNum = Number(data.totalPlayHours || 0);
+      let nextTier = 'Bạc';
+      let targetHours = 20;
+      if (hoursNum >= 80) {
+        nextTier = 'Kim Cương (Tối đa)';
+        targetHours = 80;
+      } else if (hoursNum >= 40) {
+        nextTier = 'Kim Cương';
+        targetHours = 80;
+      } else if (hoursNum >= 20) {
+        nextTier = 'Vàng';
+        targetHours = 40;
+      }
+
+      const pct = Math.min(100, Math.round((hoursNum / targetHours) * 100));
+      const progTitle = document.getElementById('profTierProgressTitle');
+      if (progTitle) progTitle.textContent = `Tiến Trình Lên Hạng ${nextTier}`;
+      const progLabel = document.getElementById('profTierProgressLabel');
+      if (progLabel) progLabel.textContent = `${hoursNum} / ${targetHours} Giờ (${pct}%)`;
+      const progFill = document.getElementById('profTierProgressFill');
+      if (progFill) progFill.style.width = pct + '%';
+      const progDesc = document.getElementById('profTierProgressDesc');
+      if (progDesc) {
+        const remain = Math.max(0, targetHours - hoursNum);
+        progDesc.innerHTML = remain > 0 
+          ? `Cần thêm <strong>${remain} giờ</strong> để đạt <strong>Hạng ${nextTier}</strong>.`
+          : `Đã đạt hạng thành viên cao nhất.`;
+      }
+
+      // Ladder active state
+      const items = document.querySelectorAll('.tier-benefit-item');
+      items.forEach(it => it.classList.remove('current'));
+      const tierLower = (data.membershipTier || '').toLowerCase();
+      if (tierLower.includes('kim cương') && items[3]) items[3].classList.add('current');
+      else if (tierLower.includes('vàng') && items[2]) items[2].classList.add('current');
+      else if (tierLower.includes('bạc') && items[1]) items[1].classList.add('current');
+      else if (items[0]) items[0].classList.add('current');
+
+      // Form
+      const pName = document.getElementById('profName');
+      if (pName) pName.value = data.fullName || '';
+      const pPhone = document.getElementById('profPhone');
+      if (pPhone) pPhone.value = data.phone || '';
+      const pEmail = document.getElementById('profEmail');
+      if (pEmail) pEmail.value = data.email || '';
+      const pCode = document.getElementById('profCode');
+      if (pCode) pCode.value = data.customerCode || '';
+
+      // Recent Bookings / Point Transactions
+      const tBody = document.getElementById('profTransactionBody');
+      if (tBody) {
+        if (!data.recentBookings || data.recentBookings.length === 0) {
+          tBody.innerHTML = `
+            <tr>
+              <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                Chưa có lịch sử đặt sân nào. Hãy <a href="/customer/booking" style="color: var(--primary); font-weight: 700;">đặt sân ngay</a> để tích điểm thành viên!
+              </td>
+            </tr>
+          `;
+        } else {
+          tBody.innerHTML = data.recentBookings.slice(0, 8).map(b => {
+            const price = Number(b.totalPrice || 0);
+            const pointsEarned = Math.floor(price / 1000);
+            return `
+              <tr>
+                <td>${b.bookingDate || '---'}</td>
+                <td><strong>${b.courtCode || 'Sân CLB'}</strong> (${b.timeSlot || ''})</td>
+                <td><span style="font-family: monospace; font-weight: 600;">${b.bookingCode}</span></td>
+                <td style="text-align: right; color: var(--cust-primary-hover); font-weight: 700;">
+                  +${pointsEarned} pts <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">(${price.toLocaleString('vi-VN')}đ)</span>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+      }
+    }
+
+    function fallbackRenderFromStorage() {
       const raw = localStorage.getItem('utesport_user');
       if (raw) {
         try {
           const user = JSON.parse(raw);
-          user.fullName = name;
-          localStorage.setItem('utesport_user', JSON.stringify(user));
-        } catch(e) {}
+          renderProfileData({
+            fullName: user.fullName || 'Khách Hàng',
+            phone: user.phone || user.username || '',
+            email: user.email || '',
+            membershipTier: 'Đồng',
+            rewardPoints: 100,
+            totalPlayHours: 2,
+            savings: 20000,
+            joinDate: '10/2026',
+            tournamentCount: 0,
+            bookingCount: 1,
+            recentBookings: []
+          });
+        } catch (e) {}
       }
-      document.querySelectorAll('.card-holder-name').forEach(el => el.textContent = name.toUpperCase());
-      showToast('Đã cập nhật thông tin hồ sơ cho ' + name + ' thành công!', 'success');
+    }
+
+    async function handleProfileUpdate(e) {
+      e.preventDefault();
+      const name = document.getElementById('profName').value.trim();
+      const phone = document.getElementById('profPhone').value.trim();
+      const email = document.getElementById('profEmail').value.trim();
+      const curToken = localStorage.getItem('jwt_token');
+
+      try {
+        const res = await fetch('/api/customer/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(curToken ? { 'Authorization': 'Bearer ' + curToken } : {})
+          },
+          body: JSON.stringify({ fullName: name, phone: phone, email: email })
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          const raw = localStorage.getItem('utesport_user');
+          if (raw) {
+            try {
+              const u = JSON.parse(raw);
+              u.fullName = name;
+              u.phone = phone;
+              u.email = email;
+              localStorage.setItem('utesport_user', JSON.stringify(u));
+            } catch (err) {}
+          }
+          if (window.showToast) showToast('Đã lưu thông tin hồ sơ cho ' + name + ' thành công!', 'success');
+          else alert('Đã lưu thông tin hồ sơ thành công!');
+          loadProfileData();
+        } else {
+          if (window.showToast) showToast(result.message || 'Cập nhật thất bại!', 'warning');
+          else alert(result.message || 'Cập nhật thất bại!');
+        }
+      } catch (err) {
+        console.error('Lỗi cập nhật hồ sơ:', err);
+        showToast('Lỗi khi gửi yêu cầu cập nhật hồ sơ!', 'error');
+      }
     }
   </script>
   
@@ -797,6 +938,7 @@
   </footer>
 
   <script src="/js/global-hub.js"></script>
+  <script src="/js/auth-guard.js"></script>
 </body>
 </html>
 

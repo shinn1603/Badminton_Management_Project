@@ -8,14 +8,44 @@
   <script src="/js/auth-guard.js"></script>
   <script src="/js/global-hub.js"></script>
   <style>
-    .schedule-table {
+    .schedule-scroll-wrapper {
       width: 100%;
-      border-collapse: collapse;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg, 12px);
+      background: var(--surface);
+      margin-bottom: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary) var(--surface-subtle);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .schedule-scroll-wrapper::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .schedule-scroll-wrapper::-webkit-scrollbar-track {
+      background: var(--surface-subtle);
+      border-radius: 4px;
+    }
+
+    .schedule-scroll-wrapper::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+
+    .schedule-table {
+      min-width: 1140px;
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
       table-layout: fixed;
     }
 
     .schedule-table th, .schedule-table td {
-      border: 1px solid var(--border-subtle);
+      border-right: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
       padding: 10px 8px;
       text-align: center;
       vertical-align: top;
@@ -26,6 +56,24 @@
       font-weight: 700;
       font-size: 13px;
       color: var(--text-dark);
+      min-width: 145px;
+    }
+
+    .schedule-table th:first-child,
+    .schedule-table td:first-child {
+      width: 125px;
+      min-width: 125px;
+      max-width: 125px;
+      position: sticky;
+      left: 0;
+      background: var(--surface-subtle);
+      z-index: 3;
+      box-shadow: 2px 0 6px rgba(0, 0, 0, 0.06);
+      border-left: none;
+    }
+
+    .schedule-table th:first-child {
+      z-index: 4;
     }
 
     .schedule-cell {
@@ -289,7 +337,7 @@
             <span>Thêm Nhân Viên</span>
           </button>
 
-          <div class="user-pill-header" onclick="window.location.href='/login'">
+          <div class="user-pill-header">
             <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;">QL</div>
             <div style="font-size: 12.5px; font-weight: 600; color: var(--text-dark);">Quản lý cơ sở</div>
           </div>
@@ -380,11 +428,11 @@
             </div>
           </div>
 
-          <div class="table-container" style="overflow-x: auto;">
+          <div class="schedule-scroll-wrapper">
             <table class="schedule-table">
               <thead>
                 <tr>
-                  <th style="width: 110px;">Ca Trực</th>
+                  <th style="width: 125px;">Ca Trực</th>
                   <th>Thứ Hai (28/09)</th>
                   <th>Thứ Ba (29/09)</th>
                   <th>Thứ Tư (30/09)</th>
@@ -529,11 +577,11 @@
         <div class="form-group">
           <label class="form-label">Vai trò đảm nhiệm trong ca</label>
           <select class="form-control" id="inpShiftStaffDuty">
-            <option value="POS|🏸">Thu ngân POS quầy</option>
-            <option value="Thu ngân|💰">Thu ngân quầy</option>
-            <option value="Lễ tân|✨">Lễ tân & Đón khách</option>
-            <option value="Kỹ thuật|⚙️">Kỹ thuật & Mặt sân</option>
-            <option value="Quản lý|👑">Quản lý ca trực</option>
+            <option value="POS|POS">Thu ngân POS quầy</option>
+            <option value="Thu ngân|CASH">Thu ngân quầy</option>
+            <option value="Lễ tân|REC">Lễ tân & Đón khách</option>
+            <option value="Kỹ thuật|TECH">Kỹ thuật & Mặt sân</option>
+            <option value="Quản lý|MGR">Quản lý ca trực</option>
           </select>
         </div>
       </div>
@@ -574,32 +622,32 @@
 
     const DEFAULT_SCHEDULE = {
       mon: {
-        morning: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: '⚙️' } ],
-        night: [ { staffId: 'NV-03', duty: 'Lễ tân', icon: '✨' }, { staffId: 'NV-01', duty: 'Quản lý', icon: '👑' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: '⚙️' } ]
+        morning: [ { staffId: 'NV-02', duty: 'POS', icon: 'POS' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: 'TECH' } ],
+        night: [ { staffId: 'NV-03', duty: 'Lễ tân', icon: 'REC' }, { staffId: 'NV-01', duty: 'Quản lý', icon: 'MGR' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: 'TECH' } ]
       },
       tue: {
-        morning: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-04', duty: 'Thu ngân', icon: '💰' } ],
-        night: [ { staffId: 'NV-03', duty: 'Lễ tân', icon: '✨' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: '⚙️' } ]
+        morning: [ { staffId: 'NV-02', duty: 'POS', icon: 'POS' }, { staffId: 'NV-04', duty: 'Thu ngân', icon: 'CASH' } ],
+        night: [ { staffId: 'NV-03', duty: 'Lễ tân', icon: 'REC' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: 'TECH' } ]
       },
       wed: {
-        morning: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: '⚙️' } ],
-        night: [ { staffId: 'NV-03', duty: 'Lễ tân', icon: '✨' }, { staffId: 'NV-01', duty: 'Quản lý', icon: '👑' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: '⚙️' } ]
+        morning: [ { staffId: 'NV-02', duty: 'POS', icon: 'POS' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: 'TECH' } ],
+        night: [ { staffId: 'NV-03', duty: 'Lễ tân', icon: 'REC' }, { staffId: 'NV-01', duty: 'Quản lý', icon: 'MGR' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: 'TECH' } ]
       },
       thu: {
-        morning: [ { staffId: 'NV-04', duty: 'Thu ngân', icon: '💰' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: '⚙️' } ],
-        night: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: '⚙️' } ]
+        morning: [ { staffId: 'NV-04', duty: 'Thu ngân', icon: 'CASH' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: 'TECH' } ],
+        night: [ { staffId: 'NV-02', duty: 'POS', icon: 'POS' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: 'TECH' } ]
       },
       fri: {
-        morning: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-04', duty: 'Thu ngân', icon: '💰' } ],
-        night: [ { staffId: 'NV-03', duty: 'Lễ tân', icon: '✨' }, { staffId: 'NV-01', duty: 'Quản lý', icon: '👑' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: '⚙️' } ]
+        morning: [ { staffId: 'NV-02', duty: 'POS', icon: 'POS' }, { staffId: 'NV-04', duty: 'Thu ngân', icon: 'CASH' } ],
+        night: [ { staffId: 'NV-03', duty: 'Lễ tân', icon: 'REC' }, { staffId: 'NV-01', duty: 'Quản lý', icon: 'MGR' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: 'TECH' } ]
       },
       sat: {
-        morning: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: '⚙️' }, { staffId: 'NV-03', duty: 'Lễ tân', icon: '✨' } ],
-        night: [ { staffId: 'NV-04', duty: 'Thu ngân', icon: '💰' }, { staffId: 'NV-01', duty: 'Quản lý', icon: '👑' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: '⚙️' } ]
+        morning: [ { staffId: 'NV-02', duty: 'POS', icon: 'POS' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: 'TECH' }, { staffId: 'NV-03', duty: 'Lễ tân', icon: 'REC' } ],
+        night: [ { staffId: 'NV-04', duty: 'Thu ngân', icon: 'CASH' }, { staffId: 'NV-01', duty: 'Quản lý', icon: 'MGR' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: 'TECH' } ]
       },
       sun: {
-        morning: [ { staffId: 'NV-04', duty: 'Thu ngân', icon: '💰' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: '⚙️' }, { staffId: 'NV-03', duty: 'Lễ tân', icon: '✨' } ],
-        night: [ { staffId: 'NV-02', duty: 'POS', icon: '🏸' }, { staffId: 'NV-01', duty: 'Quản lý', icon: '👑' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: '⚙️' } ]
+        morning: [ { staffId: 'NV-04', duty: 'Thu ngân', icon: 'CASH' }, { staffId: 'NV-06', duty: 'Kỹ thuật', icon: 'TECH' }, { staffId: 'NV-03', duty: 'Lễ tân', icon: 'REC' } ],
+        night: [ { staffId: 'NV-02', duty: 'POS', icon: 'POS' }, { staffId: 'NV-01', duty: 'Quản lý', icon: 'MGR' }, { staffId: 'NV-05', duty: 'Kỹ thuật', icon: 'TECH' } ]
       }
     };
 
@@ -616,6 +664,52 @@
 
     function getStaffById(id) {
       return staffList.find(s => s.id === id);
+    }
+
+    // ==========================================
+    // BACKEND API INTEGRATION
+    // ==========================================
+    async function loadStaffAndScheduleData() {
+      try {
+        const res = await fetch('/api/staff?branchCode=CN01');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            staffList = data.map(s => {
+              const nameParts = (s.fullName || '').trim().split(' ');
+              const shortName = nameParts.length > 0 ? nameParts[nameParts.length - 1] : s.fullName;
+              return {
+                id: s.staffCode,
+                name: s.fullName,
+                shortName: shortName,
+                role: s.position,
+                phone: s.phone,
+                email: s.email || '',
+                status: s.status || 'Đang làm việc'
+              };
+            });
+            localStorage.setItem('branch_staff_list', JSON.stringify(staffList));
+          }
+        }
+      } catch (e) {
+        console.warn('API staff fallback to local cache');
+      }
+
+      try {
+        const res = await fetch('/api/shifts/week?branchCode=CN01');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.schedule) {
+            shiftSchedule = data.schedule;
+            localStorage.setItem('branch_shift_schedule', JSON.stringify(shiftSchedule));
+          }
+        }
+      } catch (e) {
+        console.warn('API shifts fallback to local cache');
+      }
+
+      renderShiftMatrix();
+      renderStaffTable();
     }
 
     // ==========================================
@@ -651,7 +745,6 @@
             const staff = getStaffById(item.staffId);
             const displayName = staff ? staff.shortName : item.staffId;
             const dutyText = item.duty || 'Trực';
-            const icon = item.icon || '🏸';
 
             const nightClass = shift.isNight ? 'shift-night' : '';
             const todayStyle = (isToday && !shift.isNight && idx === 0) ? 'border: 2px solid var(--primary);' : (isToday && shift.isNight && idx === 0) ? 'border: 2px solid #2563eb;' : '';
@@ -665,9 +758,9 @@
 
             html += `
               <div class="staff-badge-shift ${nightClass}" style="${todayStyle}" title="${staff ? staff.name : ''}">
-                <div style="display: flex; align-items: center; gap: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                  <span>${displayName} (${dutyText})</span>
-                  <span>${icon}</span>
+                <div style="display: flex; align-items: center; gap: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <span>${displayName}</span>
+                  <span style="font-size: 10px; opacity: 0.85; font-weight: 600;">[${dutyText}]</span>
                 </div>
                 <div style="display: flex; align-items: center;">
                   ${todayTag}
@@ -812,10 +905,10 @@
       const staff = getStaffById(staffId);
       const dutySelect = document.getElementById('inpShiftStaffDuty');
       if (staff && dutySelect) {
-        if (staff.role.includes('Thu ngân')) dutySelect.value = 'POS|🏸';
-        else if (staff.role.includes('Lễ tân')) dutySelect.value = 'Lễ tân|✨';
-        else if (staff.role.includes('Kỹ thuật')) dutySelect.value = 'Kỹ thuật|⚙️';
-        else if (staff.role.includes('Quản lý')) dutySelect.value = 'Quản lý|👑';
+        if (staff.role.includes('Thu ngân')) dutySelect.value = 'POS|POS';
+        else if (staff.role.includes('Lễ tân')) dutySelect.value = 'Lễ tân|REC';
+        else if (staff.role.includes('Kỹ thuật')) dutySelect.value = 'Kỹ thuật|TECH';
+        else if (staff.role.includes('Quản lý')) dutySelect.value = 'Quản lý|MGR';
       }
     }
 
@@ -823,7 +916,7 @@
       document.getElementById('assignShiftModal').classList.remove('open');
     }
 
-    function confirmAssignShift() {
+    async function confirmAssignShift() {
       const day = document.getElementById('inpShiftDay').value;
       const shift = document.getElementById('inpShiftType').value;
       const staffId = document.getElementById('inpShiftStaffSelect').value;
@@ -837,11 +930,35 @@
       if (!shiftSchedule[day]) shiftSchedule[day] = { morning: [], night: [] };
       if (!shiftSchedule[day][shift]) shiftSchedule[day][shift] = [];
 
-      // Check if already assigned to this exact shift
       const exists = shiftSchedule[day][shift].some(item => item.staffId === staffId);
       if (exists) {
         showToast('Nhân viên này đã có tên trong ca trực được chọn!', 'warning');
         return;
+      }
+
+      try {
+        const res = await fetch('/api/shifts/assign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            day,
+            shift,
+            staffCode: staffId,
+            duty,
+            icon: icon || 'POS',
+            branchCode: 'CN01'
+          })
+        });
+        if (res.ok) {
+          await loadStaffAndScheduleData();
+          closeAssignShiftModal();
+          const staff = getStaffById(staffId);
+          const staffName = staff ? staff.name : staffId;
+          showToast(`Đã phân công ${staffName} vào ca trực thành công!`, 'success');
+          return;
+        }
+      } catch (err) {
+        console.warn('API assign fallback to local');
       }
 
       shiftSchedule[day][shift].push({ staffId, duty, icon });
@@ -854,11 +971,26 @@
       showToast(`Đã phân công ${staffName} vào ca trực thành công!`, 'success');
     }
 
-    function removeStaffFromShift(day, shift, staffId) {
+    async function removeStaffFromShift(day, shift, staffId) {
       if (!shiftSchedule[day] || !shiftSchedule[day][shift]) return;
       
       const staff = getStaffById(staffId);
       const staffName = staff ? staff.name : staffId;
+
+      try {
+        const res = await fetch('/api/shifts/remove', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ day, shift, staffCode: staffId })
+        });
+        if (res.ok) {
+          await loadStaffAndScheduleData();
+          showToast(`Đã gỡ ${staffName} khỏi ca trực!`, 'info');
+          return;
+        }
+      } catch (err) {
+        console.warn('API remove shift fallback to local');
+      }
 
       shiftSchedule[day][shift] = shiftSchedule[day][shift].filter(item => item.staffId !== staffId);
       saveState();
@@ -866,13 +998,40 @@
       showToast(`Đã gỡ ${staffName} khỏi ca trực!`, 'info');
     }
 
-    function saveShiftSchedule() {
+    async function saveShiftSchedule() {
       saveState();
+      try {
+        const res = await fetch('/api/shifts/week/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ schedule: shiftSchedule, branchCode: 'CN01' })
+        });
+        if (res.ok) {
+          showToast('Đã lưu và đồng bộ lịch ca trực tuần lên hệ thống thành công!', 'success');
+          return;
+        }
+      } catch (err) {
+        console.warn('API save schedule fallback');
+      }
       showToast('Đã lưu và áp dụng lịch ca trực tuần chi nhánh thành công!', 'success');
     }
 
-    function resetScheduleToDefault() {
+    async function resetScheduleToDefault() {
       if (!confirm('Khôi phục lại phân ca trực tuần mặc định? Các chỉnh sửa phân ca hiện tại sẽ được cài lại.')) return;
+      try {
+        const res = await fetch('/api/shifts/week/reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ branchCode: 'CN01' })
+        });
+        if (res.ok) {
+          await loadStaffAndScheduleData();
+          showToast('Đã cài lại lịch phân ca trực mặc định từ hệ thống!', 'info');
+          return;
+        }
+      } catch (err) {
+        console.warn('API reset schedule fallback');
+      }
       shiftSchedule = JSON.parse(JSON.stringify(DEFAULT_SCHEDULE));
       saveState();
       renderShiftMatrix();
@@ -901,7 +1060,6 @@
       } else {
         document.getElementById('modalTitle').innerText = 'Thêm nhân sự mới vào chi nhánh';
         idxInput.value = '-1';
-        // Auto suggest next code
         const nextNum = staffList.length + 1;
         document.getElementById('inpStaffCode').value = 'NV-0' + nextNum;
         document.getElementById('inpStaffCode').disabled = false;
@@ -918,7 +1076,7 @@
       document.getElementById('staffModal').classList.remove('open');
     }
 
-    function saveStaff() {
+    async function saveStaff() {
       const editId = document.getElementById('editStaffIndex').value;
       const code = document.getElementById('inpStaffCode').value.trim();
       const name = document.getElementById('inpStaffName').value.trim();
@@ -940,12 +1098,34 @@
         return;
       }
 
-      // Compute short name for badges
       const nameParts = name.split(' ');
       const shortName = nameParts[nameParts.length - 1];
 
+      try {
+        const res = await fetch('/api/staff', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            staffCode: code,
+            branchCode: 'CN01',
+            fullName: name,
+            position: role,
+            phone: phone,
+            email: email || `${code.toLowerCase()}@utesport.vn`,
+            status: status
+          })
+        });
+        if (res.ok) {
+          await loadStaffAndScheduleData();
+          closeStaffModal();
+          showToast(`Đã lưu hồ sơ nhân viên ${name} (${code}) thành công!`, 'success');
+          return;
+        }
+      } catch (err) {
+        console.warn('API save staff fallback to local');
+      }
+
       if (editId !== '-1') {
-        // Edit existing staff
         const staff = getStaffById(editId);
         if (staff) {
           staff.name = name;
@@ -957,7 +1137,6 @@
         }
         showToast(`Đã cập nhật hồ sơ nhân viên ${name} (${code})!`, 'success');
       } else {
-        // Check duplicate code
         if (getStaffById(code)) {
           showToast(`Mã nhân viên ${code} đã tồn tại! Vui lòng chọn mã khác.`, 'warning');
           return;
@@ -980,17 +1159,28 @@
       closeStaffModal();
     }
 
-    function deleteStaff(staffId) {
+    async function deleteStaff(staffId) {
       const staff = getStaffById(staffId);
       if (!staff) return;
 
       const confirmMsg = `Bạn có chắc chắn muốn xóa nhân viên "${staff.name}" (${staff.id})?\n\nNhân viên này cũng sẽ được gỡ khỏi tất cả các ca trực đã phân công trong tuần.`;
       if (!confirm(confirmMsg)) return;
 
-      // 1. Remove from staff list
-      staffList = staffList.filter(s => s.id !== staffId);
+      try {
+        const res = await fetch(`/api/staff/${encodeURIComponent(staffId)}`, {
+          method: 'DELETE'
+        });
+        if (res.ok) {
+          await loadStaffAndScheduleData();
+          showToast(`Đã xóa nhân viên ${staff.name} và cập nhật lại phân ca!`, 'success');
+          return;
+        }
+      } catch (err) {
+        console.warn('API delete staff fallback');
+      }
 
-      // 2. Prune from all shifts in schedule
+      // Local fallback
+      staffList = staffList.filter(s => s.id !== staffId);
       DAYS_ORDER.forEach(day => {
         if (shiftSchedule[day]) {
           if (shiftSchedule[day].morning) {
@@ -1012,8 +1202,7 @@
     // INITIALIZATION ON PAGE LOAD
     // ==========================================
     document.addEventListener('DOMContentLoaded', () => {
-      renderShiftMatrix();
-      renderStaffTable();
+      loadStaffAndScheduleData();
     });
   </script>
 </body>

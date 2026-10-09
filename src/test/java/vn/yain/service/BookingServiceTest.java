@@ -44,6 +44,9 @@ class BookingServiceTest {
     @Mock
     private CourtService courtService;
 
+    @Mock
+    private org.springframework.messaging.simp.SimpMessagingTemplate messagingTemplate;
+
     @InjectMocks
     private BookingService bookingService;
 
@@ -260,5 +263,24 @@ class BookingServiceTest {
         });
 
         assertTrue(ex.getMessage().contains("đang bảo trì"));
+    }
+
+    @Test
+    @DisplayName("WebSocket: Phat song su kien dat san qua kenh /topic/bookings")
+    void testWebSocketBroadcast_OnCreateBooking() {
+        Booking booking = new Booking();
+        booking.setBookingCode("DS_WS_TEST");
+        booking.setCourtCode("CL01");
+        booking.setBranchCode("CN01");
+        booking.setCustomerName("Khach Hang WS");
+        booking.setTotalPrice(new BigDecimal("100000"));
+
+        when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
+        when(courtRepository.findByCourtCode("CL01")).thenReturn(Optional.empty());
+
+        bookingService.createBooking(booking);
+
+        verify(messagingTemplate, atLeastOnce()).convertAndSend(eq("/topic/bookings"), any(Object.class));
+        verify(messagingTemplate, atLeastOnce()).convertAndSend(eq("/topic/notifications"), any(Object.class));
     }
 }
