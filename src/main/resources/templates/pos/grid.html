@@ -431,133 +431,145 @@
 
   <!-- MODAL POS, DỊCH VỤ & THANH TOÁN (MH-NVQ05, MH-NVQ06) -->
   <div class="modal-overlay" id="checkoutModal">
-    <div class="modal-container" style="max-width: 840px;">
-      <div class="modal-header">
-        <h3 class="modal-title">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary); display: inline-block; vertical-align: middle; margin-right: 6px;">
-            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-            <line x1="2" y1="10" x2="22" y2="10"></line>
-          </svg>
-          Quầy Dịch Vụ & Lập Hóa Đơn Thanh Toán POS
-        </h3>
-        <button class="modal-close-btn" onclick="closeCheckoutModal()">✕</button>
-      </div>
-      <div class="modal-body" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px;">
-        <!-- TARGET COURT SELECTION STRIP -->
-        <div style="grid-column: 1 / -1; background: var(--surface-subtle); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-          <div>
-            <span style="font-size: 11.5px; color: var(--text-muted);">Đối tượng phục vụ:</span>
-            <strong id="checkoutTargetLabel" style="display: block; font-size: 13.5px; color: var(--primary);">Khách lẻ tại quầy (Không tính tiền sân - 0 đ)</strong>
-          </div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <label style="font-size: 12px; color: var(--text-muted); margin: 0; white-space: nowrap;">Gán vào sân:</label>
-            <select id="checkoutCourtAssignSelect" class="form-control" style="width: auto; font-size: 12px; padding: 4px 8px;" onchange="onCheckoutCourtAssignChange(this.value)">
-              <option value="none">Bán lẻ mang đi (Tiền sân 0 đ)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- SAVE SERVICE NOTIFICATION BANNER -->
-        <div id="saveServiceAlert" style="display: none; grid-column: 1 / -1; background: rgba(16, 185, 129, 0.08); border: 1px solid #10b981; border-radius: 8px; padding: 10px 14px; align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; color: #10b981; flex-shrink: 0;">
-              <polyline points="20 6 9 17 4 12"></polyline>
+    <div class="modal-container" style="width: 95vw; max-width: 1280px; height: 92vh; max-height: 92vh; display: flex; flex-direction: column;">
+      <div class="modal-header" style="padding: 14px 24px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <h3 class="modal-title" style="margin: 0; font-size: 17px; display: flex; align-items: center; gap: 8px;">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary); width: 22px; height: 22px;">
+              <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+              <line x1="2" y1="10" x2="22" y2="10"></line>
             </svg>
-            <div>
-              <strong style="font-size: 13px; color: var(--text-dark);">Đã lưu dịch vụ vào sân thành công!</strong>
-              <div style="font-size: 12px; color: var(--text-muted);" id="saveServiceAlertDetail">Khách tiếp tục chơi. Đã đồng bộ hóa đơn cho toàn bộ khung giờ của khách.</div>
-            </div>
-          </div>
-          <div style="display: flex; gap: 8px; flex-shrink: 0;">
-            <button type="button" class="btn btn-xs btn-outline" style="background: var(--surface); border-color: #10b981; color: #059669; font-weight: 600; padding: 5px 12px;" onclick="continueAddingServices()">Tiếp tục gọi món</button>
-            <button type="button" class="btn btn-xs btn-primary" style="background: #10b981; border-color: #10b981; color: #ffffff; font-weight: 600; padding: 5px 12px;" onclick="closeCheckoutModal()">Đóng quầy (Về lưới)</button>
-          </div>
+            Quầy Dịch Vụ & Lập Hóa Đơn Thanh Toán POS
+          </h3>
+          <span class="badge badge-primary" style="font-size: 11px; padding: 3px 8px;">CSDL Trực Tuyến</span>
         </div>
+        <button class="modal-close-btn" onclick="closeCheckoutModal()" title="Đóng (Esc)">✕</button>
+      </div>
 
-        <!-- LEFT: TOUCHPAD PRODUCTS DYNAMIC FROM DB -->
-        <div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <label class="form-label" style="margin: 0; font-weight: 700;">Dịch Vụ & Sản Phẩm (Kho CSDL):</label>
-            <span style="font-size: 11px; color: var(--text-muted);" id="posProductCount">Đang tải CSDL...</span>
-          </div>
-
-          <!-- Product Search & Category Filters -->
-          <div style="margin-bottom: 8px;">
-            <input type="text" id="posProductSearch" class="form-control" placeholder="Tìm sản phẩm / ống cầu..." oninput="filterPosSearch(this.value)" style="padding: 6px 10px; font-size: 12px; margin-bottom: 6px;">
-            <div id="posCatPills" style="display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px;">
-              <button type="button" class="btn btn-xs btn-primary pos-cat-btn" data-cat="all" onclick="filterPosCat('all')">Tất cả</button>
-              <button type="button" class="btn btn-xs btn-outline pos-cat-btn" data-cat="Dụng cụ" onclick="filterPosCat('Dụng cụ')">Cầu & Vợt</button>
-              <button type="button" class="btn btn-xs btn-outline pos-cat-btn" data-cat="Nước giải khát" onclick="filterPosCat('Nước giải khát')">Nước uống</button>
-              <button type="button" class="btn btn-xs btn-outline pos-cat-btn" data-cat="Phụ kiện" onclick="filterPosCat('Phụ kiện')">Phụ kiện</button>
+      <div class="modal-body" style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; flex: 1; overflow: hidden; padding: 16px 24px;">
+        <!-- LEFT: TOUCHPAD PRODUCTS DYNAMIC FROM DB & CART -->
+        <div style="display: flex; flex-direction: column; height: 100%; overflow: hidden; gap: 10px;">
+          <!-- TARGET COURT SELECTION STRIP -->
+          <div style="background: var(--surface-subtle); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; flex-shrink: 0;">
+            <div>
+              <span style="font-size: 11.5px; color: var(--text-muted);">Đối tượng phục vụ:</span>
+              <strong id="checkoutTargetLabel" style="display: block; font-size: 13.5px; color: var(--primary);">Khách lẻ tại quầy (Không tính tiền sân - 0 đ)</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label style="font-size: 12px; color: var(--text-muted); margin: 0; white-space: nowrap;">Gán vào sân:</label>
+              <select id="checkoutCourtAssignSelect" class="form-control" style="width: auto; font-size: 12px; padding: 4px 8px;" onchange="onCheckoutCourtAssignChange(this.value)">
+                <option value="none">Bán lẻ mang đi (Tiền sân 0 đ)</option>
+              </select>
             </div>
           </div>
 
-          <!-- Dynamic Products Grid -->
-          <div id="posProductGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 4px; margin-bottom: 12px;">
-            <!-- Populated dynamically via loadDbProductsForPos() -->
+          <!-- SAVE SERVICE NOTIFICATION BANNER -->
+          <div id="saveServiceAlert" style="display: none; background: rgba(16, 185, 129, 0.08); border: 1px solid #10b981; border-radius: 8px; padding: 10px 14px; align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1); flex-shrink: 0;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; color: #10b981; flex-shrink: 0;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <div>
+                <strong style="font-size: 13px; color: var(--text-dark);">Đã lưu dịch vụ vào sân thành công!</strong>
+                <div style="font-size: 12px; color: var(--text-muted);" id="saveServiceAlertDetail">Khách tiếp tục chơi. Đã đồng bộ hóa đơn cho toàn bộ khung giờ của khách.</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; flex-shrink: 0;">
+              <button type="button" class="btn btn-xs btn-outline" style="background: var(--surface); border-color: #10b981; color: #059669; font-weight: 600; padding: 5px 12px;" onclick="continueAddingServices()">Tiếp tục gọi món</button>
+              <button type="button" class="btn btn-xs btn-primary" style="background: #10b981; border-color: #10b981; color: #ffffff; font-weight: 600; padding: 5px 12px;" onclick="closeCheckoutModal()">Đóng quầy (Về lưới)</button>
+            </div>
           </div>
 
-          <label class="form-label" style="font-weight: 700; margin-bottom: 6px;">Chi Tiết Dịch Vụ Đã Thêm:</label>
-          <div style="max-height: 160px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: 8px;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-              <thead style="background: var(--surface-subtle); position: sticky; top: 0;">
-                <tr>
-                  <th style="padding: 6px 8px; text-align: left;">Mục</th>
-                  <th style="padding: 6px 8px; text-align: center;">SL</th>
-                  <th style="padding: 6px 8px; text-align: right;">Đơn giá</th>
-                  <th style="padding: 6px 8px; text-align: right;">Tiền</th>
-                  <th style="padding: 6px 4px; text-align: center; width: 32px;"></th>
-                </tr>
-              </thead>
-              <tbody id="invoiceBody"></tbody>
-            </table>
+          <!-- Catalog Header + Search + Category Pills -->
+          <div style="flex-shrink: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label class="form-label" style="margin: 0; font-weight: 700; font-size: 12.5px;">Dịch Vụ & Sản Phẩm (Kho CSDL):</label>
+              <span style="font-size: 11px; color: var(--text-muted);" id="posProductCount">Đang tải CSDL...</span>
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+              <input type="text" id="posProductSearch" class="form-control" placeholder="Tìm sản phẩm / đồ uống / ống cầu..." oninput="filterPosSearch(this.value)" style="flex: 1; padding: 6px 12px; font-size: 12px;">
+              <div id="posCatPills" style="display: flex; gap: 4px; flex-shrink: 0;">
+                <button type="button" class="btn btn-xs btn-primary pos-cat-btn" data-cat="all" onclick="filterPosCat('all')">Tất cả</button>
+                <button type="button" class="btn btn-xs btn-outline pos-cat-btn" data-cat="Dụng cụ" onclick="filterPosCat('Dụng cụ')">Cầu & Vợt</button>
+                <button type="button" class="btn btn-xs btn-outline pos-cat-btn" data-cat="Nước giải khát" onclick="filterPosCat('Nước giải khát')">Nước uống</button>
+                <button type="button" class="btn btn-xs btn-outline pos-cat-btn" data-cat="Phụ kiện" onclick="filterPosCat('Phụ kiện')">Phụ kiện</button>
+              </div>
+            </div>
+
+            <!-- Dynamic Products Grid: responsive auto-fill -->
+            <div id="posProductGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; max-height: 220px; overflow-y: auto; padding-right: 4px;">
+              <!-- Populated dynamically via loadDbProductsForPos() -->
+            </div>
+          </div>
+
+          <!-- Added Items Table Section -->
+          <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 160px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-shrink: 0;">
+              <label class="form-label" style="font-weight: 700; margin: 0; font-size: 12.5px;">Chi Tiết Dịch Vụ Đã Thêm:</label>
+              <span style="font-size: 11px; color: var(--text-muted);">Bấm ✕ để bớt số lượng hoặc xóa món</span>
+            </div>
+            <div style="flex: 1; overflow-y: auto; overflow-x: hidden; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--surface);">
+              <table style="width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed;">
+                <thead style="background: var(--surface-subtle); position: sticky; top: 0; z-index: 2;">
+                  <tr>
+                    <th style="padding: 7px 10px; text-align: left; width: 44%;">Mục</th>
+                    <th style="padding: 7px 6px; text-align: center; width: 12%;">SL</th>
+                    <th style="padding: 7px 8px; text-align: right; width: 20%;">Đơn giá</th>
+                    <th style="padding: 7px 8px; text-align: right; width: 24%;">Tiền</th>
+                    <th style="padding: 7px 4px; text-align: center; width: 32px;"></th>
+                  </tr>
+                </thead>
+                <tbody id="invoiceBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
         <!-- RIGHT: PAYMENT & VIETQR -->
-        <div style="background: var(--surface-subtle); padding: 14px; border-radius: 10px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="background: var(--surface-subtle); padding: 18px 20px; border-radius: 12px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between; height: 100%; overflow-y: auto;">
           <div>
             <div style="display: flex; gap: 6px; margin-bottom: 12px;">
-              <button type="button" class="btn btn-primary" id="btnPayCash" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="switchPaymentMode('cash')">Tiền mặt</button>
-              <button type="button" class="btn btn-outline" id="btnPayQR" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="switchPaymentMode('vietqr')">Quét VietQR</button>
-              <button type="button" class="btn btn-outline" id="btnPayCard" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="switchPaymentMode('card')">Thẻ POS</button>
+              <button type="button" class="btn btn-primary" id="btnPayCash" style="flex: 1; padding: 7px 6px; font-size: 12px; font-weight: 600;" onclick="switchPaymentMode('cash')">Tiền mặt</button>
+              <button type="button" class="btn btn-outline" id="btnPayQR" style="flex: 1; padding: 7px 6px; font-size: 12px; font-weight: 600;" onclick="switchPaymentMode('vietqr')">Quét VietQR</button>
+              <button type="button" class="btn btn-outline" id="btnPayCard" style="flex: 1; padding: 7px 6px; font-size: 12px; font-weight: 600;" onclick="switchPaymentMode('card')">Thẻ POS</button>
             </div>
 
-            <div id="vietqrBox" style="display: none; text-align: center; margin-bottom: 10px;">
+            <div id="vietqrBox" style="display: none; text-align: center; margin-bottom: 10px; padding: 10px; background: var(--surface); border-radius: 8px; border: 1px solid var(--border-subtle);">
               <img id="vietqrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=00020101021238540010A00000072701240006970422011009031234560208QRIBFTTA5303704540840005802VN62170813UTESPORT6304" alt="VietQR" style="width: 130px; height: 130px; border-radius: 8px; border: 1px solid var(--border-subtle); background: #ffffff; padding: 4px;">
               <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Quét mã VietQR thanh toán tức thì</div>
             </div>
 
-            <div style="line-height: 1.8; font-size: 12.5px; border-top: 1px dashed var(--border-subtle); padding-top: 8px;">
+            <div style="line-height: 2; font-size: 13px; border-top: 1px dashed var(--border-subtle); padding-top: 10px;">
               <div style="display: flex; justify-content: space-between;">
-                <span>Tiền giờ sân:</span>
-                <span id="coCourtPrice">0 đ</span>
+                <span style="color: var(--text-muted);">Tiền giờ sân:</span>
+                <strong id="coCourtPrice" style="color: var(--text-dark);">0 đ</strong>
               </div>
               <div style="display: flex; justify-content: space-between;">
-                <span>Dịch vụ & Dụng cụ:</span>
-                <span id="coServicePrice">0 đ</span>
+                <span style="color: var(--text-muted);">Dịch vụ & Dụng cụ:</span>
+                <strong id="coServicePrice" style="color: var(--text-dark);">0 đ</strong>
               </div>
               <div style="display: flex; justify-content: space-between; color: var(--danger);">
                 <span>Khách đã cọc trước:</span>
-                <span id="coDeposit">- 0 đ</span>
+                <strong id="coDeposit">- 0 đ</strong>
               </div>
-              <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 800; color: var(--text-dark); margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border-subtle);">
+              <div style="display: flex; justify-content: space-between; font-size: 17px; font-weight: 800; color: var(--text-dark); margin-top: 8px; padding-top: 10px; border-top: 2px solid var(--border-subtle);">
                 <span>CẦN THANH TOÁN:</span>
-                <span id="coTotal" style="color: var(--primary);">0 đ</span>
+                <span id="coTotal" style="color: var(--primary); font-size: 22px;">0 đ</span>
               </div>
             </div>
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px;">
-            <button type="button" class="btn btn-outline" id="btnSaveServicesOnly" style="width: 100%; border-color: #3b82f6; color: #2563eb; display: none;" onclick="saveServicesAndContinuePlaying()">
+            <button type="button" class="btn btn-outline" id="btnSaveServicesOnly" style="width: 100%; border-color: #3b82f6; color: #2563eb; display: none; padding: 8px;" onclick="saveServicesAndContinuePlaying()">
               <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;">
                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                 <polyline points="17 21 17 13 7 13 7 21"></polyline>
                 <polyline points="7 3 7 8 15 8"></polyline>
               </svg>
-              <span>Lưu dịch vụ vào sân (Khách tiếp tục chơi)</span>
+              <span style="font-weight: 600;">Lưu dịch vụ vào sân (Khách tiếp tục chơi)</span>
             </button>
-            <button type="button" class="btn btn-outline" style="width: 100%; font-size: 12px;" onclick="printReceiptK80()">
+            <button type="button" class="btn btn-outline" style="width: 100%; font-size: 12px; padding: 8px;" onclick="printReceiptK80()">
               <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
                 <polyline points="6 9 6 2 18 2 18 9"></polyline>
                 <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -565,7 +577,7 @@
               </svg>
               <span>In Hóa Đơn Nhiệt K80</span>
             </button>
-            <button type="button" class="btn btn-primary" style="width: 100%;" onclick="submitCheckout()">
+            <button type="button" class="btn btn-primary" style="width: 100%; padding: 10px; font-weight: 700;" onclick="submitCheckout()">
               <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
@@ -574,8 +586,10 @@
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeCheckoutModal()">Đóng</button>
+
+      <div class="modal-footer" style="padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; background: var(--surface-subtle); border-top: 1px solid var(--border-subtle); flex-shrink: 0;">
+        <span style="font-size: 12px; color: var(--text-muted);">Phím tắt: Bấm <strong>Esc</strong> để đóng quầy • Hóa đơn tự động đồng bộ theo sân</span>
+        <button class="btn btn-outline btn-sm" onclick="closeCheckoutModal()">Đóng quầy</button>
       </div>
     </div>
   </div>
