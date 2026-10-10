@@ -349,18 +349,25 @@ public class ShiftService {
 
         BigDecimal cashTotal = BigDecimal.ZERO;
         BigDecimal transferTotal = BigDecimal.ZERO;
+        BigDecimal courtFeeTotal = BigDecimal.ZERO;
+        BigDecimal productFeeTotal = BigDecimal.ZERO;
         int invoiceCount = 0;
 
         for (Invoice inv : invoices) {
             if (inv.getInvoiceDate() != null && inv.getInvoiceDate().toLocalDate().isEqual(today)) {
-                if (staff.equalsIgnoreCase(inv.getStaffCode()) || "ADMIN".equalsIgnoreCase(staff)) {
-                    invoiceCount++;
-                    BigDecimal payment = inv.getTotalPayment() != null ? inv.getTotalPayment() : BigDecimal.ZERO;
-                    if ("Tiền mặt".equalsIgnoreCase(inv.getPaymentMethod())) {
-                        cashTotal = cashTotal.add(payment);
-                    } else {
-                        transferTotal = transferTotal.add(payment);
-                    }
+                invoiceCount++;
+                BigDecimal payment = inv.getTotalPayment() != null ? inv.getTotalPayment() : BigDecimal.ZERO;
+                BigDecimal cFee = inv.getCourtFee() != null ? inv.getCourtFee() : BigDecimal.ZERO;
+                BigDecimal pFee = inv.getProductFee() != null ? inv.getProductFee() : BigDecimal.ZERO;
+                BigDecimal eqFee = inv.getEquipmentFee() != null ? inv.getEquipmentFee() : BigDecimal.ZERO;
+
+                courtFeeTotal = courtFeeTotal.add(cFee);
+                productFeeTotal = productFeeTotal.add(pFee).add(eqFee);
+
+                if ("Tiền mặt".equalsIgnoreCase(inv.getPaymentMethod())) {
+                    cashTotal = cashTotal.add(payment);
+                } else {
+                    transferTotal = transferTotal.add(payment);
                 }
             }
         }
@@ -387,6 +394,10 @@ public class ShiftService {
         summary.put("invoiceCount", invoiceCount);
         summary.put("systemCashTotal", cashTotal);
         summary.put("systemTransferTotal", transferTotal);
+        summary.put("cashRevenue", cashTotal);
+        summary.put("transferRevenue", transferTotal);
+        summary.put("courtFee", courtFeeTotal);
+        summary.put("productFee", productFeeTotal);
         summary.put("totalRevenue", totalRevenue);
         return summary;
     }

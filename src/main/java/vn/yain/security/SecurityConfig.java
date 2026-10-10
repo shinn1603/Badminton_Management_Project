@@ -54,9 +54,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/director/**").hasRole("DIRECTOR")
                 .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN", "DIRECTOR")
                 .requestMatchers("/api/staff/**", "/api/shifts/week/**", "/api/shifts/assign", "/api/shifts/remove").hasAnyRole("MANAGER", "ADMIN", "DIRECTOR")
-                .requestMatchers("/api/inventory/**").hasAnyRole("MANAGER", "ADMIN", "DIRECTOR")
-                .requestMatchers("/api/shifts/summary", "/api/shifts/close").hasAnyRole("POS", "MANAGER", "ADMIN", "DIRECTOR")
-                .requestMatchers("/api/bookings/*/checkin", "/api/bookings/*/checkout", "/api/bookings/*/transfer", "/api/bookings/*/order-service").hasAnyRole("POS", "MANAGER", "ADMIN", "DIRECTOR")
+                .requestMatchers("/api/shifts/summary", "/api/shifts/close").permitAll()
+                .requestMatchers("/api/bookings/**").permitAll()
                 // General API fallback
                 .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()

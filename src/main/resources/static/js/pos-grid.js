@@ -433,10 +433,25 @@ function recalculatePrice() {
   });
 
   const total = (count || 1) * pricePerHour;
-  const deposit = Math.round(total * 0.3);
+  const payType = document.getElementById('bookingPaymentType') ? document.getElementById('bookingPaymentType').value : 'play_now';
+  let deposit = 0;
+  const labelEl = document.getElementById('depositLabelText');
+
+  if (payType === 'play_now') {
+    deposit = 0;
+    if (labelEl) labelEl.textContent = 'Tiền cọc thực thu tại quầy:';
+    document.getElementById('displayDepositRequired').textContent = '0 đ (Trả sau khi chơi)';
+  } else if (payType === 'deposit_30') {
+    deposit = Math.round(total * 0.3);
+    if (labelEl) labelEl.textContent = 'Tiền cọc thực thu (30%):';
+    document.getElementById('displayDepositRequired').textContent = deposit.toLocaleString('vi-VN') + ' đ';
+  } else if (payType === 'full_pay') {
+    deposit = total;
+    if (labelEl) labelEl.textContent = 'Thanh toán đủ tại quầy (100%):';
+    document.getElementById('displayDepositRequired').textContent = total.toLocaleString('vi-VN') + ' đ (Thu đủ)';
+  }
 
   document.getElementById('displayTotalRental').textContent = total.toLocaleString('vi-VN') + ' đ';
-  document.getElementById('displayDepositRequired').textContent = deposit.toLocaleString('vi-VN') + ' đ';
 }
 
 async function submitBookingForm() {
@@ -472,7 +487,25 @@ async function submitBookingForm() {
   }
 
   const total = Number(document.getElementById('displayTotalRental').textContent.replace(/\D/g, ''));
-  const deposit = Number(document.getElementById('displayDepositRequired').textContent.replace(/\D/g, ''));
+  const payType = document.getElementById('bookingPaymentType') ? document.getElementById('bookingPaymentType').value : 'play_now';
+  let depositAmount = 0;
+  let bookingStatus = 'Đang chơi';
+  let payMethod = 'Trả sau khi chơi';
+
+  if (payType === 'play_now') {
+    depositAmount = 0;
+    bookingStatus = 'Đang chơi';
+    payMethod = 'Trả sau khi chơi';
+  } else if (payType === 'deposit_30') {
+    depositAmount = Math.round(total * 0.3);
+    bookingStatus = 'Đã cọc 30%';
+    payMethod = 'Tiền mặt tại quầy';
+  } else if (payType === 'full_pay') {
+    depositAmount = total;
+    bookingStatus = 'Đã thanh toán';
+    payMethod = 'Tiền mặt tại quầy';
+  }
+
   const genCode = 'DS' + Math.floor(100000 + Math.random() * 900000);
 
   try {
@@ -489,9 +522,9 @@ async function submitBookingForm() {
         timeSlot: `${startTime} - ${endTime}`,
         hourlyPrice: total / targetSlots.length,
         totalPrice: total,
-        depositAmount: deposit,
-        status: 'Đã cọc 30%',
-        paymentMethod: 'Tiền mặt tại quầy'
+        depositAmount: depositAmount,
+        status: bookingStatus,
+        paymentMethod: payMethod
       })
     });
 
@@ -681,23 +714,114 @@ function renderPosProductGrid() {
   }).join('');
 }
 
+function populateCheckoutCourtDropdown(selectedCourtSlot = null) {
+  const assignSelect = document.getElementById('checkoutCourtAssignSelect');
+  if (!assignSelect) return;
+
+  let optionsHtml = '<option value="none">Bán lẻ mang đi (Tiền sân 0 đ)</option>';
+  
+  if (appData[currentBranch] && appData[currentBranch][currentDateStr]) {
+    const branchSlots = appData[currentBranch][currentDateStr];
+    for (let cCode in branchSlots) {
+      const courtObj = realCourts.find(c => c.courtCode === cCode);
+      const courtDisplayName = courtObj ? courtObj.courtName : cCode;
+      for (let tSlot in branchSlots[cCode]) {
+        const slot = branchSlots[cCode][tSlot];
+        if (slot.state === 'in-use' || slot.state === 'booked') {
+          const val = `${cCode}__${tSlot}`;
+          const isSelected = selectedCourtSlot === val ? 'selected' : '';
+          optionsHtml += `<option value="${val}" ${isSelected}>${courtDisplayName} (${tSlot} - ${slot.customer || 'Đang chơi'})</option>`;
+        }
+      }
+    }
+  }
+
+  assignSelect.innerHTML = optionsHtml;
+}
+
+function onCheckoutCourtAssignChange(val) {
+  const targetLabel = document.getElementById('checkoutTargetLabel');
+  const btnSave = document.getElementById('btnSaveServicesOnly');
+  const btnSubmitText = document.getElementById('btnCheckoutSubmitText');
+
+  if (val === 'none') {
+    activeSlotCell = null;
+    currentBasePrice = 0;
+    currentDeposit = 0;
+    if (targetLabel) targetLabel.textContent = 'Khách lẻ tại quầy (Không tính tiền sân - 0 đ)';
+    if (btnSave) btnSave.style.display = 'none';
+    if (btnSubmitText) btnSubmitText.textContent = 'Thanh toán Đơn lẻ & In Bill';
+  } else {
+    const [cCode, tSlot] = val.split('__');
+    const slotData = (appData[currentBranch] && appData[currentBranch][currentDateStr] && appData[currentBranch][currentDateStr][cCode]) ? appData[currentBranch][currentDateStr][cCode][tSlot] : null;
+
+    if (slotData) {
+      currentBasePrice = Number(slotData.price) || 0;
+      currentDeposit = Number(slotData.deposit) || 0;
+      posItems = slotData.posItems ? [...slotData.posItems] : [];
+
+      const domCell = document.querySelector(`.slot-inner[data-court-code="${cCode}"][data-time="${tSlot}"]`);
+      if (domCell) {
+        activeSlotCell = domCell;
+      } else {
+        activeSlotCell = {
+          dataset: {
+            code: slotData.code,
+            courtCode: cCode,
+            court: cCode,
+            time: tSlot,
+            price: currentBasePrice,
+            deposit: currentDeposit,
+            customer: slotData.customer,
+            phone: slotData.phone
+          }
+        };
+      }
+
+      const courtObj = realCourts.find(c => c.courtCode === cCode);
+      const courtName = courtObj ? courtObj.courtName : cCode;
+      if (targetLabel) targetLabel.textContent = `${courtName} - Khách: ${slotData.customer || 'Đang chơi'} (${tSlot})`;
+      if (btnSave) btnSave.style.display = 'block';
+      if (btnSubmitText) btnSubmitText.textContent = 'Xác nhận Thanh toán & Trả sân';
+    }
+  }
+  renderInvoice();
+}
+
 function openCheckoutModal(element) {
+  const targetLabel = document.getElementById('checkoutTargetLabel');
+  const btnSave = document.getElementById('btnSaveServicesOnly');
+  const btnSubmitText = document.getElementById('btnCheckoutSubmitText');
+
+  let selectedCourtKey = 'none';
+
   if (element) {
     activeSlotCell = element;
-    currentBasePrice = Number(activeSlotCell.dataset.price) || 120000;
-    currentDeposit = Number(activeSlotCell.dataset.deposit) || 36000;
+    currentBasePrice = Number(activeSlotCell.dataset.price) || 0;
+    currentDeposit = Number(activeSlotCell.dataset.deposit) || 0;
 
     const courtCode = activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court;
     const timeObj = activeSlotCell.dataset.time;
+    selectedCourtKey = `${courtCode}__${timeObj}`;
+
     const slotData = (appData[currentBranch] && appData[currentBranch][currentDateStr] && appData[currentBranch][currentDateStr][courtCode]) ? appData[currentBranch][currentDateStr][courtCode][timeObj] : {};
     posItems = (slotData && slotData.posItems) ? [...slotData.posItems] : [];
+
+    if (targetLabel) targetLabel.textContent = `${activeSlotCell.dataset.court || courtCode} - Khách: ${activeSlotCell.dataset.customer || 'Đang chơi'} (${timeObj})`;
+    if (btnSave) btnSave.style.display = 'block';
+    if (btnSubmitText) btnSubmitText.textContent = 'Xác nhận Thanh toán & Trả sân';
   } else {
     activeSlotCell = null;
-    currentBasePrice = 90000;
+    currentBasePrice = 0; // Retail walk-in has 0d court fee!
     currentDeposit = 0;
     posItems = [];
+
+    if (targetLabel) targetLabel.textContent = 'Khách lẻ tại quầy (Không tính tiền sân - 0 đ)';
+    if (btnSave) btnSave.style.display = 'none';
+    if (btnSubmitText) btnSubmitText.textContent = 'Thanh toán Đơn lẻ & In Bill';
   }
 
+  populateCheckoutCourtDropdown(selectedCourtKey);
   loadDbProductsForPos();
   renderInvoice();
   document.getElementById('checkoutModal').classList.add('active');
@@ -882,6 +1006,25 @@ function renderInvoice() {
   if (qrEl) qrEl.src = qrUrl;
 }
 
+async function saveServicesAndContinuePlaying() {
+  if (!activeSlotCell) {
+    if (typeof showToast === 'function') {
+      showToast('Vui lòng chọn sân đang chơi để lưu dịch vụ!', 'warning');
+    }
+    return;
+  }
+  const courtCode = activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court;
+  const timeObj = activeSlotCell.dataset.time;
+
+  updateDataStore(courtCode, timeObj, { posItems: [...posItems] });
+
+  if (typeof showToast === 'function') {
+    showToast('Đã lưu dịch vụ vào sân thành công! Khách tiếp tục chơi.', 'success');
+  }
+  closeCheckoutModal();
+  await renderGridForDate(currentDateStr);
+}
+
 async function submitCheckout() {
   const bCode = (activeSlotCell && activeSlotCell.dataset.code) ? activeSlotCell.dataset.code : null;
   const serviceSubtotal = posItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
@@ -913,7 +1056,25 @@ async function submitCheckout() {
     } catch (e) {
       console.warn('Lỗi checkout backend:', e);
     }
+    if (activeSlotCell) {
+      const courtCode = activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court;
+      const timeObj = activeSlotCell.dataset.time;
+      updateDataStore(courtCode, timeObj, { state: 'available', customer: '', phone: '', code: '', posItems: [] });
+    }
   } else {
+    try {
+      await fetch('/api/invoices/retail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productFee: serviceSubtotal,
+          paymentMethod: payMode,
+          staffCode: 'NVQ01'
+        })
+      });
+    } catch (e) {
+      console.warn('Lỗi lưu hóa đơn lẻ:', e);
+    }
     if (typeof showToast === 'function') {
       showToast('Đã xuất Hóa đơn K80 và thanh toán thành công!', 'success');
     }

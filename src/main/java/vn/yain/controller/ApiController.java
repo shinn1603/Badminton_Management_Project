@@ -768,6 +768,34 @@ public class ApiController {
         return invoiceRepository.findAllByOrderByInvoiceDateDesc();
     }
 
+    @PostMapping("/invoices/retail")
+    public ResponseEntity<?> createRetailInvoice(@RequestBody Map<String, Object> payload) {
+        try {
+            BigDecimal prodFee = payload.get("productFee") != null ? new BigDecimal(payload.get("productFee").toString()) : BigDecimal.ZERO;
+            BigDecimal eqFee = payload.get("equipmentFee") != null ? new BigDecimal(payload.get("equipmentFee").toString()) : BigDecimal.ZERO;
+            String paymentMethod = (String) payload.getOrDefault("paymentMethod", "Tiền mặt");
+            String staffCode = (String) payload.getOrDefault("staffCode", "NVQ01");
+
+            Invoice invoice = new Invoice();
+            invoice.setInvoiceCode("HD" + (System.currentTimeMillis() % 1000000));
+            invoice.setBookingCode("LE" + (System.currentTimeMillis() % 100000));
+            invoice.setStaffCode(staffCode);
+            invoice.setInvoiceDate(LocalDateTime.now());
+            invoice.setCourtFee(BigDecimal.ZERO);
+            invoice.setEquipmentFee(eqFee);
+            invoice.setProductFee(prodFee);
+            invoice.setDepositPaid(BigDecimal.ZERO);
+            invoice.setTotalPayment(prodFee.add(eqFee));
+            invoice.setPaymentMethod(paymentMethod);
+            invoice.setStatus("Đã thanh toán");
+
+            Invoice saved = invoiceRepository.save(invoice);
+            return ResponseEntity.ok(Map.of("success", true, "invoice", saved));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
     @GetMapping("/tournaments")
     public List<Tournament> getTournaments() {
         return tournamentRepository.findAll();
