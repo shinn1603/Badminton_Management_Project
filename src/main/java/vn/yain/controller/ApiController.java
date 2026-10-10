@@ -396,7 +396,14 @@ public class ApiController {
     // ==========================================
 
     @GetMapping("/bookings")
-    public List<Booking> getBookings() {
+    public List<Booking> getBookings(
+            @RequestParam(required = false) String branchCode,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        if (branchCode != null && !branchCode.trim().isEmpty() && date != null) {
+            return bookingRepository.findByBranchCodeAndBookingDate(branchCode.trim(), date);
+        } else if (branchCode != null && !branchCode.trim().isEmpty()) {
+            return bookingRepository.findByBranchCodeOrderByBookingDateDesc(branchCode.trim());
+        }
         return bookingService.getAllBookings();
     }
 
@@ -513,6 +520,10 @@ public class ApiController {
                     map.put("timeSlot", b.getTimeSlot());
                     map.put("status", b.getStatus());
                     map.put("customerName", b.getCustomerName());
+                    map.put("customerPhone", b.getCustomerPhone());
+                    map.put("totalPrice", b.getTotalPrice());
+                    map.put("depositAmount", b.getDepositAmount());
+                    map.put("paymentMethod", b.getPaymentMethod());
                     return map;
                 })
                 .collect(Collectors.toList());

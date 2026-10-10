@@ -227,6 +227,7 @@
                   <th class="matrix-th-time">10:00 - 11:00</th>
                   <th class="matrix-th-time">14:00 - 15:00</th>
                   <th class="matrix-th-time">15:00 - 16:00</th>
+                  <th class="matrix-th-time">16:00 - 17:00</th>
                   <th class="matrix-th-time">17:00 - 18:00</th>
                   <th class="matrix-th-time">18:00 - 19:00</th>
                   <th class="matrix-th-time">19:00 - 20:00</th>
@@ -281,10 +282,15 @@
               <option value="07:00">07:00</option>
               <option value="08:00" selected>08:00</option>
               <option value="09:00">09:00</option>
+              <option value="10:00">10:00</option>
+              <option value="14:00">14:00</option>
+              <option value="15:00">15:00</option>
+              <option value="16:00">16:00</option>
               <option value="17:00">17:00</option>
               <option value="18:00">18:00</option>
               <option value="19:00">19:00</option>
               <option value="20:00">20:00</option>
+              <option value="21:00">21:00</option>
             </select>
           </div>
           <div class="form-group">
@@ -292,8 +298,12 @@
             <select id="bookingEndTime" class="form-control" onchange="recalculatePrice()">
               <option value="07:00">07:00</option>
               <option value="08:00">08:00</option>
-              <option value="09:00">09:00</option>
-              <option value="10:00" selected>10:00</option>
+              <option value="09:00" selected>09:00</option>
+              <option value="10:00">10:00</option>
+              <option value="11:00">11:00</option>
+              <option value="15:00">15:00</option>
+              <option value="16:00">16:00</option>
+              <option value="17:00">17:00</option>
               <option value="18:00">18:00</option>
               <option value="19:00">19:00</option>
               <option value="20:00">20:00</option>
@@ -336,6 +346,7 @@
       <div class="modal-footer" style="display: flex; justify-content: space-between;">
         <button class="btn btn-outline" onclick="closeDetailModal()">Đóng</button>
         <div style="display: flex; gap: 8px;">
+          <button class="btn btn-outline" style="border-color: #ef4444; color: #ef4444;" onclick="cancelBookingFromModal()">Hủy đặt sân</button>
           <button class="btn btn-outline" style="border-color: #3b82f6; color: #2563eb;" onclick="openTransferModal()">
             <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;">
               <polyline points="16 3 21 3 21 8"></polyline>
@@ -797,21 +808,7 @@
         if (data.success) {
           showToast(`Chuyển sang [${targetCourtName}] thành công! Chênh lệch: ${Number(data.priceDifference || 0).toLocaleString('vi-VN')} đ`, 'success');
           closeTransferModal();
-          // Update local memory and grid view
-          if (activeSlotCell) {
-            const oldCourt = activeSlotCell.dataset.court;
-            const oldTime = activeSlotCell.dataset.time;
-            const cust = activeSlotCell.dataset.customer;
-            const phone = activeSlotCell.dataset.phone;
-            updateDataStore(oldCourt, oldTime, { state: 'available', customer: '', phone: '' });
-            updateDataStore(targetCourtName, newTimeSlot, {
-              state: 'booked',
-              customer: cust,
-              phone: phone,
-              price: Number(select.options[select.selectedIndex].dataset.price) || 120000
-            });
-            renderGridForDate(currentDateStr);
-          }
+          await renderGridForDate(currentDateStr);
         } else {
           showToast(data.message || 'Lỗi chuyển sân', 'error');
         }

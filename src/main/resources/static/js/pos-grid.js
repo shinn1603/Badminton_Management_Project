@@ -1,6 +1,7 @@
 /**
  * UTE SPORT - POS GRID REALTIME LOGIC
- * Module: Lễ tân & Bán hàng POS (MH-NVQ01 -> MH-NVQ07)
+ * Module: Le tan & Ban hang POS (MH-NVQ01 -> MH-NVQ07)
+ * Live Database Integration (No Mock / No Random Data)
  */
 
 let appData = {};
@@ -10,12 +11,22 @@ let activeSlotCell = null;
 let posItems = [];
 let currentBasePrice = 120000;
 let currentDeposit = 36000;
+let realCourts = [];
 
-const mockNames = ['Lê Bá Đạt', 'Trần Nam', 'Đoàn Thanh Niên', 'Vũ Quốc Cường', 'Nguyễn Hải', 'Nhóm IT UTE', 'CLB Tân Bình', 'Khách vãng lai', 'Chị Lan', 'Anh Hoàng Vũ'];
-const mockPhones = ['0901234567', '0988777666', '0912345678', '0933444555', '0909888777'];
-const timeSlots = ['06:00 - 07:00', '07:00 - 08:00', '08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00', '14:00 - 15:00', '15:00 - 16:00', '17:00 - 18:00', '18:00 - 19:00', '19:00 - 20:00', '20:00 - 21:00', '21:00 - 22:00'];
-let courtsList = ['Sân 01 (VIP Yonex)', 'Sân 02 (VIP Yonex)', 'Sân 03 (Thảm Enlio)', 'Sân 04 (Thảm Enlio)', 'Sân 05 (Tiêu chuẩn)', 'Sân 06 (Tiêu chuẩn)'];
-const branchesList = ['CN01', 'CN02', 'CN03'];
+const timeSlots = [
+  '06:00 - 07:00', '07:00 - 08:00', '08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00',
+  '14:00 - 15:00', '15:00 - 16:00', '16:00 - 17:00', '17:00 - 18:00', '18:00 - 19:00',
+  '19:00 - 20:00', '20:00 - 21:00', '21:00 - 22:00'
+];
+
+const fallbackCourts = [
+  { courtCode: 'CL01', courtName: 'San 01 (VIP Yonex)', courtType: 'VIP Yonex', hourlyRate: 120000, branchCode: 'CN01' },
+  { courtCode: 'CL02', courtName: 'San 02 (VIP Yonex)', courtType: 'VIP Yonex', hourlyRate: 120000, branchCode: 'CN01' },
+  { courtCode: 'CL03', courtName: 'San 03 (Tham Enlio)', courtType: 'Tieu chuan', hourlyRate: 90000, branchCode: 'CN01' },
+  { courtCode: 'CL04', courtName: 'San 04 (Tham Enlio)', courtType: 'Tieu chuan', hourlyRate: 90000, branchCode: 'CN01' },
+  { courtCode: 'CL05', courtName: 'San 05 (Tieu chuan)', courtType: 'Tieu chuan', hourlyRate: 90000, branchCode: 'CN01' },
+  { courtCode: 'CL06', courtName: 'San 06 (Tieu chuan)', courtType: 'Tieu chuan', hourlyRate: 90000, branchCode: 'CN01' }
+];
 
 function formatDate(dateObj) {
   const yyyy = dateObj.getFullYear();
@@ -24,100 +35,165 @@ function formatDate(dateObj) {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-// Khởi tạo dữ liệu thời gian thực cho ngày truy cập
-function ensureDataForDate(dateStr) {
-  const todayStr = formatDate(new Date());
+function isSlotOverlapping(s1, s2) {
+  if (!s1 || !s2) return false;
+  if (s1.trim().toLowerCase() === s2.trim().toLowerCase()) return true;
+  const parseHours = (slot) => {
+    const m = slot.match(/(\d{1,2}):\d{2}\s*-\s*(\d{1,2}):\d{2}/);
+    return m ? [parseInt(m[1]), parseInt(m[2])] : [0, 0];
+  };
+  const [start1, end1] = parseHours(s1);
+  const [start2, end2] = parseHours(s2);
+  return Math.max(start1, start2) < Math.min(end1, end2);
+}
 
-  branchesList.forEach(branch => {
-    if (!appData[branch]) appData[branch] = {};
-    if (!appData[branch][dateStr]) appData[branch][dateStr] = {};
+// Update modal select dropdowns with real courts from database
+function updateCourtSelectDropdowns() {
+  const bSelect = document.getElementById('bookingCourtSelect');
+  if (bSelect && realCourts.length > 0) {
+    const curVal = bSelect.value;
+    bSelect.innerHTML = realCourts.map(c => {
+      const rate = Number(c.hourlyRate) || 90000;
+      return `<option value="${c.courtCode}" data-price="${rate}">${c.courtName} - ${rate.toLocaleString('vi-VN')} đ/h</option>`;
+    }).join('');
+    if (curVal && realCourts.some(c => c.courtCode === curVal)) {
+      bSelect.value = curVal;
+    }
+  }
 
-    courtsList.forEach(court => {
-      if (!appData[branch][dateStr][court]) {
-        appData[branch][dateStr][court] = {};
-        let price = court.includes('VIP') ? 120000 : 90000;
-        let hasInUse = false;
+  const tSelect = document.getElementById('transferTargetCourtSelect');
+  if (tSelect && realCourts.length > 0) {
+    const curVal = tSelect.value;
+    tSelect.innerHTML = realCourts.map(c => {
+      const rate = Number(c.hourlyRate) || 90000;
+      return `<option value="${c.courtCode}" data-price="${rate}">${c.courtName} - ${rate.toLocaleString('vi-VN')} đ/h</option>`;
+    }).join('');
+    if (curVal && realCourts.some(c => c.courtCode === curVal)) {
+      tSelect.value = curVal;
+    }
+  }
+}
 
-        timeSlots.forEach(time => {
-          let rand = Math.random();
-          let state = 'available';
-          let customer = '', phone = '';
-
-          if (dateStr < todayStr) {
-            state = rand > 0.6 ? 'completed' : 'available';
-          } else if (dateStr === todayStr) {
-            if (!hasInUse && rand < 0.15) {
-              state = 'in-use';
-              hasInUse = true;
-            } else if (rand < 0.4) {
-              state = 'booked';
-            }
-          } else {
-            state = rand > 0.7 ? 'booked' : 'available';
-          }
-
-          if (state !== 'available') {
-            customer = mockNames[Math.floor(Math.random() * mockNames.length)];
-            phone = mockPhones[Math.floor(Math.random() * mockPhones.length)];
-          }
-
-          appData[branch][dateStr][court][time] = {
-            state: state, customer: customer, phone: phone, price: price, deposit: price * 0.3, posItems: []
-          };
-        });
+// Load real courts for the active branch
+async function loadCourtsForBranch(branchCode) {
+  try {
+    const res = await fetch(`/api/courts?branchCode=${encodeURIComponent(branchCode)}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        realCourts = data;
+      } else {
+        realCourts = fallbackCourts.map(c => ({ ...c, branchCode: branchCode }));
       }
-    });
-  });
-}
-
-function initAppData() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  for (let i = -15; i <= 15; i++) {
-    let d = new Date(today);
-    d.setDate(d.getDate() + i);
-    ensureDataForDate(formatDate(d));
+    } else {
+      realCourts = fallbackCourts.map(c => ({ ...c, branchCode: branchCode }));
+    }
+  } catch (e) {
+    console.warn('Lỗi kết nối tải sân:', e);
+    realCourts = fallbackCourts.map(c => ({ ...c, branchCode: branchCode }));
   }
+  updateCourtSelectDropdowns();
 }
 
-function updateDataStore(court, time, updateObj) {
-  if (!appData[currentBranch][currentDateStr][court]) appData[currentBranch][currentDateStr][court] = {};
-  if (!appData[currentBranch][currentDateStr][court][time]) {
-    appData[currentBranch][currentDateStr][court][time] = { price: 90000 };
-  }
-  Object.assign(appData[currentBranch][currentDateStr][court][time], updateObj);
-}
-
-function renderGridForDate(dateStr) {
-  ensureDataForDate(dateStr);
+// Render POS timetable grid completely from live backend database
+async function renderGridForDate(dateStr) {
+  const branchFilterEl = document.getElementById('branchFilter');
+  currentBranch = branchFilterEl ? branchFilterEl.value : 'CN01';
   currentDateStr = dateStr;
-  currentBranch = document.getElementById('branchFilter') ? document.getElementById('branchFilter').value : 'CN01';
+
   const tbody = document.getElementById('matrixGridBody');
   if (!tbody) return;
-  tbody.innerHTML = '';
 
-  let gridState = appData[currentBranch][dateStr];
+  if (!realCourts || realCourts.length === 0 || realCourts[0].branchCode !== currentBranch) {
+    await loadCourtsForBranch(currentBranch);
+  }
+
+  let bookings = [];
+  try {
+    const res = await fetch(`/api/bookings?branchCode=${encodeURIComponent(currentBranch)}&date=${encodeURIComponent(dateStr)}`);
+    if (res.ok) {
+      bookings = await res.json() || [];
+    }
+  } catch (err) {
+    console.warn('Lỗi tải dữ liệu đặt sân:', err);
+  }
+
+  if (!appData[currentBranch]) appData[currentBranch] = {};
+  appData[currentBranch][dateStr] = {};
+
+  tbody.innerHTML = '';
   const todayStr = formatDate(new Date());
 
-  courtsList.forEach(court => {
-    const isVip = court.includes('VIP');
-    const isEnlio = court.includes('Enlio');
-    const defaultPrice = isVip ? 120000 : 90000;
+  realCourts.forEach(court => {
+    const isVip = (court.courtType && court.courtType.toLowerCase().includes('vip')) || (court.hourlyRate >= 110000);
+    const isEnlio = court.courtName && court.courtName.toLowerCase().includes('enlio');
+    const defaultPrice = Number(court.hourlyRate) || (isVip ? 120000 : 90000);
+
+    if (!appData[currentBranch][dateStr][court.courtCode]) {
+      appData[currentBranch][dateStr][court.courtCode] = {};
+    }
 
     let rowHtml = `
       <tr>
         <td class="matrix-td-court">
           <div class="court-info">
-            <span class="court-name">${court}</span>
+            <span class="court-name">${court.courtName}</span>
             <span class="court-type">${isVip ? 'VIP • Thảm Yonex BWF' : (isEnlio ? 'Tiêu chuẩn • Thảm Enlio' : 'Tiêu chuẩn • Thảm Taraflex')}</span>
           </div>
         </td>`;
 
-    timeSlots.forEach(timeObj => {
-      const [startTime, endTime] = timeObj.split(' - ');
-      const courtSlots = (gridState && gridState[court]) ? gridState[court] : {};
-      let cellData = courtSlots[timeObj] || { state: 'available', price: defaultPrice };
+    timeSlots.forEach(timeSlot => {
+      const [startTime, endTime] = timeSlot.split(' - ');
+
+      const matchedBooking = bookings.find(b => {
+        if (!b.status || b.status === 'Đã hủy') return false;
+        const matchCourt = (b.courtCode && (
+          b.courtCode.toUpperCase() === court.courtCode.toUpperCase() ||
+          b.courtCode.toLowerCase() === court.courtName.toLowerCase() ||
+          court.courtName.toLowerCase().includes(b.courtCode.toLowerCase())
+        ));
+        return matchCourt && isSlotOverlapping(timeSlot, b.timeSlot);
+      });
+
+      let cellData;
+      if (matchedBooking) {
+        let state = 'booked';
+        const st = (matchedBooking.status || '').toLowerCase();
+        if (st.includes('đang sử dụng') || st.includes('đang chơi') || st === 'in-use') {
+          state = 'in-use';
+        } else if (st.includes('hoàn thành') || st.includes('đã thanh toán') || st === 'completed') {
+          state = 'completed';
+        } else {
+          state = 'booked';
+        }
+
+        const bPrice = Number(matchedBooking.totalPrice) || defaultPrice;
+        const bDeposit = Number(matchedBooking.depositAmount) || Math.round(bPrice * 0.3);
+
+        cellData = {
+          state: state,
+          code: matchedBooking.bookingCode,
+          customer: matchedBooking.customerName || 'Khách đặt sân',
+          phone: matchedBooking.customerPhone || '',
+          price: bPrice,
+          deposit: bDeposit,
+          rawStatus: matchedBooking.status,
+          posItems: []
+        };
+      } else {
+        cellData = {
+          state: 'available',
+          code: '',
+          customer: '',
+          phone: '',
+          price: defaultPrice,
+          deposit: Math.round(defaultPrice * 0.3),
+          rawStatus: 'Trống',
+          posItems: []
+        };
+      }
+
+      appData[currentBranch][dateStr][court.courtCode][timeSlot] = cellData;
 
       rowHtml += `<td class="matrix-slot-cell">`;
       if (cellData.state === 'available') {
@@ -128,7 +204,7 @@ function renderGridForDate(dateStr) {
             </div>`;
         } else {
           rowHtml += `
-            <div class="slot-inner state-available" data-court="${court}" data-time="${timeObj}" onclick="quickBookSlot(this, '${court}', '${startTime}', '${endTime}', ${cellData.price})">
+            <div class="slot-inner state-available" data-court-code="${court.courtCode}" data-court="${court.courtName}" data-time="${timeSlot}" onclick="quickBookSlot(this, '${court.courtCode}', '${startTime}', '${endTime}', ${cellData.price})">
               <div class="slot-action">
                 <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>Đặt</span>
@@ -137,20 +213,25 @@ function renderGridForDate(dateStr) {
             </div>`;
         }
       } else if (cellData.state === 'booked') {
+        const isPending = (cellData.rawStatus || '').includes('Chờ');
+        const badgeClass = isPending ? 'badge-warning' : 'badge-booked';
+        const badgeStyle = isPending ? 'background: rgba(245, 158, 11, 0.15); color: #d97706; border-color: rgba(245, 158, 11, 0.3);' : '';
+        const badgeText = cellData.rawStatus || 'Đã cọc 30%';
+
         rowHtml += `
-          <div class="slot-inner state-booked" data-price="${cellData.price}" data-deposit="${cellData.deposit}" data-customer="${cellData.customer}" data-phone="${cellData.phone}" data-court="${court}" data-time="${timeObj}" onclick="openDetailModal(this, 'BK-10X', '${court}', '${timeObj}', '${cellData.customer}', '${cellData.phone}', 'Đã cọc 30%', ${cellData.price}, ${cellData.deposit})">
+          <div class="slot-inner state-booked" data-code="${cellData.code}" data-price="${cellData.price}" data-deposit="${cellData.deposit}" data-customer="${cellData.customer}" data-phone="${cellData.phone}" data-court="${court.courtName}" data-court-code="${court.courtCode}" data-time="${timeSlot}" onclick="openDetailModal(this, '${cellData.code}', '${court.courtName}', '${timeSlot}', '${cellData.customer}', '${cellData.phone}', '${badgeText}', ${cellData.price}, ${cellData.deposit})">
             <span class="slot-title">${cellData.customer}</span>
-            <span class="slot-badge-status badge-booked">Đã cọc 30%</span>
+            <span class="slot-badge-status ${badgeClass}" style="${badgeStyle}">${badgeText}</span>
           </div>`;
       } else if (cellData.state === 'in-use') {
         rowHtml += `
-          <div class="slot-inner state-in-use" data-price="${cellData.price}" data-deposit="${cellData.deposit}" data-customer="${cellData.customer}" data-phone="${cellData.phone}" data-court="${court}" data-time="${timeObj}" onclick="openCheckoutModal(this)">
+          <div class="slot-inner state-in-use" data-code="${cellData.code}" data-price="${cellData.price}" data-deposit="${cellData.deposit}" data-customer="${cellData.customer}" data-phone="${cellData.phone}" data-court="${court.courtName}" data-court-code="${court.courtCode}" data-time="${timeSlot}" onclick="openCheckoutModal(this)">
             <span class="slot-title">${cellData.customer}</span>
             <span class="slot-badge-status badge-in-use">Đang chơi</span>
           </div>`;
       } else if (cellData.state === 'completed') {
         rowHtml += `
-          <div class="slot-inner state-completed" data-court="${court}" data-time="${timeObj}">
+          <div class="slot-inner state-completed" data-code="${cellData.code}" data-court="${court.courtName}" data-court-code="${court.courtCode}" data-time="${timeSlot}">
             <span class="slot-title" style="font-weight: 700;">${cellData.customer}</span>
             <span class="slot-badge-status badge-completed">Đã thanh toán</span>
           </div>`;
@@ -164,6 +245,16 @@ function renderGridForDate(dateStr) {
   handleSearch();
 }
 
+function updateDataStore(courtCode, time, updateObj) {
+  if (!appData[currentBranch]) appData[currentBranch] = {};
+  if (!appData[currentBranch][currentDateStr]) appData[currentBranch][currentDateStr] = {};
+  if (!appData[currentBranch][currentDateStr][courtCode]) appData[currentBranch][currentDateStr][courtCode] = {};
+  if (!appData[currentBranch][currentDateStr][courtCode][time]) {
+    appData[currentBranch][currentDateStr][courtCode][time] = { price: 90000 };
+  }
+  Object.assign(appData[currentBranch][currentDateStr][courtCode][time], updateObj);
+}
+
 function shiftDate(offset) {
   const dateInput = document.getElementById('gridDateInput');
   if (!dateInput) return;
@@ -172,7 +263,6 @@ function shiftDate(offset) {
   curDate.setDate(curDate.getDate() + offset);
   dateInput.value = formatDate(curDate);
   renderGridForDate(dateInput.value);
-  handleSearch();
 }
 
 function goToToday() {
@@ -180,13 +270,19 @@ function goToToday() {
   if (dateInput) {
     dateInput.value = formatDate(new Date());
     renderGridForDate(dateInput.value);
-    handleSearch();
   }
 }
 
-function changeBranch() {
+async function changeBranch() {
+  const branchFilterEl = document.getElementById('branchFilter');
+  if (branchFilterEl) {
+    currentBranch = branchFilterEl.value;
+  }
   const dateInput = document.getElementById('gridDateInput');
-  if (dateInput) renderGridForDate(dateInput.value);
+  await loadCourtsForBranch(currentBranch);
+  if (dateInput) {
+    await renderGridForDate(dateInput.value);
+  }
 }
 
 function toggleSidebar() {
@@ -201,7 +297,7 @@ function toggleTheme() {
   localStorage.setItem('utesport_theme', nxt);
 }
 
-// SEARCH & HIGHLIGHT
+// SEARCH & HIGHLIGHT REAL BOOKINGS
 function handleSearch() {
   const searchInput = document.getElementById('searchInput');
   if (!searchInput) return;
@@ -222,9 +318,9 @@ function handleSearch() {
 
   for (let branch in appData) {
     for (let date in appData[branch]) {
-      for (let court in appData[branch][date]) {
-        for (let time in appData[branch][date][court]) {
-          const data = appData[branch][date][court][time];
+      for (let courtCode in appData[branch][date]) {
+        for (let time in appData[branch][date][courtCode]) {
+          const data = appData[branch][date][courtCode][time];
           if (data.state !== 'available') {
             const matchName = data.customer && data.customer.toLowerCase().includes(query);
             const matchPhone = data.phone && data.phone.includes(query);
@@ -232,12 +328,14 @@ function handleSearch() {
             if (matchName || matchPhone) {
               matchCount++;
               if (resultList) {
+                const courtObj = realCourts.find(c => c.courtCode === courtCode);
+                const displayCourt = courtObj ? courtObj.courtName : courtCode;
                 const li = document.createElement('li');
                 li.className = 'search-result-item';
                 li.innerHTML = `
                   <div class="sri-name">${data.customer} <span class="sri-phone">(${data.phone})</span></div>
                   <div class="sri-details">
-                    <span>${court}</span>
+                    <span>${displayCourt}</span>
                     <span>${time}</span>
                     <span>${date}</span>
                     <span class="badge ${data.state === 'in-use' ? 'badge-in-use' : 'badge-booked'}">${data.state === 'in-use' ? 'Đang chơi' : 'Đã cọc'}</span>
@@ -250,9 +348,10 @@ function handleSearch() {
                   currentBranch = branch;
                   const gDate = document.getElementById('gridDateInput');
                   if (gDate) gDate.value = date;
-                  renderGridForDate(date);
-                  if (dropdown) dropdown.classList.remove('active');
-                  highlightExactSlot(court, time);
+                  renderGridForDate(date).then(() => {
+                    if (dropdown) dropdown.classList.remove('active');
+                    highlightExactSlot(courtCode, time);
+                  });
                 };
                 resultList.appendChild(li);
               }
@@ -269,12 +368,12 @@ function handleSearch() {
   }
 }
 
-function highlightExactSlot(court, time) {
+function highlightExactSlot(courtCode, time) {
   setTimeout(() => {
     document.querySelectorAll('.slot-inner').forEach(slot => {
-      const parentCourt = slot.closest('tr')?.querySelector('.court-name')?.textContent;
+      const slotCourtCode = slot.dataset.courtCode;
       const slotTime = slot.dataset.time;
-      if (parentCourt === court && slotTime === time) {
+      if (slotCourtCode === courtCode && slotTime === time) {
         slot.classList.add('slot-highlight');
         slot.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
       } else {
@@ -284,7 +383,7 @@ function highlightExactSlot(court, time) {
   }, 100);
 }
 
-// BOOKING MODAL LOGIC
+// QUICK BOOKING MODAL LOGIC
 function openCreateBookingModal() {
   document.getElementById('bookingCustName').value = '';
   document.getElementById('bookingCustPhone').value = '';
@@ -292,9 +391,16 @@ function openCreateBookingModal() {
   document.getElementById('createBookingModal').classList.add('active');
 }
 
-function quickBookSlot(element, court, startTime, endTime, price) {
+function quickBookSlot(element, courtCodeOrName, startTime, endTime, price) {
   const courtSelect = document.getElementById('bookingCourtSelect');
-  if (courtSelect) courtSelect.value = court;
+  if (courtSelect) {
+    for (let i = 0; i < courtSelect.options.length; i++) {
+      if (courtSelect.options[i].value === courtCodeOrName || courtSelect.options[i].text.includes(courtCodeOrName)) {
+        courtSelect.selectedIndex = i;
+        break;
+      }
+    }
+  }
   const sTime = document.getElementById('bookingStartTime');
   if (sTime) sTime.value = startTime;
   const eTime = document.getElementById('bookingEndTime');
@@ -307,7 +413,7 @@ function quickBookSlot(element, court, startTime, endTime, price) {
 
 function recalculatePrice() {
   const courtSelect = document.getElementById('bookingCourtSelect');
-  if (!courtSelect) return;
+  if (!courtSelect || courtSelect.selectedIndex < 0) return;
   const selectedOption = courtSelect.options[courtSelect.selectedIndex];
   const pricePerHour = Number(selectedOption.dataset.price) || 90000;
 
@@ -333,7 +439,7 @@ function recalculatePrice() {
   document.getElementById('displayDepositRequired').textContent = deposit.toLocaleString('vi-VN') + ' đ';
 }
 
-function submitBookingForm() {
+async function submitBookingForm() {
   const name = document.getElementById('bookingCustName').value.trim();
   const phone = document.getElementById('bookingCustPhone').value.trim();
   if (!name || !phone) {
@@ -342,7 +448,8 @@ function submitBookingForm() {
     return;
   }
 
-  const courtName = document.getElementById('bookingCourtSelect').value;
+  const courtSelect = document.getElementById('bookingCourtSelect');
+  const courtCode = courtSelect.value;
   const startTime = document.getElementById('bookingStartTime').value;
   const endTime = document.getElementById('bookingEndTime').value;
 
@@ -366,44 +473,48 @@ function submitBookingForm() {
 
   const total = Number(document.getElementById('displayTotalRental').textContent.replace(/\D/g, ''));
   const deposit = Number(document.getElementById('displayDepositRequired').textContent.replace(/\D/g, ''));
-  const pricePerSlot = total / targetSlots.length;
-  const depositPerSlot = deposit / targetSlots.length;
-
-  targetSlots.forEach(slot => {
-    updateDataStore(courtName, slot, {
-      state: 'booked', customer: name, phone: phone, price: pricePerSlot, deposit: depositPerSlot, posItems: []
-    });
-  });
-
-  // Sync to Backend API
   const genCode = 'DS' + Math.floor(100000 + Math.random() * 900000);
-  fetch('/api/bookings', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      bookingCode: genCode,
-      courtCode: courtName.includes('01') ? 'CL01' : courtName.includes('02') ? 'CL02' : 'CL03',
-      branchCode: 'CN01',
-      customerName: name,
-      customerPhone: phone,
-      bookingDate: currentDateStr,
-      timeSlot: `${startTime} - ${endTime}`,
-      totalPrice: total,
-      depositAmount: deposit,
-      status: 'Đã cọc 30%',
-      paymentMethod: 'Tiền mặt tại quầy'
-    })
-  }).catch(() => {});
 
-  renderGridForDate(currentDateStr);
-  if (typeof showToast === 'function') {
-    showToast(`Đã đặt thành công ${targetSlots.length} khung giờ cho khách: ${name}!`, 'success');
-  } else {
-    alert(`Đã đặt thành công ${targetSlots.length} khung giờ cho khách: ${name}!`);
+  try {
+    const res = await fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bookingCode: genCode,
+        courtCode: courtCode,
+        branchCode: currentBranch,
+        customerName: name,
+        customerPhone: phone,
+        bookingDate: currentDateStr,
+        timeSlot: `${startTime} - ${endTime}`,
+        hourlyPrice: total / targetSlots.length,
+        totalPrice: total,
+        depositAmount: deposit,
+        status: 'Đã cọc 30%',
+        paymentMethod: 'Tiền mặt tại quầy'
+      })
+    });
+
+    if (res.ok) {
+      if (typeof showToast === 'function') {
+        showToast(`Đặt sân thành công cho khách: ${name}! Mã: ${genCode}`, 'success');
+      } else {
+        alert(`Đặt sân thành công cho khách: ${name}!`);
+      }
+      closeCreateBookingModal();
+      await renderGridForDate(currentDateStr);
+    } else {
+      const errData = await res.json().catch(() => ({}));
+      if (typeof showToast === 'function') showToast(errData.message || 'Lỗi đặt sân từ máy chủ', 'error');
+      else alert(errData.message || 'Lỗi đặt sân');
+    }
+  } catch (err) {
+    if (typeof showToast === 'function') showToast('Lỗi kết nối đặt sân: ' + err.message, 'error');
+    else alert('Lỗi kết nối đặt sân: ' + err.message);
   }
-  closeCreateBookingModal();
 }
 
+// DETAIL MODAL & CHECK-IN
 function openDetailModal(element, code, court, time, customer, phone, status, price, deposit = 0) {
   activeSlotCell = element;
   activeSlotCell.dataset.code = code || 'DS0102';
@@ -422,14 +533,51 @@ function openDetailModal(element, code, court, time, customer, phone, status, pr
   document.getElementById('detailBookingModal').classList.add('active');
 }
 
-function checkInBooking() {
+async function checkInBooking() {
   if (activeSlotCell) {
-    const court = activeSlotCell.dataset.court;
-    const timeObj = activeSlotCell.dataset.time;
-    updateDataStore(court, timeObj, { state: 'in-use' });
-    renderGridForDate(currentDateStr);
+    const bCode = activeSlotCell.dataset.code;
+    if (bCode) {
+      try {
+        const res = await fetch(`/api/bookings/${bCode}/checkin`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success || res.ok) {
+          if (typeof showToast === 'function') showToast(`Khách đã nhận sân [${activeSlotCell.dataset.court}]!`, 'success');
+        } else {
+          if (typeof showToast === 'function') showToast(data.message || 'Lỗi check-in', 'error');
+        }
+      } catch (e) {
+        if (typeof showToast === 'function') showToast('Lỗi kết nối: ' + e.message, 'error');
+      }
+    }
+    await renderGridForDate(currentDateStr);
   }
   closeDetailModal();
+}
+
+async function cancelBookingFromModal() {
+  if (!activeSlotCell) return;
+  const bCode = activeSlotCell.dataset.code;
+  const cust = activeSlotCell.dataset.customer;
+  if (!confirm(`Bạn có chắc chắn muốn hủy đơn đặt sân [${bCode}] của khách [${cust}]?`)) {
+    return;
+  }
+  try {
+    const res = await fetch(`/api/bookings/${bCode}/cancel`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason: 'Nhân viên hủy tại quầy POS' })
+    });
+    const data = await res.json();
+    if (data.success || res.ok) {
+      if (typeof showToast === 'function') showToast(`Đã hủy đơn đặt sân [${bCode}]!`, 'info');
+      closeDetailModal();
+      await renderGridForDate(currentDateStr);
+    } else {
+      if (typeof showToast === 'function') showToast(data.message || 'Lỗi hủy đơn', 'error');
+    }
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Lỗi kết nối: ' + e.message, 'error');
+  }
 }
 
 // CHECKOUT & POS SERVICES MODAL (DYNAMIC DB INTEGRATED)
@@ -536,10 +684,10 @@ function openCheckoutModal(element) {
     currentBasePrice = Number(activeSlotCell.dataset.price) || 120000;
     currentDeposit = Number(activeSlotCell.dataset.deposit) || 36000;
 
-    const court = activeSlotCell.dataset.court;
+    const courtCode = activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court;
     const timeObj = activeSlotCell.dataset.time;
-    const slotData = appData[currentBranch][currentDateStr][court][timeObj] || {};
-    posItems = slotData.posItems ? [...slotData.posItems] : [];
+    const slotData = (appData[currentBranch] && appData[currentBranch][currentDateStr] && appData[currentBranch][currentDateStr][courtCode]) ? appData[currentBranch][currentDateStr][courtCode][timeObj] : {};
+    posItems = (slotData && slotData.posItems) ? [...slotData.posItems] : [];
   } else {
     activeSlotCell = null;
     currentBasePrice = 90000;
@@ -572,9 +720,9 @@ function removePosItem(name) {
     }
   }
   if (activeSlotCell) {
-    const court = activeSlotCell.dataset.court;
+    const courtCode = activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court;
     const timeObj = activeSlotCell.dataset.time;
-    updateDataStore(court, timeObj, { posItems: [...posItems] });
+    updateDataStore(courtCode, timeObj, { posItems: [...posItems] });
   }
   renderInvoice();
 }
@@ -584,7 +732,6 @@ function quickAddProduct(codeOrName, name, price, stock) {
   let itemName = name;
   let itemPrice = price;
 
-  // Compatibility: if called with 2 arguments (name, price)
   if (arguments.length === 2) {
     itemName = codeOrName;
     itemPrice = name;
@@ -599,7 +746,6 @@ function quickAddProduct(codeOrName, name, price, stock) {
     posItems.push({ code: itemCode, name: itemName, price: Number(itemPrice) || 0, qty: 1 });
   }
 
-  // Deduct 1 in local cache for immediate UI feedback
   const prodInCache = dbProductsCache.find(p => p.productCode === itemCode || p.productName === itemName);
   if (prodInCache) {
     if (typeof prodInCache.stockQuantity === 'number') {
@@ -611,9 +757,9 @@ function quickAddProduct(codeOrName, name, price, stock) {
   }
 
   if (activeSlotCell) {
-    const court = activeSlotCell.dataset.court;
+    const courtCode = activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court;
     const timeObj = activeSlotCell.dataset.time;
-    updateDataStore(court, timeObj, { posItems: [...posItems] });
+    updateDataStore(courtCode, timeObj, { posItems: [...posItems] });
 
     const bCode = activeSlotCell.dataset.code || 'DS0102';
     fetch(`/api/bookings/${bCode}/order-service`, {
@@ -733,19 +879,44 @@ function renderInvoice() {
   if (qrEl) qrEl.src = qrUrl;
 }
 
-function submitCheckout() {
-  if (typeof showToast === 'function') {
-    showToast('Đã xuất Hóa đơn K80 và thanh toán thành công!', 'success');
+async function submitCheckout() {
+  const bCode = (activeSlotCell && activeSlotCell.dataset.code) ? activeSlotCell.dataset.code : null;
+  const serviceSubtotal = posItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+  let payMode = 'Tiền mặt';
+  const btnQR = document.getElementById('btnPayQR');
+  const btnCard = document.getElementById('btnPayCard');
+  if (btnQR && btnQR.classList.contains('btn-primary')) payMode = 'VietQR';
+  else if (btnCard && btnCard.classList.contains('btn-primary')) payMode = 'Thẻ POS';
+
+  if (bCode) {
+    try {
+      const res = await fetch(`/api/bookings/${bCode}/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productFee: serviceSubtotal,
+          paymentMethod: payMode,
+          staffCode: 'NVQ01'
+        })
+      });
+      const data = await res.json();
+      if (data.success || res.ok) {
+        if (typeof showToast === 'function') {
+          showToast('Đã xuất Hóa đơn K80 và thanh toán thành công!', 'success');
+        }
+      }
+    } catch (e) {
+      console.warn('Lỗi checkout backend:', e);
+    }
   } else {
-    alert('Đã xuất Hóa đơn K80 và thanh toán thành công!');
+    if (typeof showToast === 'function') {
+      showToast('Đã xuất Hóa đơn K80 và thanh toán thành công!', 'success');
+    }
   }
-  if (activeSlotCell) {
-    const court = activeSlotCell.dataset.court;
-    const timeObj = activeSlotCell.dataset.time;
-    updateDataStore(court, timeObj, { state: 'completed', deposit: 0, posItems: [] });
-    renderGridForDate(currentDateStr);
-  }
+
   closeCheckoutModal();
+  await renderGridForDate(currentDateStr);
 }
 
 function closeCreateBookingModal() {
@@ -756,22 +927,6 @@ function closeDetailModal() {
 }
 function closeCheckoutModal() {
   document.getElementById('checkoutModal').classList.remove('active');
-}
-
-// FETCH REAL COURTS FROM SQL SERVER
-async function loadCourtsFromSql() {
-  try {
-    const res = await fetch('/api/courts');
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.length > 0) {
-        courtsList = data.map(c => c.courtName);
-        renderGridForDate(currentDateStr);
-      }
-    }
-  } catch (e) {
-    console.warn('SQL courts fallback:', e);
-  }
 }
 
 // ==========================================
@@ -847,7 +1002,6 @@ function initGridDragToScroll() {
     scrollEl.style.removeProperty('user-select');
   });
 
-  // Prevent click on child slot if user actually dragged
   scrollEl.addEventListener('click', (e) => {
     if (hasDragged) {
       e.preventDefault();
@@ -856,10 +1010,6 @@ function initGridDragToScroll() {
     }
   }, true);
 
-  // Wheel scroll support:
-  // - Shift + Wheel: scroll timetable horizontally
-  // - Trackpad horizontal swipe: scroll timetable horizontally
-  // - Normal Wheel: ALLOW natural vertical scrolling of the entire page up/down!
   scrollEl.addEventListener('wheel', (e) => {
     if (e.shiftKey) {
       e.preventDefault();
@@ -867,10 +1017,8 @@ function initGridDragToScroll() {
     } else if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
       scrollEl.scrollLeft += e.deltaX;
     }
-    // Normal vertical wheel is NOT intercepted, browser scrolls page up/down smoothly!
   }, { passive: false });
 
-  // Sync active shift pill with scroll position
   scrollEl.addEventListener('scroll', () => {
     const sl = scrollEl.scrollLeft;
     document.querySelectorAll('.btn-time-shift').forEach(b => b.classList.remove('active'));
@@ -887,14 +1035,26 @@ function initGridDragToScroll() {
   }, { passive: true });
 }
 
-// KHỞI CHẠY
-window.addEventListener('DOMContentLoaded', () => {
+// INITIALIZATION
+window.addEventListener('DOMContentLoaded', async () => {
   const savedTheme = localStorage.getItem('utesport_theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
 
-  initAppData();
-  goToToday();
-  loadCourtsFromSql();
+  const dateInput = document.getElementById('gridDateInput');
+  if (dateInput) {
+    dateInput.value = formatDate(new Date());
+    currentDateStr = dateInput.value;
+  } else {
+    currentDateStr = formatDate(new Date());
+  }
+
+  const branchFilterEl = document.getElementById('branchFilter');
+  if (branchFilterEl) {
+    currentBranch = branchFilterEl.value;
+  }
+
+  await loadCourtsForBranch(currentBranch);
+  await renderGridForDate(currentDateStr);
   loadDbProductsForPos();
   initGridDragToScroll();
 
@@ -906,9 +1066,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  const gridDateInput = document.getElementById('gridDateInput');
-  if (gridDateInput) {
-    gridDateInput.addEventListener('change', function(e) {
+  if (dateInput) {
+    dateInput.addEventListener('change', function(e) {
       renderGridForDate(e.target.value);
     });
   }
