@@ -496,6 +496,7 @@ async function submitBookingForm() {
     });
 
     if (res.ok) {
+      window.lastActionBookingCode = genCode;
       if (typeof showToast === 'function') {
         showToast(`Đặt sân thành công cho khách: ${name}! Mã: ${genCode}`, 'success');
       } else {
@@ -537,6 +538,7 @@ async function checkInBooking() {
   if (activeSlotCell) {
     const bCode = activeSlotCell.dataset.code;
     if (bCode) {
+      window.lastActionBookingCode = bCode;
       try {
         const res = await fetch(`/api/bookings/${bCode}/checkin`, { method: 'POST' });
         const data = await res.json();
@@ -561,6 +563,7 @@ async function cancelBookingFromModal() {
   if (!confirm(`Bạn có chắc chắn muốn hủy đơn đặt sân [${bCode}] của khách [${cust}]?`)) {
     return;
   }
+  window.lastActionBookingCode = bCode;
   try {
     const res = await fetch(`/api/bookings/${bCode}/cancel`, {
       method: 'POST',
@@ -890,6 +893,7 @@ async function submitCheckout() {
   else if (btnCard && btnCard.classList.contains('btn-primary')) payMode = 'Thẻ POS';
 
   if (bCode) {
+    window.lastActionBookingCode = bCode;
     try {
       const res = await fetch(`/api/bookings/${bCode}/checkout`, {
         method: 'POST',

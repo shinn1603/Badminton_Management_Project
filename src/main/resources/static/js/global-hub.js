@@ -159,7 +159,16 @@ function selectPeriod(btnElement, period) {
 }
 
 // 5. Toast & In-Modal Prominent Notification System
+const activeToastMessages = new Set();
 function showToast(message, type = 'success') {
+  if (!message) return;
+  const cleanMsg = message.trim();
+  if (activeToastMessages.has(cleanMsg)) {
+    return;
+  }
+  activeToastMessages.add(cleanMsg);
+  setTimeout(() => activeToastMessages.delete(cleanMsg), 2500);
+
   let container = document.getElementById('toastContainer');
   if (!container) {
     container = document.createElement('div');
@@ -169,6 +178,10 @@ function showToast(message, type = 'success') {
   }
 
   container.style.zIndex = '999999';
+
+  while (container.children.length >= 2) {
+    container.removeChild(container.firstChild);
+  }
 
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
@@ -311,11 +324,26 @@ function showToast(message, type = 'success') {
     reconnectTimer = setTimeout(connect, 6000);
   }
 
+  const recentEventKeys = new Set();
+
   function handleIncomingNotification(payload) {
     if (!payload) return;
 
+    // Deduplicate identical events received across multiple topic subscriptions (/topic/bookings, /topic/notifications)
+    const eventKey = `${payload.eventType || ''}_${payload.bookingCode || ''}_${payload.message || ''}`;
+    if (recentEventKeys.has(eventKey)) {
+      return;
+    }
+    recentEventKeys.add(eventKey);
+    setTimeout(() => recentEventKeys.delete(eventKey), 5000);
+
     window.dispatchEvent(new CustomEvent('badminton:booking-event', { detail: payload }));
     window.dispatchEvent(new CustomEvent('badminton:notification', { detail: payload }));
+
+    // If this booking or action was performed directly in this active tab, skip the duplicate broadcast toast
+    if (window.lastActionBookingCode && payload.bookingCode && window.lastActionBookingCode === payload.bookingCode) {
+      return;
+    }
 
     const path = window.location.pathname.toLowerCase();
     const isDashboardOrPos = path.startsWith('/manager') || path.startsWith('/pos') || path.startsWith('/director');

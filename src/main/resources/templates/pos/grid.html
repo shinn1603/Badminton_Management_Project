@@ -806,6 +806,7 @@
         });
         const data = await res.json();
         if (data.success) {
+          window.lastActionBookingCode = currentTransferBookingCode;
           showToast(`Chuyển sang [${targetCourtName}] thành công! Chênh lệch: ${Number(data.priceDifference || 0).toLocaleString('vi-VN')} đ`, 'success');
           closeTransferModal();
           await renderGridForDate(currentDateStr);
