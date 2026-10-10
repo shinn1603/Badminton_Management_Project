@@ -12,6 +12,63 @@ let posItems = [];
 let currentBasePrice = 120000;
 let currentDeposit = 36000;
 let realCourts = [];
+let bookingServicesStore = {};
+let currentSessionKey = null;
+let currentSessionSlots = [];
+let currentDisplayTimeRange = '';
+
+function getSessionKey(courtCode, code, customer, phone) {
+  if (code && code.trim() !== '') return `code_${code.trim()}`;
+  return `cust_${currentBranch}_${currentDateStr}_${courtCode}_${customer || 'unknown'}_${phone || ''}`;
+}
+
+function getSessionSlots(courtCode, timeSlot, code, customer, phone) {
+  const results = [];
+  if (!appData[currentBranch] || !appData[currentBranch][currentDateStr] || !appData[currentBranch][currentDateStr][courtCode]) {
+    return results;
+  }
+  const courtSlots = appData[currentBranch][currentDateStr][courtCode];
+
+  if (code && code.trim() !== '') {
+    for (let t in courtSlots) {
+      if (courtSlots[t].code === code) {
+        results.push({ time: t, slot: courtSlots[t] });
+      }
+    }
+  }
+
+  if (results.length === 0 && customer && customer.trim() !== '' && customer !== 'Khách đặt sân') {
+    for (let t in courtSlots) {
+      const s = courtSlots[t];
+      if ((s.state === 'in-use' || s.state === 'booked') && s.customer === customer) {
+        if (!phone || !s.phone || s.phone === phone) {
+          results.push({ time: t, slot: s });
+        }
+      }
+    }
+  }
+
+  if (results.length === 0 && courtSlots[timeSlot]) {
+    results.push({ time: timeSlot, slot: courtSlots[timeSlot] });
+  }
+
+  return results;
+}
+
+function formatSessionTimeRange(sessionSlots) {
+  if (!sessionSlots || sessionSlots.length === 0) return '';
+  if (sessionSlots.length === 1) return sessionSlots[0].time;
+
+  const times = sessionSlots.map(s => {
+    const parts = s.time.split(' - ');
+    return { start: parts[0], end: parts[1] };
+  });
+
+  times.sort((a, b) => a.start.localeCompare(b.start));
+  const earliest = times[0].start;
+  const latest = times[times.length - 1].end;
+  return `${earliest} - ${latest} (${sessionSlots.length} tiếng)`;
+}
 
 const timeSlots = [
   '06:00 - 07:00', '07:00 - 08:00', '08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00',
@@ -169,6 +226,12 @@ async function renderGridForDate(dateStr) {
 
         const bPrice = Number(matchedBooking.totalPrice) || defaultPrice;
         const bDeposit = Number(matchedBooking.depositAmount) || Math.round(bPrice * 0.3);
+        const bKey = getSessionKey(court.courtCode, matchedBooking.bookingCode, matchedBooking.customerName, matchedBooking.customerPhone);
+        const existingSlot = (appData[currentBranch] && appData[currentBranch][dateStr] && appData[currentBranch][dateStr][court.courtCode]) ? appData[currentBranch][dateStr][court.courtCode][timeSlot] : null;
+        let storedItems = bookingServicesStore[bKey] || (existingSlot && existingSlot.posItems ? existingSlot.posItems : []);
+        if (storedItems.length > 0 && !bookingServicesStore[bKey]) {
+          bookingServicesStore[bKey] = [...storedItems];
+        }
 
         cellData = {
           state: state,
@@ -178,7 +241,7 @@ async function renderGridForDate(dateStr) {
           price: bPrice,
           deposit: bDeposit,
           rawStatus: matchedBooking.status,
-          posItems: []
+          posItems: [...storedItems]
         };
       } else {
         cellData = {
@@ -719,7 +782,7 @@ function populateCheckoutCourtDropdown(selectedCourtSlot = null) {
   if (!assignSelect) return;
 
   let optionsHtml = '<option value="none">Bán lẻ mang đi (Tiền sân 0 đ)</option>';
-  
+
   if (appData[currentBranch] && appData[currentBranch][currentDateStr]) {
     const branchSlots = appData[currentBranch][currentDateStr];
     for (let cCode in branchSlots) {
@@ -743,11 +806,17 @@ function onCheckoutCourtAssignChange(val) {
   const targetLabel = document.getElementById('checkoutTargetLabel');
   const btnSave = document.getElementById('btnSaveServicesOnly');
   const btnSubmitText = document.getElementById('btnCheckoutSubmitText');
+  const alertEl = document.getElementById('saveServiceAlert');
+  if (alertEl) alertEl.style.display = 'none';
 
   if (val === 'none') {
     activeSlotCell = null;
+    currentSessionKey = null;
+    currentSessionSlots = [];
+    currentDisplayTimeRange = '';
     currentBasePrice = 0;
     currentDeposit = 0;
+    posItems = [];
     if (targetLabel) targetLabel.textContent = 'Khách lẻ tại quầy (Không tính tiền sân - 0 đ)';
     if (btnSave) btnSave.style.display = 'none';
     if (btnSubmitText) btnSubmitText.textContent = 'Thanh toán Đơn lẻ & In Bill';
@@ -756,10 +825,6 @@ function onCheckoutCourtAssignChange(val) {
     const slotData = (appData[currentBranch] && appData[currentBranch][currentDateStr] && appData[currentBranch][currentDateStr][cCode]) ? appData[currentBranch][currentDateStr][cCode][tSlot] : null;
 
     if (slotData) {
-      currentBasePrice = Number(slotData.price) || 0;
-      currentDeposit = Number(slotData.deposit) || 0;
-      posItems = slotData.posItems ? [...slotData.posItems] : [];
-
       const domCell = document.querySelector(`.slot-inner[data-court-code="${cCode}"][data-time="${tSlot}"]`);
       if (domCell) {
         activeSlotCell = domCell;
@@ -770,17 +835,44 @@ function onCheckoutCourtAssignChange(val) {
             courtCode: cCode,
             court: cCode,
             time: tSlot,
-            price: currentBasePrice,
-            deposit: currentDeposit,
+            price: Number(slotData.price) || 0,
+            deposit: Number(slotData.deposit) || 0,
             customer: slotData.customer,
             phone: slotData.phone
           }
         };
       }
 
+      const sessionSlots = getSessionSlots(cCode, tSlot, slotData.code, slotData.customer, slotData.phone);
+      currentSessionSlots = sessionSlots;
+      currentSessionKey = getSessionKey(cCode, slotData.code, slotData.customer, slotData.phone);
+      currentDisplayTimeRange = formatSessionTimeRange(sessionSlots);
+
+      // Compute total base price and deposit for session
+      if (sessionSlots.length > 1 && sessionSlots.every(s => s.slot.code === sessionSlots[0].slot.code && s.slot.code !== '')) {
+        currentBasePrice = Number(sessionSlots[0].slot.price) || 0;
+        currentDeposit = Number(sessionSlots[0].slot.deposit) || 0;
+      } else if (sessionSlots.length > 1) {
+        currentBasePrice = sessionSlots.reduce((sum, s) => sum + (Number(s.slot.price) || 0), 0);
+        currentDeposit = sessionSlots.reduce((sum, s) => sum + (Number(s.slot.deposit) || 0), 0);
+      } else {
+        currentBasePrice = Number(slotData.price) || 0;
+        currentDeposit = Number(slotData.deposit) || 0;
+      }
+
+      // Sync posItems
+      if (bookingServicesStore[currentSessionKey]) {
+        posItems = [...bookingServicesStore[currentSessionKey]];
+      } else {
+        const found = sessionSlots.find(s => s.slot.posItems && s.slot.posItems.length > 0);
+        posItems = found ? [...found.slot.posItems] : (slotData.posItems ? [...slotData.posItems] : []);
+        bookingServicesStore[currentSessionKey] = [...posItems];
+      }
+      sessionSlots.forEach(s => { s.slot.posItems = [...posItems]; });
+
       const courtObj = realCourts.find(c => c.courtCode === cCode);
       const courtName = courtObj ? courtObj.courtName : cCode;
-      if (targetLabel) targetLabel.textContent = `${courtName} - Khách: ${slotData.customer || 'Đang chơi'} (${tSlot})`;
+      if (targetLabel) targetLabel.textContent = `${courtName} - Khách: ${slotData.customer || 'Đang chơi'} (${currentDisplayTimeRange})`;
       if (btnSave) btnSave.style.display = 'block';
       if (btnSubmitText) btnSubmitText.textContent = 'Xác nhận Thanh toán & Trả sân';
     }
@@ -792,26 +884,58 @@ function openCheckoutModal(element) {
   const targetLabel = document.getElementById('checkoutTargetLabel');
   const btnSave = document.getElementById('btnSaveServicesOnly');
   const btnSubmitText = document.getElementById('btnCheckoutSubmitText');
+  const alertEl = document.getElementById('saveServiceAlert');
+  if (alertEl) alertEl.style.display = 'none';
 
   let selectedCourtKey = 'none';
 
   if (element) {
     activeSlotCell = element;
-    currentBasePrice = Number(activeSlotCell.dataset.price) || 0;
-    currentDeposit = Number(activeSlotCell.dataset.deposit) || 0;
-
     const courtCode = activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court;
     const timeObj = activeSlotCell.dataset.time;
+    const bCode = activeSlotCell.dataset.code || '';
+    const cust = activeSlotCell.dataset.customer || '';
+    const phone = activeSlotCell.dataset.phone || '';
+
     selectedCourtKey = `${courtCode}__${timeObj}`;
 
-    const slotData = (appData[currentBranch] && appData[currentBranch][currentDateStr] && appData[currentBranch][currentDateStr][courtCode]) ? appData[currentBranch][currentDateStr][courtCode][timeObj] : {};
-    posItems = (slotData && slotData.posItems) ? [...slotData.posItems] : [];
+    const sessionSlots = getSessionSlots(courtCode, timeObj, bCode, cust, phone);
+    currentSessionSlots = sessionSlots;
+    currentSessionKey = getSessionKey(courtCode, bCode, cust, phone);
+    currentDisplayTimeRange = formatSessionTimeRange(sessionSlots);
 
-    if (targetLabel) targetLabel.textContent = `${activeSlotCell.dataset.court || courtCode} - Khách: ${activeSlotCell.dataset.customer || 'Đang chơi'} (${timeObj})`;
+    // Synchronize price and deposit for multi-hour session
+    if (sessionSlots.length > 1 && sessionSlots.every(s => s.slot.code === sessionSlots[0].slot.code && s.slot.code !== '')) {
+      currentBasePrice = Number(sessionSlots[0].slot.price) || Number(activeSlotCell.dataset.price) || 0;
+      currentDeposit = Number(sessionSlots[0].slot.deposit) || Number(activeSlotCell.dataset.deposit) || 0;
+    } else if (sessionSlots.length > 1) {
+      currentBasePrice = sessionSlots.reduce((sum, s) => sum + (Number(s.slot.price) || 0), 0);
+      currentDeposit = sessionSlots.reduce((sum, s) => sum + (Number(s.slot.deposit) || 0), 0);
+    } else {
+      currentBasePrice = Number(activeSlotCell.dataset.price) || 0;
+      currentDeposit = Number(activeSlotCell.dataset.deposit) || 0;
+    }
+
+    // Synchronize posItems across all connected slots
+    if (bookingServicesStore[currentSessionKey]) {
+      posItems = [...bookingServicesStore[currentSessionKey]];
+    } else {
+      const found = sessionSlots.find(s => s.slot.posItems && s.slot.posItems.length > 0);
+      posItems = found ? [...found.slot.posItems] : [];
+      bookingServicesStore[currentSessionKey] = [...posItems];
+    }
+    sessionSlots.forEach(s => { s.slot.posItems = [...posItems]; });
+
+    const courtObj = realCourts.find(c => c.courtCode === courtCode);
+    const courtName = courtObj ? courtObj.courtName : (activeSlotCell.dataset.court || courtCode);
+    if (targetLabel) targetLabel.textContent = `${courtName} - Khách: ${cust || 'Đang chơi'} (${currentDisplayTimeRange})`;
     if (btnSave) btnSave.style.display = 'block';
     if (btnSubmitText) btnSubmitText.textContent = 'Xác nhận Thanh toán & Trả sân';
   } else {
     activeSlotCell = null;
+    currentSessionKey = null;
+    currentSessionSlots = [];
+    currentDisplayTimeRange = '';
     currentBasePrice = 0; // Retail walk-in has 0d court fee!
     currentDeposit = 0;
     posItems = [];
@@ -846,11 +970,22 @@ function removePosItem(name) {
       posItems.splice(idx, 1);
     }
   }
-  if (activeSlotCell) {
+
+  if (currentSessionKey) {
+    bookingServicesStore[currentSessionKey] = [...posItems];
+  }
+  if (currentSessionSlots && currentSessionSlots.length > 0) {
+    const courtCode = activeSlotCell ? (activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court) : '';
+    currentSessionSlots.forEach(s => {
+      s.slot.posItems = [...posItems];
+      if (courtCode) updateDataStore(courtCode, s.time, { posItems: [...posItems] });
+    });
+  } else if (activeSlotCell) {
     const courtCode = activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court;
     const timeObj = activeSlotCell.dataset.time;
     updateDataStore(courtCode, timeObj, { posItems: [...posItems] });
   }
+
   renderInvoice();
 }
 
@@ -883,21 +1018,34 @@ function quickAddProduct(codeOrName, name, price, stock) {
     renderPosProductGrid();
   }
 
-  if (activeSlotCell) {
+  if (currentSessionKey) {
+    bookingServicesStore[currentSessionKey] = [...posItems];
+  }
+  if (currentSessionSlots && currentSessionSlots.length > 0) {
+    const courtCode = activeSlotCell ? (activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court) : '';
+    currentSessionSlots.forEach(s => {
+      s.slot.posItems = [...posItems];
+      if (courtCode) updateDataStore(courtCode, s.time, { posItems: [...posItems] });
+    });
+  } else if (activeSlotCell) {
     const courtCode = activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court;
     const timeObj = activeSlotCell.dataset.time;
     updateDataStore(courtCode, timeObj, { posItems: [...posItems] });
+  }
 
-    const bCode = activeSlotCell.dataset.code || 'DS0102';
-    fetch(`/api/bookings/${bCode}/order-service`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productCode: itemCode, quantity: 1 })
-    }).then(r => r.json()).then(data => {
-      if (data.success && window.showToast) {
-        showToast(`Đã xuất [${itemName}] và trừ tồn kho CSDL!`, 'info');
-      }
-    }).catch(e => console.warn('Lỗi đồng bộ dịch vụ:', e));
+  if (activeSlotCell) {
+    const bCode = activeSlotCell.dataset.code;
+    if (bCode) {
+      fetch(`/api/bookings/${bCode}/order-service`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productCode: itemCode, quantity: 1 })
+      }).then(r => r.json()).then(data => {
+        if (data.success && window.showToast) {
+          showToast(`Đã xuất [${itemName}] và trừ tồn kho CSDL!`, 'info');
+        }
+      }).catch(e => console.warn('Lỗi đồng bộ dịch vụ:', e));
+    }
   } else {
     if (window.showToast) {
       showToast(`Đã thêm: ${itemName}`, 'info');
@@ -930,8 +1078,8 @@ function switchPaymentMode(mode) {
 
 function printReceiptK80() {
   const total = document.getElementById('coTotal').innerText;
-  const court = activeSlotCell ? activeSlotCell.dataset.court : 'Sân 01';
-  const time = activeSlotCell ? activeSlotCell.dataset.time : 'Khung giờ hiện tại';
+  const court = activeSlotCell ? (activeSlotCell.dataset.court || 'Sân 01') : 'Khách vãng lai';
+  const time = currentDisplayTimeRange || (activeSlotCell ? activeSlotCell.dataset.time : 'Khung giờ hiện tại');
   const cust = activeSlotCell ? activeSlotCell.dataset.customer : 'Khách vãng lai';
 
   const win = window.open('', '_blank', 'width=360,height=580');
@@ -1007,22 +1155,52 @@ function renderInvoice() {
 }
 
 async function saveServicesAndContinuePlaying() {
-  if (!activeSlotCell) {
+  if (!activeSlotCell && (!currentSessionSlots || currentSessionSlots.length === 0)) {
     if (typeof showToast === 'function') {
       showToast('Vui lòng chọn sân đang chơi để lưu dịch vụ!', 'warning');
     }
     return;
   }
-  const courtCode = activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court;
-  const timeObj = activeSlotCell.dataset.time;
 
-  updateDataStore(courtCode, timeObj, { posItems: [...posItems] });
+  const courtCode = activeSlotCell ? (activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court) : '';
+  const customerName = activeSlotCell ? (activeSlotCell.dataset.customer || 'Khách đang chơi') : 'Khách';
+
+  // Sync to shared store
+  if (currentSessionKey) {
+    bookingServicesStore[currentSessionKey] = [...posItems];
+  }
+
+  // Sync to all slots in current session
+  if (currentSessionSlots && currentSessionSlots.length > 0) {
+    currentSessionSlots.forEach(s => {
+      s.slot.posItems = [...posItems];
+      if (courtCode) {
+        updateDataStore(courtCode, s.time, { posItems: [...posItems] });
+      }
+    });
+  } else if (activeSlotCell) {
+    const timeObj = activeSlotCell.dataset.time;
+    updateDataStore(courtCode, timeObj, { posItems: [...posItems] });
+  }
+
+  // Show in-modal alert banner with action buttons
+  const alertEl = document.getElementById('saveServiceAlert');
+  const alertDetail = document.getElementById('saveServiceAlertDetail');
+  if (alertEl) {
+    if (alertDetail) {
+      alertDetail.textContent = `Đã cập nhật ${posItems.length} dịch vụ cho khách ${customerName} (${currentDisplayTimeRange || 'Đang chơi'}). Khách tiếp tục chơi.`;
+    }
+    alertEl.style.display = 'flex';
+  }
 
   if (typeof showToast === 'function') {
-    showToast('Đã lưu dịch vụ vào sân thành công! Khách tiếp tục chơi.', 'success');
+    showToast(`Đã lưu ${posItems.length} dịch vụ vào sân (${currentDisplayTimeRange || 'Đang chơi'})!`, 'success');
   }
-  closeCheckoutModal();
-  await renderGridForDate(currentDateStr);
+}
+
+function continueAddingServices() {
+  const alertEl = document.getElementById('saveServiceAlert');
+  if (alertEl) alertEl.style.display = 'none';
 }
 
 async function submitCheckout() {
@@ -1056,10 +1234,20 @@ async function submitCheckout() {
     } catch (e) {
       console.warn('Lỗi checkout backend:', e);
     }
-    if (activeSlotCell) {
-      const courtCode = activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court;
+
+    // Reset ALL slots in the session so neither hour is stuck in-use!
+    const courtCode = activeSlotCell ? (activeSlotCell.dataset.courtCode || activeSlotCell.dataset.court) : '';
+    if (currentSessionSlots && currentSessionSlots.length > 0) {
+      currentSessionSlots.forEach(s => {
+        updateDataStore(courtCode, s.time, { state: 'available', customer: '', phone: '', code: '', posItems: [] });
+      });
+    } else if (activeSlotCell) {
       const timeObj = activeSlotCell.dataset.time;
       updateDataStore(courtCode, timeObj, { state: 'available', customer: '', phone: '', code: '', posItems: [] });
+    }
+
+    if (currentSessionKey) {
+      delete bookingServicesStore[currentSessionKey];
     }
   } else {
     try {
@@ -1091,6 +1279,8 @@ function closeDetailModal() {
   document.getElementById('detailBookingModal').classList.remove('active');
 }
 function closeCheckoutModal() {
+  const alertEl = document.getElementById('saveServiceAlert');
+  if (alertEl) alertEl.style.display = 'none';
   document.getElementById('checkoutModal').classList.remove('active');
 }
 

@@ -457,6 +457,23 @@
           </div>
         </div>
 
+        <!-- SAVE SERVICE NOTIFICATION BANNER -->
+        <div id="saveServiceAlert" style="display: none; grid-column: 1 / -1; background: rgba(16, 185, 129, 0.08); border: 1px solid #10b981; border-radius: 8px; padding: 10px 14px; align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; color: #10b981; flex-shrink: 0;">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <div>
+              <strong style="font-size: 13px; color: var(--text-dark);">Đã lưu dịch vụ vào sân thành công!</strong>
+              <div style="font-size: 12px; color: var(--text-muted);" id="saveServiceAlertDetail">Khách tiếp tục chơi. Đã đồng bộ hóa đơn cho toàn bộ khung giờ của khách.</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; flex-shrink: 0;">
+            <button type="button" class="btn btn-xs btn-outline" style="background: var(--surface); border-color: #10b981; color: #059669; font-weight: 600; padding: 5px 12px;" onclick="continueAddingServices()">Tiếp tục gọi món</button>
+            <button type="button" class="btn btn-xs btn-primary" style="background: #10b981; border-color: #10b981; color: #ffffff; font-weight: 600; padding: 5px 12px;" onclick="closeCheckoutModal()">Đóng quầy (Về lưới)</button>
+          </div>
+        </div>
+
         <!-- LEFT: TOUCHPAD PRODUCTS DYNAMIC FROM DB -->
         <div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
