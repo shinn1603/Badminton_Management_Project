@@ -1,6 +1,7 @@
 package vn.yain.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import vn.yain.dto.ChatMessageDto;
 import vn.yain.entity.Booking;
@@ -46,10 +47,21 @@ public class ChatbotService {
     @Autowired
     private GeminiAiService geminiAiService;
 
+    @Autowired
+    private PricingService pricingService;
+
     // Session Memory Store (sessionId -> ChatSessionContext)
     private final Map<String, ChatSessionContext> sessionStore = new ConcurrentHashMap<>();
 
+    @Scheduled(fixedRate = 600000)
+    public void cleanExpiredSessions() {
+        long now = System.currentTimeMillis();
+        // Evict sessions inactive for over 30 minutes
+        sessionStore.entrySet().removeIf(entry -> (now - entry.getValue().lastAccessed) > 1800000);
+    }
+
     public static class ChatSessionContext {
+        public long lastAccessed = System.currentTimeMillis();
         public String branchCode = "CN01";
         public String branchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
         public String courtCode = "CL01";
@@ -65,6 +77,7 @@ public class ChatbotService {
         public List<Map<String, String>> dialogHistory = new ArrayList<>();
 
         public void addDialogTurn(String role, String text) {
+            lastAccessed = System.currentTimeMillis();
             if (dialogHistory.size() > 14) {
                 dialogHistory.remove(0);
             }
@@ -72,6 +85,7 @@ public class ChatbotService {
         }
 
         public void reset() {
+            lastAccessed = System.currentTimeMillis();
             branchCode = "CN01";
             branchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
             courtCode = "CL01";
@@ -100,6 +114,7 @@ public class ChatbotService {
     public ChatMessageDto processMessage(String rawInput, String sessionId) {
         String sid = (sessionId != null && !sessionId.trim().isEmpty()) ? sessionId.trim() : "default_session";
         ChatSessionContext ctx = sessionStore.computeIfAbsent(sid, k -> new ChatSessionContext());
+        ctx.lastAccessed = System.currentTimeMillis();
 
         // 1. Try Google Gemini Cloud AI if configured
         if (geminiAiService != null && geminiAiService.isConfigured() && rawInput != null && !rawInput.trim().isEmpty()) {
@@ -163,7 +178,15 @@ public class ChatbotService {
             try {
                 bookingService.createBooking(booking);
                 courtService.holdCourtForBooking(ctx.courtCode, ctx.branchCode, ctx.timeSlot, booking.getCustomerName());
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                return ChatMessageDto.builder()
+                        .sender("bot")
+                        .intent("BOOKING_ERROR")
+                        .text("Rất tiếc, không thể tạo đơn đặt sân vì: " + e.getMessage() + ". Bạn vui lòng chọn khung giờ khác hoặc liên hệ hotline.")
+                        .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân"))
+                        .actionType("NONE")
+                        .timestamp(LocalDateTime.now())
+                        .build();
             }
 
             // VietQR Dynamic URL (MBBank)
@@ -291,6 +314,41 @@ public class ChatbotService {
             }
 
             if (targetCode != null) {
+                Optional<Booking> optBooking = bookingService.getBookingByCode(targetCode);
+                if (optBooking.isEmpty()) {
+                    return ChatMessageDto.builder()
+                            .sender("bot")
+                            .intent("CANCEL_ERROR")
+                            .text("Không tìm thấy đơn đặt sân " + targetCode + " trong hệ thống. Bạn vui lòng kiểm tra lại mã đơn.")
+                            .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân"))
+                            .actionType("NONE")
+                            .timestamp(LocalDateTime.now())
+                            .build();
+                }
+
+                Booking b = optBooking.get();
+                boolean isSessionOwner = ctx.lastBookingCode != null && ctx.lastBookingCode.equalsIgnoreCase(targetCode);
+                if (!isSessionOwner) {
+                    String bPhone = b.getCustomerPhone() != null ? b.getCustomerPhone().replaceAll("\\D", "") : "";
+                    boolean phoneMatched = false;
+                    if (!bPhone.isEmpty() && bPhone.length() >= 4) {
+                        String last4 = bPhone.substring(bPhone.length() - 4);
+                        if (rawInput != null && (rawInput.contains(bPhone) || rawInput.contains(last4))) {
+                            phoneMatched = true;
+                        }
+                    }
+                    if (!phoneMatched) {
+                        return ChatMessageDto.builder()
+                                .sender("bot")
+                                .intent("CANCEL_VERIFY")
+                                .text("Vì lý do bảo mật, để hủy đơn " + targetCode + ", bạn vui lòng cung cấp kèm số điện thoại đã dùng để đặt sân (Ví dụ: 'Hủy đơn " + targetCode + " SĐT " + (bPhone.length() >= 4 ? "***" + bPhone.substring(bPhone.length() - 3) : "") + "').")
+                                .quickReplies(List.of("Tra cứu đơn " + targetCode, "Bảng giá thuê sân"))
+                                .actionType("NONE")
+                                .timestamp(LocalDateTime.now())
+                                .build();
+                    }
+                }
+
                 try {
                     Booking cancelled = bookingService.cancelBooking(targetCode, "Khách yêu cầu hủy qua Chatbot");
                     String reply = String.format(
@@ -371,43 +429,53 @@ public class ChatbotService {
                 ctx.date = LocalDate.now();
             }
 
-            // Determine pricing
-            if (startHour >= 17 && startHour < 21) {
-                ctx.hourlyRate = new BigDecimal("140000");
-            } else if (startHour < 14) {
-                ctx.hourlyRate = new BigDecimal("80000");
-            } else {
-                ctx.hourlyRate = new BigDecimal("100000");
-            }
+            // Determine pricing via centralized PricingService
+            ctx.hourlyRate = pricingService.calculateHourlyRate(null, startHour);
+            ctx.totalPrice = pricingService.calculateTotalPrice(ctx.hourlyRate, duration);
+            ctx.depositAmount = pricingService.calculateDepositAmount(ctx.totalPrice);
 
-            ctx.totalPrice = ctx.hourlyRate.multiply(new BigDecimal(duration));
-            ctx.depositAmount = ctx.totalPrice.multiply(new BigDecimal("0.3"));
-
-            // Check actual courts from database
+            // Check actual courts from database and cross-reference with bookings
             List<Court> branchCourts = courtRepository.findByBranchCode(ctx.branchCode);
             Optional<Court> availableCourt = branchCourts.stream()
-                    .filter(c -> "Trống".equalsIgnoreCase(c.getStatus()))
+                    .filter(c -> !"Bảo trì".equalsIgnoreCase(c.getStatus()))
+                    .filter(c -> {
+                        List<Booking> dayBookings = bookingRepository.findByCourtCodeAndBookingDate(c.getCourtCode(), ctx.date);
+                        return dayBookings.stream().noneMatch(b ->
+                                b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus())
+                                && bookingService.isSlotOverlapping(slotStr, b.getTimeSlot())
+                        );
+                    })
                     .findFirst();
 
-            if (availableCourt.isPresent()) {
-                ctx.courtCode = availableCourt.get().getCourtCode();
-                ctx.courtName = availableCourt.get().getCourtName();
-            } else if (!branchCourts.isEmpty()) {
-                ctx.courtCode = branchCourts.get(0).getCourtCode();
-                ctx.courtName = branchCourts.get(0).getCourtName();
+            if (availableCourt.isEmpty()) {
+                return ChatMessageDto.builder()
+                        .sender("bot")
+                        .intent("COURT_UNAVAILABLE")
+                        .text(String.format("Rất tiếc, vào ngày %s trong khung giờ %s tại %s, tất cả các sân đều đã có khách đặt trước hoặc đang bảo trì.\n\nBạn có muốn đổi sang khung giờ khác (ví dụ trước 17h hoặc sau 20h) hoặc tham khảo chi nhánh khác không?",
+                                ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), slotStr, ctx.branchName))
+                        .quickReplies(List.of("Hôm nay có sân nào trống từ 14h đến 16h không?", "Hôm nay có sân nào trống từ 20h đến 22h không?", "Chi nhánh khác còn sân không?"))
+                        .actionType("NONE")
+                        .timestamp(LocalDateTime.now())
+                        .build();
             }
+
+            ctx.courtCode = availableCourt.get().getCourtCode();
+            ctx.courtName = availableCourt.get().getCourtName();
+            ctx.hourlyRate = pricingService.calculateHourlyRate(availableCourt.get(), startHour);
+            ctx.totalPrice = pricingService.calculateTotalPrice(ctx.hourlyRate, duration);
+            ctx.depositAmount = pricingService.calculateDepositAmount(ctx.totalPrice);
 
             ctx.stage = "COURT_PROPOSED";
 
             String reply = String.format(
-                    "Hôm nay trong khung giờ %s tại %s, hệ thống đang còn %s sẵn sàng phục vụ.\n\n" +
+                    "Ngày %s trong khung giờ %s tại %s, hệ thống đang còn %s sẵn sàng phục vụ.\n\n" +
                     "Thông tin chi tiết:\n" +
                     "• Thời gian: %s (Thời lượng: %d tiếng)\n" +
                     "• Đơn giá: %,d đ/giờ\n" +
                     "• Tổng tiền sân: %,d đ\n" +
                     "• Số tiền cọc 30%%: %,d đ\n\n" +
                     "Bạn có muốn tôi đặt giữ chỗ sân này cho bạn luôn không? Bạn chỉ cần nhắn 'Ok đặt sân cho tôi'.",
-                    slotStr, ctx.branchName, ctx.courtName, slotStr, duration,
+                    ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), slotStr, ctx.branchName, ctx.courtName, slotStr, duration,
                     ctx.hourlyRate.longValue(), ctx.totalPrice.longValue(), ctx.depositAmount.longValue()
             );
 

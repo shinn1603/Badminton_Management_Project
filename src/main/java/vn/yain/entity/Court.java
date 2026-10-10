@@ -28,7 +28,7 @@ public class Court {
     @Column(name = "branch_code", nullable = false, length = 20)
     private String branchCode;
 
-    @Column(name = "hourly_rate", nullable = false)
+    @Column(name = "hourly_rate", nullable = false, precision = 15, scale = 2)
     private BigDecimal hourlyRate;
 
     @Column(length = 30)

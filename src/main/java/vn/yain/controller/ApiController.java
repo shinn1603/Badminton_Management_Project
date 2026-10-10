@@ -1,6 +1,8 @@
 package vn.yain.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.yain.dto.CourtEventDto;
@@ -11,10 +13,12 @@ import vn.yain.repository.BookingRepository;
 import vn.yain.security.JwtTokenProvider;
 import vn.yain.service.BookingService;
 import vn.yain.service.CourtService;
+import vn.yain.service.PricingService;
 import vn.yain.service.UserService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,11 +26,23 @@ import java.util.stream.Collectors;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 import vn.yain.service.CloudinaryService;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
 public class ApiController {
+
+    @Value("${vietqr.webhook.token:UTE_VIETQR_SECRET_TOKEN_2026}")
+    private String webhookToken;
+
+    private String sanitizeErrorMessage(Exception e) {
+        log.error("Internal processing error: {}", e.getMessage(), e);
+        if (e instanceof IllegalArgumentException || e instanceof IllegalStateException) {
+            return e.getMessage();
+        }
+        return "Đã xảy ra lỗi trong quá trình xử lý hệ thống. Vui lòng liên hệ ban quản trị.";
+    }
 
     @Autowired
     private UserService userService;
@@ -36,6 +52,9 @@ public class ApiController {
 
     @Autowired
     private BookingService bookingService;
+
+    @Autowired
+    private PricingService pricingService;
 
     @Autowired
     private ProductRepository productRepository;
@@ -94,7 +113,7 @@ public class ApiController {
         } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.status(401).body(Map.of("success", false, "message", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi máy chủ: " + e.getMessage()));
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
         }
     }
 
@@ -118,7 +137,38 @@ public class ApiController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi máy chủ: " + e.getMessage()));
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
+        }
+    }
+
+    @PostMapping("/auth/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> payload) {
+        try {
+            String identifier = payload.get("identifier");
+            if (identifier == null || identifier.trim().isEmpty()) {
+                identifier = payload.get("username");
+            }
+            if (identifier == null || identifier.trim().isEmpty()) {
+                identifier = payload.get("phone");
+            }
+            if (identifier == null || identifier.trim().isEmpty()) {
+                identifier = payload.get("email");
+            }
+
+            String newPassword = payload.get("newPassword");
+            if (newPassword == null) {
+                newPassword = payload.get("password");
+            }
+
+            userService.resetPassword(identifier, newPassword);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Đặt lại mật khẩu thành công! Quý khách vui lòng đăng nhập với mật khẩu mới."
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
         }
     }
 
@@ -476,7 +526,7 @@ public class ApiController {
         } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi máy chủ: " + e.getMessage()));
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
         }
     }
 
@@ -493,7 +543,7 @@ public class ApiController {
         } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi máy chủ: " + e.getMessage()));
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
         }
     }
 
@@ -563,18 +613,11 @@ public class ApiController {
                 duration = Math.max(1, endHour - startHour);
             }
 
-            // Hourly rate check from court or default
-            BigDecimal hourlyRate = (startHour >= 17 && startHour < 21) ? new BigDecimal("140000") : new BigDecimal("90000");
+            // Hourly rate check from court or default via PricingService
             Optional<Court> courtOpt = courtRepository.findByCourtCode(courtCode);
-            if (courtOpt.isPresent() && courtOpt.get().getHourlyRate() != null) {
-                hourlyRate = courtOpt.get().getHourlyRate();
-                if (startHour >= 17 && startHour < 21) {
-                    hourlyRate = hourlyRate.multiply(new BigDecimal("1.25")); // peak hour boost
-                }
-            }
-
-            BigDecimal totalPrice = hourlyRate.multiply(new BigDecimal(duration));
-            BigDecimal deposit = totalPrice.multiply(new BigDecimal("0.3"));
+            BigDecimal hourlyRate = pricingService.calculateHourlyRate(courtOpt.orElse(null), startHour);
+            BigDecimal totalPrice = pricingService.calculateTotalPrice(hourlyRate, duration);
+            BigDecimal deposit = pricingService.calculateDepositAmount(totalPrice);
 
             String bookingCode = "DS" + (100000 + (int) (Math.random() * 900000));
             Booking booking = new Booking();
@@ -641,8 +684,17 @@ public class ApiController {
     // ==========================================
 
     @PostMapping("/webhook/vietqr")
-    public ResponseEntity<?> handleVietQRWebhook(@RequestBody Map<String, Object> webhookData) {
+    public ResponseEntity<?> handleVietQRWebhook(
+            @RequestHeader(value = "X-Webhook-Secret", required = false) String secretHeader,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestBody Map<String, Object> webhookData) {
         try {
+            boolean authorized = (secretHeader != null && secretHeader.trim().equals(webhookToken)) ||
+                                 (authHeader != null && authHeader.contains(webhookToken));
+            if (!authorized) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "error", "Unauthorized webhook caller"));
+            }
+
             String content = (String) webhookData.getOrDefault("content", "");
             if (content == null || content.isEmpty()) {
                 content = (String) webhookData.getOrDefault("description", "");
@@ -667,6 +719,9 @@ public class ApiController {
     }
 
     private boolean isSlotOverlapping(String s1, String s2) {
+        if (bookingService != null) {
+            return bookingService.isSlotOverlapping(s1, s2);
+        }
         if (s1 == null || s2 == null) return false;
         if (s1.trim().equalsIgnoreCase(s2.trim())) return true;
         try {
@@ -679,6 +734,9 @@ public class ApiController {
     }
 
     private int[] parseSlotHours(String slot) {
+        if (bookingService != null) {
+            return bookingService.parseSlotHours(slot);
+        }
         Pattern p = Pattern.compile("(\\d{1,2}):\\d{2}\\s*-\\s*(\\d{1,2}):\\d{2}");
         Matcher m = p.matcher(slot);
         if (m.find()) {
@@ -754,8 +812,13 @@ public class ApiController {
         if (!productRepository.existsById(id)) {
             return ResponseEntity.status(404).body(Map.of("success", false, "message", "Không tìm thấy sản phẩm!"));
         }
-        productRepository.deleteById(id);
-        return ResponseEntity.ok(Map.of("success", true, "message", "Đã xóa sản phẩm khỏi cơ sở dữ liệu thành công!"));
+        try {
+            productRepository.deleteById(id);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Đã xóa sản phẩm khỏi cơ sở dữ liệu thành công!"));
+        } catch (Exception e) {
+            log.warn("Cannot delete product id={}: {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("success", false, "message", "Không thể xóa sản phẩm do đã có dữ liệu giao dịch hoặc hóa đơn liên quan!"));
+        }
     }
 
     @GetMapping("/branches")
@@ -798,7 +861,95 @@ public class ApiController {
 
     @GetMapping("/tournaments")
     public List<Tournament> getTournaments() {
-        return tournamentRepository.findAll();
+        List<Tournament> list = tournamentRepository.findAll();
+        if (list.isEmpty()) {
+            Tournament t1 = new Tournament();
+            t1.setTournamentCode("GD01");
+            t1.setBranchCode("CN01");
+            t1.setTournamentName("Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026");
+            t1.setStartDate(LocalDateTime.of(2026, 10, 10, 8, 0));
+            t1.setEndDate(LocalDateTime.of(2026, 10, 12, 18, 0));
+            t1.setRules("Thi đấu theo thể thức loại trực tiếp 3 hiệp 21 điểm theo luật BWF.");
+            t1.setMaxParticipants(32);
+            t1.setCurrentParticipants(24);
+            t1.setEntryFee(new BigDecimal("300000"));
+            t1.setTotalPrize(new BigDecimal("20000000"));
+            t1.setStatus("Đang mở đăng ký");
+
+            Tournament t2 = new Tournament();
+            t2.setTournamentCode("GD02");
+            t2.setBranchCode("CN01");
+            t2.setTournamentName("Giải Cầu Lông Doanh Nghiệp & Sinh Viên Cúp Thủ Đức 2026");
+            t2.setStartDate(LocalDateTime.of(2026, 11, 20, 8, 0));
+            t2.setEndDate(LocalDateTime.of(2026, 11, 22, 18, 0));
+            t2.setRules("Giải đấu phong trào kết nối các doanh nghiệp và cựu sinh viên.");
+            t2.setMaxParticipants(24);
+            t2.setCurrentParticipants(0);
+            t2.setEntryFee(BigDecimal.ZERO);
+            t2.setTotalPrize(new BigDecimal("30000000"));
+            t2.setStatus("Sắp mở đăng ký");
+
+            try {
+                tournamentRepository.save(t1);
+                tournamentRepository.save(t2);
+                list = tournamentRepository.findAll();
+            } catch (Exception ignored) {
+                list = List.of(t1, t2);
+            }
+        }
+        return list;
+    }
+
+    @PostMapping("/tournaments/register")
+    public ResponseEntity<?> registerTournament(@RequestBody Map<String, Object> payload) {
+        String tournamentCode = (String) payload.getOrDefault("tournamentCode", "GD01");
+        Optional<Tournament> opt = tournamentRepository.findByTournamentCode(tournamentCode);
+        if (opt.isEmpty()) {
+            List<Tournament> all = tournamentRepository.findAll();
+            if (!all.isEmpty()) {
+                opt = Optional.of(all.get(0));
+            }
+        }
+
+        if (opt.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Không tìm thấy giải đấu yêu cầu."
+            ));
+        }
+
+        Tournament t = opt.get();
+        int max = t.getMaxParticipants() != null ? t.getMaxParticipants() : 32;
+        int current = t.getCurrentParticipants() != null ? t.getCurrentParticipants() : 0;
+
+        if ("Đã đóng đăng ký".equalsIgnoreCase(t.getStatus()) || "Hết chỗ".equalsIgnoreCase(t.getStatus()) || current >= max) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Giải đấu đã hết chỗ hoặc cổng đăng ký đã chính thức đóng.",
+                    "currentParticipants", current,
+                    "maxParticipants", max,
+                    "status", "Hết chỗ"
+            ));
+        }
+
+        current++;
+        t.setCurrentParticipants(current);
+        if (current >= max) {
+            t.setStatus("Hết chỗ");
+        }
+        tournamentRepository.save(t);
+
+        int remaining = max - current;
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Đăng ký tham gia giải đấu thành công!",
+                "tournamentCode", t.getTournamentCode(),
+                "tournamentName", t.getTournamentName(),
+                "currentParticipants", current,
+                "maxParticipants", max,
+                "remainingSlots", Math.max(0, remaining),
+                "status", t.getStatus()
+        ));
     }
 
     @GetMapping("/equipment")
@@ -845,7 +996,7 @@ public class ApiController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi máy chủ: " + e.getMessage()));
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
         }
     }
 
@@ -876,7 +1027,7 @@ public class ApiController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi máy chủ: " + e.getMessage()));
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
         }
     }
 

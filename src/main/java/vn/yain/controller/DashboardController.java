@@ -47,6 +47,11 @@ public class DashboardController {
         return "customer/tournaments";
     }
 
+    @GetMapping({ "/customer/policy", "/policy" })
+    public String customerPolicy() {
+        return "customer/policy";
+    }
+
     @GetMapping("/director/dashboard")
     public String directorDashboard() {
         return "director/dashboard";

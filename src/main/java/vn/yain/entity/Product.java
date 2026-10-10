@@ -28,10 +28,10 @@ public class Product {
     @Column(nullable = false, length = 20)
     private String unit;
 
-    @Column(name = "unit_price", nullable = false)
+    @Column(name = "unit_price", nullable = false, precision = 15, scale = 2)
     private BigDecimal unitPrice;
 
-    @Column(name = "cost_price", nullable = false)
+    @Column(name = "cost_price", nullable = false, precision = 15, scale = 2)
     private BigDecimal costPrice;
 
     @Column(name = "stock_quantity")

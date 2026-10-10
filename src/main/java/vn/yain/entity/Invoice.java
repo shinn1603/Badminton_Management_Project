@@ -29,22 +29,22 @@ public class Invoice {
     @Column(name = "invoice_date")
     private LocalDateTime invoiceDate = LocalDateTime.now();
 
-    @Column(name = "court_fee", nullable = false)
+    @Column(name = "court_fee", nullable = false, precision = 15, scale = 2)
     private BigDecimal courtFee = BigDecimal.ZERO;
 
-    @Column(name = "equipment_fee")
+    @Column(name = "equipment_fee", precision = 15, scale = 2)
     private BigDecimal equipmentFee = BigDecimal.ZERO;
 
-    @Column(name = "product_fee")
+    @Column(name = "product_fee", precision = 15, scale = 2)
     private BigDecimal productFee = BigDecimal.ZERO;
 
-    @Column(name = "discount_amount")
+    @Column(name = "discount_amount", precision = 15, scale = 2)
     private BigDecimal discountAmount = BigDecimal.ZERO;
 
-    @Column(name = "deposit_paid")
+    @Column(name = "deposit_paid", precision = 15, scale = 2)
     private BigDecimal depositPaid = BigDecimal.ZERO;
 
-    @Column(name = "total_payment", nullable = false)
+    @Column(name = "total_payment", nullable = false, precision = 15, scale = 2)
     private BigDecimal totalPayment = BigDecimal.ZERO;
 
     @Column(name = "payment_method", length = 50)

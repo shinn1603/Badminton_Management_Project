@@ -779,11 +779,11 @@
         <div style="background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px; margin-bottom: 14px;">
           <div style="margin-bottom: 8px;">
             <label style="font-size: 11.5px; font-weight: 700; color: var(--cust-text-main); display: block; margin-bottom: 4px;">Họ tên người đặt (*):</label>
-            <input type="text" id="custNameInput" class="form-control" placeholder="vd: Nguyen Van A" style="font-size: 12.5px; padding: 7px 10px;">
+            <input type="text" id="custNameInput" class="form-control" placeholder="vd: Nguyen Van A" style="font-size: 12.5px; padding: 7px 10px;" maxlength="50" autocomplete="off" oninput="this.value = this.value.replace(/[0-9]/g, '').replace(/[^\p{L}\s'-]/gu, '')">
           </div>
           <div>
             <label style="font-size: 11.5px; font-weight: 700; color: var(--cust-text-main); display: block; margin-bottom: 4px;">Số điện thoại (*):</label>
-            <input type="tel" id="custPhoneInput" class="form-control" placeholder="vd: 0903123456" style="font-size: 12.5px; padding: 7px 10px;">
+            <input type="tel" id="custPhoneInput" class="form-control" placeholder="vd: 0903123456" style="font-size: 12.5px; padding: 7px 10px;" maxlength="10" inputmode="numeric" autocomplete="off" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)">
           </div>
         </div>
 
@@ -812,7 +812,7 @@
       </p>
 
       <div class="vietqr-qr-frame">
-        <img id="bookingQrImg" src="/images/vietqr-bank.png" alt="Mã VietQR Chuyển Khoản Cọc">
+        <img id="bookingQrImg" src="/images/vietqr-bank.png" onerror="this.src='https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=30000&addInfo=CK%20DAT%20SAN&accountName=UTE%20BADMINTON%20CLUB'" alt="Mã VietQR Chuyển Khoản Cọc">
       </div>
 
       <div style="background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px 16px; text-align: left; font-size: 13px; margin-bottom: 18px;">
@@ -887,7 +887,7 @@
           <li><a href="/customer/tournaments">Đăng Ký Giải Đấu UTE</a></li>
           <li><a href="/customer/profile">Tích Điểm Thẻ Hội Viên</a></li>
           <li><a href="/customer/history">Tra Cứu Lịch Sử & Check-in</a></li>
-          <li><a href="#">Chính Sách Hoàn Cọc 100%</a></li>
+          <li><a href="/customer/policy">Chính Sách Hoàn Cọc 100%</a></li>
         </ul>
       </div>
 
@@ -916,6 +916,7 @@
   </footer>
 
   <script src="/js/global-hub.js"></script>
+  <script src="/js/auth-guard.js"></script>
   <script>
     const TIME_SLOTS = [
       '06:00 - 07:00', '07:00 - 08:00', '08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00',
@@ -927,6 +928,16 @@
     let selectedCourt = null;
     let selectedSlots = [];
     let modalTimerInterval = null;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
     function isSlotOverlapping(s1, s2) {
       if (!s1 || !s2) return false;
@@ -1133,8 +1144,23 @@
 
       const name = document.getElementById('custNameInput').value.trim();
       const phone = document.getElementById('custPhoneInput').value.trim();
-      if (!name || !phone) {
-        showToast('Vui lòng nhập họ tên và số điện thoại người đặt!', 'warning');
+      if (!name) {
+        showToast('Vui lòng nhập họ tên người đặt!', 'warning');
+        document.getElementById('custNameInput').focus();
+        return;
+      }
+      if (/\d/.test(name) || !/^[\p{L}\s'-]{2,50}$/u.test(name)) {
+        showToast('Họ tên người đặt chỉ được chứa chữ cái (tối thiểu 2 ký tự, không bao gồm số)!', 'warning');
+        document.getElementById('custNameInput').focus();
+        return;
+      }
+      if (!phone) {
+        showToast('Vui lòng nhập số điện thoại người đặt!', 'warning');
+        document.getElementById('custPhoneInput').focus();
+        return;
+      }
+      if (!/^0\d{9}$/.test(phone)) {
+        showToast('Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số (bắt đầu bằng số 0).', 'warning');
         document.getElementById('custPhoneInput').focus();
         return;
       }
@@ -1228,26 +1254,29 @@
       });
     }
 
+    let isSubmittingDeposit = false;
     async function confirmBkgPayment() {
+      if (isSubmittingDeposit) return;
+      isSubmittingDeposit = true;
+      const btn = document.querySelector('#bookingVietqrModal .btn-primary');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Đang xác nhận...';
+      }
+
       const bookingCode = document.getElementById('bkgBookingCode').innerText;
       showToast('Đang đối soát giao dịch VietQR và cập nhật cơ sở dữ liệu...', 'info');
 
       try {
         const depAmount = Number(document.getElementById('bkgDepositAmount').innerText.replace(/\D/g, '')) || 30000;
-        await Promise.all([
-          fetch('/api/webhook/vietqr', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: `CK ${bookingCode}`, amount: depAmount })
-          }),
-          fetch(`/api/bookings/${bookingCode}/deposit`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount: depAmount, paymentMethod: 'VietQR Pro' })
-          })
-        ]);
+        const res = await fetch(`/api/bookings/${bookingCode}/deposit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: depAmount, paymentMethod: 'VietQR Pro' })
+        });
+        const data = await res.json();
 
-        setTimeout(() => {
+        if (data.success || res.ok) {
           showToast(`Đã ghi nhận tiền cọc cho đơn ${bookingCode} trong cơ sở dữ liệu!`, 'success');
           closeBookingVietQrModal();
           setTimeout(() => {
@@ -1255,9 +1284,21 @@
               window.location.href = '/customer/history';
             }
           }, 600);
-        }, 800);
+        } else {
+          showToast(data.message || 'Xác nhận cọc chưa thành công, vui lòng thử lại!', 'error');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = 'Xác Nhận Đã Chuyển Khoản';
+          }
+        }
       } catch (e) {
-        closeBookingVietQrModal();
+        showToast('Lỗi mạng khi kết nối máy chủ!', 'error');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'Xác Nhận Đã Chuyển Khoản';
+        }
+      } finally {
+        isSubmittingDeposit = false;
       }
     }
 
@@ -1298,7 +1339,5 @@
       loadBranchCourts(courtParam);
     });
   </script>
-  <script src="/js/global-hub.js"></script>
-  <script src="/js/auth-guard.js"></script>
 </body>
 </html>

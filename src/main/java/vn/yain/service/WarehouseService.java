@@ -109,9 +109,20 @@ public class WarehouseService {
             Product product = productRepository.findByProductCode(productCode)
                     .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm mã: " + productCode));
 
-            // Tăng tồn kho và cập nhật giá vốn
-            product.setStockQuantity(product.getStockQuantity() + quantity);
-            product.setCostPrice(importPrice);
+            // Tăng tồn kho và cập nhật giá vốn bình quân gia quyền (BUG-MED-26)
+            int currentStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+            BigDecimal currentCost = product.getCostPrice() != null ? product.getCostPrice() : BigDecimal.ZERO;
+            int newTotalStock = currentStock + quantity;
+            if (newTotalStock > 0 && currentStock > 0 && currentCost.compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal oldStockVal = currentCost.multiply(new BigDecimal(currentStock));
+                BigDecimal newStockVal = importPrice.multiply(new BigDecimal(quantity));
+                BigDecimal weightedAvgCost = oldStockVal.add(newStockVal)
+                        .divide(new BigDecimal(newTotalStock), 2, java.math.RoundingMode.HALF_UP);
+                product.setCostPrice(weightedAvgCost);
+            } else {
+                product.setCostPrice(importPrice);
+            }
+            product.setStockQuantity(newTotalStock);
             productRepository.save(product);
 
             BigDecimal lineTotal = importPrice.multiply(new BigDecimal(quantity));

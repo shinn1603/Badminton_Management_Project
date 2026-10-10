@@ -151,7 +151,7 @@
           <div style="display: flex; align-items: center; gap: 10px;">
             <button type="button" class="btn btn-primary" onclick="openCreateBookingModal()" style="font-size: 12px; padding: 6px 14px;">
               <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              <span>+ Đặt sân tại quầy</span>
+              <span>Đặt sân tại quầy</span>
             </button>
             <button type="button" class="btn btn-outline" onclick="openShiftHandoverModal()" style="font-size: 12px; padding: 6px 14px; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.25); color: #ffffff;">
               <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
@@ -174,6 +174,7 @@
               <option value="CN01" selected>Chi nhánh 1 - Thủ Đức</option>
               <option value="CN02">Chi nhánh 2 - Quận 7</option>
               <option value="CN03">Chi nhánh 3 - Bình Thạnh</option>
+              <option value="CN04">Chi nhánh 4 - Gò Vấp</option>
             </select>
 
             <!-- BỘ ĐIỀU HƯỚNG KHUNG GIỜ & CUỘN LƯỚI -->
@@ -245,11 +246,13 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Tên khách hàng (*)</label>
-            <input type="text" id="bookingCustName" class="form-control" placeholder="vd: Anh Tuấn" required>
+            <input type="text" id="bookingCustName" class="form-control" placeholder="vd: Anh Tuấn" required maxlength="50" autocomplete="off" oninput="cleanCustomerNameInput(this)">
+            <small id="custNameError" style="display: none; color: #ef4444; font-size: 11px; margin-top: 3px; font-weight: 500;">Tên khách hàng chỉ được nhập chữ cái, không nhập số hoặc ký tự lạ.</small>
           </div>
           <div class="form-group">
             <label class="form-label">Số điện thoại (*)</label>
-            <input type="tel" id="bookingCustPhone" class="form-control" placeholder="vd: 0901234567" required>
+            <input type="tel" id="bookingCustPhone" class="form-control" placeholder="vd: 0901234567" required maxlength="10" inputmode="numeric" autocomplete="off" oninput="cleanCustomerPhoneInput(this)">
+            <small id="custPhoneError" style="display: none; color: #ef4444; font-size: 11px; margin-top: 3px; font-weight: 500;">Số điện thoại chỉ được nhập số (10 chữ số, bắt đầu bằng 0).</small>
           </div>
         </div>
         <div class="form-group" style="margin-bottom: 12px;">
@@ -674,7 +677,8 @@
       document.getElementById('handoverTime').innerText = now.toLocaleString('vi-VN');
       const bFilter = document.getElementById('branchFilter');
       const branch = bFilter ? bFilter.value : 'CN01';
-      document.getElementById('handoverBranch').innerText = branch + ' - Thủ Đức';
+      const branchText = (bFilter && bFilter.options[bFilter.selectedIndex]) ? bFilter.options[bFilter.selectedIndex].text : (branch + ' - Thủ Đức');
+      document.getElementById('handoverBranch').innerText = branchText;
 
       try {
         const res = await fetch(`/api/shifts/summary?branchCode=${branch}`);

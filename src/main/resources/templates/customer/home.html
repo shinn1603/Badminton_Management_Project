@@ -1525,7 +1525,7 @@
           <li><a href="/customer/tournaments">Đăng Ký Giải Đấu UTE</a></li>
           <li><a href="/customer/profile">Tích Điểm Thẻ Hội Viên</a></li>
           <li><a href="/customer/history">Tra Cứu Lịch Sử & Check-in</a></li>
-          <li><a href="#">Chính Sách Hoàn Cọc 100%</a></li>
+          <li><a href="/customer/policy">Chính Sách Hoàn Cọc 100%</a></li>
         </ul>
       </div>
 
@@ -1621,11 +1621,11 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
             <div>
               <label style="font-size: 12px; font-weight: 600; color: var(--text-dark); display: block; margin-bottom: 4px;">Họ tên người đặt (*):</label>
-              <input type="text" id="modalCustName" class="form-control" placeholder="vd: Nguyen Van A">
+              <input type="text" id="modalCustName" class="form-control" placeholder="vd: Nguyen Van A" maxlength="50" autocomplete="off" oninput="this.value = this.value.replace(/[0-9]/g, '').replace(/[^\p{L}\s'-]/gu, '')">
             </div>
             <div>
               <label style="font-size: 12px; font-weight: 600; color: var(--text-dark); display: block; margin-bottom: 4px;">Số điện thoại (*):</label>
-              <input type="tel" id="modalCustPhone" class="form-control" placeholder="vd: 0903123456">
+              <input type="tel" id="modalCustPhone" class="form-control" placeholder="vd: 0903123456" maxlength="10" inputmode="numeric" autocomplete="off" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)">
             </div>
           </div>
         </div>
@@ -1653,7 +1653,7 @@
       <p style="font-size: 12.5px; color: var(--text-muted); margin: 0 0 14px;">Hệ thống đã khóa duy nhất slot này cho bạn trong <strong style="color: #ef4444;" id="vietqrTimer">10:00</strong>. Các slot khác và sân khác hoàn toàn không bị ảnh hưởng.</p>
 
       <div class="vietqr-qr-frame">
-        <img id="vietqrImg" src="/images/vietqr-bank.png" alt="Mã VietQR Chuyển Khoản Cọc">
+        <img id="vietqrImg" src="/images/vietqr-bank.png" onerror="this.src='https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=30000&addInfo=CK%20DAT%20SAN&accountName=UTE%20BADMINTON%20CLUB'" alt="Mã VietQR Chuyển Khoản Cọc">
       </div>
 
       <div style="background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px 16px; text-align: left; font-size: 13px; margin-bottom: 18px;">
@@ -1701,6 +1701,16 @@
       '14:00 - 15:00', '15:00 - 16:00', '16:00 - 17:00', '17:00 - 18:00', '18:00 - 19:00',
       '19:00 - 20:00', '20:00 - 21:00', '21:00 - 22:00'
     ];
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
     let currentModalCourt = {
       courtCode: '',
@@ -2054,8 +2064,24 @@
       const custPhone = document.getElementById('modalCustPhone').value.trim();
       const bookingDate = document.getElementById('modalBookingDate').value;
 
-      if (!custName || !custPhone) {
-        showToast('Vui lòng nhập họ tên và số điện thoại người đặt!', 'warning');
+      if (!custName) {
+        showToast('Vui lòng nhập họ tên người đặt!', 'warning');
+        document.getElementById('modalCustName').focus();
+        return;
+      }
+      if (/\d/.test(custName) || !/^[\p{L}\s'-]{2,50}$/u.test(custName)) {
+        showToast('Họ tên người đặt chỉ được chứa chữ cái (tối thiểu 2 ký tự, không bao gồm số)!', 'warning');
+        document.getElementById('modalCustName').focus();
+        return;
+      }
+      if (!custPhone) {
+        showToast('Vui lòng nhập số điện thoại người đặt!', 'warning');
+        document.getElementById('modalCustPhone').focus();
+        return;
+      }
+      if (!/^0\d{9}$/.test(custPhone)) {
+        showToast('Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số (bắt đầu bằng số 0).', 'warning');
+        document.getElementById('modalCustPhone').focus();
         return;
       }
 
@@ -2153,30 +2179,51 @@
       });
     }
 
+    let isSubmittingHomePayment = false;
     async function confirmPaymentDone() {
+      if (isSubmittingHomePayment) return;
+      isSubmittingHomePayment = true;
+      const btn = document.querySelector('#vietqrModal .btn-primary');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Đang kiểm tra...';
+      }
+
       const bookingCode = document.getElementById('vqBookingCode').innerText;
       showToast('Đang kiểm tra giao dịch chuyển khoản VietQR...', 'info');
 
       try {
-        // Trigger simulated or webhook confirmation
-        await fetch('/api/webhook/vietqr', {
+        const depAmount = Number(document.getElementById('vqDepositAmount').innerText.replace(/\D/g, '')) || 30000;
+        const res = await fetch(`/api/bookings/${bookingCode}/deposit`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content: `CK ${bookingCode}`, amount: 30000 })
+          body: JSON.stringify({ amount: depAmount, paymentMethod: 'VietQR Pro' })
         });
+        const data = await res.json();
 
-        setTimeout(() => {
+        if (data.success || res.ok) {
           showToast(`Đã ghi nhận tiền cọc cho đơn ${bookingCode}! Vé đặt sân đã sẵn sàng.`, 'success');
           closeVietQrModal();
-          // Prompt user to view tickets
           setTimeout(() => {
             if (confirm('Đặt sân và cọc thành công! Bạn có muốn mở trang Lịch Sử & Vé Check-in QR không?')) {
               window.location.href = '/customer/history';
             }
           }, 800);
-        }, 1200);
+        } else {
+          showToast(data.message || 'Chưa ghi nhận được thanh toán cọc!', 'error');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = 'Xác Nhận Đã Chuyển Khoản';
+          }
+        }
       } catch (e) {
-        closeVietQrModal();
+        showToast('Lỗi mạng khi kết nối máy chủ!', 'error');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'Xác Nhận Đã Chuyển Khoản';
+        }
+      } finally {
+        isSubmittingHomePayment = false;
       }
     }
 

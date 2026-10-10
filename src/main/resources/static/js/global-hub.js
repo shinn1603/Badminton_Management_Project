@@ -367,5 +367,16 @@ function showToast(message, type = 'success') {
   } else {
     setTimeout(connect, 600);
   }
+
+  window.addEventListener('beforeunload', () => {
+    clearTimeout(reconnectTimer);
+    clearInterval(heartbeatTimer);
+    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+      try {
+        ws.send("DISCONNECT\n\n\0");
+        ws.close();
+      } catch (e) {}
+    }
+  });
 })();
 

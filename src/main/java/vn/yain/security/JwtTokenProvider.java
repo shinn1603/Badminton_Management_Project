@@ -3,6 +3,7 @@ package vn.yain.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -14,12 +15,16 @@ import java.util.Map;
 @Component
 public class JwtTokenProvider {
 
-    // 256-bit secret key for HMAC-SHA256
-    private static final String SECRET_STRING = "UTE_BADMINTON_MANAGEMENT_SUPER_SECRET_KEY_2026_JWT_TOKEN_CHAIN_PRO";
-    private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET_STRING.getBytes(StandardCharsets.UTF_8));
-    
-    // 24 hours validity
+    private final SecretKey secretKey;
     private static final long EXPIRATION_TIME_MS = 24 * 60 * 60 * 1000L;
+
+    public JwtTokenProvider() {
+        this("UTE_BADMINTON_MANAGEMENT_SUPER_SECRET_KEY_2026_JWT_TOKEN_CHAIN_PRO");
+    }
+
+    public JwtTokenProvider(@Value("${jwt.secret:UTE_BADMINTON_MANAGEMENT_SUPER_SECRET_KEY_2026_JWT_TOKEN_CHAIN_PRO}") String secretString) {
+        this.secretKey = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
+    }
 
     /**
      * Generate JWT Token for user
@@ -38,7 +43,7 @@ public class JwtTokenProvider {
                 .subject(username)
                 .issuedAt(now)
                 .expiration(expiryDate)
-                .signWith(SECRET_KEY)
+                .signWith(secretKey)
                 .compact();
     }
 
@@ -73,7 +78,7 @@ public class JwtTokenProvider {
     public Claims getClaimsFromToken(String token) {
         try {
             return Jwts.parser()
-                    .verifyWith(SECRET_KEY)
+                    .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();

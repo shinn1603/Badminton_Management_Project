@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional
@@ -53,12 +55,26 @@ public class BookingService {
         return bookingRepository.findByBookingCode(bookingCode);
     }
 
-    public Booking createBooking(Booking booking) {
-        if (booking.getBookingCode() == null || booking.getBookingCode().trim().isEmpty()) {
-            booking.setBookingCode("DS" + System.currentTimeMillis() % 1000000);
+    public synchronized Booking createBooking(Booking booking) {
+        if (booking.getCourtCode() == null || booking.getTimeSlot() == null) {
+            throw new IllegalArgumentException("Thông tin sân và khung giờ không được để trống!");
         }
-        if (booking.getBookingDate() == null) {
-            booking.setBookingDate(LocalDate.now());
+
+        LocalDate date = booking.getBookingDate() != null ? booking.getBookingDate() : LocalDate.now();
+        booking.setBookingDate(date);
+
+        // Atomic conflict check to prevent race condition double-booking
+        List<Booking> existing = bookingRepository.findByCourtCodeAndBookingDate(booking.getCourtCode(), date);
+        boolean conflict = existing.stream().anyMatch(b ->
+                b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus())
+                && isSlotOverlapping(booking.getTimeSlot(), b.getTimeSlot())
+        );
+        if (conflict) {
+            throw new IllegalStateException("Khung giờ " + booking.getTimeSlot() + " của sân " + booking.getCourtCode() + " đã có người đặt trước!");
+        }
+
+        if (booking.getBookingCode() == null || booking.getBookingCode().trim().isEmpty()) {
+            booking.setBookingCode("DS" + String.format("%06d", (int)(Math.random() * 900000) + 100000));
         }
         if (booking.getStatus() == null) {
             booking.setStatus("Chờ cọc 30%");
@@ -276,25 +292,25 @@ public class BookingService {
         boolean hasConflict = conflicts.stream().anyMatch(b -> 
             !b.getBookingCode().equalsIgnoreCase(bookingCode) &&
             b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus()) &&
-            effectiveSlot.equalsIgnoreCase(b.getTimeSlot())
+            isSlotOverlapping(effectiveSlot, b.getTimeSlot())
         );
         if (hasConflict) {
             throw new IllegalStateException("Sân đích đã được đặt trong khung giờ " + effectiveSlot + "!");
         }
 
-        // Calculate price difference
+        // Calculate price accurately based on duration
         BigDecimal oldHourly = booking.getHourlyPrice() != null ? booking.getHourlyPrice() : BigDecimal.ZERO;
         BigDecimal newHourly = targetCourt.getHourlyRate() != null ? targetCourt.getHourlyRate() : oldHourly;
-        BigDecimal priceDifference = newHourly.subtract(oldHourly);
+        int[] hours = parseSlotHours(effectiveSlot);
+        int duration = (hours[1] > hours[0]) ? (hours[1] - hours[0]) : 1;
+        BigDecimal newTotalPrice = newHourly.multiply(BigDecimal.valueOf(duration));
+        BigDecimal oldTotal = booking.getTotalPrice() != null ? booking.getTotalPrice() : oldHourly.multiply(BigDecimal.valueOf(duration));
+        BigDecimal priceDifference = newTotalPrice.subtract(oldTotal);
 
         booking.setCourtCode(targetCourtCode);
         booking.setTimeSlot(effectiveSlot);
         booking.setHourlyPrice(newHourly);
-        if (booking.getTotalPrice() != null) {
-            booking.setTotalPrice(booking.getTotalPrice().add(priceDifference));
-        } else {
-            booking.setTotalPrice(newHourly);
-        }
+        booking.setTotalPrice(newTotalPrice);
         booking.setNotes((booking.getNotes() != null ? booking.getNotes() + " | " : "") + 
                 "Chuyển từ " + oldCourtCode + " sang " + targetCourtCode + " (Chênh lệch: " + priceDifference + "đ)");
         Booking updatedBooking = bookingRepository.save(booking);
@@ -347,5 +363,26 @@ public class BookingService {
                 // Non-blocking fallback if socket broker is initializing
             }
         }
+    }
+
+    public boolean isSlotOverlapping(String s1, String s2) {
+        if (s1 == null || s2 == null) return false;
+        if (s1.trim().equalsIgnoreCase(s2.trim())) return true;
+        try {
+            int[] r1 = parseSlotHours(s1);
+            int[] r2 = parseSlotHours(s2);
+            return Math.max(r1[0], r2[0]) < Math.min(r1[1], r2[1]);
+        } catch (Exception e) {
+            return s1.trim().equalsIgnoreCase(s2.trim());
+        }
+    }
+
+    public int[] parseSlotHours(String slot) {
+        Pattern p = Pattern.compile("(\\d{1,2}):\\d{2}\\s*-\\s*(\\d{1,2}):\\d{2}");
+        Matcher m = p.matcher(slot);
+        if (m.find()) {
+            return new int[]{Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2))};
+        }
+        return new int[]{0, 0};
     }
 }

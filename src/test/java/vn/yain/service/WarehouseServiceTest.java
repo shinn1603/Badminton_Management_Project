@@ -121,9 +121,9 @@ class WarehouseServiceTest {
         assertEquals(new BigDecimal("1400000"), receipt.getTotalAmount());
         assertEquals("Yonex Sunrise VN", receipt.getSupplierName());
 
-        // Kiem tra hang hoa da duoc cong them vao kho
+        // Kiem tra hang hoa da duoc cong them vao kho va tinh dung gia von binh quan gia quyen
         assertEquals(60, grip.getStockQuantity()); // 10 + 50 = 60
-        assertEquals(new BigDecimal("28000"), grip.getCostPrice());
+        assertEquals(new BigDecimal("27500.00"), grip.getCostPrice());
         verify(productRepository, times(1)).save(grip);
         verify(stockReceiptRepository, times(1)).save(any(StockReceipt.class));
     }

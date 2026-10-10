@@ -32,7 +32,7 @@ public class StockReceipt {
     @Column(name = "supplier_name", nullable = false, length = 100)
     private String supplierName;
 
-    @Column(name = "total_amount", nullable = false)
+    @Column(name = "total_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal totalAmount;
 
     @Column(length = 255)

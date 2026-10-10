@@ -655,11 +655,11 @@
         <div class="modal-body">
           <div class="form-group">
             <label class="form-label">Tên khách hàng</label>
-            <input type="text" id="mCustName" class="form-control" placeholder="Ví dụ: Trần Phúc Bảo" required>
+            <input type="text" id="mCustName" class="form-control" placeholder="Ví dụ: Trần Phúc Bảo" required maxlength="50" autocomplete="off" oninput="this.value = this.value.replace(/[0-9]/g, '').replace(/[^\p{L}\s'-]/gu, '')">
           </div>
           <div class="form-group">
             <label class="form-label">Số điện thoại</label>
-            <input type="tel" id="mCustPhone" class="form-control" placeholder="09xx xxx xxx" required>
+            <input type="tel" id="mCustPhone" class="form-control" placeholder="09xx xxx xxx" required maxlength="10" inputmode="numeric" autocomplete="off" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)">
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <div class="form-group">
@@ -760,8 +760,16 @@
 
     function handleCreateBooking(e) {
       e.preventDefault();
-      const cust = document.getElementById('mCustName').value;
-      const phone = document.getElementById('mCustPhone').value;
+      const cust = document.getElementById('mCustName').value.trim();
+      const phone = document.getElementById('mCustPhone').value.trim();
+      if (/\d/.test(cust) || !/^[\p{L}\s'-]{2,50}$/u.test(cust)) {
+        alert('Tên khách hàng chỉ được chứa chữ cái (không bao gồm số)!');
+        return;
+      }
+      if (!/^0\d{9}$/.test(phone)) {
+        alert('Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số (bắt đầu bằng số 0).');
+        return;
+      }
       const court = document.getElementById('mCourtSelect').value;
       const status = document.getElementById('mStatusSelect').value;
       const total = document.getElementById('mTotalDisplay').value;

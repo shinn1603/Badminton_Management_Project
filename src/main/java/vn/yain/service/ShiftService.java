@@ -88,7 +88,10 @@ public class ShiftService {
         staffRepository.deleteByStaffCode(code);
     }
 
+    private static volatile boolean staffSeeded = false;
+
     private void ensureDefaultStaffSeeded() {
+        if (staffSeeded) return;
         List<Staff> defaults = List.of(
             Staff.builder().staffCode("NV-01").branchCode("CN01").fullName("Trần Phúc Bảo").position("Quản lý chi nhánh").phone("0903123456").email("manager@utesport.vn").status("Đang làm việc").build(),
             Staff.builder().staffCode("NV-02").branchCode("CN01").fullName("Nguyễn Thanh Tâm").position("Thu ngân POS quầy").phone("0904555666").email("pos@utesport.vn").status("Đang làm việc").build(),
@@ -102,6 +105,7 @@ public class ShiftService {
                 staffRepository.save(s);
             }
         }
+        staffSeeded = true;
     }
 
     // ==========================================
@@ -413,6 +417,35 @@ public class ShiftService {
 
         String handoverCode = "BG" + (100000 + (int)(Math.random() * 900000));
         LocalDateTime closedAt = LocalDateTime.now();
+
+        String effectiveStaff = (staffCode != null && !staffCode.isBlank()) ? staffCode.trim() : "NVQ01";
+        if (!staffRepository.existsByStaffCode(effectiveStaff)) {
+            staffRepository.save(Staff.builder()
+                    .staffCode(effectiveStaff)
+                    .branchCode(branchCode != null ? branchCode : "CN01")
+                    .fullName("Nhân viên " + effectiveStaff)
+                    .position("Thu ngân POS quầy")
+                    .phone("0903000000")
+                    .email(effectiveStaff.toLowerCase() + "@utesport.vn")
+                    .status("Đang làm việc")
+                    .build());
+        }
+
+        // Persist shift handover record to database
+        WorkShift closedShift = WorkShift.builder()
+                .shiftCode(handoverCode)
+                .staffCode(effectiveStaff)
+                .branchCode(branchCode != null ? branchCode : "CN01")
+                .shiftDate(closedAt.toLocalDate())
+                .dayOfWeek(closedAt.getDayOfWeek().toString().substring(0, 3).toLowerCase())
+                .icon("POS")
+                .startTime("06:00")
+                .endTime(String.format("%02d:%02d", closedAt.getHour(), closedAt.getMinute()))
+                .shiftType("handover")
+                .duty("POS")
+                .status("Đã kết ca")
+                .build();
+        workShiftRepository.save(closedShift);
 
         Map<String, Object> receipt = new HashMap<>();
         receipt.put("success", true);

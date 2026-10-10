@@ -25,7 +25,7 @@ public class Equipment {
     @Column(name = "stock_quantity")
     private Integer stockQuantity = 0;
 
-    @Column(name = "rental_price", nullable = false)
+    @Column(name = "rental_price", nullable = false, precision = 15, scale = 2)
     private BigDecimal rentalPrice;
 
     @Column(length = 50)

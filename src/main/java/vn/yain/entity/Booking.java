@@ -39,13 +39,13 @@ public class Booking {
     @Column(name = "time_slot", nullable = false, length = 50)
     private String timeSlot;
 
-    @Column(name = "hourly_price", nullable = false)
+    @Column(name = "hourly_price", nullable = false, precision = 15, scale = 2)
     private BigDecimal hourlyPrice;
 
-    @Column(name = "total_price", nullable = false)
+    @Column(name = "total_price", nullable = false, precision = 15, scale = 2)
     private BigDecimal totalPrice;
 
-    @Column(name = "deposit_amount")
+    @Column(name = "deposit_amount", precision = 15, scale = 2)
     private BigDecimal depositAmount = BigDecimal.ZERO;
 
     @Column(name = "payment_method", length = 50)

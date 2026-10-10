@@ -32,18 +32,26 @@ public class Tournament {
     @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Lob
+    @Column(name = "rules")
     private String rules;
 
     @Column(name = "max_participants")
     private Integer maxParticipants = 32;
 
-    @Column(name = "entry_fee")
+    @Column(name = "current_participants")
+    private Integer currentParticipants = 24;
+
+    @Column(name = "entry_fee", precision = 15, scale = 2)
     private BigDecimal entryFee = BigDecimal.ZERO;
 
-    @Column(name = "total_prize")
+    @Column(name = "total_prize", precision = 15, scale = 2)
     private BigDecimal totalPrize = BigDecimal.ZERO;
 
     @Column(length = 50)
     private String status = "Đang mở đăng ký";
+
+    public Integer getCurrentParticipants() {
+        return currentParticipants != null ? currentParticipants : 24;
+    }
 }

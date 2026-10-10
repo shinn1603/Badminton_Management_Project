@@ -35,7 +35,7 @@ build/
 # Documents
 *.docx
 *.doc
-
+*.md
 # Agent
 .agent/
 .antigravity/

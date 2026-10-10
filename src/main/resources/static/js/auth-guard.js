@@ -467,9 +467,9 @@
     syncUserProfileUI();
   }
 
-  // Intercept window.fetch to attach JWT Bearer token
+  // Intercept window.fetch to attach JWT Bearer token and handle 401 Unauthorized
   const originalFetch = window.fetch;
-  window.fetch = function (url, options = {}) {
+  window.fetch = async function (url, options = {}) {
     const token = localStorage.getItem('jwt_token');
     if (token && typeof url === 'string' && url.startsWith('/api')) {
       options.headers = options.headers || {};
@@ -481,7 +481,16 @@
         options.headers['Authorization'] = 'Bearer ' + token;
       }
     }
-    return originalFetch(url, options);
+    const response = await originalFetch(url, options);
+    if (response.status === 401 && typeof url === 'string' && url.startsWith('/api') && !url.includes('/api/auth/login')) {
+      const p = window.location.pathname.toLowerCase();
+      if (p.startsWith('/pos') || p.startsWith('/manager') || p.startsWith('/director') || p.startsWith('/admin')) {
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('utesport_user');
+        window.location.href = '/login?expired=true';
+      }
+    }
+    return response;
   };
 
   // Expose global helper for testing or role switching

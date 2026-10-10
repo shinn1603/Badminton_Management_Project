@@ -550,7 +550,7 @@
             <div class="form-group">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <label class="form-label" for="loginPassword">Mật khẩu</label>
-                <a href="javascript:void(0)" onclick="showToast('Vui lòng liên hệ Hotline 1900 6868 hoặc nhân viên quầy để đặt lại mật khẩu.', 'warning')" style="font-size: 11.5px; color: var(--cust-primary); text-decoration: none; font-weight: 600;">Quên mật khẩu?</a>
+                <a href="javascript:void(0)" onclick="openCustomerForgotModal()" style="font-size: 11.5px; color: var(--cust-primary); text-decoration: none; font-weight: 600;">Quên mật khẩu?</a>
               </div>
               <input type="password" id="loginPassword" class="form-control" placeholder="Nhập mật khẩu" required>
             </div>
@@ -637,6 +637,35 @@
             </button>
           </form>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORGOT PASSWORD MODAL FOR CUSTOMERS -->
+  <div id="customerForgotModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(5px); z-index: 99999; align-items: center; justify-content: center;">
+    <div style="background: var(--cust-surface); border: 1px solid var(--cust-border); border-radius: 20px; padding: 28px; max-width: 440px; width: 90%; box-shadow: 0 25px 50px rgba(0,0,0,0.35);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="margin: 0; font-size: 19px; font-weight: 800; color: var(--cust-text-dark);">Khôi Phục Mật Khẩu Hội Viên</h3>
+        <button type="button" onclick="closeCustomerForgotModal()" style="border: none; background: transparent; font-size: 18px; cursor: pointer; color: var(--cust-text-muted);">✕</button>
+      </div>
+      <p style="font-size: 12.5px; color: var(--cust-text-muted); margin: 0 0 16px;">
+        Vui lòng nhập số điện thoại hoặc email đăng ký và mật khẩu mới để thiết lập lại mật khẩu.
+      </p>
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label class="form-label">Số điện thoại hoặc Email</label>
+        <input type="text" id="cfIdentifier" class="form-control" placeholder="0901234567 hoặc email" style="width: 100%; box-sizing: border-box;">
+      </div>
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label class="form-label">Mật khẩu mới (tối thiểu 6 ký tự)</label>
+        <input type="password" id="cfNewPassword" class="form-control" placeholder="Nhập mật khẩu mới" style="width: 100%; box-sizing: border-box;">
+      </div>
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label class="form-label">Xác nhận mật khẩu mới</label>
+        <input type="password" id="cfConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu mới" style="width: 100%; box-sizing: border-box;">
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn btn-outline" style="flex: 1; height: 42px; border-radius: 10px;" onclick="closeCustomerForgotModal()">Hủy</button>
+        <button type="button" class="btn btn-primary" id="btnCustomerReset" style="flex: 1.5; height: 42px; border-radius: 10px;" onclick="submitCustomerResetPassword()">Xác Nhận Đổi</button>
       </div>
     </div>
   </div>
@@ -904,11 +933,65 @@
     }
 
     function quickSocialLogin(provider) {
-      showToast('Đang kết nối ' + provider + '...');
-      setTimeout(() => {
-        showToast('Đăng nhập ' + provider + ' thành công.');
-        window.location.href = '/customer/booking';
-      }, 1000);
+      showToast('Tính năng đăng nhập qua ' + provider + ' OAuth 2.0 đang kết nối chứng thực. Vui lòng đăng nhập bằng SĐT/mật khẩu hoặc đăng ký tài khoản!', 'warning');
+    }
+
+    function openCustomerForgotModal() {
+      const modal = document.getElementById('customerForgotModal');
+      if (modal) modal.style.display = 'flex';
+      const phoneVal = document.getElementById('loginPhone')?.value.trim();
+      if (phoneVal) document.getElementById('cfIdentifier').value = phoneVal;
+    }
+
+    function closeCustomerForgotModal() {
+      const modal = document.getElementById('customerForgotModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function submitCustomerResetPassword() {
+      const identifier = document.getElementById('cfIdentifier').value.trim();
+      const newPass = document.getElementById('cfNewPassword').value;
+      const confirmPass = document.getElementById('cfConfirmPassword').value;
+      const btn = document.getElementById('btnCustomerReset');
+
+      if (!identifier) {
+        showToast('Vui lòng nhập số điện thoại hoặc email!', 'warning');
+        return;
+      }
+      if (!newPass || newPass.length < 6) {
+        showToast('Mật khẩu mới phải có tối thiểu 6 ký tự!', 'warning');
+        return;
+      }
+      if (newPass !== confirmPass) {
+        showToast('Xác nhận mật khẩu mới không trùng khớp!', 'warning');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Đang xử lý...';
+
+      try {
+        const res = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier, newPassword: newPass })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          closeCustomerForgotModal();
+          document.getElementById('loginPhone').value = identifier;
+          document.getElementById('loginPassword').value = newPass;
+          document.getElementById('loginPassword').focus();
+        } else {
+          showToast(data.message || 'Không thể đặt lại mật khẩu!', 'error');
+        }
+      } catch (err) {
+        showToast('Lỗi mạng khi kết nối máy chủ!', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Xác Nhận Đổi';
+      }
     }
   </script>
   
@@ -948,7 +1031,7 @@
           <li><a href="/customer/tournaments">Đăng Ký Giải Đấu UTE</a></li>
           <li><a href="/customer/profile">Tích Điểm Thẻ Hội Viên</a></li>
           <li><a href="/customer/history">Tra Cứu Lịch Sử & Check-in</a></li>
-          <li><a href="#">Chính Sách Hoàn Cọc 100%</a></li>
+          <li><a href="/customer/policy">Chính Sách Hoàn Cọc 100%</a></li>
         </ul>
       </div>
 

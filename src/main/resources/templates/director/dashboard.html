@@ -137,7 +137,7 @@
             </svg>
             <span>In báo cáo</span>
           </button>
-          <button class="btn-action btn-primary-action" onclick="alert('Đã kết xuất dữ liệu sang file Excel.')">
+          <button class="btn-action btn-primary-action" onclick="exportDirectorExcel()">
             <svg class="svg-icon" viewBox="0 0 24 24">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
@@ -548,9 +548,15 @@
       document.getElementById('btnToggleAll').innerHTML = allExpanded ? '<span>Thu gọn tất cả</span>' : '<span>Mở rộng tất cả</span>';
     }
 
+    let monthlyChartInst = null;
+    let sourcesChartInst = null;
+    let occChartInst = null;
+
     document.addEventListener('DOMContentLoaded', () => {
-      const ctxMonthly = document.getElementById('monthlyChart').getContext('2d');
-      new Chart(ctxMonthly, {
+      const elMonthly = document.getElementById('monthlyChart');
+      if (elMonthly) {
+        if (monthlyChartInst) monthlyChartInst.destroy();
+        monthlyChartInst = new Chart(elMonthly.getContext('2d'), {
         type: 'bar',
         data: {
           labels: ['Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9'],
@@ -574,8 +580,10 @@
         }
       });
 
-      const ctxSources = document.getElementById('sourcePieChart').getContext('2d');
-      new Chart(ctxSources, {
+      const elSources = document.getElementById('sourcePieChart');
+      if (elSources) {
+        if (sourcesChartInst) sourcesChartInst.destroy();
+        sourcesChartInst = new Chart(elSources.getContext('2d'), {
         type: 'doughnut',
         data: {
           labels: ['Thuê sân', 'Nước uống', 'Thuê dụng cụ', 'Giải đấu'],
@@ -595,9 +603,12 @@
           cutout: '68%'
         }
       });
+      }
 
-      const ctxOcc = document.getElementById('occupancyChart').getContext('2d');
-      new Chart(ctxOcc, {
+      const elOcc = document.getElementById('occupancyChart');
+      if (elOcc) {
+        if (occChartInst) occChartInst.destroy();
+        occChartInst = new Chart(elOcc.getContext('2d'), {
         type: 'line',
         data: {
           labels: ['06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
@@ -633,6 +644,42 @@
         }
       });
     });
+
+    function exportDirectorExcel() {
+      const table = document.getElementById('branchTable');
+      if (!table) return;
+
+      let csv = "\uFEFF"; // UTF-8 BOM
+      csv += "BAO CAO TONG HOP TOAN HE THONG CHI NHANH - BAN GIAM DOC\n";
+      csv += `Ngay xuat: ${new Date().toLocaleDateString('vi-VN')} ${new Date().toLocaleTimeString('vi-VN')}\n\n`;
+
+      const rows = table.querySelectorAll('thead tr, tr.main-row');
+      rows.forEach(tr => {
+        const cells = tr.querySelectorAll('th, td');
+        const rowArr = [];
+        cells.forEach((td, idx) => {
+          if (idx === 0) return; // Skip chevron toggle icon column
+          let text = td.innerText.replace(/"/g, '""').replace(/\r?\n|\r/g, ' ').trim();
+          rowArr.push(`"${text}"`);
+        });
+        if (rowArr.length > 0) {
+          csv += rowArr.join(',') + '\n';
+        }
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const dateStr = new Date().toISOString().split('T')[0];
+      a.href = url;
+      a.download = `Bao_Cao_Giam_Doc_Chi_Nhanh_${dateStr}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      alert('Đã kết xuất dữ liệu và tải về file Excel (CSV) tổng hợp các chi nhánh thành công!');
+    }
   </script>
 
   <script src="/js/global-hub.js"></script>

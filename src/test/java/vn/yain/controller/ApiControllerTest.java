@@ -163,6 +163,7 @@ class ApiControllerTest {
         webhookPayload.put("transferAmount", 30000);
 
         mockMvc.perform(post("/api/webhook/vietqr")
+                        .header("X-Webhook-Secret", "UTE_VIETQR_SECRET_TOKEN_2026")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(webhookPayload)))
                 .andExpect(status().isOk())
@@ -328,5 +329,32 @@ class ApiControllerTest {
                         .content(objectMapper.writeValueAsString(assignPayload)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(true)));
+    }
+
+    @Test
+    @DisplayName("API Tournaments: Tra cuu danh sach va dang ky giai dau")
+    void testApiTournaments_GetAndRegister() throws Exception {
+        // 1. Lay danh sach giai dau
+        mockMvc.perform(get("/api/tournaments"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", notNullValue()))
+                .andExpect(jsonPath("$[0].tournamentCode", notNullValue()));
+
+        // 2. Dang ky tham gia giai dau GD01
+        Map<String, Object> regPayload = new HashMap<>();
+        regPayload.put("tournamentCode", "GD01");
+        regPayload.put("tournamentName", "Giai Cau Long Mua Thu UTE Open 2026");
+        regPayload.put("teamName", "CLB UTE Masters Test");
+        regPayload.put("category", "Doi Nam Nu");
+        regPayload.put("player1Name", "Nguyen Van Test");
+        regPayload.put("phone", "0908123456");
+
+        mockMvc.perform(post("/api/tournaments/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(regPayload)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success", is(true)))
+                .andExpect(jsonPath("$.currentParticipants", notNullValue()))
+                .andExpect(jsonPath("$.remainingSlots", notNullValue()));
     }
 }

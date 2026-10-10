@@ -242,12 +242,37 @@
   background: var(--primary-hover);
 }
 
+.matrix-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 220px);
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
 .matrix-table {
   min-width: 1720px;
   width: max-content;
   border-collapse: separate;
   border-spacing: 0;
   text-align: left;
+}
+
+@media (max-width: 1366px) {
+  .matrix-table {
+    min-width: 1450px;
+  }
+  .matrix-th-time {
+    width: 110px !important;
+    min-width: 110px !important;
+    font-size: 11.5px !important;
+    padding: 8px 4px !important;
+  }
+  .matrix-th-corner, .matrix-td-court {
+    width: 140px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+  }
 }
 
 .matrix-table th, .matrix-table td {

@@ -1,6 +1,9 @@
 package vn.yain.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.yain.entity.Customer;
@@ -13,8 +16,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-@Transactional
 public class UserService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -25,17 +29,36 @@ public class UserService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public Map<String, Object> authenticate(String username, String password) {
         if (username == null || password == null) {
             throw new IllegalArgumentException("Vui lòng nhập tài khoản và mật khẩu!");
         }
 
-        Optional<User> userOpt = userRepository.findByUsernameAndPassword(username.trim(), password.trim());
-        if (userOpt.isEmpty()) {
+        User user = userRepository.findByUsername(username.trim())
+                .orElseThrow(() -> new IllegalArgumentException("Tài khoản hoặc mật khẩu không chính xác!"));
+
+        String storedPassword = user.getPassword();
+        boolean isMatch = false;
+
+        if (storedPassword != null && (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$"))) {
+            isMatch = passwordEncoder.matches(password.trim(), storedPassword);
+        } else {
+            // Legacy plaintext fallback - verify and upgrade to BCrypt immediately
+            if (storedPassword != null && storedPassword.equals(password.trim())) {
+                isMatch = true;
+                user.setPassword(passwordEncoder.encode(password.trim()));
+                userRepository.save(user);
+                log.info("Nâng cấp mật khẩu sang BCrypt thành công cho người dùng: {}", user.getUsername());
+            }
+        }
+
+        if (!isMatch) {
             throw new IllegalArgumentException("Tài khoản hoặc mật khẩu không chính xác!");
         }
 
-        User user = userOpt.get();
         if ("Khóa".equalsIgnoreCase(user.getStatus()) || "Bị khóa".equalsIgnoreCase(user.getStatus())) {
             throw new IllegalStateException("Tài khoản đã bị tạm khóa, vui lòng liên hệ quản trị viên!");
         }
@@ -59,9 +82,13 @@ public class UserService {
         return result;
     }
 
+    @Transactional
     public Map<String, Object> registerCustomer(String username, String password, String fullName, String phone, String email) {
         if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             throw new IllegalArgumentException("Tên đăng nhập và mật khẩu không được để trống!");
+        }
+        if (password.trim().length() < 6) {
+            throw new IllegalArgumentException("Mật khẩu phải có độ dài tối thiểu từ 6 ký tự trở lên!");
         }
         if (fullName == null || fullName.trim().isEmpty()) {
             throw new IllegalArgumentException("Họ và tên không được để trống!");
@@ -77,7 +104,7 @@ public class UserService {
 
         User newUser = new User();
         newUser.setUsername(username.trim());
-        newUser.setPassword(password.trim());
+        newUser.setPassword(passwordEncoder.encode(password.trim()));
         newUser.setFullName(fullName.trim());
         newUser.setPhone(phone != null ? phone.trim() : "");
         newUser.setEmail(email != null ? email.trim() : "");
@@ -99,7 +126,8 @@ public class UserService {
             c.setStatus("Hoạt động");
             c.setCreatedAt(LocalDateTime.now());
             customerRepository.save(c);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.warn("Không thể đồng bộ hồ sơ khách hàng: {}", e.getMessage());
         }
 
         String token = jwtTokenProvider.generateToken(
@@ -133,9 +161,9 @@ public class UserService {
         User u = existing.orElseGet(User::new);
         u.setUsername(username.trim());
         if (payload.containsKey("password") && payload.get("password") != null && !payload.get("password").isBlank()) {
-            u.setPassword(payload.get("password").trim());
+            u.setPassword(passwordEncoder.encode(payload.get("password").trim()));
         } else if (u.getPassword() == null) {
-            u.setPassword("123456");
+            u.setPassword(passwordEncoder.encode("123456"));
         }
         if (payload.containsKey("fullName")) u.setFullName(payload.get("fullName"));
         if (payload.containsKey("role")) u.setRole(payload.get("role").toUpperCase());
@@ -146,14 +174,32 @@ public class UserService {
         return userRepository.save(u);
     }
 
-    public User toggleUserStatus(String username) {
-        User u = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy người dùng: " + username));
-        if ("Hoạt động".equalsIgnoreCase(u.getStatus())) {
-            u.setStatus("Khóa");
-        } else {
-            u.setStatus("Hoạt động");
+    public void resetPassword(String identifier, String newPassword) {
+        if (identifier == null || identifier.trim().isEmpty()) {
+            throw new IllegalArgumentException("Vui lòng nhập tên tài khoản, số điện thoại hoặc email!");
         }
-        return userRepository.save(u);
+        if (newPassword == null || newPassword.trim().length() < 6) {
+            throw new IllegalArgumentException("Mật khẩu mới phải có ít nhất 6 ký tự!");
+        }
+
+        String search = identifier.trim();
+        User user = userRepository.findByUsername(search)
+                .or(() -> userRepository.findByPhone(search))
+                .or(() -> userRepository.findAll().stream().filter(u -> search.equalsIgnoreCase(u.getEmail())).findFirst())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản với thông tin đã cung cấp!"));
+
+        user.setPassword(passwordEncoder.encode(newPassword.trim()));
+        userRepository.save(user);
+
+        // Also update Customer record if exists
+        customerRepository.findAll().stream()
+                .filter(c -> search.equalsIgnoreCase(c.getPhone()) || search.equalsIgnoreCase(c.getEmail()))
+                .findFirst()
+                .ifPresent(cust -> {
+                    cust.setPassword(user.getPassword());
+                    customerRepository.save(cust);
+                });
+
+        log.info("Đặt lại mật khẩu thành công cho tài khoản: {}", user.getUsername());
     }
 }

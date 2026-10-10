@@ -16,6 +16,7 @@ import vn.yain.repository.CourtRepository;
 import vn.yain.repository.TournamentRepository;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -247,7 +248,7 @@ public class GeminiAiService {
             booking.setCustomerPhone("0903123456");
             booking.setBookingDate(ctx.date != null ? ctx.date : LocalDate.now());
             booking.setTimeSlot(slot);
-            booking.setHourlyPrice(totalPrice.divide(new BigDecimal(2), BigDecimal.ROUND_HALF_UP));
+            booking.setHourlyPrice(totalPrice.divide(new BigDecimal(2), RoundingMode.HALF_UP));
             booking.setTotalPrice(totalPrice);
             booking.setDepositAmount(depositAmount);
             booking.setPaymentMethod("Chuyển khoản VietQR");
@@ -257,26 +258,28 @@ public class GeminiAiService {
             try {
                 bookingService.createBooking(booking);
                 courtService.holdCourtForBooking(courtCode, branchCode, slot, booking.getCustomerName());
-            } catch (Exception ignored) {
+
+                String qrUrl = String.format(
+                        "https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=%d&addInfo=CK%%20%s&accountName=UTE%%20BADMINTON%%20CLUB",
+                        depositAmount.longValue(), bookingCode
+                );
+
+                paymentData = new HashMap<>();
+                paymentData.put("bookingCode", bookingCode);
+                paymentData.put("courtName", ctx.courtName != null ? ctx.courtName : "Sân thi đấu tiêu chuẩn");
+                paymentData.put("branchName", ctx.branchName);
+                paymentData.put("bookingDate", LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                paymentData.put("timeSlot", slot);
+                paymentData.put("totalPrice", totalPrice);
+                paymentData.put("depositAmount", depositAmount);
+                paymentData.put("qrUrl", qrUrl);
+                paymentData.put("bankName", "MBBank (Ngân hàng Quân Đội)");
+                paymentData.put("accountNo", "0903123456");
+                paymentData.put("accountName", "UTE BADMINTON CLUB");
+            } catch (Exception e) {
+                actionType = "NONE";
+                cleanText = "Không thể hoàn tất tạo đơn đặt sân vì: " + e.getMessage() + ". Vui lòng thử lại với khung giờ hoặc sân khác.";
             }
-
-            String qrUrl = String.format(
-                    "https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=%d&addInfo=CK%%20%s&accountName=UTE%%20BADMINTON%%20CLUB",
-                    depositAmount.longValue(), bookingCode
-            );
-
-            paymentData = new HashMap<>();
-            paymentData.put("bookingCode", bookingCode);
-            paymentData.put("courtName", ctx.courtName != null ? ctx.courtName : "Sân thi đấu tiêu chuẩn");
-            paymentData.put("branchName", ctx.branchName);
-            paymentData.put("bookingDate", LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            paymentData.put("timeSlot", slot);
-            paymentData.put("totalPrice", totalPrice);
-            paymentData.put("depositAmount", depositAmount);
-            paymentData.put("qrUrl", qrUrl);
-            paymentData.put("bankName", "MBBank (Ngân hàng Quân Đội)");
-            paymentData.put("accountNo", "0903123456");
-            paymentData.put("accountName", "UTE BADMINTON CLUB");
 
             return ChatMessageDto.builder()
                     .sender("bot")
@@ -318,7 +321,8 @@ public class GeminiAiService {
             cleanText = rawReply.replace(cancelMatcher.group(0), "").trim();
             try {
                 bookingService.cancelBooking(code, "Hủy qua yêu cầu trợ lý AI");
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                cleanText = "Không thể hủy đơn " + code + ": " + e.getMessage();
             }
         }
 

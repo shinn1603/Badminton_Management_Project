@@ -34,12 +34,21 @@ class UserServiceTest {
     @Mock
     private JwtTokenProvider jwtTokenProvider;
 
+    @Mock
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private UserService userService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        when(passwordEncoder.encode(any(CharSequence.class))).thenAnswer(inv -> "encoded_" + inv.getArgument(0));
+        when(passwordEncoder.matches(any(CharSequence.class), anyString())).thenAnswer(inv -> {
+            CharSequence raw = inv.getArgument(0);
+            String encoded = inv.getArgument(1);
+            return raw != null && (raw.toString().equals(encoded) || ("encoded_" + raw).equals(encoded));
+        });
     }
 
     @Test
@@ -54,7 +63,7 @@ class UserServiceTest {
         user.setBranchCode("CN01");
         user.setStatus("Hoat dong");
 
-        when(userRepository.findByUsernameAndPassword("thopham", "123456")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("thopham")).thenReturn(Optional.of(user));
         when(jwtTokenProvider.generateToken(anyString(), anyString(), anyString(), anyString())).thenReturn("mock-jwt-token");
 
         Map<String, Object> result = userService.authenticate("thopham", "123456");
@@ -64,13 +73,13 @@ class UserServiceTest {
         assertEquals("thopham", result.get("username"));
         assertEquals("CUSTOMER", result.get("role"));
         assertEquals("CN01", result.get("branchCode"));
-        verify(userRepository, times(1)).findByUsernameAndPassword("thopham", "123456");
+        verify(userRepository, times(1)).findByUsername("thopham");
     }
 
     @Test
     @DisplayName("XL-01: Dang nhap that bai khi sai tai khoan hoac mat khau")
     void testAuthenticate_WrongCredentials() {
-        when(userRepository.findByUsernameAndPassword("thopham", "wrongpass")).thenReturn(Optional.empty());
+        when(userRepository.findByUsername("thopham")).thenReturn(Optional.empty());
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
             userService.authenticate("thopham", "wrongpass");
@@ -87,7 +96,7 @@ class UserServiceTest {
         lockedUser.setPassword("123456");
         lockedUser.setStatus("Khóa");
 
-        when(userRepository.findByUsernameAndPassword("locked_user", "123456")).thenReturn(Optional.of(lockedUser));
+        when(userRepository.findByUsername("locked_user")).thenReturn(Optional.of(lockedUser));
 
         IllegalStateException ex = assertThrows(IllegalStateException.class, () -> {
             userService.authenticate("locked_user", "123456");

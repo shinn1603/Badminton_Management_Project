@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chính Sách Hoàn Cọc &amp; Quy Chế Hủy Lịch - UTE Sport</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    :root {
+      --cust-bg: var(--bg-page);
+      --cust-surface: var(--surface);
+      --cust-border: var(--border-subtle);
+      --cust-primary: var(--primary);
+      --cust-primary-hover: var(--primary-hover);
+      --cust-primary-light: var(--primary-light);
+      --cust-primary-border: var(--primary-border);
+      --cust-accent: var(--accent);
+      --cust-accent-light: var(--accent-light);
+      --cust-text-main: var(--text-dark);
+      --cust-text-body: var(--text-body);
+      --cust-text-muted: var(--text-muted);
+    }
+
+    body {
+      background-color: var(--cust-bg);
+      color: var(--cust-text-body);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    /* LUXURY TOP NAVBAR */
+    .cust-navbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .cust-nav-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cust-brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-dark);
+    }
+    .cust-logo-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+    .cust-brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .cust-brand-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .cust-nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .cust-nav-link {
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 0;
+      position: relative;
+    }
+    .cust-nav-link:hover { color: var(--text-dark); }
+    .cust-nav-link.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .cust-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* CONTAINER & HERO */
+    .policy-container {
+      max-width: 1120px;
+      margin: 32px auto 64px;
+      padding: 0 20px;
+    }
+
+    .policy-hero {
+      background: radial-gradient(circle at 20% 30%, rgba(6, 78, 59, 0.95) 0%, rgba(4, 20, 16, 0.98) 100%),
+        url('/images/badminton_arena_hero.jpg') center/cover no-repeat;
+      background-blend-mode: overlay;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #ffffff;
+      padding: 44px 40px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .policy-hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.2) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .policy-hero h1 {
+      font-size: 32px;
+      font-weight: 900;
+      margin: 0 0 12px 0;
+      letter-spacing: -0.6px;
+      color: #ffffff;
+    }
+    .policy-hero h1 span {
+      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .policy-hero p {
+      color: #cbd5e1;
+      font-size: 14.5px;
+      max-width: 760px;
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    /* KPI HIGHLIGHT CARDS */
+    .policy-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .policy-kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .policy-kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+    }
+    .policy-kpi-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .policy-kpi-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+    .policy-kpi-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* ARTICLE SECTIONS */
+    .policy-card {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+    .policy-section-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-top: 0;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px solid var(--border-subtle);
+      padding-bottom: 10px;
+    }
+    .policy-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .policy-text {
+      font-size: 14px;
+      color: var(--text-body);
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+
+    .rule-box-green {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 13.5px;
+      color: #166534;
+    }
+    .rule-box-amber {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 13.5px;
+      color: #92400e;
+    }
+
+    .steps-list {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0;
+      counter-reset: step-counter;
+    }
+    .steps-list li {
+      counter-increment: step-counter;
+      position: relative;
+      padding-left: 36px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      color: var(--text-body);
+    }
+    .steps-list li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      background: var(--primary);
+      color: #ffffff;
+      border-radius: 50%;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 24px;
+    }
+
+    .policy-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 900px) {
+      .policy-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .policy-card { padding: 24px; }
+      .cust-nav-menu { display: none; }
+    }
+    @media (max-width: 600px) {
+      .policy-kpi-grid { grid-template-columns: 1fr; }
+      .policy-hero { padding: 28px 20px; }
+      .policy-hero h1 { font-size: 24px; }
+    }
+
+    /* FOOTER */
+    .cust-footer-dark {
+      background: #0b1120;
+      color: #94a3b8;
+      padding: 56px 24px 28px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+    }
+    .cust-footer-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    @media (max-width: 992px) {
+      .cust-footer-inner { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .cust-footer-inner { grid-template-columns: 1fr; }
+    }
+    .footer-col-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .footer-links-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-links-list a {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+    .footer-links-list a:hover {
+      color: #10b981;
+    }
+    .footer-bottom-bar {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. TOP NAVBAR -->
+  <header class="cust-navbar">
+    <div class="cust-nav-inner">
+      <a href="/customer/home" class="cust-brand-wrap">
+        <div class="cust-logo-icon">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 22px; height: 22px; stroke-width: 2.2;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="cust-brand-title">UTE SPORT</div>
+          <div class="cust-brand-sub">Hệ Thống Sân Cầu Lông</div>
+        </div>
+      </a>
+
+      <nav class="cust-nav-menu">
+        <a href="/customer/home" class="cust-nav-link">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+          Trang chủ
+        </a>
+        <a href="/customer/booking" class="cust-nav-link">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          Đặt sân
+        </a>
+        <a href="/customer/tournaments" class="cust-nav-link">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+          Giải đấu
+        </a>
+        <a href="/customer/history" class="cust-nav-link">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Lịch sử đặt
+        </a>
+        <a href="/customer/profile" class="cust-nav-link">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Hội viên
+        </a>
+      </nav>
+
+      <div class="cust-nav-actions">
+        <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Đổi giao diện Sáng / Tối" style="padding: 8px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--text-dark); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;">
+          <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+          </svg>
+        </button>
+
+        <div id="navUserArea">
+          <a href="/customer/auth" class="btn btn-primary" id="btnNavAuth" style="padding: 9px 18px; border-radius: 8px; font-size: 13.5px; font-weight: 600;">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            Đăng Nhập / Đăng Ký
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. MAIN POLICY CONTAINER -->
+  <div class="policy-container">
+    <div class="policy-hero">
+      <div style="position: relative; z-index: 2;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 12px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 14px;">
+          <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 10px #10b981; display: inline-block;"></span>
+          <span>Quy Định Vận Hành &amp; Bảo Vệ Khách Hàng (QĐ-KH03)</span>
+        </div>
+        <h1>Chính Sách Hoàn Cọc <span>100% Tự Động</span></h1>
+        <p>
+          Hệ thống sân cầu lông UTE Sport cam kết mang đến trải nghiệm minh bạch, công bằng và linh hoạt. Chính sách hoàn cọc 100% được áp dụng cho mọi khách hàng khi có nhu cầu hủy lịch theo đúng quy chế.
+        </p>
+      </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="policy-kpi-grid">
+      <div class="policy-kpi-card">
+        <div class="policy-kpi-val">100%</div>
+        <div class="policy-kpi-title">Tỷ Lệ Hoàn Cọc</div>
+        <div class="policy-kpi-desc">Hoàn toàn bộ số tiền cọc đã thanh toán khi hủy đúng thời hạn quy định.</div>
+      </div>
+      <div class="policy-kpi-card">
+        <div class="policy-kpi-val">&ge; 4 Tiếng</div>
+        <div class="policy-kpi-title">Thời Gian Hủy Tối Thiểu</div>
+        <div class="policy-kpi-desc">Chỉ cần gửi yêu cầu hủy trước giờ bắt đầu chơi tối thiểu 4 tiếng đồng hồ.</div>
+      </div>
+      <div class="policy-kpi-card">
+        <div class="policy-kpi-val">0 VNĐ</div>
+        <div class="policy-kpi-title">Phí Xử Lý Hủy</div>
+        <div class="policy-kpi-desc">Hoàn toàn không thu phụ phí, không trừ chiết khấu vận hành hệ thống.</div>
+      </div>
+      <div class="policy-kpi-card">
+        <div class="policy-kpi-val">1 - 24h</div>
+        <div class="policy-kpi-title">Thời Gian Nhận Lại</div>
+        <div class="policy-kpi-desc">Tiền về tài khoản ngân hàng hoặc hoàn tức thì vào ví hội viên trên hệ thống.</div>
+      </div>
+    </div>
+
+    <!-- SECTION 1 -->
+    <div class="policy-card">
+      <h2 class="policy-section-title">
+        <span class="policy-badge">1</span>
+        Điều Kiện Hưởng Chính Sách Hoàn Cọc 100%
+      </h2>
+      <p class="policy-text">
+        Chính sách hoàn cọc 100% được kích hoạt tự động trên toàn bộ hệ thống chuỗi cơ sở UTE Sport đối với các trường hợp sau:
+      </p>
+      <div class="rule-box-green">
+        <strong>Quy định hủy trước 4 giờ:</strong> Khách hàng chủ động hủy lịch đặt sân trên giao diện trực tuyến hoặc thông báo qua tổng đài trước giờ nhận sân tối thiểu <strong>4 tiếng (240 phút)</strong> sẽ được hoàn trả 100% số tiền đặt cọc (theo cấu hình hệ thống quy định tại QĐ-KH03).
+      </div>
+      <p class="policy-text">
+        <strong>Trường hợp bất khả kháng:</strong> Khách hàng được hoàn 100% không phụ thuộc vào mốc thời gian 4 tiếng trong các sự cố khách quan:
+      </p>
+      <ul style="padding-left: 20px; font-size: 14px; margin-bottom: 0;">
+        <li>Cơ sở gặp sự cố kỹ thuật về mặt sàn, hệ thống chiếu sáng hoặc bảo trì đột xuất.</li>
+        <li>Thời tiết thiên tai, ngập úng ảnh hưởng nghiêm trọng đến việc di chuyển và thi đấu an toàn.</li>
+        <li>Sự cố điều phối từ ban quản lý sân và đã có thông báo chính thức đến người đặt.</li>
+      </ul>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="policy-card">
+      <h2 class="policy-section-title">
+        <span class="policy-badge">2</span>
+        Các Trường Hợp Không Áp Dụng Hoàn Cọc
+      </h2>
+      <p class="policy-text">
+        Để đảm bảo công bằng cho các khách hàng khác có nhu cầu sử dụng sân và duy trì chi phí vận hành cơ sở, hệ thống sẽ <strong>không hỗ trợ hoàn cọc</strong> trong các tình huống:
+      </p>
+      <div class="rule-box-amber">
+        <strong>Hủy cận giờ:</strong> Khách hàng thực hiện hủy lịch trong khoảng thời gian dưới 4 tiếng trước giờ bắt đầu thi đấu. Số tiền cọc 30% sẽ được bù đắp vào chi phí giữ chỗ của khung giờ trống.
+      </div>
+      <ul style="padding-left: 20px; font-size: 14px; margin-bottom: 0;">
+        <li><strong>Vắng mặt không nhận sân (No-show):</strong> Sau 15 phút kể từ giờ bắt đầu ca chơi mà khách hàng không đến check-in và không thông báo trước cho quầy thu ngân.</li>
+        <li><strong>Đơn đặt sân ưu đãi đặc biệt:</strong> Các gói sân tài trợ sự kiện hoặc giải đấu có ghi chú thỏa thuận riêng không hoàn cọc.</li>
+      </ul>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="policy-card">
+      <h2 class="policy-section-title">
+        <span class="policy-badge">3</span>
+        Phương Thức Và Thời Gian Nhận Lại Tiền Hoàn
+      </h2>
+      <p class="policy-text">
+        Tiền hoàn cọc sẽ được chuyển trả theo đúng phương thức mà khách hàng đã thực hiện thanh toán ban đầu:
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0;">
+        <div style="border: 1px solid var(--border-subtle); border-radius: 10px; padding: 18px; background: var(--surface-subtle);">
+          <div style="font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">Hoàn qua Ví Hội Viên UTE</div>
+          <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+            Số tiền được cộng trực tiếp vào số dư ví của tài khoản người dùng ngay lập tức. Có thể sử dụng để đặt các ca sân tiếp theo mà không cần thanh toán lại.
+          </div>
+        </div>
+        <div style="border: 1px solid var(--border-subtle); border-radius: 10px; padding: 18px; background: var(--surface-subtle);">
+          <div style="font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">Hoàn về Tài Khoản Ngân Hàng / VietQR</div>
+          <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+            Lệnh chuyển khoản tự động được gửi qua cổng VietQR đến đúng số tài khoản nguồn trong vòng từ 1 đến 24 giờ làm việc.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="policy-card">
+      <h2 class="policy-section-title">
+        <span class="policy-badge">4</span>
+        Quy Trình 3 Bước Tự Hủy Sân Trực Tuyến
+      </h2>
+      <ol class="steps-list">
+        <li>
+          <strong>Đăng nhập &amp; Truy cập mục Lịch Sử:</strong> Vào mục <em>Lịch Sử Đặt</em> trên thanh menu chính hoặc truy cập trang hồ sơ cá nhân.
+        </li>
+        <li>
+          <strong>Chọn đơn đặt sân cần hủy:</strong> Nhấn nút <em>Xem chi tiết</em> hoặc <em>Hủy lịch</em> tại đơn đặt tương ứng. Hệ thống sẽ kiểm tra thời gian thực tế so với giờ nhận sân.
+        </li>
+        <li>
+          <strong>Xác nhận hoàn cọc:</strong> Hệ thống hiển thị số tiền hoàn trả (100% nếu &ge; 4 tiếng). Nhấn <em>Xác nhận hủy đơn</em> để hoàn tất giao dịch và nhận mã tra cứu hoàn tiền.
+        </li>
+      </ol>
+
+      <div class="policy-actions">
+        <a href="/customer/history" class="btn btn-primary" style="padding: 10px 22px; font-weight: 600; border-radius: 8px;">
+          Tra Cứu &amp; Quản Lý Lịch Đặt
+        </a>
+        <a href="/customer/booking" class="btn btn-outline" style="padding: 10px 22px; font-weight: 600; border-radius: 8px;">
+          Đặt Sân Cầu Lông Mới
+        </a>
+      </div>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="policy-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);">
+      <h2 class="policy-section-title">
+        <span class="policy-badge">5</span>
+        Kênh Hỗ Trợ Khách Hàng 24/7
+      </h2>
+      <p class="policy-text">
+        Nếu quý khách cần hỗ trợ kiểm tra trạng thái đơn hủy hoặc có thắc mắc về đối soát giao dịch, vui lòng liên hệ ban chăm sóc khách hàng:
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 14px;">
+        <div>
+          <div style="font-size: 11.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Hotline Hỗ Trợ 24/7</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--primary); margin-top: 2px;">1900 6868</div>
+        </div>
+        <div>
+          <div style="font-size: 11.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Hộp Thư Tiếp Nhận</div>
+          <div style="font-size: 14px; font-weight: 700; color: var(--text-dark); margin-top: 2px;">support@utesport.vn</div>
+        </div>
+        <div>
+          <div style="font-size: 11.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Trụ Sở Điều Hành</div>
+          <div style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-top: 2px;">Võ Văn Ngân, TP. Thủ Đức</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. FOOTER -->
+  <footer class="cust-footer-dark">
+    <div class="cust-footer-inner">
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+          <div class="cust-logo-icon" style="width: 38px; height: 38px;">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+          </div>
+          <span style="font-size: 18px; font-weight: 900; color: #ffffff;">UTE SPORT ARENA</span>
+        </div>
+        <p style="line-height: 1.6; margin-bottom: 18px;">
+          Hệ thống chuỗi sân cầu lông tiêu chuẩn quốc tế BWF. Tiên phong ứng dụng công nghệ khóa giữ chỗ thời gian thực, đối soát thanh toán tự động VietQR và dịch vụ chăm sóc người chơi hàng đầu.
+        </p>
+        <div>
+          <span style="color: #6ee7b7; font-weight: 700;">Hotline Đặt Sân:</span>
+          <strong style="color: #ffffff; font-size: 15px;"> 1900 6868 - 028 3722 1223</strong>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Chi Nhánh Sân Cầu Lông</div>
+        <ul class="footer-links-list">
+          <li>• CN 1: Võ Văn Ngân, TP. Thủ Đức</li>
+          <li>• CN 2: Nguyễn Thị Thập, Quận 7</li>
+          <li>• CN 3: Điện Biên Phủ, Bình Thạnh</li>
+          <li>• CN 4: Quang Trung, Gò Vấp</li>
+          <li>• Giờ mở cửa: <strong>05:30 - 22:30</strong> (Thứ 2 - CN)</li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Dịch Vụ &amp; Hội Viên</div>
+        <ul class="footer-links-list">
+          <li><a href="/customer/booking">Đặt Sân Trực Tuyến</a></li>
+          <li><a href="/customer/tournaments">Đăng Ký Giải Đấu UTE</a></li>
+          <li><a href="/customer/profile">Tích Điểm Thẻ Hội Viên</a></li>
+          <li><a href="/customer/history">Tra Cứu Lịch Sử &amp; Check-in</a></li>
+          <li><a href="/customer/policy">Chính Sách Hoàn Cọc 100%</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Hệ Thống &amp; Quản Trị</div>
+        <ul class="footer-links-list">
+          <li><a href="/login">Đăng Nhập Cán Bộ &amp; Nhân Viên</a></li>
+          <li><a href="/pos/grid">Giao Diện Thu Ngân POS</a></li>
+          <li><a href="/manager/dashboard">Dashboard Quản Lý Chi Nhánh</a></li>
+          <li><a href="/director/dashboard">Dashboard Điều Hành Chuỗi</a></li>
+          <li><a href="/admin/users">Quản Trị Người Dùng &amp; Phân Quyền</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-bar">
+      <div>
+        &copy; 2026 <strong>UTE Sport Badminton Management System</strong> &bull; Nhóm 11 (Thọ - Bảo - Tâm - Hương)
+      </div>
+      <div style="display: flex; gap: 20px;">
+        <span>Tiêu chuẩn thảm thi đấu BWF</span>
+        <span>Thanh toán VietQR tự động</span>
+        <span>Hỗ trợ kỹ thuật 24/7</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/global-hub.js"></script>
+  <script src="/js/auth-guard.js"></script>
+</body>
+</html>

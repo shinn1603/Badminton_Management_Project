@@ -37,6 +37,7 @@ public class AuditLog {
     @Column(name = "log_time")
     private LocalDateTime logTime = LocalDateTime.now();
 
-    @Column(columnDefinition = "NVARCHAR(MAX)")
+    @Lob
+    @Column(name = "details")
     private String details;
 }

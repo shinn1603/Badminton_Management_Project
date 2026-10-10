@@ -131,6 +131,35 @@ function updateCourtSelectDropdowns() {
   }
 }
 
+// Load all branches dynamically from database
+async function loadBranchesForPos() {
+  const branchFilterEl = document.getElementById('branchFilter');
+  if (!branchFilterEl) return;
+  try {
+    const res = await fetch('/api/branches');
+    if (res.ok) {
+      const branches = await res.json();
+      if (Array.isArray(branches) && branches.length > 0) {
+        const curVal = branchFilterEl.value || 'CN01';
+        branchFilterEl.innerHTML = '';
+        branches.forEach(b => {
+          const opt = document.createElement('option');
+          opt.value = b.branchCode;
+          opt.textContent = b.branchName || `${b.branchCode} - Chi nhánh`;
+          if (b.branchCode === curVal) opt.selected = true;
+          branchFilterEl.appendChild(opt);
+        });
+        if (!branchFilterEl.value && branches.length > 0) {
+          branchFilterEl.value = branches[0].branchCode;
+        }
+        currentBranch = branchFilterEl.value;
+      }
+    }
+  } catch (e) {
+    console.warn('Lỗi kết nối tải danh sách chi nhánh:', e);
+  }
+}
+
 // Load real courts for the active branch
 async function loadCourtsForBranch(branchCode) {
   try {
@@ -446,10 +475,51 @@ function highlightExactSlot(courtCode, time) {
   }, 100);
 }
 
+// REAL-TIME INPUT RESTRICTIONS FOR CUSTOMER INFO
+function cleanCustomerNameInput(input) {
+  if (!input) return;
+  const errorEl = document.getElementById('custNameError');
+  const original = input.value;
+  // Block digits and symbols, allow Vietnamese letters, spaces, and hyphens
+  const cleaned = original.replace(/[0-9]/g, '').replace(/[^\p{L}\s'-]/gu, '');
+  if (original !== cleaned) {
+    input.value = cleaned;
+    if (errorEl) {
+      errorEl.style.display = 'block';
+      setTimeout(() => { if (errorEl) errorEl.style.display = 'none'; }, 2500);
+    }
+  } else if (errorEl && errorEl.style.display === 'block') {
+    errorEl.style.display = 'none';
+  }
+}
+
+function cleanCustomerPhoneInput(input) {
+  if (!input) return;
+  const errorEl = document.getElementById('custPhoneError');
+  const original = input.value;
+  // Block non-digits and cap at 10 digits
+  const cleaned = original.replace(/\D/g, '').slice(0, 10);
+  if (original !== cleaned) {
+    input.value = cleaned;
+    if (errorEl) {
+      errorEl.style.display = 'block';
+      setTimeout(() => { if (errorEl) errorEl.style.display = 'none'; }, 2500);
+    }
+  } else if (errorEl && errorEl.style.display === 'block' && cleaned.length === 10 && cleaned.startsWith('0')) {
+    errorEl.style.display = 'none';
+  }
+}
+
 // QUICK BOOKING MODAL LOGIC
 function openCreateBookingModal() {
-  document.getElementById('bookingCustName').value = '';
-  document.getElementById('bookingCustPhone').value = '';
+  const nameInp = document.getElementById('bookingCustName');
+  const phoneInp = document.getElementById('bookingCustPhone');
+  if (nameInp) nameInp.value = '';
+  if (phoneInp) phoneInp.value = '';
+  const nameErr = document.getElementById('custNameError');
+  if (nameErr) nameErr.style.display = 'none';
+  const phoneErr = document.getElementById('custPhoneError');
+  if (phoneErr) phoneErr.style.display = 'none';
   recalculatePrice();
   document.getElementById('createBookingModal').classList.add('active');
 }
@@ -468,8 +538,14 @@ function quickBookSlot(element, courtCodeOrName, startTime, endTime, price) {
   if (sTime) sTime.value = startTime;
   const eTime = document.getElementById('bookingEndTime');
   if (eTime) eTime.value = endTime;
-  document.getElementById('bookingCustName').value = '';
-  document.getElementById('bookingCustPhone').value = '';
+  const nameInp = document.getElementById('bookingCustName');
+  const phoneInp = document.getElementById('bookingCustPhone');
+  if (nameInp) nameInp.value = '';
+  if (phoneInp) phoneInp.value = '';
+  const nameErr = document.getElementById('custNameError');
+  if (nameErr) nameErr.style.display = 'none';
+  const phoneErr = document.getElementById('custPhoneError');
+  if (phoneErr) phoneErr.style.display = 'none';
   recalculatePrice();
   document.getElementById('createBookingModal').classList.add('active');
 }
@@ -518,11 +594,44 @@ function recalculatePrice() {
 }
 
 async function submitBookingForm() {
-  const name = document.getElementById('bookingCustName').value.trim();
-  const phone = document.getElementById('bookingCustPhone').value.trim();
-  if (!name || !phone) {
-    if (typeof showToast === 'function') showToast('Vui lòng nhập họ tên và số điện thoại.', 'warning');
-    else alert('Vui lòng nhập họ tên và số điện thoại.');
+  const nameInp = document.getElementById('bookingCustName');
+  const phoneInp = document.getElementById('bookingCustPhone');
+  const name = nameInp ? nameInp.value.trim() : '';
+  const phone = phoneInp ? phoneInp.value.trim() : '';
+
+  if (!name) {
+    if (typeof showToast === 'function') showToast('Vui lòng nhập tên khách hàng!', 'warning');
+    else alert('Vui lòng nhập tên khách hàng!');
+    if (nameInp) nameInp.focus();
+    return;
+  }
+
+  // Tên phải là chữ (tiếng Việt có dấu, khoảng trắng, gạch nối), không chứa số
+  const nameRegex = /^[\p{L}\s'-]{2,50}$/u;
+  if (/\d/.test(name) || !nameRegex.test(name)) {
+    if (typeof showToast === 'function') showToast('Tên khách hàng chỉ được chứa chữ cái (tối thiểu 2 ký tự, không bao gồm số hoặc ký tự lạ)!', 'warning');
+    else alert('Tên khách hàng chỉ được chứa chữ cái (tối thiểu 2 ký tự, không bao gồm số hoặc ký tự lạ)!');
+    const nameErr = document.getElementById('custNameError');
+    if (nameErr) nameErr.style.display = 'block';
+    if (nameInp) nameInp.focus();
+    return;
+  }
+
+  if (!phone) {
+    if (typeof showToast === 'function') showToast('Vui lòng nhập số điện thoại khách hàng!', 'warning');
+    else alert('Vui lòng nhập số điện thoại khách hàng!');
+    if (phoneInp) phoneInp.focus();
+    return;
+  }
+
+  // Số điện thoại phải gồm 10 chữ số, bắt đầu bằng 0
+  const phoneRegex = /^0\d{9}$/;
+  if (!phoneRegex.test(phone)) {
+    if (typeof showToast === 'function') showToast('Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số (bắt đầu bằng số 0).', 'warning');
+    else alert('Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số (bắt đầu bằng số 0).');
+    const phoneErr = document.getElementById('custPhoneError');
+    if (phoneErr) phoneErr.style.display = 'block';
+    if (phoneInp) phoneInp.focus();
     return;
   }
 
@@ -1403,6 +1512,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     currentDateStr = formatDate(new Date());
   }
 
+  await loadBranchesForPos();
   const branchFilterEl = document.getElementById('branchFilter');
   if (branchFilterEl) {
     currentBranch = branchFilterEl.value;
@@ -1424,6 +1534,41 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (dateInput) {
     dateInput.addEventListener('change', function(e) {
       renderGridForDate(e.target.value);
+    });
+  }
+
+  // Lock Name input: block digit keys
+  const bCustName = document.getElementById('bookingCustName');
+  if (bCustName) {
+    bCustName.addEventListener('keydown', function(e) {
+      if ((e.key >= '0' && e.key <= '9') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        const err = document.getElementById('custNameError');
+        if (err) {
+          err.style.display = 'block';
+          setTimeout(() => { if (err) err.style.display = 'none'; }, 2000);
+        }
+      }
+    });
+    bCustName.addEventListener('blur', function() {
+      this.value = this.value.trim().replace(/\s+/g, ' ');
+    });
+  }
+
+  // Lock Phone input: allow only digits and control keys
+  const bCustPhone = document.getElementById('bookingCustPhone');
+  if (bCustPhone) {
+    bCustPhone.addEventListener('keydown', function(e) {
+      const allowedKeys = ['Backspace', 'Tab', 'Enter', 'Delete', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+      if (allowedKeys.includes(e.key) || e.ctrlKey || e.metaKey) return;
+      if (e.key < '0' || e.key > '9') {
+        e.preventDefault();
+        const err = document.getElementById('custPhoneError');
+        if (err) {
+          err.style.display = 'block';
+          setTimeout(() => { if (err) err.style.display = 'none'; }, 2000);
+        }
+      }
     });
   }
 

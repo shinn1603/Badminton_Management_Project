@@ -39,6 +39,7 @@ public class Staff {
     @Column(name = "address", length = 255)
     private String address;
 
+    @Builder.Default
     @Column(name = "status", length = 30)
     private String status = "Đang làm việc";
 }

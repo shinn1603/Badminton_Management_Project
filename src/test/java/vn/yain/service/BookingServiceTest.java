@@ -272,10 +272,13 @@ class BookingServiceTest {
         booking.setBookingCode("DS_WS_TEST");
         booking.setCourtCode("CL01");
         booking.setBranchCode("CN01");
+        booking.setBookingDate(java.time.LocalDate.now());
+        booking.setTimeSlot("18:00 - 19:00");
         booking.setCustomerName("Khach Hang WS");
         booking.setTotalPrice(new BigDecimal("100000"));
 
         when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
+        when(bookingRepository.findByCourtCodeAndBookingDate(anyString(), any())).thenReturn(java.util.Collections.emptyList());
         when(courtRepository.findByCourtCode("CL01")).thenReturn(Optional.empty());
 
         bookingService.createBooking(booking);

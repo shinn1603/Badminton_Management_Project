@@ -23,7 +23,7 @@ public class Payment {
     @Column(name = "booking_code", nullable = false, length = 30)
     private String bookingCode;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
     @Column(nullable = false, length = 50)

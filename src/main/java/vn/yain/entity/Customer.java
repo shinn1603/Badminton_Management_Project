@@ -1,5 +1,6 @@
 package vn.yain.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,10 +30,11 @@ public class Customer {
     @Column(length = 100)
     private String email;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false, length = 100)
-    private String password = "123";
+    private String password;
 
-    @Column(name = "total_play_hours")
+    @Column(name = "total_play_hours", precision = 10, scale = 2)
     private BigDecimal totalPlayHours = BigDecimal.ZERO;
 
     @Column(name = "reward_points")

@@ -471,25 +471,25 @@
     </div>
 
     <!-- Tournament 1: Active Registration -->
-    <div class="tour-card">
+    <div class="tour-card" id="card-GD01">
       <div class="tour-card-banner">
         <div>
-          <span class="badge badge-success">ĐANG MỞ ĐĂNG KÝ</span>
+          <span class="badge badge-success" id="tourBadge-GD01">ĐANG MỞ ĐĂNG KÝ</span>
           <div style="font-size: 20px; font-weight: 800; margin-top: 10px; color: var(--cust-text-main);">MÙA THU 2026</div>
-          <div style="font-size: 12px; color: var(--cust-text-muted); margin-top: 2px;">Khởi tranh: 10/10/2026</div>
+          <div style="font-size: 12px; color: var(--cust-text-muted); margin-top: 2px;" id="tourDate-GD01">Khởi tranh: 10/10/2026</div>
         </div>
         <div style="margin-top: 24px;">
           <div style="font-size: 11px; text-transform: uppercase; color: var(--cust-text-muted); font-weight: 600;">Tổng giải thưởng</div>
-          <div style="font-size: 22px; font-weight: 800; color: var(--cust-primary-hover);">20.000.000 đ</div>
+          <div style="font-size: 22px; font-weight: 800; color: var(--cust-primary-hover);" id="tourPrize-GD01">20.000.000 đ</div>
           <div style="font-size: 11px; color: var(--cust-text-muted);">+ Cúp & Vợt Yonex Pro</div>
         </div>
       </div>
 
       <div class="tour-card-content">
         <div>
-          <h2 class="tour-title">Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026</h2>
+          <h2 class="tour-title" id="tourTitle-GD01">Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026</h2>
           <div style="font-size: 12.5px; color: var(--cust-text-muted); line-height: 1.5;">
-            Giải đấu thường niên quy mô lớn nhất do CLB UTE Badminton tổ chức, quy tụ 32 cặp VĐV xuất sắc toàn thành phố.
+            Giải đấu thường niên quy mô lớn nhất do CLB UTE Badminton tổ chức, quy tụ các cặp VĐV xuất sắc toàn thành phố.
           </div>
 
           <div class="tour-meta-grid">
@@ -503,7 +503,7 @@
               <span></span> <strong>Lệ phí tham gia:</strong> 300.000 đ / cặp
             </div>
             <div class="tour-meta-item">
-              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: var(--primary);"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> <strong>Hạn đăng ký:</strong> Đến hết 07/10/2026
+              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: var(--primary);"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> <strong>Hạn đăng ký:</strong> Trước 3 ngày khai mạc
             </div>
           </div>
 
@@ -516,17 +516,17 @@
           <div class="tour-progress-wrap">
             <div style="display: flex; justify-content: space-between; font-size: 11.5px; margin-bottom: 4px;">
               <span style="color: var(--cust-text-muted);">Số slot đăng ký:</span>
-              <strong style="color: var(--cust-primary-hover);">Đã đăng ký: 24 / 32 Cặp (Còn 8 slot)</strong>
+              <strong style="color: var(--cust-primary-hover);" id="tourSlotText-GD01">Đã đăng ký: 24 / 32 Cặp (Còn 8 slot)</strong>
             </div>
             <div style="height: 6px; background: #e2e8f0; border-radius: 9999px; overflow: hidden;">
-              <div style="height: 100%; width: 75%; background: var(--cust-primary); border-radius: 9999px;"></div>
+              <div id="tourProgressBar-GD01" style="height: 100%; width: 75%; background: var(--cust-primary); border-radius: 9999px; transition: width 0.3s ease;"></div>
             </div>
           </div>
         </div>
 
         <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--cust-border);">
           <span style="font-size: 11.5px; color: var(--cust-text-muted);">Áp dụng thể lệ thi đấu chính thức</span>
-          <button type="button" class="btn btn-primary" onclick="openRegisterModal('Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026')" style="padding: 0 20px; font-weight: 600; border-radius: 6px; height: 36px; font-size: 12.5px;">
+          <button type="button" class="btn btn-primary" id="tourBtn-GD01" onclick="openRegisterModal('GD01', 'Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026')" style="padding: 0 20px; font-weight: 600; border-radius: 6px; height: 36px; font-size: 12.5px;">
             Đăng Ký Tham Gia Ngay
           </button>
         </div>
@@ -534,23 +534,23 @@
     </div>
 
     <!-- Tournament 2: Upcoming Soon -->
-    <div class="tour-card">
+    <div class="tour-card" id="card-GD02">
       <div class="tour-card-banner">
         <div>
-          <span class="badge badge-blue">SẮP MỞ ĐĂNG KÝ</span>
+          <span class="badge badge-blue" id="tourBadge-GD02">SẮP MỞ ĐĂNG KÝ</span>
           <div style="font-size: 20px; font-weight: 800; margin-top: 10px; color: var(--cust-text-main);">CÚP DOANH NGHIỆP</div>
-          <div style="font-size: 12px; color: var(--cust-text-muted); margin-top: 2px;">Khởi tranh: 20/11/2026</div>
+          <div style="font-size: 12px; color: var(--cust-text-muted); margin-top: 2px;" id="tourDate-GD02">Khởi tranh: 20/11/2026</div>
         </div>
         <div style="margin-top: 24px;">
           <div style="font-size: 11px; text-transform: uppercase; color: var(--cust-text-muted); font-weight: 600;">Tổng giải thưởng</div>
-          <div style="font-size: 22px; font-weight: 800; color: #2563eb;">30.000.000 đ</div>
+          <div style="font-size: 22px; font-weight: 800; color: #2563eb;" id="tourPrize-GD02">30.000.000 đ</div>
           <div style="font-size: 11px; color: var(--cust-text-muted);">Cúp Vàng & Kỷ niệm chương</div>
         </div>
       </div>
 
       <div class="tour-card-content">
         <div>
-          <h2 class="tour-title">Giải Cầu Lông Doanh Nghiệp & Sinh Viên Cúp Thủ Đức 2026</h2>
+          <h2 class="tour-title" id="tourTitle-GD02">Giải Cầu Lông Doanh Nghiệp & Sinh Viên Cúp Thủ Đức 2026</h2>
           <div style="font-size: 12.5px; color: var(--cust-text-muted); line-height: 1.5;">
             Giải đấu kết nối các doanh nghiệp tài trợ, đối tác tuyển dụng và cựu sinh viên - sinh viên đam mê thể thao.
           </div>
@@ -575,11 +575,21 @@
             <div><strong> Á Quân:</strong> 8.000.000đ</div>
             <div><strong> Quý Quân:</strong> 4.000.000đ</div>
           </div>
+
+          <div class="tour-progress-wrap">
+            <div style="display: flex; justify-content: space-between; font-size: 11.5px; margin-bottom: 4px;">
+              <span style="color: var(--cust-text-muted);">Số slot đăng ký:</span>
+              <strong style="color: #2563eb;" id="tourSlotText-GD02">Chưa mở đăng ký (Quy mô 24 Cặp)</strong>
+            </div>
+            <div style="height: 6px; background: #e2e8f0; border-radius: 9999px; overflow: hidden;">
+              <div id="tourProgressBar-GD02" style="height: 100%; width: 0%; background: #2563eb; border-radius: 9999px; transition: width 0.3s ease;"></div>
+            </div>
+          </div>
         </div>
 
         <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--cust-border);">
           <span style="font-size: 11.5px; color: var(--cust-text-muted);">Cổng đăng ký mở vào 15/10/2026</span>
-          <button type="button" class="btn btn-outline" disabled style="padding: 0 18px; border-radius: 6px; cursor: not-allowed; opacity: 0.6; height: 36px; font-size: 12.5px;">
+          <button type="button" class="btn btn-outline" id="tourBtn-GD02" disabled style="padding: 0 18px; border-radius: 6px; cursor: not-allowed; opacity: 0.6; height: 36px; font-size: 12.5px;">
             Sắp Mở Cổng
           </button>
         </div>
@@ -600,6 +610,7 @@
 
       <div class="modal-body">
         <form onsubmit="handleTournamentSubmit(event)">
+          <input type="hidden" id="modalTourCode" value="GD01">
           <div class="form-group">
             <label class="form-label">Giải Đấu Đăng Ký</label>
             <input type="text" id="modalTourName" class="form-control" readonly style="background: #f1f5f9; font-weight: 600;">
@@ -616,7 +627,7 @@
             </div>
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Tên CLB / Đội Đại Diện *</label>
-              <input type="text" class="form-control" placeholder="Ví dụ: CLB Sư Phạm Kỹ Thuật" required value="CLB UTE Masters">
+              <input type="text" class="form-control" id="tourClubName" placeholder="Ví dụ: CLB Sư Phạm Kỹ Thuật" required value="CLB UTE Masters">
             </div>
           </div>
 
@@ -627,18 +638,18 @@
           <div class="form-row">
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Họ và Tên VĐV 1 *</label>
-              <input type="text" class="form-control" value="Nguyễn Văn An" required>
+              <input type="text" class="form-control" id="tourPlayer1Name" value="Nguyễn Văn An" required>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Số ĐT Liên Hệ *</label>
-              <input type="tel" class="form-control" value="0912345678" required>
+              <input type="tel" class="form-control" id="tourPlayer1Phone" value="0912345678" required>
             </div>
           </div>
 
           <div class="form-row" style="margin-top: 10px;">
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Số CCCD / Mã Số Sinh Viên *</label>
-              <input type="text" class="form-control" placeholder="079xxxxxxxx hoặc 24110xxx" required value="24110234">
+              <input type="text" class="form-control" id="tourPlayer1Cccd" placeholder="079xxxxxxxx hoặc 24110xxx" required value="24110234">
             </div>
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Trình Độ</label>
@@ -656,18 +667,18 @@
           <div class="form-row">
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Họ và Tên VĐV 2 *</label>
-              <input type="text" class="form-control" placeholder="Nhập tên VĐV cùng đội" required value="Trần Thị Mai">
+              <input type="text" class="form-control" id="tourPlayer2Name" placeholder="Nhập tên VĐV cùng đội" required value="Trần Thị Mai">
             </div>
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Số ĐT Liên Hệ VĐV 2 *</label>
-              <input type="tel" class="form-control" placeholder="09xxxxxxxx" required value="0987654321">
+              <input type="tel" class="form-control" id="tourPlayer2Phone" placeholder="09xxxxxxxx" required value="0987654321">
             </div>
           </div>
 
           <div class="form-row" style="margin-top: 10px;">
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Số CCCD / MSSV *</label>
-              <input type="text" class="form-control" placeholder="079xxxxxxxx hoặc 24110xxx" required value="24110888">
+              <input type="text" class="form-control" id="tourPlayer2Cccd" placeholder="079xxxxxxxx hoặc 24110xxx" required value="24110888">
             </div>
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Trình Độ</label>
@@ -687,7 +698,7 @@
 
           <div class="modal-footer" style="padding: 12px 0 0; background: transparent; border-top: none;">
             <button type="button" class="btn btn-outline" onclick="closeTourModal()">Hủy</button>
-            <button type="submit" class="btn btn-primary" style="height: 38px; padding: 0 20px; font-weight: 600;">
+            <button type="submit" class="btn btn-primary" id="btnSubmitTourReg" style="height: 38px; padding: 0 20px; font-weight: 600;">
               Gửi Hồ Sơ Đăng Ký (300.000đ / cặp)
             </button>
           </div>
@@ -697,8 +708,9 @@
   </div>
 
   <script>
-    function openRegisterModal(name) {
-      document.getElementById('modalTourName').value = name;
+    function openRegisterModal(code, name) {
+      document.getElementById('modalTourCode').value = code || 'GD01';
+      document.getElementById('modalTourName').value = name || 'Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026';
       document.getElementById('regModal').classList.add('open');
     }
 
@@ -706,11 +718,188 @@
       document.getElementById('regModal').classList.remove('open');
     }
 
-    function handleTournamentSubmit(e) {
-      e.preventDefault();
-      showToast('Đăng ký giải đấu thành công! Ban tổ chức sẽ liên hệ qua SĐT để hướng dẫn nhận lịch thi đấu.', 'success');
-      closeTourModal();
+    function applyTournamentState(code, current, max, status, startDate, prize) {
+      current = Number(current != null ? current : 24);
+      max = Number(max != null ? max : 32);
+      const badgeEl = document.getElementById('tourBadge-' + code);
+      const slotTextEl = document.getElementById('tourSlotText-' + code);
+      const barEl = document.getElementById('tourProgressBar-' + code);
+      const btnEl = document.getElementById('tourBtn-' + code);
+      const dateEl = document.getElementById('tourDate-' + code);
+      const prizeEl = document.getElementById('tourPrize-' + code);
+
+      if (startDate && dateEl) {
+        try {
+          const d = new Date(startDate);
+          if (!isNaN(d.getTime())) {
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            dateEl.textContent = `Khởi tranh: ${day}/${month}/${year}`;
+          }
+        } catch (e) {}
+      }
+
+      if (prize && prizeEl) {
+        prizeEl.textContent = Number(prize).toLocaleString('vi-VN') + ' đ';
+      }
+
+      const pct = Math.min(100, Math.round((current / max) * 100));
+      const remaining = Math.max(0, max - current);
+
+      const isFull = current >= max || status === 'Hết chỗ';
+      const isClosed = status === 'Đã đóng đăng ký';
+      const isUpcoming = status === 'Sắp mở đăng ký';
+
+      if (barEl) {
+        barEl.style.width = (isUpcoming ? 0 : pct) + '%';
+        if (isFull) {
+          barEl.style.background = '#ef4444';
+        } else {
+          barEl.style.background = 'var(--cust-primary)';
+        }
+      }
+
+      if (slotTextEl) {
+        if (isFull) {
+          slotTextEl.innerHTML = `<span style="color: #ef4444; font-weight: 700;">Đã đủ: ${max} / ${max} Cặp (Đã hết chỗ)</span>`;
+        } else if (isClosed) {
+          slotTextEl.innerHTML = `<span style="color: #f59e0b; font-weight: 700;">Đã đóng cổng đăng ký (${current} / ${max} Cặp)</span>`;
+        } else if (isUpcoming) {
+          slotTextEl.textContent = `Chưa mở đăng ký (Quy mô ${max} Cặp)`;
+        } else {
+          slotTextEl.innerHTML = `Đã đăng ký: <strong>${current} / ${max} Cặp</strong> (Còn ${remaining} slot)`;
+        }
+      }
+
+      if (badgeEl) {
+        if (isFull) {
+          badgeEl.className = 'badge';
+          badgeEl.textContent = 'ĐÃ HẾT CHỖ';
+          badgeEl.style.background = '#fee2e2';
+          badgeEl.style.color = '#dc2626';
+          badgeEl.style.border = '1px solid #fca5a5';
+        } else if (isClosed) {
+          badgeEl.className = 'badge badge-warning';
+          badgeEl.textContent = 'ĐÃ ĐÓNG ĐĂNG KÝ';
+          badgeEl.style.background = '';
+          badgeEl.style.color = '';
+          badgeEl.style.border = '';
+        } else if (isUpcoming) {
+          badgeEl.className = 'badge badge-blue';
+          badgeEl.textContent = 'SẮP MỞ ĐĂNG KÝ';
+          badgeEl.style.background = '';
+          badgeEl.style.color = '';
+          badgeEl.style.border = '';
+        } else {
+          badgeEl.className = 'badge badge-success';
+          badgeEl.textContent = 'ĐANG MỞ ĐĂNG KÝ';
+          badgeEl.style.background = '';
+          badgeEl.style.color = '';
+          badgeEl.style.border = '';
+        }
+      }
+
+      if (btnEl) {
+        if (isFull) {
+          btnEl.disabled = true;
+          btnEl.textContent = 'Đã Hết Chỗ';
+          btnEl.className = 'btn btn-outline';
+          btnEl.style.opacity = '0.6';
+          btnEl.style.cursor = 'not-allowed';
+        } else if (isClosed) {
+          btnEl.disabled = true;
+          btnEl.textContent = 'Đã Đóng Cổng';
+          btnEl.className = 'btn btn-outline';
+          btnEl.style.opacity = '0.6';
+          btnEl.style.cursor = 'not-allowed';
+        } else if (isUpcoming) {
+          btnEl.disabled = true;
+          btnEl.textContent = 'Sắp Mở Cổng';
+          btnEl.className = 'btn btn-outline';
+          btnEl.style.opacity = '0.6';
+          btnEl.style.cursor = 'not-allowed';
+        } else {
+          btnEl.disabled = false;
+          btnEl.textContent = 'Đăng Ký Tham Gia Ngay';
+          btnEl.className = 'btn btn-primary';
+          btnEl.style.opacity = '1';
+          btnEl.style.cursor = 'pointer';
+        }
+      }
     }
+
+    async function loadTournaments() {
+      try {
+        const res = await fetch('/api/tournaments');
+        if (res.ok) {
+          const list = await res.json();
+          if (Array.isArray(list)) {
+            list.forEach(t => {
+              const code = t.tournamentCode || 'GD01';
+              applyTournamentState(code, t.currentParticipants, t.maxParticipants, t.status, t.startDate, t.totalPrize);
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('Lỗi đồng bộ dữ liệu giải đấu:', err);
+      }
+    }
+
+    async function handleTournamentSubmit(e) {
+      e.preventDefault();
+      const code = document.getElementById('modalTourCode').value || 'GD01';
+      const name = document.getElementById('modalTourName').value;
+      const teamName = document.getElementById('tourClubName').value;
+      const category = document.getElementById('tourCategory').value;
+      const player1 = document.getElementById('tourPlayer1Name').value;
+      const phone1 = document.getElementById('tourPlayer1Phone').value;
+      const submitBtn = document.getElementById('btnSubmitTourReg');
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Đang xử lý đăng ký...';
+      }
+
+      try {
+        const res = await fetch('/api/tournaments/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tournamentCode: code,
+            tournamentName: name,
+            teamName: teamName,
+            category: category,
+            player1Name: player1,
+            phone: phone1
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          applyTournamentState(data.tournamentCode || code, data.currentParticipants, data.maxParticipants, data.status);
+          showToast(`Đăng ký thành công giải đấu! Slot hiện tại: ${data.currentParticipants}/${data.maxParticipants}. Ban tổ chức sẽ liên hệ SĐT ${phone1}.`, 'success');
+          closeTourModal();
+        } else {
+          showToast(data.message || 'Không thể đăng ký giải đấu.', 'warning');
+          if (data.status) {
+            applyTournamentState(code, data.currentParticipants, data.maxParticipants, data.status);
+          }
+        }
+      } catch (err) {
+        console.error('Lỗi gửi hồ sơ đăng ký:', err);
+        showToast('Có lỗi kết nối máy chủ. Vui lòng thử lại sau!', 'error');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Gửi Hồ Sơ Đăng Ký (300.000đ / cặp)';
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadTournaments();
+    });
   </script>
   
   <footer class="cust-footer-dark">
@@ -749,7 +938,7 @@
           <li><a href="/customer/tournaments">Đăng Ký Giải Đấu UTE</a></li>
           <li><a href="/customer/profile">Tích Điểm Thẻ Hội Viên</a></li>
           <li><a href="/customer/history">Tra Cứu Lịch Sử & Check-in</a></li>
-          <li><a href="#">Chính Sách Hoàn Cọc 100%</a></li>
+          <li><a href="/customer/policy">Chính Sách Hoàn Cọc 100%</a></li>
         </ul>
       </div>
 
