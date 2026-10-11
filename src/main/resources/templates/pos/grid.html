@@ -665,7 +665,6 @@
 
   <!-- JAVASCRIPT LOGIC TÁCH RIÊNG HOÀN CHỈNH -->
   <script src="/js/pos-grid.js"></script>
-  <script src="/js/auth-guard.js"></script>
   <script src="/js/global-hub.js"></script>
   <script>
     let shiftSystemCash = 0;
@@ -680,8 +679,26 @@
       const branchText = (bFilter && bFilter.options[bFilter.selectedIndex]) ? bFilter.options[bFilter.selectedIndex].text : (branch + ' - Thủ Đức');
       document.getElementById('handoverBranch').innerText = branchText;
 
+      let token = localStorage.getItem('jwt_token');
+      if (!token && document.cookie) {
+        const m = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+        if (m) {
+          token = m[1];
+          localStorage.setItem('jwt_token', token);
+        }
+      }
+
+      if (!token) {
+        showToast('Phiên làm việc đã hết hạn hoặc chưa đăng nhập. Vui lòng đăng nhập tài khoản Thu ngân (pos)!', 'error');
+        setTimeout(() => { window.location.href = '/login?expired=true'; }, 1500);
+        return;
+      }
+
       try {
-        const res = await fetch(`/api/shifts/summary?branchCode=${branch}`);
+        const headers = { 'Accept': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch(`/api/shifts/summary?branchCode=${branch}`, { headers });
         if (res.ok) {
           const data = await res.json();
           currentShiftSummary = data;
@@ -699,12 +716,17 @@
 
           document.getElementById('actualCashInput').value = shiftSystemCash;
           calculateHandoverDifference();
+          document.getElementById('shiftHandoverModal').classList.add('active');
+        } else if (res.status === 401 || res.status === 403) {
+          showToast('Phiên làm việc đã hết hạn hoặc bạn không có quyền thu ngân (403 Forbidden). Đang chuyển hướng đăng nhập...', 'error');
+          setTimeout(() => { window.location.href = '/login?expired=true'; }, 1500);
+        } else {
+          showToast('Không thể tải tổng hợp ca: Lỗi máy chủ ' + res.status, 'error');
         }
       } catch (err) {
         console.warn('Lỗi tải tổng hợp ca:', err);
+        showToast('Lỗi mạng khi tải dữ liệu ca trực!', 'error');
       }
-
-      document.getElementById('shiftHandoverModal').classList.add('active');
     }
 
     function closeShiftHandoverModal() {
@@ -736,13 +758,17 @@
       const cashRev = document.getElementById('shiftCashRevenue').innerText;
       const tfRev = document.getElementById('shiftTransferRevenue').innerText;
 
+      const curUser = (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser()) || {};
+      const staffName = curUser.fullName || 'Nguyễn Thanh Tâm';
+      const staffTitle = curUser.roleTitle || 'Thu ngân POS';
+
       win.document.write(`
         <html><head><title>Biên Bản Bàn Giao Ca</title>
         <style>body{font-family:'Courier New',monospace;padding:16px;line-height:1.4;font-size:12px;}.center{text-align:center;}.dash{border-bottom:1px dashed #000;margin:8px 0;}.row{display:flex;justify-content:space-between;}</style>
         </head><body onload="window.print()">
         <div class="center"><h3>UTE SPORT ARENA</h3><p>BIÊN BẢN BÀN GIAO CA THU NGÂN</p></div>
         <div class="dash"></div>
-        <div>Thu ngân: <strong>Nguyễn Thanh Tâm (NS03)</strong></div>
+        <div>Thu ngân: <strong>${staffName} (${staffTitle})</strong></div>
         <div>Thời gian in: ${new Date().toLocaleString('vi-VN')}</div>
         <div class="dash"></div>
         <div class="row"><span>Doanh thu giờ sân:</span><strong>${courtRev}</strong></div>
@@ -763,26 +789,61 @@
       const actualCash = Number(document.getElementById('actualCashInput').value) || 0;
       const bFilter = document.getElementById('branchFilter');
       const branch = bFilter ? bFilter.value : 'CN01';
+      const curUser = (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser()) || {};
+      const currentStaffCode = curUser.staffCode || (curUser.username === 'pos' ? 'NV-02' : 'NV-02');
+
+      let token = localStorage.getItem('jwt_token');
+      if (!token && document.cookie) {
+        const m = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+        if (m) {
+          token = m[1];
+          localStorage.setItem('jwt_token', token);
+        }
+      }
+
+      if (!token) {
+        showToast('Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại!', 'error');
+        setTimeout(() => { window.location.href = '/login?expired=true'; }, 1500);
+        return;
+      }
 
       try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
         const res = await fetch('/api/shifts/close', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: headers,
           body: JSON.stringify({
-            staffCode: 'NVQ01',
+            staffCode: currentStaffCode,
             branchCode: branch,
             actualCash: actualCash,
             notes: 'Bàn giao ca trực cuối ca POS'
           })
         });
+
+        if (res.status === 401 || res.status === 403) {
+          showToast('Phiên làm việc đã hết hạn hoặc bạn không có quyền thu ngân (403 Forbidden). Đang chuyển hướng đăng nhập...', 'error');
+          setTimeout(() => { window.location.href = '/login?expired=true'; }, 1500);
+          return;
+        }
+
         const result = await res.json();
-        if (result.success) {
-          showToast(`Đã lưu biên bản kết ca [${result.handoverCode}] thành công! Chênh lệch: ${Number(result.difference).toLocaleString('vi-VN')} đ`, 'success');
+        if (res.ok && result.success) {
+          const diffVal = Number(result.difference) || 0;
+          const diffText = diffVal === 0 ? 'Khớp sổ 100%' : (diffVal > 0 ? `Thừa két: +${diffVal.toLocaleString('vi-VN')} đ` : `Thiếu két: ${diffVal.toLocaleString('vi-VN')} đ`);
+          showToast(`Đã lưu biên bản kết ca [${result.handoverCode}] thành công! (${diffText})`, 'success');
+
           setTimeout(() => {
+            const shouldLogout = confirm(`Đã kết ca thành công!\n- Mã biên bản: ${result.handoverCode}\n- Tình trạng quỹ: ${diffText}\n\nBạn có muốn ĐĂNG XUẤT tài khoản để bàn giao cho ca tiếp theo không?\n(Bấm OK để đăng xuất, bấm Cancel để ở lại quầy)`);
             closeShiftHandoverModal();
-            if (window.handleLogout) window.handleLogout();
-            else window.location.href = '/login';
-          }, 1500);
+            if (shouldLogout) {
+              localStorage.removeItem('jwt_token');
+              localStorage.removeItem('utesport_user');
+              document.cookie = 'jwt_token=; path=/; max-age=0';
+              window.location.href = '/login';
+            }
+          }, 400);
         } else {
           showToast(result.message || 'Lỗi kết ca', 'error');
         }

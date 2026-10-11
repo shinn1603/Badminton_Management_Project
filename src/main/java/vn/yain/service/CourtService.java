@@ -11,6 +11,7 @@ import vn.yain.dto.CourtEventDto;
 import vn.yain.entity.Court;
 import vn.yain.repository.CourtRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -122,13 +123,68 @@ public class CourtService {
         });
     }
 
+    public Court saveCourt(Court court) {
+        if (court.getCourtCode() == null || court.getCourtCode().trim().isEmpty()) {
+            throw new IllegalArgumentException("Mã sân không được để trống!");
+        }
+        if (court.getBranchCode() == null || court.getBranchCode().trim().isEmpty()) {
+            court.setBranchCode("CN01");
+        }
+        if (court.getCourtName() == null || court.getCourtName().trim().isEmpty()) {
+            court.setCourtName("Sân " + court.getCourtCode());
+        }
+        if (court.getCourtType() == null || court.getCourtType().trim().isEmpty()) {
+            court.setCourtType("Cầu lông tiêu chuẩn");
+        }
+        if (court.getHourlyRate() == null || court.getHourlyRate().compareTo(BigDecimal.ZERO) <= 0) {
+            court.setHourlyRate(new BigDecimal("90000"));
+        }
+        if (court.getStatus() == null || court.getStatus().trim().isEmpty()) {
+            court.setStatus("Trống");
+        }
+
+        Optional<Court> existingOpt = courtRepository.findByCourtCode(court.getCourtCode().trim());
+        if (existingOpt.isPresent()) {
+            Court existing = existingOpt.get();
+            existing.setCourtName(court.getCourtName());
+            existing.setCourtType(court.getCourtType());
+            existing.setHourlyRate(court.getHourlyRate());
+            existing.setStatus(court.getStatus());
+            if (court.getImageUrl() != null && !court.getImageUrl().isBlank()) {
+                existing.setImageUrl(court.getImageUrl());
+            }
+            if (court.getBranchCode() != null && !court.getBranchCode().isBlank()) {
+                existing.setBranchCode(court.getBranchCode());
+            }
+            Court saved = courtRepository.save(existing);
+            broadcastCourtEvent(CourtEventDto.builder()
+                    .eventType("COURT_STATUS_CHANGED")
+                    .courtCode(saved.getCourtCode())
+                    .branchCode(saved.getBranchCode())
+                    .status(saved.getStatus())
+                    .timestamp(LocalDateTime.now())
+                    .build());
+            return saved;
+        }
+
+        Court saved = courtRepository.save(court);
+        broadcastCourtEvent(CourtEventDto.builder()
+                .eventType("COURT_STATUS_CHANGED")
+                .courtCode(saved.getCourtCode())
+                .branchCode(saved.getBranchCode())
+                .status(saved.getStatus())
+                .timestamp(LocalDateTime.now())
+                .build());
+        return saved;
+    }
+
     private void broadcastCourtEvent(CourtEventDto event) {
         if (messagingTemplate != null) {
             try {
                 messagingTemplate.convertAndSend("/topic/courts", event);
                 messagingTemplate.convertAndSend("/topic/courts/" + event.getBranchCode(), event);
             } catch (Exception e) {
-                // Non-blocking fallback if socket broker is initializing
+                log.warn("Không thể phát sự kiện realtime sân đấu: {}", e.getMessage());
             }
         }
     }

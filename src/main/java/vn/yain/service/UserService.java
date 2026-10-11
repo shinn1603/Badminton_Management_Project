@@ -32,9 +32,24 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private final Map<String, Integer> failedAttempts = new java.util.concurrent.ConcurrentHashMap<>();
+    private final Map<String, Long> lockoutExpiry = new java.util.concurrent.ConcurrentHashMap<>();
+
     public Map<String, Object> authenticate(String username, String password) {
         if (username == null || password == null) {
             throw new IllegalArgumentException("Vui lòng nhập tài khoản và mật khẩu!");
+        }
+
+        String userKey = username.trim().toLowerCase();
+        Long lockoutUntil = lockoutExpiry.get(userKey);
+        if (lockoutUntil != null) {
+            if (System.currentTimeMillis() < lockoutUntil) {
+                long remainingSec = (lockoutUntil - System.currentTimeMillis()) / 1000;
+                throw new IllegalStateException("Tài khoản tạm thời bị khóa do nhập sai mật khẩu quá 5 lần. Vui lòng thử lại sau " + Math.max(1, remainingSec / 60) + " phút!");
+            } else {
+                lockoutExpiry.remove(userKey);
+                failedAttempts.remove(userKey);
+            }
         }
 
         User user = userRepository.findByUsername(username.trim())
@@ -56,8 +71,16 @@ public class UserService {
         }
 
         if (!isMatch) {
+            int attempts = failedAttempts.merge(userKey, 1, Integer::sum);
+            if (attempts >= 5) {
+                lockoutExpiry.put(userKey, System.currentTimeMillis() + 15 * 60 * 1000);
+            }
             throw new IllegalArgumentException("Tài khoản hoặc mật khẩu không chính xác!");
         }
+
+        // Reset failed attempts upon successful login
+        failedAttempts.remove(userKey);
+        lockoutExpiry.remove(userKey);
 
         if ("Khóa".equalsIgnoreCase(user.getStatus()) || "Bị khóa".equalsIgnoreCase(user.getStatus())) {
             throw new IllegalStateException("Tài khoản đã bị tạm khóa, vui lòng liên hệ quản trị viên!");
@@ -89,6 +112,10 @@ public class UserService {
         }
         if (password.trim().length() < 6) {
             throw new IllegalArgumentException("Mật khẩu phải có độ dài tối thiểu từ 6 ký tự trở lên!");
+        }
+        boolean hasDigitOrLetter = password.trim().matches(".*[a-zA-Z].*") && password.trim().matches(".*[0-9].*");
+        if (!hasDigitOrLetter) {
+            throw new IllegalArgumentException("Mật khẩu phải chứa cả chữ cái và số để đảm bảo tính an toàn!");
         }
         if (fullName == null || fullName.trim().isEmpty()) {
             throw new IllegalArgumentException("Họ và tên không được để trống!");
@@ -149,7 +176,47 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        List<User> users = new ArrayList<>(userRepository.findAll());
+        Set<String> existingPhones = users.stream()
+                .map(User::getPhone)
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(java.util.stream.Collectors.toSet());
+        Set<String> existingUsernames = users.stream()
+                .map(User::getUsername)
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .map(String::toLowerCase)
+                .collect(java.util.stream.Collectors.toSet());
+
+        try {
+            List<Customer> customers = customerRepository.findAll();
+            for (Customer c : customers) {
+                String uname = c.getCustomerCode() != null ? c.getCustomerCode().toLowerCase() : "";
+                String phone = c.getPhone() != null ? c.getPhone().trim() : "";
+                if ((uname.isEmpty() || !existingUsernames.contains(uname)) && (phone.isEmpty() || !existingPhones.contains(phone))) {
+                    User u = new User();
+                    u.setId(c.getId() != null ? c.getId() + 1000L : (long) (users.size() + 1));
+                    u.setUsername(c.getCustomerCode() != null && !c.getCustomerCode().isBlank() ? c.getCustomerCode() : (phone.isEmpty() ? ("kh_" + c.getId()) : phone));
+                    u.setFullName(c.getFullName() != null ? c.getFullName() : "Khách hàng");
+                    u.setPhone(c.getPhone() != null ? c.getPhone() : "");
+                    u.setEmail(c.getEmail() != null ? c.getEmail() : "");
+                    u.setRole("CUSTOMER");
+                    u.setBranchCode("CN01");
+                    u.setStatus(c.getStatus() != null ? c.getStatus() : "Hoạt động");
+                    u.setCreatedAt(c.getCreatedAt() != null ? c.getCreatedAt() : LocalDateTime.now());
+                    users.add(u);
+                    existingUsernames.add(u.getUsername().toLowerCase());
+                    if (u.getPhone() != null && !u.getPhone().trim().isEmpty()) {
+                        existingPhones.add(u.getPhone().trim());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Lỗi đồng bộ danh sách khách hàng vào tài khoản người dùng: {}", e.getMessage());
+        }
+        return users;
     }
 
     public User saveOrUpdateUser(Map<String, String> payload) {
@@ -163,7 +230,7 @@ public class UserService {
         if (payload.containsKey("password") && payload.get("password") != null && !payload.get("password").isBlank()) {
             u.setPassword(passwordEncoder.encode(payload.get("password").trim()));
         } else if (u.getPassword() == null) {
-            u.setPassword(passwordEncoder.encode("123456"));
+            u.setPassword(passwordEncoder.encode("Badminton@2026"));
         }
         if (payload.containsKey("fullName")) u.setFullName(payload.get("fullName"));
         if (payload.containsKey("role")) u.setRole(payload.get("role").toUpperCase());
@@ -201,5 +268,56 @@ public class UserService {
                 });
 
         log.info("Đặt lại mật khẩu thành công cho tài khoản: {}", user.getUsername());
+    }
+
+    public User toggleUserStatus(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Tên đăng nhập không được để trống!");
+        }
+        String cleanUser = username.trim();
+        Optional<User> userOpt = userRepository.findByUsername(cleanUser);
+
+        User user;
+        if (userOpt.isPresent()) {
+            user = userOpt.get();
+        } else {
+            Optional<Customer> custOpt = customerRepository.findByCustomerCode(cleanUser)
+                    .or(() -> customerRepository.findByPhone(cleanUser));
+            if (custOpt.isPresent()) {
+                Customer c = custOpt.get();
+                user = new User();
+                user.setUsername(cleanUser);
+                user.setFullName(c.getFullName() != null ? c.getFullName() : "Khách hàng");
+                user.setPhone(c.getPhone() != null ? c.getPhone() : "");
+                user.setEmail(c.getEmail() != null ? c.getEmail() : "");
+                user.setRole("CUSTOMER");
+                user.setBranchCode("CN01");
+                user.setStatus(c.getStatus() != null ? c.getStatus() : "Hoạt động");
+                user.setPassword(c.getPassword() != null ? c.getPassword() : passwordEncoder.encode("123456"));
+            } else {
+                throw new IllegalArgumentException("Không tìm thấy tài khoản người dùng: " + cleanUser);
+            }
+        }
+
+        String newStatus;
+        if ("Hoạt động".equalsIgnoreCase(user.getStatus())) {
+            newStatus = "Bị khóa";
+        } else {
+            newStatus = "Hoạt động";
+        }
+        user.setStatus(newStatus);
+        User saved = userRepository.save(user);
+
+        // Sync to Customer table if matching customer exists
+        customerRepository.findByCustomerCode(cleanUser)
+                .or(() -> customerRepository.findByPhone(cleanUser))
+                .or(() -> (user.getPhone() != null && !user.getPhone().isEmpty()) ? customerRepository.findByPhone(user.getPhone()) : Optional.empty())
+                .ifPresent(cust -> {
+                    cust.setStatus(newStatus);
+                    customerRepository.save(cust);
+                });
+
+        log.info("Cập nhật trạng thái người dùng {} thành {}", saved.getUsername(), saved.getStatus());
+        return saved;
     }
 }

@@ -1,6 +1,7 @@
 package vn.yain.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +46,21 @@ public class BookingService {
     @Autowired
     private CourtService courtService;
 
+    @Autowired
+    private PricingService pricingService;
+
+    @Value("${vietqr.bank.bin:970422}")
+    private String bankBin;
+
+    @Value("${vietqr.bank.name:MBBank (Ngân hàng Quân Đội)}")
+    private String bankName;
+
+    @Value("${vietqr.account.no:0903123456}")
+    private String accountNo;
+
+    @Value("${vietqr.account.name:UTE BADMINTON CLUB}")
+    private String accountName;
+
     @Autowired(required = false)
     private SimpMessagingTemplate messagingTemplate;
 
@@ -55,13 +72,61 @@ public class BookingService {
         return bookingRepository.findByBookingCode(bookingCode);
     }
 
+    public String generateUniqueBookingCode() {
+        for (int i = 0; i < 20; i++) {
+            String code = "DS" + String.format("%06d", ThreadLocalRandom.current().nextInt(100000, 999999));
+            if (bookingRepository.findByBookingCode(code).isEmpty()) {
+                return code;
+            }
+        }
+        return "DS" + (System.currentTimeMillis() % 900000 + 100000);
+    }
+
+    public String generateUniquePaymentCode() {
+        for (int i = 0; i < 20; i++) {
+            String code = "PAY" + String.format("%06d", ThreadLocalRandom.current().nextInt(100000, 999999));
+            if (paymentRepository.findByPaymentCode(code).isEmpty()) {
+                return code;
+            }
+        }
+        return "PAY" + (System.currentTimeMillis() % 900000 + 100000);
+    }
+
+    public String generateUniqueInvoiceCode() {
+        for (int i = 0; i < 20; i++) {
+            String code = "HD" + String.format("%06d", ThreadLocalRandom.current().nextInt(100000, 999999));
+            if (invoiceRepository.findByInvoiceCode(code).isEmpty()) {
+                return code;
+            }
+        }
+        return "HD" + (System.currentTimeMillis() % 900000 + 100000);
+    }
+
     public synchronized Booking createBooking(Booking booking) {
-        if (booking.getCourtCode() == null || booking.getTimeSlot() == null) {
+        if (booking.getCourtCode() == null || booking.getCourtCode().trim().isEmpty() ||
+            booking.getTimeSlot() == null || booking.getTimeSlot().trim().isEmpty()) {
             throw new IllegalArgumentException("Thông tin sân và khung giờ không được để trống!");
         }
 
+        int[] hours = parseSlotHours(booking.getTimeSlot());
+        if (hours[1] <= hours[0]) {
+            throw new IllegalArgumentException("Khung giờ không hợp lệ: giờ kết thúc phải sau giờ bắt đầu!");
+        }
+        if (hours[0] < 5 || hours[1] > 23) {
+            throw new IllegalArgumentException("Khung giờ ngoài thời gian hoạt động của câu lạc bộ (05:00 - 23:00)!");
+        }
+
         LocalDate date = booking.getBookingDate() != null ? booking.getBookingDate() : LocalDate.now();
+        if (date.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Ngày đặt sân không thể ở trong quá khứ!");
+        }
         booking.setBookingDate(date);
+
+        courtRepository.findByCourtCode(booking.getCourtCode().trim()).ifPresent(court -> {
+            if ("Bảo trì".equalsIgnoreCase(court.getStatus())) {
+                throw new IllegalStateException("Sân " + booking.getCourtCode() + " đang bảo trì, không thể đặt!");
+            }
+        });
 
         // Atomic conflict check to prevent race condition double-booking
         List<Booking> existing = bookingRepository.findByCourtCodeAndBookingDate(booking.getCourtCode(), date);
@@ -74,7 +139,7 @@ public class BookingService {
         }
 
         if (booking.getBookingCode() == null || booking.getBookingCode().trim().isEmpty()) {
-            booking.setBookingCode("DS" + String.format("%06d", (int)(Math.random() * 900000) + 100000));
+            booking.setBookingCode(generateUniqueBookingCode());
         }
         if (booking.getStatus() == null) {
             booking.setStatus("Chờ cọc 30%");
@@ -110,12 +175,128 @@ public class BookingService {
         return saved;
     }
 
+    public synchronized Map<String, Object> lockSlotBooking(Map<String, Object> payload) {
+        String courtCode = (String) payload.get("courtCode");
+        String branchCode = (String) payload.get("branchCode");
+        String dateStr = (String) payload.get("date");
+        String timeSlot = (String) payload.get("timeSlot");
+        String customerName = (String) payload.getOrDefault("customerName", "Khách đặt trực tuyến");
+        String customerPhone = (String) payload.getOrDefault("customerPhone", "0903123456");
+
+        if (courtCode == null || courtCode.trim().isEmpty()) {
+            throw new IllegalArgumentException("Mã sân không được để trống!");
+        }
+        if (timeSlot == null || timeSlot.trim().isEmpty()) {
+            throw new IllegalArgumentException("Khung giờ không được để trống!");
+        }
+
+        LocalDate bookingDate = (dateStr != null && !dateStr.trim().isEmpty())
+                ? LocalDate.parse(dateStr.trim())
+                : LocalDate.now();
+
+        if (bookingDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Ngày đặt sân không thể ở trong quá khứ!");
+        }
+
+        Court court = courtRepository.findByCourtCode(courtCode.trim()).orElse(null);
+        if (court != null && "Bảo trì".equalsIgnoreCase(court.getStatus())) {
+            throw new IllegalStateException("Sân " + courtCode + " đang bảo trì, vui lòng chọn sân khác!");
+        }
+
+        // Validate that the slot is not already booked (including multi-hour overlaps)
+        List<Booking> existing = bookingRepository.findByCourtCodeAndBookingDate(courtCode.trim(), bookingDate);
+        boolean alreadyBooked = existing.stream()
+                .anyMatch(b -> b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus()) && isSlotOverlapping(timeSlot, b.getTimeSlot()));
+        if (alreadyBooked) {
+            throw new IllegalStateException("Khung giờ " + timeSlot + " của sân này đã có người đặt trước!");
+        }
+
+        // Duration and pricing
+        int duration = 1;
+        int[] hours = parseSlotHours(timeSlot);
+        int startHour = hours[0];
+        if (hours[1] > hours[0]) {
+            duration = hours[1] - hours[0];
+        }
+
+        BigDecimal hourlyRate = pricingService != null ? pricingService.calculateHourlyRate(court, startHour) : (court != null && court.getHourlyRate() != null ? court.getHourlyRate() : new BigDecimal("90000"));
+        BigDecimal totalPrice = pricingService != null ? pricingService.calculateTotalPrice(hourlyRate, duration) : hourlyRate.multiply(BigDecimal.valueOf(duration));
+        BigDecimal deposit = pricingService != null ? pricingService.calculateDepositAmount(totalPrice) : totalPrice.multiply(new BigDecimal("0.3"));
+
+        String bookingCode = generateUniqueBookingCode();
+        Booking booking = new Booking();
+        booking.setBookingCode(bookingCode);
+        booking.setBranchCode(branchCode != null ? branchCode.trim() : (court != null ? court.getBranchCode() : "CN01"));
+        booking.setCourtCode(courtCode.trim());
+        booking.setCustomerName(customerName != null ? customerName.trim() : "Khách đặt trực tuyến");
+        booking.setCustomerPhone(customerPhone != null ? customerPhone.trim() : "0903123456");
+        booking.setBookingDate(bookingDate);
+        booking.setTimeSlot(timeSlot.trim());
+        booking.setHourlyPrice(hourlyRate);
+        booking.setTotalPrice(totalPrice);
+        booking.setDepositAmount(deposit);
+        booking.setPaymentMethod("Chuyển khoản VietQR");
+        booking.setStatus("Chờ cọc 30%");
+        booking.setNotes("Đặt qua Lưới giờ Sân trực tuyến");
+
+        Booking saved = bookingRepository.save(booking);
+
+        broadcastBookingEvent(BookingNotificationDto.builder()
+                .eventType("NEW_BOOKING")
+                .bookingCode(bookingCode)
+                .courtCode(courtCode)
+                .branchCode(booking.getBranchCode())
+                .customerName(booking.getCustomerName())
+                .customerPhone(booking.getCustomerPhone())
+                .timeSlot(timeSlot)
+                .totalPrice(totalPrice)
+                .depositAmount(deposit)
+                .status("Chờ cọc 30%")
+                .message("Đơn đặt sân mới trực tuyến [" + bookingCode + "] - Sân " + courtCode + " (" + timeSlot + ")")
+                .timestamp(LocalDateTime.now())
+                .build());
+
+        String bin = (bankBin != null && !bankBin.isBlank()) ? bankBin : "970422";
+        String accNo = (accountNo != null && !accountNo.isBlank()) ? accountNo : "0903123456";
+        String accName = (accountName != null && !accountName.isBlank()) ? accountName : "UTE BADMINTON CLUB";
+        String bName = (bankName != null && !bankName.isBlank()) ? bankName : "MBBank (Ngân hàng Quân Đội)";
+
+        String qrUrl = String.format(
+                "https://img.vietqr.io/image/%s-%s-compact2.png?amount=%d&addInfo=CK%%20%s&accountName=%s",
+                bin, accNo, deposit.longValue(), bookingCode, java.net.URLEncoder.encode(accName, java.nio.charset.StandardCharsets.UTF_8).replace("+", "%20")
+        );
+
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", true);
+        resp.put("bookingCode", bookingCode);
+        resp.put("courtCode", courtCode);
+        resp.put("courtName", court != null ? court.getCourtName() : courtCode);
+        resp.put("branchCode", booking.getBranchCode());
+        resp.put("date", bookingDate.toString());
+        resp.put("timeSlot", timeSlot);
+        resp.put("totalPrice", totalPrice);
+        resp.put("depositAmount", deposit);
+        resp.put("qrUrl", qrUrl);
+        resp.put("bankName", bName);
+        resp.put("accountNo", accNo);
+        resp.put("accountName", accName);
+
+        return resp;
+    }
+
     /**
      * Confirm 30% deposit payment via VietQR (XL-03)
      */
     public Booking confirmDeposit(String bookingCode, BigDecimal depositAmount, String paymentMethod, String txRef) {
         Booking booking = bookingRepository.findByBookingCode(bookingCode)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn đặt sân: " + bookingCode));
+
+        if ("Đã hủy".equalsIgnoreCase(booking.getStatus())) {
+            throw new IllegalStateException("Đơn đặt sân [" + bookingCode + "] đã bị hủy, không thể xác nhận cọc!");
+        }
+        if ("Hoàn thành".equalsIgnoreCase(booking.getStatus())) {
+            throw new IllegalStateException("Đơn đặt sân [" + bookingCode + "] đã hoàn thành!");
+        }
 
         booking.setStatus("Đã cọc 30%");
         booking.setDepositAmount(depositAmount != null ? depositAmount : booking.getDepositAmount());
@@ -124,7 +305,7 @@ public class BookingService {
 
         // Record payment transaction
         Payment payment = new Payment();
-        payment.setPaymentCode("PAY" + System.currentTimeMillis() % 1000000);
+        payment.setPaymentCode(generateUniquePaymentCode());
         payment.setBookingCode(bookingCode);
         payment.setAmount(booking.getDepositAmount());
         payment.setMethod(booking.getPaymentMethod());
@@ -158,6 +339,16 @@ public class BookingService {
         Booking booking = bookingRepository.findByBookingCode(bookingCode)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn: " + bookingCode));
 
+        if ("Đã hủy".equalsIgnoreCase(booking.getStatus())) {
+            throw new IllegalStateException("Đơn đặt sân [" + bookingCode + "] đã bị hủy, không thể nhận sân!");
+        }
+        if ("Hoàn thành".equalsIgnoreCase(booking.getStatus())) {
+            throw new IllegalStateException("Đơn đặt sân [" + bookingCode + "] đã hoàn thành, không thể nhận sân lại!");
+        }
+        if ("Đang sử dụng".equalsIgnoreCase(booking.getStatus())) {
+            throw new IllegalStateException("Đơn đặt sân [" + bookingCode + "] hiện đang sử dụng!");
+        }
+
         booking.setStatus("Đang sử dụng");
         booking.setCheckInTime(LocalDateTime.now());
         Booking updated = bookingRepository.save(booking);
@@ -189,6 +380,13 @@ public class BookingService {
         Booking booking = bookingRepository.findByBookingCode(bookingCode)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn: " + bookingCode));
 
+        if ("Hoàn thành".equalsIgnoreCase(booking.getStatus())) {
+            throw new IllegalStateException("Đơn đặt sân [" + bookingCode + "] đã hoàn tất thanh toán và trả sân!");
+        }
+        if ("Đã hủy".equalsIgnoreCase(booking.getStatus())) {
+            throw new IllegalStateException("Đơn đặt sân [" + bookingCode + "] đã bị hủy, không thể thanh toán trả sân!");
+        }
+
         booking.setStatus("Hoàn thành");
         booking.setCheckOutTime(LocalDateTime.now());
         bookingRepository.save(booking);
@@ -204,7 +402,7 @@ public class BookingService {
         }
 
         Invoice invoice = new Invoice();
-        invoice.setInvoiceCode("HD" + System.currentTimeMillis() % 1000000);
+        invoice.setInvoiceCode(generateUniqueInvoiceCode());
         invoice.setBookingCode(bookingCode);
         invoice.setStaffCode(staffCode != null ? staffCode : "NVQ01");
         invoice.setInvoiceDate(LocalDateTime.now());
@@ -243,6 +441,13 @@ public class BookingService {
     public Booking cancelBooking(String bookingCode, String reason) {
         Booking booking = bookingRepository.findByBookingCode(bookingCode)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn: " + bookingCode));
+
+        if ("Hoàn thành".equalsIgnoreCase(booking.getStatus())) {
+            throw new IllegalStateException("Đơn đặt sân [" + bookingCode + "] đã hoàn thành, không thể hủy!");
+        }
+        if ("Đã hủy".equalsIgnoreCase(booking.getStatus())) {
+            return booking;
+        }
 
         booking.setStatus("Đã hủy");
         booking.setNotes((booking.getNotes() != null ? booking.getNotes() + " | " : "") + "Hủy: " + reason);

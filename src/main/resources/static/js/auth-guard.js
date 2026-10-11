@@ -81,6 +81,14 @@
       }
     }
 
+    // Auto-recover token from cookie if missing in localStorage
+    if (!localStorage.getItem('jwt_token') && typeof document !== 'undefined' && document.cookie) {
+      const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+      if (match) {
+        localStorage.setItem('jwt_token', match[1]);
+      }
+    }
+
     const currentPath = window.location.pathname.toLowerCase();
     const targetRole = resolveTargetRoleForPath(currentPath);
 
@@ -175,8 +183,22 @@
 
     const target = resolveTargetRoleForPath(lowerPath);
     if (target && target !== 'CUSTOMER') {
+      let token = localStorage.getItem('jwt_token');
+      if (!token && typeof document !== 'undefined' && document.cookie) {
+        const m = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+        if (m) {
+          token = m[1];
+          localStorage.setItem('jwt_token', token);
+        }
+      }
       if (!currentUser) {
         window.location.href = '/login';
+        return;
+      }
+      if (!token) {
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('utesport_user');
+        window.location.href = '/login?expired=true';
         return;
       }
       // Strict role isolation: Each role can ONLY access its own subsystem
@@ -467,10 +489,17 @@
     syncUserProfileUI();
   }
 
-  // Intercept window.fetch to attach JWT Bearer token and handle 401 Unauthorized
+  // Intercept window.fetch to attach JWT Bearer token and handle 401/403 Unauthorized/Forbidden
   const originalFetch = window.fetch;
   window.fetch = async function (url, options = {}) {
-    const token = localStorage.getItem('jwt_token');
+    let token = localStorage.getItem('jwt_token');
+    if (!token && typeof document !== 'undefined' && document.cookie) {
+      const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+      if (match) {
+        token = match[1];
+        localStorage.setItem('jwt_token', token);
+      }
+    }
     if (token && typeof url === 'string' && url.startsWith('/api')) {
       options.headers = options.headers || {};
       if (options.headers instanceof Headers) {
@@ -487,6 +516,9 @@
       if (p.startsWith('/pos') || p.startsWith('/manager') || p.startsWith('/director') || p.startsWith('/admin')) {
         localStorage.removeItem('jwt_token');
         localStorage.removeItem('utesport_user');
+        if (typeof document !== 'undefined') {
+          document.cookie = 'jwt_token=; path=/; max-age=0';
+        }
         window.location.href = '/login?expired=true';
       }
     }

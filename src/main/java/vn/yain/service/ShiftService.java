@@ -61,8 +61,12 @@ public class ShiftService {
         if (staff.getBranchCode() == null || staff.getBranchCode().trim().isEmpty()) {
             staff.setBranchCode("CN01");
         }
-        if (staff.getStatus() == null || staff.getStatus().trim().isEmpty()) {
-            staff.setStatus("Đang làm việc");
+        if (staff.getEmail() != null && !staff.getEmail().isBlank()) {
+            staffRepository.findByEmail(staff.getEmail().trim()).ifPresent(s -> {
+                if (staff.getStaffCode() != null && !s.getStaffCode().equalsIgnoreCase(staff.getStaffCode().trim())) {
+                    throw new IllegalArgumentException("Email " + staff.getEmail() + " đã được sử dụng bởi nhân viên khác!");
+                }
+            });
         }
 
         Optional<Staff> existing = staffRepository.findByStaffCode(staff.getStaffCode().trim());
@@ -178,7 +182,7 @@ public class ShiftService {
         // Remove existing identical assignment to prevent duplicate
         workShiftRepository.deleteByDayOfWeekAndShiftTypeAndStaffCode(d, s, st);
 
-        String shiftCode = "WS-" + d.toUpperCase() + "-" + s.substring(0, Math.min(3, s.length())).toUpperCase() + "-" + st + "-" + (System.currentTimeMillis() % 100000);
+        String shiftCode = "WS-" + d.toUpperCase() + "-" + s.substring(0, Math.min(3, s.length())).toUpperCase() + "-" + st + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         String startTime = "night".equalsIgnoreCase(s) ? "13:30" : "05:00";
         String endTime = "night".equalsIgnoreCase(s) ? "22:30" : "13:30";
         WorkShift ws = WorkShift.builder()
@@ -348,8 +352,15 @@ public class ShiftService {
     public Map<String, Object> getShiftSummary(String staffCode, String branchCode) {
         String staff = (staffCode != null && !staffCode.trim().isEmpty()) ? staffCode.trim() : "NVQ01";
 
-        List<Invoice> invoices = invoiceRepository.findAllByOrderByInvoiceDateDesc();
         LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(23, 59, 59, 999999999);
+
+        List<Invoice> invoices = invoiceRepository.findByInvoiceDateBetween(startOfDay, endOfDay);
+        if (invoices == null || invoices.isEmpty()) {
+            invoices = invoiceRepository.findAllByOrderByInvoiceDateDesc();
+        }
+        if (invoices == null) invoices = Collections.emptyList();
 
         BigDecimal cashTotal = BigDecimal.ZERO;
         BigDecimal transferTotal = BigDecimal.ZERO;
@@ -376,7 +387,11 @@ public class ShiftService {
             }
         }
 
-        List<Payment> payments = paymentRepository.findAll();
+        List<Payment> payments = paymentRepository.findByPaymentTimeBetween(startOfDay, endOfDay);
+        if (payments == null || payments.isEmpty()) {
+            payments = paymentRepository.findAll();
+        }
+        if (payments == null) payments = Collections.emptyList();
         for (Payment p : payments) {
             if (p.getPaymentTime() != null && p.getPaymentTime().toLocalDate().isEqual(today)) {
                 if ("Thành công".equalsIgnoreCase(p.getStatus())) {
@@ -415,7 +430,7 @@ public class ShiftService {
         BigDecimal systemCash = (BigDecimal) summary.get("systemCashTotal");
         BigDecimal difference = actualCash.subtract(systemCash);
 
-        String handoverCode = "BG" + (100000 + (int)(Math.random() * 900000));
+        String handoverCode = "BG" + (100000 + java.util.concurrent.ThreadLocalRandom.current().nextInt(100000, 999999));
         LocalDateTime closedAt = LocalDateTime.now();
 
         String effectiveStaff = (staffCode != null && !staffCode.isBlank()) ? staffCode.trim() : "NVQ01";

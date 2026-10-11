@@ -237,7 +237,7 @@ public class GeminiAiService {
             BigDecimal totalPrice = new BigDecimal(priceStr);
             BigDecimal depositAmount = new BigDecimal(depositStr);
 
-            String bookingCode = "DS" + (100000 + (int)(Math.random() * 900000));
+            String bookingCode = bookingService.generateUniqueBookingCode();
             ctx.lastBookingCode = bookingCode;
 
             Booking booking = new Booking();

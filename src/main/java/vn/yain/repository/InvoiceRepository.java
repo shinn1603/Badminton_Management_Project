@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import vn.yain.entity.Invoice;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,4 +13,5 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     Optional<Invoice> findByInvoiceCode(String invoiceCode);
     Optional<Invoice> findByBookingCode(String bookingCode);
     List<Invoice> findAllByOrderByInvoiceDateDesc();
+    List<Invoice> findByInvoiceDateBetween(LocalDateTime start, LocalDateTime end);
 }

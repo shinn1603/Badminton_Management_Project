@@ -625,7 +625,7 @@
       document.getElementById('courtModal').classList.remove('open');
     }
 
-    function saveCourt() {
+    async function saveCourt() {
       const code = document.getElementById('inpCourtCode').value.trim();
       const name = document.getElementById('inpCourtName').value.trim() || ('Sân ' + code);
       const type = document.getElementById('inpCourtType').value;
@@ -637,8 +637,30 @@
         return;
       }
 
-      showToast(`Đã lưu sân ${code} (${name}) - ${Number(rate).toLocaleString('vi-VN')} đ/h!`, 'success');
-      closeCourtModal();
+      try {
+        const res = await fetch('/api/courts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            courtCode: code,
+            courtName: name,
+            courtType: type,
+            hourlyRate: Number(rate),
+            status: status,
+            branchCode: 'CN01'
+          })
+        });
+        const data = await res.json();
+        if (data.success || res.ok) {
+          showToast(`Đã lưu sân ${code} (${name}) - ${Number(rate).toLocaleString('vi-VN')} đ/h vào cơ sở dữ liệu!`, 'success');
+          closeCourtModal();
+          await loadCourtsFromApi();
+        } else {
+          showToast(data.message || 'Lỗi lưu thông tin sân', 'error');
+        }
+      } catch (err) {
+        showToast(`Lỗi kết nối máy chủ: ${err.message}`, 'error');
+      }
     }
 
     async function loadCourtsFromApi() {

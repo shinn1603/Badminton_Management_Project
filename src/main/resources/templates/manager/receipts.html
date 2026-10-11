@@ -259,13 +259,14 @@
 
               <div id="receiptItemsContainer">
                 <div class="receipt-item-row">
-                  <select class="form-control" onchange="calcTotals()">
-                    <option value="8000">Nước Revive Chanh Muối 500ml</option>
-                    <option value="11000">Nước Pocari Sweat 500ml</option>
-                    <option value="5000">Nước suối Aquafina 500ml</option>
-                    <option value="145000">Ống Cầu Hải Yến Đỏ (12 quả)</option>
-                    <option value="175000">Ống Cầu Thành Công 77</option>
-                    <option value="7000">Quấn cán vợt VS</option>
+                  <select class="form-control" onchange="handleProductChange(this)">
+                    <option value="P01" selected>Nước Revive Chanh Muối 500ml</option>
+                    <option value="P02">Nước Pocari Sweat 500ml</option>
+                    <option value="P03">Nước suối Aquafina 500ml</option>
+                    <option value="P04">Nước tăng lực Bò Húc Red Bull</option>
+                    <option value="P05">Ống Cầu Hải Yến Đỏ (12 quả)</option>
+                    <option value="P06">Ống Cầu Thành Công 77</option>
+                    <option value="P07">Quấn cán vợt VS</option>
                   </select>
                   <input type="number" class="form-control" placeholder="SL" value="50" min="1" oninput="calcTotals()">
                   <input type="number" class="form-control" placeholder="Giá nhập" value="8000" step="1000" oninput="calcTotals()">
@@ -274,13 +275,14 @@
                 </div>
 
                 <div class="receipt-item-row">
-                  <select class="form-control" onchange="calcTotals()">
-                    <option value="145000" selected>Ống Cầu Hải Yến Đỏ (12 quả)</option>
-                    <option value="8000">Nước Revive Chanh Muối 500ml</option>
-                    <option value="11000">Nước Pocari Sweat 500ml</option>
-                    <option value="5000">Nước suối Aquafina 500ml</option>
-                    <option value="175000">Ống Cầu Thành Công 77</option>
-                    <option value="7000">Quấn cán vợt VS</option>
+                  <select class="form-control" onchange="handleProductChange(this)">
+                    <option value="P05" selected>Ống Cầu Hải Yến Đỏ (12 quả)</option>
+                    <option value="P01">Nước Revive Chanh Muối 500ml</option>
+                    <option value="P02">Nước Pocari Sweat 500ml</option>
+                    <option value="P03">Nước suối Aquafina 500ml</option>
+                    <option value="P04">Nước tăng lực Bò Húc Red Bull</option>
+                    <option value="P06">Ống Cầu Thành Công 77</option>
+                    <option value="P07">Quấn cán vợt VS</option>
                   </select>
                   <input type="number" class="form-control" placeholder="SL" value="20" min="1" oninput="calcTotals()">
                   <input type="number" class="form-control" placeholder="Giá nhập" value="145000" step="5000" oninput="calcTotals()">
@@ -468,41 +470,78 @@
       const items = [];
 
       rows.forEach(r => {
-        const productCode = r.querySelector('select').value;
-        const qty = Number(r.querySelectorAll('input')[0].value) || 0;
-        const unitPrice = Number(r.querySelectorAll('input')[1].value) || 0;
+        const productSelect = r.querySelector('select');
+        const productCode = productSelect ? productSelect.value : '';
+        const qtyInp = r.querySelectorAll('input')[0];
+        const priceInp = r.querySelectorAll('input')[1];
+        const qty = qtyInp ? (Number(qtyInp.value) || 0) : 0;
+        const unitPrice = priceInp ? (Number(priceInp.value) || 0) : 0;
         if (qty > 0 && productCode) {
-          items.push({ productCode, quantity: qty, unitPrice });
+          items.push({
+            productCode: productCode,
+            quantity: qty,
+            importPrice: unitPrice,
+            unitPrice: unitPrice
+          });
         }
       });
 
       if (items.length === 0) {
-        showToast('Vui lòng thêm ít nhất một mặt hàng nhập kho!', 'warning');
+        showToast('Vui lòng thêm ít nhất một mặt hàng nhập kho hợp lệ!', 'warning');
         return;
       }
 
       const supplierName = document.getElementById('supplierSelect').value;
       const receiptDate = document.getElementById('receiptDate').value;
+
+      // Dynamic manager branch & staff resolution
+      const curUser = (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser()) || (function() {
+        try { return JSON.parse(localStorage.getItem('utesport_user')); } catch(e) { return null; }
+      })();
+      const branchCode = (curUser && curUser.branchCode && curUser.branchCode !== 'ALL') ? curUser.branchCode : 'CN01';
+      const staffCode = (curUser && curUser.staffCode) ? curUser.staffCode : 'NS02';
+
       const payload = {
         supplierName: supplierName,
-        branchCode: 'CN01',
-        staffCode: 'NS02',
-        notes: 'Phiếu nhập kho ngày ' + receiptDate,
+        branchCode: branchCode,
+        staffCode: staffCode,
+        notes: 'Phiếu nhập kho ngày ' + (receiptDate || new Date().toISOString().split('T')[0]),
         items: items
       };
 
       try {
+        let token = localStorage.getItem('jwt_token');
+        if (!token && typeof document !== 'undefined' && document.cookie) {
+          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+          if (match) token = match[1];
+        }
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
         const res = await fetch('/api/inventory/intake', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: headers,
           body: JSON.stringify(payload)
         });
-        const data = await res.json();
-        if (data.success) {
-          showToast(`Nhập kho thành công phiếu [${data.receipt.receiptCode}]! Tồn kho đã được cập nhật.`, 'success');
-          loadReceiptHistory();
+
+        let data = {};
+        try {
+          data = await res.json();
+        } catch(err) {
+          data = {};
+        }
+
+        if (res.ok && data.success) {
+          const code = (data.receipt && data.receipt.receiptCode) ? data.receipt.receiptCode : 'mới';
+          showToast(`Nhập kho thành công phiếu [${code}]! Tồn kho đã được cập nhật.`, 'success');
+          await loadReceiptHistory();
+          // Reset danh sách nhập kho
+          const container = document.getElementById('receiptItemsContainer');
+          container.innerHTML = '';
+          addReceiptRow('P01', 50);
+          addReceiptRow('P05', 20);
         } else {
-          showToast(data.message || 'Lỗi lập phiếu nhập kho', 'error');
+          showToast(data.message || `Lỗi lập phiếu nhập kho (Mã lỗi: ${res.status})`, 'error');
         }
       } catch (err) {
         showToast('Lỗi gửi dữ liệu nhập kho: ' + err.message, 'error');

@@ -303,37 +303,10 @@
           btn.innerHTML = '<span>Đăng nhập vào hệ thống</span>';
         }
       } catch (err) {
-        console.warn('API error, using local fallback:', err);
-        let fallbackRole = 'MANAGER';
-        let fallbackName = 'Trần Phúc Bảo';
-        let fallbackUrl = '/manager/dashboard';
-
-        if (username === 'director') {
-          fallbackRole = 'DIRECTOR';
-          fallbackName = 'Nguyễn Phước Thọ';
-          fallbackUrl = '/director/dashboard';
-        } else if (username === 'pos') {
-          fallbackRole = 'POS';
-          fallbackName = 'Nguyễn Thanh Tâm';
-          fallbackUrl = '/pos/grid';
-        } else if (username === 'customer') {
-          fallbackRole = 'CUSTOMER';
-          fallbackName = 'Lê Bá Đạt';
-          fallbackUrl = '/customer/home';
-        } else if (username === 'admin') {
-          fallbackRole = 'ADMIN';
-          fallbackName = 'Trần Biểu Hương';
-          fallbackUrl = '/admin/users';
-        }
-
-        localStorage.setItem('utesport_user', JSON.stringify({
-          success: true,
-          username: username,
-          fullName: fallbackName,
-          role: fallbackRole,
-          branchCode: 'CN01'
-        }));
-        window.location.href = fallbackUrl;
+        console.warn('Login API error:', err);
+        showToast('Lỗi kết nối máy chủ xác thực: ' + (err.message || 'Không thể đăng nhập'), 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Đăng nhập vào hệ thống</span>';
       }
     }
 

@@ -157,7 +157,7 @@ public class ChatbotService {
         // INTENT 1: XÁC NHẬN ĐẶT SÂN ("ok dat san cho toi", "dat san di", "dong y dat")
         // =========================================================================
         if (matches(normalized, "ok dat san", "dat san cho toi", "dat san di", "dat di", "dat luon", "dong y dat", "tien hanh dat", "dat cho toi", "dat giup toi", "xac nhan dat", "dong y giu cho")) {
-            String bookingCode = "DS" + (100000 + (int)(Math.random() * 900000));
+            String bookingCode = bookingService.generateUniqueBookingCode();
             ctx.lastBookingCode = bookingCode;
 
             Booking booking = new Booking();

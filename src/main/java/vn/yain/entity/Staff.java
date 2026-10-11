@@ -33,7 +33,7 @@ public class Staff {
     @Column(name = "phone", nullable = false, length = 20)
     private String phone;
 
-    @Column(name = "email", length = 100)
+    @Column(name = "email", length = 100, unique = true)
     private String email;
 
     @Column(name = "address", length = 255)

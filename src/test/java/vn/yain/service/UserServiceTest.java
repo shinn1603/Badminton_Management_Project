@@ -164,4 +164,30 @@ class UserServiceTest {
 
         assertEquals("Số điện thoại đã được đăng ký bởi tài khoản khác!", ex.getMessage());
     }
+
+    @Test
+    @DisplayName("Admin: Lay toan bo danh sach tai khoan nguoi dung va dong bo khach hang")
+    void testGetAllUsers_IncludesCustomers() {
+        User u1 = new User();
+        u1.setId(1L);
+        u1.setUsername("admin");
+        u1.setFullName("Admin User");
+        u1.setRole("ADMIN");
+
+        when(userRepository.findAll()).thenReturn(new java.util.ArrayList<>(java.util.List.of(u1)));
+
+        Customer c1 = new Customer();
+        c1.setId(2L);
+        c1.setCustomerCode("KH0011");
+        c1.setFullName("Bao Tran Phuc");
+        c1.setPhone("0944853235");
+        c1.setEmail("tranphucbao26@gmail.com");
+
+        when(customerRepository.findAll()).thenReturn(java.util.List.of(c1));
+
+        java.util.List<User> allUsers = userService.getAllUsers();
+        assertNotNull(allUsers);
+        assertEquals(2, allUsers.size());
+        assertTrue(allUsers.stream().anyMatch(u -> "Bao Tran Phuc".equals(u.getFullName())));
+    }
 }

@@ -98,16 +98,45 @@ public class WarehouseService {
         StringBuilder detailNotes = new StringBuilder();
 
         for (Map<String, Object> item : items) {
-            String productCode = (String) item.get("productCode");
-            int quantity = Integer.parseInt(item.get("quantity").toString());
-            BigDecimal importPrice = new BigDecimal(item.get("importPrice").toString());
+            String productCode = item.get("productCode") != null ? item.get("productCode").toString().trim() : "";
+            if (productCode.isEmpty()) {
+                throw new IllegalArgumentException("Mã sản phẩm không được để trống!");
+            }
+
+            Object qtyObj = item.get("quantity") != null ? item.get("quantity") : item.get("qty");
+            if (qtyObj == null) {
+                throw new IllegalArgumentException("Số lượng nhập không được để trống!");
+            }
+            int quantity;
+            try {
+                quantity = new BigDecimal(qtyObj.toString().trim()).intValue();
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Số lượng nhập không hợp lệ: " + qtyObj);
+            }
+
+            Object priceObj = item.get("importPrice") != null ? item.get("importPrice") : item.get("unitPrice");
+            if (priceObj == null) {
+                priceObj = item.get("price");
+            }
+            if (priceObj == null) {
+                throw new IllegalArgumentException("Đơn giá nhập của sản phẩm không được để trống!");
+            }
+            BigDecimal importPrice;
+            try {
+                importPrice = new BigDecimal(priceObj.toString().trim());
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Đơn giá nhập không hợp lệ: " + priceObj);
+            }
 
             if (quantity <= 0 || importPrice.compareTo(BigDecimal.ZERO) < 0) {
                 throw new IllegalArgumentException("Số lượng và giá nhập của từng sản phẩm phải hợp lệ!");
             }
 
             Product product = productRepository.findByProductCode(productCode)
-                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm mã: " + productCode));
+                    .or(() -> productRepository.findAll().stream()
+                            .filter(p -> p.getProductCode().equalsIgnoreCase(productCode) || p.getProductName().equalsIgnoreCase(productCode))
+                            .findFirst())
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm có mã: " + productCode));
 
             // Tăng tồn kho và cập nhật giá vốn bình quân gia quyền (BUG-MED-26)
             int currentStock = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
@@ -134,12 +163,17 @@ public class WarehouseService {
 
         StockReceipt receipt = new StockReceipt();
         receipt.setReceiptCode(receiptCode);
-        receipt.setBranchCode(branchCode != null ? branchCode : "CN01");
-        receipt.setStaffCode(staffCode != null ? staffCode : "NS03");
+        receipt.setBranchCode(branchCode != null && !branchCode.trim().isEmpty() ? branchCode.trim() : "CN01");
+        receipt.setStaffCode(staffCode != null && !staffCode.trim().isEmpty() ? staffCode.trim() : "NS02");
         receipt.setSupplierName(supplierName.trim());
         receipt.setReceiptDate(LocalDateTime.now());
         receipt.setTotalAmount(totalAmount);
-        receipt.setNotes((notes != null && !notes.trim().isEmpty() ? notes.trim() + " - " : "") + detailNotes);
+
+        String combinedNotes = (notes != null && !notes.trim().isEmpty() ? notes.trim() + " - " : "") + detailNotes;
+        if (combinedNotes.length() > 250) {
+            combinedNotes = combinedNotes.substring(0, 247) + "...";
+        }
+        receipt.setNotes(combinedNotes);
 
         return stockReceiptRepository.save(receipt);
     }

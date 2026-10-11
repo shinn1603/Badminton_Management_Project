@@ -40,9 +40,49 @@ class ApiControllerTest {
     @Autowired
     private BookingRepository bookingRepository;
 
+    @Autowired
+    private vn.yain.repository.CourtRepository courtRepository;
+
+    @Autowired
+    private vn.yain.repository.ProductRepository productRepository;
+
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(apiController).build();
+
+        if (courtRepository.findByCourtCode("CL01").isEmpty()) {
+            vn.yain.entity.Court c1 = new vn.yain.entity.Court();
+            c1.setCourtCode("CL01");
+            c1.setCourtName("Sân Tiêu Chuẩn 1");
+            c1.setCourtType("Tiêu chuẩn");
+            c1.setBranchCode("CN01");
+            c1.setStatus("Trống");
+            c1.setHourlyRate(new BigDecimal("90000"));
+            courtRepository.save(c1);
+        }
+        if (courtRepository.findByCourtCode("CL02").isEmpty()) {
+            vn.yain.entity.Court c2 = new vn.yain.entity.Court();
+            c2.setCourtCode("CL02");
+            c2.setCourtName("Sân Tiêu Chuẩn 2");
+            c2.setCourtType("Tiêu chuẩn");
+            c2.setBranchCode("CN01");
+            c2.setStatus("Trống");
+            c2.setHourlyRate(new BigDecimal("90000"));
+            courtRepository.save(c2);
+        }
+        if (productRepository.findByProductCode("P01").isEmpty()) {
+            vn.yain.entity.Product p = new vn.yain.entity.Product();
+            p.setProductCode("P01");
+            p.setProductName("Nước khoáng Lavie 500ml");
+            p.setCategory("Nước uống");
+            p.setUnit("Chai");
+            p.setUnitPrice(new BigDecimal("10000"));
+            p.setCostPrice(new BigDecimal("6000"));
+            p.setStockQuantity(50);
+            p.setMinQuantity(10);
+            p.setBranchCode("CN01");
+            productRepository.save(p);
+        }
     }
 
     @Test
@@ -356,5 +396,14 @@ class ApiControllerTest {
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.currentParticipants", notNullValue()))
                 .andExpect(jsonPath("$.remainingSlots", notNullValue()));
+    }
+
+    @Test
+    @DisplayName("Admin: Lay danh sach tai khoan nguoi dung he thong GET /api/admin/users")
+    void testGetAdminUsers_ReturnsUserList() throws Exception {
+        mockMvc.perform(get("/api/admin/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", notNullValue()))
+                .andExpect(jsonPath("$", isA(java.util.List.class)));
     }
 }

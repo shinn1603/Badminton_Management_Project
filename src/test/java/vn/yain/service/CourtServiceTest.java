@@ -124,4 +124,57 @@ class CourtServiceTest {
         verify(courtRepository, times(1)).save(court);
         verify(messagingTemplate, atLeastOnce()).convertAndSend(eq("/topic/courts"), any(CourtEventDto.class));
     }
+
+    @Test
+    @DisplayName("Them moi san thi dau thanh cong")
+    void testSaveCourt_Create() {
+        Court newCourt = new Court();
+        newCourt.setCourtCode("CL09");
+        newCourt.setCourtName("Sân cầu lông 9 VIP");
+        newCourt.setCourtType("Cầu lông VIP");
+        newCourt.setHourlyRate(new BigDecimal("150000"));
+
+        when(courtRepository.findByCourtCode("CL09")).thenReturn(Optional.empty());
+        when(courtRepository.save(any(Court.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Court saved = courtService.saveCourt(newCourt);
+
+        assertNotNull(saved);
+        assertEquals("CL09", saved.getCourtCode());
+        assertEquals("CN01", saved.getBranchCode());
+        assertEquals("Trống", saved.getStatus());
+        verify(courtRepository, times(1)).save(newCourt);
+        verify(messagingTemplate, atLeastOnce()).convertAndSend(eq("/topic/courts"), any(CourtEventDto.class));
+    }
+
+    @Test
+    @DisplayName("Cap nhat thong tin san thi dau da ton tai")
+    void testSaveCourt_Update() {
+        Court existing = new Court();
+        existing.setCourtCode("CL01");
+        existing.setCourtName("Sân 1 cũ");
+        existing.setCourtType("Tiêu chuẩn");
+        existing.setHourlyRate(new BigDecimal("90000"));
+        existing.setStatus("Trống");
+        existing.setBranchCode("CN01");
+
+        Court payload = new Court();
+        payload.setCourtCode("CL01");
+        payload.setCourtName("Sân 1 VIP Thảm Mới");
+        payload.setCourtType("VIP Yonex");
+        payload.setHourlyRate(new BigDecimal("130000"));
+        payload.setStatus("Bảo trì");
+
+        when(courtRepository.findByCourtCode("CL01")).thenReturn(Optional.of(existing));
+        when(courtRepository.save(any(Court.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Court updated = courtService.saveCourt(payload);
+
+        assertNotNull(updated);
+        assertEquals("CL01", updated.getCourtCode());
+        assertEquals("Sân 1 VIP Thảm Mới", updated.getCourtName());
+        assertEquals(new BigDecimal("130000"), updated.getHourlyRate());
+        assertEquals("Bảo trì", updated.getStatus());
+        verify(courtRepository, times(1)).save(existing);
+    }
 }

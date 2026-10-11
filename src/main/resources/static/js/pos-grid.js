@@ -1322,6 +1322,9 @@ async function submitCheckout() {
   if (btnQR && btnQR.classList.contains('btn-primary')) payMode = 'VietQR';
   else if (btnCard && btnCard.classList.contains('btn-primary')) payMode = 'Thẻ POS';
 
+  const curStaff = (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser()) || {};
+  const posStaffCode = curStaff.staffCode || (curStaff.username === 'pos' ? 'NV-02' : 'NV-02');
+
   if (bCode) {
     window.lastActionBookingCode = bCode;
     try {
@@ -1331,7 +1334,7 @@ async function submitCheckout() {
         body: JSON.stringify({
           productFee: serviceSubtotal,
           paymentMethod: payMode,
-          staffCode: 'NVQ01'
+          staffCode: posStaffCode
         })
       });
       const data = await res.json();
@@ -1366,7 +1369,7 @@ async function submitCheckout() {
         body: JSON.stringify({
           productFee: serviceSubtotal,
           paymentMethod: payMode,
-          staffCode: 'NVQ01'
+          staffCode: posStaffCode
         })
       });
     } catch (e) {

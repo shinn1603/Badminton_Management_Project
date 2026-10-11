@@ -12,11 +12,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Pure WebSocket and SockJS fallback endpoint
+        // Pure WebSocket and SockJS fallback endpoint with restricted origins
         registry.addEndpoint("/ws-court")
-                .setAllowedOriginPatterns("*");
+                .setAllowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*", "https://*.utesport.vn");
         registry.addEndpoint("/ws-court")
-                .setAllowedOriginPatterns("*")
+                .setAllowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*", "https://*.utesport.vn")
                 .withSockJS();
     }
 

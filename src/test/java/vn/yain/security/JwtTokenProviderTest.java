@@ -45,6 +45,20 @@ class JwtTokenProviderTest {
     }
 
     @Test
+    @DisplayName("Sinh va xac thuc JWT token hop le cho Thu ngan POS va Nhan vien Staff")
+    void testGenerateToken_PosAndStaffRoles() {
+        String posToken = jwtTokenProvider.generateToken("pos", "POS", "Nguyen Thanh Tam", "CN01");
+        assertTrue(jwtTokenProvider.validateToken(posToken));
+        assertEquals("pos", jwtTokenProvider.getUsernameFromToken(posToken));
+        assertEquals("POS", jwtTokenProvider.getRoleFromToken(posToken));
+
+        String staffToken = jwtTokenProvider.generateToken("staff01", "STAFF", "Le Thi Mai", "CN01");
+        assertTrue(jwtTokenProvider.validateToken(staffToken));
+        assertEquals("staff01", jwtTokenProvider.getUsernameFromToken(staffToken));
+        assertEquals("STAFF", jwtTokenProvider.getRoleFromToken(staffToken));
+    }
+
+    @Test
     @DisplayName("Validate token gia mao hoac bi loi cau truc")
     void testValidateToken_Invalid() {
         assertFalse(jwtTokenProvider.validateToken("invalid.jwt.token.string"));

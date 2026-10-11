@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import vn.yain.dto.CourtEventDto;
 import vn.yain.entity.*;
@@ -441,6 +443,16 @@ public class ApiController {
         }
     }
 
+    @PostMapping("/courts")
+    public ResponseEntity<?> saveCourt(@RequestBody Court court) {
+        try {
+            Court saved = courtService.saveCourt(court);
+            return ResponseEntity.ok(Map.of("success", true, "court", saved, "message", "Đã lưu thông tin sân thành công!"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
     // ==========================================
     // 3. BOOKINGS & WORKFLOW (XL-03, XL-04, XL-07)
     // ==========================================
@@ -505,11 +517,37 @@ public class ApiController {
     @PostMapping("/bookings/{code}/cancel")
     public ResponseEntity<?> cancelBooking(@PathVariable String code, @RequestBody(required = false) Map<String, String> payload) {
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equalsIgnoreCase(auth.getName())
+                    && auth.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN")
+                    || a.getAuthority().equals("ROLE_MANAGER") || a.getAuthority().equals("ROLE_STAFF") || a.getAuthority().equals("ROLE_DIRECTOR"))) {
+                String currentUsername = auth.getName();
+                Booking b = bookingRepository.findByBookingCode(code).orElse(null);
+                if (b != null) {
+                    boolean isOwner = (b.getCustomerName() != null && b.getCustomerName().equalsIgnoreCase(currentUsername))
+                            || (b.getCustomerPhone() != null && b.getCustomerPhone().equalsIgnoreCase(currentUsername));
+                    if (!isOwner) {
+                        Optional<User> userOpt = userRepository.findByUsername(currentUsername);
+                        if (userOpt.isPresent()) {
+                            User u = userOpt.get();
+                            if ((u.getPhone() != null && u.getPhone().equals(b.getCustomerPhone())) ||
+                                (u.getFullName() != null && u.getFullName().equalsIgnoreCase(b.getCustomerName()))) {
+                                isOwner = true;
+                            }
+                        }
+                    }
+                    if (!isOwner) {
+                        return ResponseEntity.status(403).body(Map.of("success", false, "message", "Bạn không có quyền hủy lịch đặt sân của người khác!"));
+                    }
+                }
+            }
             String reason = payload != null ? payload.getOrDefault("reason", "Khách hàng yêu cầu hủy") : "Khách hàng yêu cầu hủy";
             Booking updated = bookingService.cancelBooking(code, reason);
             return ResponseEntity.ok(Map.of("success", true, "booking", updated));
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
         }
     }
 
@@ -583,99 +621,12 @@ public class ApiController {
     @PostMapping("/bookings/slot-lock")
     public ResponseEntity<?> lockSlotBooking(@RequestBody Map<String, Object> payload) {
         try {
-            String courtCode = (String) payload.get("courtCode");
-            String branchCode = (String) payload.get("branchCode");
-            String dateStr = (String) payload.get("date");
-            String timeSlot = (String) payload.get("timeSlot");
-            String customerName = (String) payload.getOrDefault("customerName", "Khách đặt trực tuyến");
-            String customerPhone = (String) payload.getOrDefault("customerPhone", "0903123456");
-
-            LocalDate bookingDate = (dateStr != null && !dateStr.trim().isEmpty())
-                    ? LocalDate.parse(dateStr.trim())
-                    : LocalDate.now();
-
-            // Validate that the slot is not already booked (including multi-hour overlaps)
-            List<Booking> existing = bookingRepository.findByCourtCodeAndBookingDate(courtCode, bookingDate);
-            boolean alreadyBooked = existing.stream()
-                    .anyMatch(b -> b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus()) && isSlotOverlapping(timeSlot, b.getTimeSlot()));
-            if (alreadyBooked) {
-                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Khung giờ " + timeSlot + " của sân này đã có người đặt trước!"));
-            }
-
-            // Duration and pricing
-            int duration = 1;
-            Pattern p = Pattern.compile("(\\d{2}):00\\s*-\\s*(\\d{2}):00");
-            Matcher m = p.matcher(timeSlot);
-            int startHour = 18;
-            if (m.find()) {
-                startHour = Integer.parseInt(m.group(1));
-                int endHour = Integer.parseInt(m.group(2));
-                duration = Math.max(1, endHour - startHour);
-            }
-
-            // Hourly rate check from court or default via PricingService
-            Optional<Court> courtOpt = courtRepository.findByCourtCode(courtCode);
-            BigDecimal hourlyRate = pricingService.calculateHourlyRate(courtOpt.orElse(null), startHour);
-            BigDecimal totalPrice = pricingService.calculateTotalPrice(hourlyRate, duration);
-            BigDecimal deposit = pricingService.calculateDepositAmount(totalPrice);
-
-            String bookingCode = "DS" + (100000 + (int) (Math.random() * 900000));
-            Booking booking = new Booking();
-            booking.setBookingCode(bookingCode);
-            booking.setBranchCode(branchCode);
-            booking.setCourtCode(courtCode);
-            booking.setCustomerName(customerName);
-            booking.setCustomerPhone(customerPhone);
-            booking.setBookingDate(bookingDate);
-            booking.setTimeSlot(timeSlot);
-            booking.setHourlyPrice(hourlyRate);
-            booking.setTotalPrice(totalPrice);
-            booking.setDepositAmount(deposit);
-            booking.setPaymentMethod("Chuyển khoản VietQR");
-            booking.setStatus("Chờ cọc 30%");
-            booking.setNotes("Đặt qua Lưới giờ Sân trực tuyến");
-
-            Booking saved = bookingRepository.save(booking);
-
-            bookingService.broadcastBookingEvent(vn.yain.dto.BookingNotificationDto.builder()
-                    .eventType("NEW_BOOKING")
-                    .bookingCode(bookingCode)
-                    .courtCode(courtCode)
-                    .branchCode(branchCode)
-                    .customerName(customerName)
-                    .customerPhone(customerPhone)
-                    .timeSlot(timeSlot)
-                    .totalPrice(totalPrice)
-                    .depositAmount(deposit)
-                    .status("Chờ cọc 30%")
-                    .message("Đơn đặt sân mới trực tuyến [" + bookingCode + "] - Sân " + courtCode + " (" + timeSlot + ")")
-                    .timestamp(java.time.LocalDateTime.now())
-                    .build());
-
-            // Dynamic VietQR payment URL (MBBank)
-            String qrUrl = String.format(
-                    "https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=%d&addInfo=CK%%20%s&accountName=UTE%%20BADMINTON%%20CLUB",
-                    deposit.longValue(), bookingCode
-            );
-
-            Map<String, Object> resp = new HashMap<>();
-            resp.put("success", true);
-            resp.put("bookingCode", bookingCode);
-            resp.put("courtCode", courtCode);
-            resp.put("courtName", courtOpt.isPresent() ? courtOpt.get().getCourtName() : courtCode);
-            resp.put("branchCode", branchCode);
-            resp.put("date", bookingDate.toString());
-            resp.put("timeSlot", timeSlot);
-            resp.put("totalPrice", totalPrice);
-            resp.put("depositAmount", deposit);
-            resp.put("qrUrl", qrUrl);
-            resp.put("bankName", "MBBank (Ngân hàng Quân Đội)");
-            resp.put("accountNo", "0903123456");
-            resp.put("accountName", "UTE BADMINTON CLUB");
-
+            Map<String, Object> resp = bookingService.lockSlotBooking(payload);
             return ResponseEntity.ok(resp);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
         }
     }
 
@@ -778,7 +729,7 @@ public class ApiController {
         }
 
         if (productRepository.findByProductCode(product.getProductCode().trim()).isPresent()) {
-            product.setProductCode(product.getProductCode().trim() + "_" + (System.currentTimeMillis() % 1000));
+            product.setProductCode(product.getProductCode().trim() + "_" + UUID.randomUUID().toString().substring(0, 6).toUpperCase());
         }
 
         Product saved = productRepository.save(product);
@@ -993,10 +944,11 @@ public class ApiController {
             List<Map<String, Object>> items = (List<Map<String, Object>>) payload.get("items");
             StockReceipt receipt = warehouseService.createStockReceipt(supplierName, branchCode, staffCode, items, notes);
             return ResponseEntity.ok(Map.of("success", true, "receipt", receipt));
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
+            log.error("Lỗi khi lập phiếu nhập kho: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Lỗi lập phiếu nhập kho: " + (e.getMessage() != null ? e.getMessage() : "Lỗi xử lý nội bộ")));
         }
     }
 

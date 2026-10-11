@@ -325,21 +325,52 @@
     let cachedUsers = [];
 
     async function loadUsers() {
+      // 1. Fetch live data from /api/admin/users
       try {
-        const res = await fetch('/api/admin/users');
+        const token = localStorage.getItem('jwt_token');
+        const headers = { 'Accept': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+        const res = await fetch('/api/admin/users', { headers });
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
             cachedUsers = data;
-          } else {
-            cachedUsers = DEFAULT_SYSTEM_USERS;
           }
-        } else {
-          cachedUsers = DEFAULT_SYSTEM_USERS;
         }
       } catch (e) {
+        console.warn('API error fetching /api/admin/users:', e);
+      }
+
+      // 3. Ensure any customer registered in current browser session is merged if not yet in list
+      try {
+        const localUserRaw = localStorage.getItem('utesport_user');
+        if (localUserRaw) {
+          const localUser = JSON.parse(localUserRaw);
+          if (localUser && localUser.fullName && (localUser.role === 'CUSTOMER' || localUser.username)) {
+            const exists = cachedUsers.some(u =>
+              (u.username && localUser.username && u.username.toLowerCase() === localUser.username.toLowerCase()) ||
+              (u.phone && localUser.phone && u.phone === localUser.phone)
+            );
+            if (!exists) {
+              cachedUsers.push({
+                id: localUser.userId || Date.now(),
+                username: localUser.username || localUser.phone,
+                fullName: localUser.fullName,
+                role: (localUser.role || 'CUSTOMER').toUpperCase(),
+                branchCode: localUser.branchCode || 'CN01',
+                status: 'Hoạt động',
+                phone: localUser.phone || '',
+                email: localUser.email || ''
+              });
+            }
+          }
+        }
+      } catch (e) {}
+
+      if (!cachedUsers || cachedUsers.length === 0) {
         cachedUsers = DEFAULT_SYSTEM_USERS;
       }
+
       renderUserTable(cachedUsers);
       updateKpis(cachedUsers);
     }
@@ -466,9 +497,16 @@
       if (password) payload.password = password;
 
       try {
+        let token = localStorage.getItem('jwt_token');
+        if (!token && typeof document !== 'undefined' && document.cookie) {
+          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+          if (match) token = match[1];
+        }
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
         const res = await fetch('/api/admin/users', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: headers,
           body: JSON.stringify(payload)
         });
         const data = await res.json();
@@ -495,21 +533,60 @@
     }
 
     async function toggleUserStatus(username) {
+      // 1. Chống tự khóa chính tài khoản admin đang đăng nhập
+      const curUser = (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser()) || (function() {
+        try { return JSON.parse(localStorage.getItem('utesport_user')); } catch(e) { return null; }
+      })();
+      if (curUser && curUser.username && curUser.username.toLowerCase() === username.toLowerCase()) {
+        if (window.showToast) {
+          showToast('Bạn không thể tự khóa tài khoản quản trị viên đang trực tiếp đăng nhập!', 'warning');
+        } else {
+          alert('Bạn không thể tự khóa tài khoản quản trị viên đang trực tiếp đăng nhập!');
+        }
+        return;
+      }
+
+      const u = cachedUsers.find(x => x.username === username);
+      const isCurrentlyLocked = u && ((u.status || '').toLowerCase() === 'khóa' || (u.status || '').toLowerCase() === 'đã khóa' || (u.status || '').toLowerCase() === 'bị khóa');
+      const actionName = isCurrentlyLocked ? 'mở khóa' : 'khóa';
+
+      if (!confirm(`Bạn có chắc chắn muốn ${actionName} tài khoản [${username}] không?`)) {
+        return;
+      }
+
       try {
+        let token = localStorage.getItem('jwt_token');
+        if (!token && typeof document !== 'undefined' && document.cookie) {
+          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+          if (match) token = match[1];
+        }
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
         const res = await fetch(`/api/admin/users/${encodeURIComponent(username)}/toggle-status`, {
-          method: 'POST'
+          method: 'POST',
+          headers: headers
         });
-        const data = await res.json();
+        
+        let data = {};
+        try {
+          data = await res.json();
+        } catch (e) {
+          data = {};
+        }
+
         if (res.ok && data.success) {
-          if (window.showToast) showToast(`Đã chuyển trạng thái tài khoản ${username} thành [${data.status}]`, 'info');
+          if (window.showToast) showToast(`Đã ${actionName} tài khoản ${username} thành công! [${data.status}]`, 'success');
           await loadUsers();
         } else {
-          if (window.showToast) showToast(data.message || 'Lỗi khi đổi trạng thái!', 'error');
+          const errMsg = data.message || `Lỗi khi ${actionName} tài khoản (Mã phản hồi: ${res.status})`;
+          if (window.showToast) showToast(errMsg, 'error');
+          else alert(errMsg);
         }
       } catch (err) {
-        const u = cachedUsers.find(x => x.username === username);
+        console.error('Lỗi khi đổi trạng thái tài khoản:', err);
         if (u) {
-          u.status = (u.status === 'Khóa' ? 'Hoạt động' : 'Khóa');
+          u.status = isCurrentlyLocked ? 'Hoạt động' : 'Bị khóa';
           renderUserTable(cachedUsers);
           if (window.showToast) showToast(`Đã đổi trạng thái tài khoản ${username} thành [${u.status}]`, 'info');
         }

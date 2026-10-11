@@ -840,6 +840,10 @@
         showToast(`Đã thêm mới đơn đặt sân ${code}!`, 'success');
       }
 
+      const userBranch = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser().branchCode)
+        || (window.RBAC && window.RBAC.getCurrentUser() && window.RBAC.getCurrentUser().branchCode)
+        || 'CN01';
+
       // Sync to SQL Server database
       fetch('/api/bookings', {
         method: 'POST',
@@ -849,7 +853,7 @@
           customerName: name,
           customerPhone: phone,
           courtCode: court,
-          branchCode: 'CN01',
+          branchCode: userBranch,
           bookingDate: date,
           timeSlot: time,
           hourlyPrice: 90000,
@@ -887,9 +891,19 @@
       }
     }
 
-    function deleteCurrentBooking() {
+    async function deleteCurrentBooking() {
       const code = document.getElementById('fBookingCode').value;
       if (!confirm(`Bạn có chắc chắn muốn xóa đơn ${code}?`)) return;
+
+      try {
+        await fetch(`/api/bookings/${encodeURIComponent(code)}/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: 'Quản lý chi nhánh hủy đơn' })
+        });
+      } catch (e) {
+        console.warn('SQL cancel error:', e);
+      }
 
       bookings = bookings.filter(b => b.code !== code);
       saveToStorage();

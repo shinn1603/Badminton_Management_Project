@@ -16,6 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Configuration
@@ -52,6 +53,18 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("{\"success\":false,\"status\":401,\"message\":\"Phiên đăng nhập đã hết hạn hoặc chưa đăng nhập. Vui lòng đăng nhập lại!\",\"error\":\"Unauthorized\"}");
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("{\"success\":false,\"status\":403,\"message\":\"Tài khoản không có quyền thực hiện thao tác này!\",\"error\":\"Forbidden\"}");
+                })
+            )
             .authorizeHttpRequests(auth -> auth
                 // Allow static resources
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
@@ -67,12 +80,14 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/bookings/slots/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/bookings/slot-lock").permitAll()
                 .requestMatchers("/api/bookings/*/deposit").permitAll()
-                // Sensitive administrative APIs
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                // Sensitive administrative & Manager APIs
+                .requestMatchers(HttpMethod.GET, "/api/admin/users").permitAll()
+                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "DIRECTOR")
                 .requestMatchers("/api/director/**").hasRole("DIRECTOR")
                 .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN", "DIRECTOR")
-                .requestMatchers("/api/staff/**", "/api/shifts/week/**", "/api/shifts/assign", "/api/shifts/remove").hasAnyRole("MANAGER", "ADMIN", "DIRECTOR")
-                .requestMatchers("/api/shifts/summary", "/api/shifts/close").hasAnyRole("POS", "MANAGER", "ADMIN", "DIRECTOR")
+                .requestMatchers("/api/staff", "/api/staff/**").hasAnyRole("MANAGER", "ADMIN", "DIRECTOR")
+                .requestMatchers("/api/inventory", "/api/inventory/**").hasAnyRole("MANAGER", "ADMIN", "DIRECTOR")
+                .requestMatchers("/api/shifts", "/api/shifts/**").hasAnyRole("POS", "STAFF", "MANAGER", "ADMIN", "DIRECTOR")
                 // Require authentication for all remaining APIs
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().authenticated()
