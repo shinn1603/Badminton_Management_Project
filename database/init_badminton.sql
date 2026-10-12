@@ -382,7 +382,7 @@ CREATE TABLE audit_logs (
     username VARCHAR(50) NOT NULL,
     action_type NVARCHAR(100) NOT NULL,
     action_time DATETIME DEFAULT GETDATE(),
-    details NVARCHAR(255) NOT NULL,
+    details NVARCHAR(MAX) NOT NULL,
     ip_address VARCHAR(50) DEFAULT '127.0.0.1',
     module NVARCHAR(50) DEFAULT N'Hệ thống',
     status NVARCHAR(30) DEFAULT N'Thành công'
