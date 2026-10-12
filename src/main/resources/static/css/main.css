@@ -118,6 +118,10 @@
 }
 
 /* --- BASE STYLES --- */
+html {
+  scroll-behavior: smooth;
+}
+
 *,
 *::before,
 *::after {
@@ -1927,6 +1931,99 @@ textarea {
 .clean-table tr:last-child td,
 .data-table tr:last-child td {
   border-bottom: none;
+}
+
+/* --- ACCORDION & DETAIL DRAWER ROWS --- */
+.main-row {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.main-row:hover,
+.main-row.expanded {
+  background-color: var(--surface-subtle);
+}
+
+.main-row .chevron-icon {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.15s ease;
+  color: var(--text-muted);
+}
+
+.main-row:hover .chevron-icon,
+.main-row.expanded .chevron-icon {
+  color: var(--primary);
+}
+
+.detail-drawer {
+  display: none !important;
+}
+
+.detail-drawer.show {
+  display: table-row !important;
+}
+
+.detail-drawer td {
+  padding: 0 !important;
+  background: var(--surface-subtle) !important;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.drawer-inner {
+  padding: 14px 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  background: var(--surface);
+  border-left: 3px solid var(--primary);
+  margin: 6px 16px 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  animation: drawerFadeIn 0.2s ease-out;
+}
+
+@keyframes drawerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .drawer-inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .drawer-inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+.drawer-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.drawer-item .label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.drawer-item .value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
 }
 
 /* --- SEARCH BOX --- */

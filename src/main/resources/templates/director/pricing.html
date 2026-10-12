@@ -6,6 +6,16 @@
   <title>Phê duyệt chính sách giá & Khuyến mãi - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
   <script src="/js/auth-guard.js"></script>
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
   <style>
     .chart-tab-bar {
       display: inline-flex;
@@ -18,7 +28,7 @@
     }
 
     .chart-tab-btn {
-      padding: 8px 16px;
+      padding: 8px 18px;
       border-radius: 8px;
       border: none;
       background: transparent;
@@ -28,6 +38,9 @@
       cursor: pointer;
       transition: all 0.2s ease;
       font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .chart-tab-btn.active {
@@ -36,9 +49,139 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     }
 
+    .tab-badge {
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(245, 158, 11, 0.15);
+      color: #d97706;
+    }
+
+    .chart-tab-btn.active .tab-badge {
+      background: #f59e0b;
+      color: #fff;
+    }
+
     .data-table th, .data-table td {
-      padding: 10px 8px !important;
+      padding: 11px 10px !important;
       font-size: 12.5px !important;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 540px;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+    }
+
+    .modal-close-btn:hover {
+      color: var(--danger);
+      background: var(--surface-subtle);
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      background: var(--surface-subtle);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-body);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--text-dark);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s ease;
+      box-sizing: border-box;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
     }
   </style>
 </head>
@@ -113,7 +256,6 @@
           </svg>
           <span class="menu-text">Phê duyệt giải đấu</span>
         </a>
-
       </div>
 
       <div class="sidebar-bottom">
@@ -156,7 +298,20 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" placeholder="Tìm đề xuất, mã KM...">
+            <input type="text" id="searchInput" onkeyup="filterActiveTab()" placeholder="Tìm đề xuất, mã KM, chi nhánh...">
+          </div>
+
+          <button class="btn btn-primary" id="btnHeaderAction" onclick="handleHeaderAction()">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span id="btnHeaderActionText">Tạo đề xuất giá mới</span>
+          </button>
+
+          <div class="user-pill-header" id="headerUserWidget" title="Tài khoản đang đăng nhập">
+            <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;">GD</div>
+            <div style="font-size: 12.5px; font-weight: 600; color: var(--text-dark);">Giám đốc điều hành</div>
           </div>
         </div>
       </header>
@@ -167,103 +322,69 @@
           <div class="hero-banner-content">
             <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
               <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
-              Ban Giám Đốc Phê Duyệt Giá Toàn Hệ Thống
+              Ban Giám Đốc Thẩm Định & Phê Duyệt Toàn Chuỗi
             </div>
-            <h1 class="hero-title" style="margin-bottom: 8px;">Chính Sách Bảng Giá & Khuyến Mãi Chuỗi</h1>
-            <p class="hero-subtitle" style="margin-bottom: 0;">Thẩm định đề xuất giá sân giờ vàng, duyệt voucher ưu đãi và chiến dịch chiết khấu hội viên VIP</p>
+            <h1 class="hero-title" style="margin-bottom: 8px;">Phê Duyệt Chính Sách Giá & Khuyến Mãi</h1>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Xem xét các đề xuất điều chỉnh giá từ Quản lý chi nhánh, quyết định phê duyệt áp dụng và kích hoạt chiến dịch khuyến mãi toàn hệ thống</p>
           </div>
         </div>
+
+        <!-- TAB NAVIGATION -->
         <div class="chart-tab-bar" style="margin-bottom: 18px;">
-          <button class="chart-tab-btn active" onclick="switchPricingTab(1)">Đề xuất bảng giá giờ chơi (3)</button>
-          <button class="chart-tab-btn" onclick="switchPricingTab(2)">Duyệt chương trình khuyến mãi & Voucher (2)</button>
+          <button class="chart-tab-btn active" id="tabBtn1" onclick="switchPricingTab(1)">
+            <span>Đề xuất bảng giá giờ chơi</span>
+            <span class="tab-badge" id="badgePendingProposals">0 chờ duyệt</span>
+          </button>
+          <button class="chart-tab-btn" id="tabBtn2" onclick="switchPricingTab(2)">
+            <span>Duyệt chương trình khuyến mãi & Voucher</span>
+            <span class="tab-badge" id="badgePendingPromos">0 chờ duyệt</span>
+          </button>
+          <button class="chart-tab-btn" id="tabBtn3" onclick="switchPricingTab(3)">
+            <span>Bảng giá hiện hành toàn chuỗi</span>
+            <span class="tab-badge" id="badgeTotalRules" style="background: rgba(59, 130, 246, 0.15); color: #2563eb;">11 biểu giá</span>
+          </button>
         </div>
 
+        <!-- TAB 1: ĐỀ XUẤT ĐIỀU CHỈNH GIÁ SÂN (CHỨC NĂNG PHÊ DUYỆT CỦA GIÁM ĐỐC) -->
         <div id="pricingTabContent1">
           <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">Danh sách đề xuất điều chỉnh giá sân từ Quản lý chi nhánh</h2>
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 class="card-title" style="margin-bottom: 4px;">Danh sách đề xuất điều chỉnh giá sân từ Quản lý chi nhánh</h2>
+                <div style="font-size: 12.5px; color: var(--text-muted);">Quản lý cơ sở gửi đề xuất tăng/giảm giá theo khung giờ, Giám đốc thẩm định và phê duyệt áp dụng</div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <select class="form-control" id="filterProposalStatus" onchange="filterActiveTab()" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
+                  <option value="ALL">-- Tất cả trạng thái --</option>
+                  <option value="Chờ phê duyệt" selected>Chờ phê duyệt</option>
+                  <option value="Đã phê duyệt">Đã phê duyệt</option>
+                  <option value="Từ chối">Từ chối</option>
+                </select>
+                <button class="btn btn-outline" onclick="openProposalModal()" style="font-size: 12.5px; padding: 6px 14px;">
+                  + Tạo đề xuất mới
+                </button>
+              </div>
             </div>
 
             <div class="table-container">
-              <table class="data-table">
+              <table class="data-table" id="proposalsTable">
                 <thead>
                   <tr>
-                    <th>Mã ĐX</th>
+                    <th style="width: 85px;">Mã ĐX</th>
                     <th>Chi nhánh đề xuất</th>
                     <th>Loại sân áp dụng</th>
                     <th>Khung giờ áp dụng</th>
-                    <th>Mức giá hiện tại</th>
-                    <th>Mức giá đề xuất</th>
-                    <th>Lý do đề xuất</th>
-                    <th style="text-align: center;">Trạng thái</th>
-                    <th style="text-align: right;">Hành động</th>
+                    <th style="text-align: right;">Giá hiện tại</th>
+                    <th style="text-align: right;">Giá đề xuất</th>
+                    <th style="max-width: 260px;">Lý do đề xuất</th>
+                    <th style="text-align: center; width: 130px;">Trạng thái</th>
+                    <th style="text-align: right; width: 160px;">Hành động</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr id="priceRow1">
-                    <td style="font-weight: 700;">DX-G01</td>
-                    <td>
-                      <div style="font-weight: 600;">Chi nhánh 2 - Quận 9</div>
-                      <div style="font-size: 11px; color: var(--text-muted);">Trần Hữu Nam gửi</div>
-                    </td>
-                    <td>Sân VIP Yonex</td>
-                    <td>
-                      <span class="badge" style="background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa;">17:00 - 21:00 (Giờ vàng)</span>
-                    </td>
-                    <td style="color: var(--text-muted);">120.000 đ/h</td>
-                    <td style="font-weight: 700; color: var(--primary);">140.000 đ/h (+16%)</td>
-                    <td style="font-size: 12px; color: var(--text-muted); max-width: 200px;">Nhu cầu hội viên cao điểm quá tải, nâng cấp hệ thống đèn LED mới</td>
-                    <td style="text-align: center;" id="statusCell1">
-                      <span class="badge badge-warning">Chờ phê duyệt</span>
-                    </td>
-                    <td style="text-align: right;">
-                      <div style="display: flex; gap: 6px; justify-content: flex-end;" id="actionCell1">
-                        <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approvePricing('1')">Duyệt</button>
-                        <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444;" onclick="rejectPricing('1')">Từ chối</button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr id="priceRow2">
-                    <td style="font-weight: 700;">DX-G02</td>
-                    <td>
-                      <div style="font-weight: 600;">Chi nhánh 1 - Thủ Đức</div>
-                      <div style="font-size: 11px; color: var(--text-muted);">Nguyễn Văn Quản gửi</div>
-                    </td>
-                    <td>Sân Tiêu chuẩn</td>
-                    <td>
-                      <span class="badge" style="background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;">08:00 - 14:00 (Giờ thấp điểm)</span>
-                    </td>
-                    <td style="color: var(--text-muted);">80.000 đ/h</td>
-                    <td style="font-weight: 700; color: var(--primary);">60.000 đ/h (-25%)</td>
-                    <td style="font-size: 12px; color: var(--text-muted); max-width: 200px;">Kích cầu sinh viên UTE thuê sân buổi sáng các ngày trong tuần</td>
-                    <td style="text-align: center;" id="statusCell2">
-                      <span class="badge badge-warning">Chờ phê duyệt</span>
-                    </td>
-                    <td style="text-align: right;">
-                      <div style="display: flex; gap: 6px; justify-content: flex-end;" id="actionCell2">
-                        <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approvePricing('2')">Duyệt</button>
-                        <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444;" onclick="rejectPricing('2')">Từ chối</button>
-                      </div>
-                    </td>
-                  </tr>
-
+                <tbody id="proposalsTableBody">
                   <tr>
-                    <td style="font-weight: 700;">DX-G00</td>
-                    <td>
-                      <div style="font-weight: 600;">Chi nhánh 3 - Bình Thạnh</div>
-                      <div style="font-size: 11px; color: var(--text-muted);">Lê Hoàng Khang gửi</div>
-                    </td>
-                    <td>Sân Tiêu chuẩn</td>
-                    <td>06:00 - 08:00</td>
-                    <td style="color: var(--text-muted);">70.000 đ/h</td>
-                    <td style="font-weight: 700; color: var(--primary);">80.000 đ/h</td>
-                    <td style="font-size: 12px; color: var(--text-muted); max-width: 200px;">Đồng bộ mức giá sáng sớm toàn chuỗi</td>
-                    <td style="text-align: center;">
-                      <span class="badge badge-success">Đã phê duyệt</span>
-                    </td>
-                    <td style="text-align: right; color: var(--text-light); font-size: 11.5px;">
-                      Đã áp dụng
+                    <td colspan="9" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                      Đang tải danh sách đề xuất giá từ Database...
                     </td>
                   </tr>
                 </tbody>
@@ -272,63 +393,37 @@
           </div>
         </div>
 
+        <!-- TAB 2: DUYỆT CHƯƠNG TRÌNH KHUYẾN MÃI & VOUCHER -->
         <div id="pricingTabContent2" style="display: none;">
           <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">Danh sách chiến dịch Khuyến mãi & Mã giảm giá toàn chuỗi</h2>
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 class="card-title" style="margin-bottom: 4px;">Danh sách chương trình Khuyến mãi & Voucher chờ duyệt</h2>
+                <div style="font-size: 12.5px; color: var(--text-muted);">Chiến dịch ưu đãi toàn chuỗi hoặc cơ sở cần sự phê duyệt của Ban Giám Đốc trước khi tung ra thị trường</div>
+              </div>
+              <button class="btn btn-primary" onclick="openPromoModal()" style="font-size: 12.5px; padding: 6px 14px;">
+                + Tạo chiến dịch KM mới
+              </button>
             </div>
 
             <div class="table-container">
-              <table class="data-table">
+              <table class="data-table" id="promotionsTable">
                 <thead>
                   <tr>
-                    <th>Mã KM</th>
-                    <th>Tên chiến dịch</th>
-                    <th>Mã Voucher</th>
-                    <th>Mức ưu đãi</th>
+                    <th style="width: 90px;">Mã KM</th>
+                    <th>Tên chiến dịch ưu đãi</th>
+                    <th>Hình thức ưu đãi</th>
+                    <th style="text-align: right;">Mức giảm</th>
                     <th>Phạm vi áp dụng</th>
-                    <th>Thời hạn</th>
-                    <th style="text-align: center;">Trạng thái</th>
-                    <th style="text-align: right;">Hành động</th>
+                    <th>Thời hạn hiệu lực</th>
+                    <th style="text-align: center; width: 130px;">Trạng thái</th>
+                    <th style="text-align: right; width: 170px;">Hành động</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr id="promoRow1">
-                    <td style="font-weight: 700;">KM-2026-01</td>
-                    <td>
-                      <div style="font-weight: 600;">Chào đón Tân sinh viên HCM-UTE</div>
-                      <div style="font-size: 11px; color: var(--text-muted);">Ưu đãi khai giảng năm học mới</div>
-                    </td>
-                    <td><span style="font-family: monospace; font-weight: 700; color: var(--secondary); background: #eff6ff; padding: 2px 6px; border-radius: 4px;">UTEFRESH26</span></td>
-                    <td style="font-weight: 700; color: #ea580c;">Giảm 20%</td>
-                    <td>Toàn chuỗi (CN01, CN02, CN03)</td>
-                    <td>01/10 - 31/10/2026</td>
-                    <td style="text-align: center;" id="promoStatus1">
-                      <span class="badge badge-warning">Chờ phê duyệt</span>
-                    </td>
-                    <td style="text-align: right;">
-                      <div style="display: flex; gap: 6px; justify-content: flex-end;" id="promoAction1">
-                        <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approvePromo('1')">Kích hoạt</button>
-                        <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444;" onclick="rejectPromo('1')">Bác bỏ</button>
-                      </div>
-                    </td>
-                  </tr>
-
+                <tbody id="promotionsTableBody">
                   <tr>
-                    <td style="font-weight: 700;">KM-2026-00</td>
-                    <td>
-                      <div style="font-weight: 600;">Tri ân Hội viên Thân thiết Tháng 9</div>
-                      <div style="font-size: 11px; color: var(--text-muted);">Tặng giờ chơi thứ 3 trong tuần</div>
-                    </td>
-                    <td><span style="font-family: monospace; font-weight: 700; color: var(--secondary); background: #eff6ff; padding: 2px 6px; border-radius: 4px;">VIPMEMBER</span></td>
-                    <td style="font-weight: 700; color: #ea580c;">Giảm 15%</td>
-                    <td>Toàn chuỗi</td>
-                    <td>01/09 - 30/09/2026</td>
-                    <td style="text-align: center;">
-                      <span class="badge badge-success">Đang diễn ra</span>
-                    </td>
-                    <td style="text-align: right; color: var(--text-light); font-size: 11.5px;">
-                      Đã kích hoạt
+                    <td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                      Đang tải danh sách khuyến mãi từ Database...
                     </td>
                   </tr>
                 </tbody>
@@ -336,60 +431,808 @@
             </div>
           </div>
         </div>
+
+        <!-- TAB 3: BẢNG GIÁ HIỆN HÀNH TOÀN CHUỖI -->
+        <div id="pricingTabContent3" style="display: none;">
+          <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 class="card-title" style="margin-bottom: 4px;">Ma trận biểu giá đang áp dụng trên toàn chuỗi UTE Sport</h2>
+                <div style="font-size: 12.5px; color: var(--text-muted);">Dữ liệu biểu giá được tự động cập nhật khi Giám đốc phê duyệt các đề xuất điều chỉnh giá</div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <select class="form-control" id="filterBranchSelect" onchange="filterActiveTab()" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
+                  <option value="ALL">-- Tất cả chi nhánh --</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table" id="pricingRulesTable">
+                <thead>
+                  <tr>
+                    <th style="width: 80px;">Mã giá</th>
+                    <th>Chi nhánh áp dụng</th>
+                    <th>Khung giờ thi đấu</th>
+                    <th>Phân loại khung giờ</th>
+                    <th>Loại ngày áp dụng</th>
+                    <th style="text-align: right;">Đơn giá sân / Giờ</th>
+                    <th>Ngày hiệu lực</th>
+                    <th style="text-align: center;">Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody id="pricingRulesTableBody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                      Đang tải dữ liệu biểu giá từ Database...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </div>
     </main>
   </div>
 
+  <!-- MODAL TẠO ĐỀ XUẤT ĐIỀU CHỈNH GIÁ -->
+  <div class="modal-overlay" id="proposalModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalProposalTitle">Gửi đề xuất điều chỉnh giá sân</h3>
+        <button class="modal-close-btn" onclick="closeProposalModal()">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Chi nhánh đề xuất <span style="color: var(--danger);">*</span></label>
+            <select class="form-control" id="inpPropBranch" onchange="syncCurrentPrice()"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Người đề xuất <span style="color: var(--danger);">*</span></label>
+            <input type="text" class="form-control" id="inpPropManager" placeholder="Ví dụ: Trần Phúc Bảo">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Loại sân áp dụng <span style="color: var(--danger);">*</span></label>
+            <select class="form-control" id="inpPropCourtType">
+              <option value="Sân VIP Yonex">Sân VIP Yonex</option>
+              <option value="Sân VIP Victor">Sân VIP Victor</option>
+              <option value="Sân VIP Lining">Sân VIP Lining</option>
+              <option value="Sân Tiêu chuẩn BWF" selected>Sân Tiêu chuẩn BWF</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Khung giờ áp dụng <span style="color: var(--danger);">*</span></label>
+            <select class="form-control" id="inpPropSlotInfo" onchange="syncCurrentPrice()">
+              <option value="17:00 - 22:00 (Giờ vàng)">17:00 - 22:00 (Giờ vàng cao điểm)</option>
+              <option value="09:00 - 17:00 (Ban ngày)">09:00 - 17:00 (Ban ngày thường)</option>
+              <option value="06:00 - 09:00 (Sáng sớm)">06:00 - 09:00 (Sáng sớm)</option>
+              <option value="22:00 - 23:00 (Tối muộn)">22:00 - 23:00 (Tối muộn)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Mức giá hiện tại (VNĐ)</label>
+            <input type="number" class="form-control" id="inpPropCurrentPrice" value="120000" readonly style="background: var(--surface-subtle);">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mức giá đề xuất mới (VNĐ) <span style="color: var(--danger);">*</span></label>
+            <input type="number" class="form-control" id="inpPropNewPrice" placeholder="Ví dụ: 140000" step="5000">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Lý do đề xuất điều chỉnh <span style="color: var(--danger);">*</span></label>
+          <textarea class="form-control" id="inpPropReason" rows="3" placeholder="Nêu rõ lý do: nhu cầu quá tải, nâng cấp trang thiết bị đèn/thảm, hoặc kích cầu giờ thấp điểm..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeProposalModal()">Hủy bỏ</button>
+        <button class="btn btn-primary" id="btnSaveProposal" onclick="saveProposal()">Gửi đề xuất lên Giám đốc</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL TẠO KHUYẾN MÃI -->
+  <div class="modal-overlay" id="promoModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalPromoTitle">Tạo chiến dịch khuyến mãi mới</h3>
+        <button class="modal-close-btn" onclick="closePromoModal()">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Mã khuyến mãi / Voucher</label>
+            <input type="text" class="form-control" id="inpPromoCode" placeholder="Tự sinh nếu để trống (ví dụ: KM06)" style="text-transform: uppercase;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phạm vi áp dụng</label>
+            <select class="form-control" id="inpPromoScope">
+              <option value="Toàn chuỗi">Toàn chuỗi hệ thống</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tên chiến dịch ưu đãi <span style="color: var(--danger);">*</span></label>
+          <input type="text" class="form-control" id="inpPromoName" placeholder="Ví dụ: Giảm 20% cho sinh viên UTE">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Loại chiết khấu <span style="color: var(--danger);">*</span></label>
+            <select class="form-control" id="inpDiscountType">
+              <option value="Phần trăm (%)">Phần trăm (%)</option>
+              <option value="Số tiền (VNĐ)">Số tiền (VNĐ)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mức giảm <span style="color: var(--danger);">*</span></label>
+            <input type="number" class="form-control" id="inpDiscountValue" placeholder="Ví dụ: 20 hoặc 50000" min="1">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Ngày bắt đầu</label>
+            <input type="date" class="form-control" id="inpPromoStartDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ngày kết thúc</label>
+            <input type="date" class="form-control" id="inpPromoEndDate">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closePromoModal()">Hủy bỏ</button>
+        <button class="btn btn-primary" id="btnSavePromo" onclick="savePromotion()">Lưu đề xuất vào Database</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    let currentTab = 1;
+    let allProposals = [];
+    let allPromotions = [];
+    let allRules = [];
+    let allBranches = [];
+
+    function formatVND(amount) {
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
+    }
+
     function toggleSidebar() {
       const sidebar = document.getElementById('appSidebar');
       if (sidebar) sidebar.classList.toggle('collapsed');
     }
 
+    function handleHeaderAction() {
+      if (currentTab === 1) openProposalModal();
+      else if (currentTab === 2) openPromoModal();
+      else openProposalModal();
+    }
+
     function switchPricingTab(tabIndex) {
-      const btn1 = document.querySelectorAll('.chart-tab-btn')[0];
-      const btn2 = document.querySelectorAll('.chart-tab-btn')[1];
+      currentTab = tabIndex;
+      const btn1 = document.getElementById('tabBtn1');
+      const btn2 = document.getElementById('tabBtn2');
+      const btn3 = document.getElementById('tabBtn3');
       const c1 = document.getElementById('pricingTabContent1');
       const c2 = document.getElementById('pricingTabContent2');
+      const c3 = document.getElementById('pricingTabContent3');
+      const btnHeaderText = document.getElementById('btnHeaderActionText');
+
+      btn1.classList.toggle('active', tabIndex === 1);
+      btn2.classList.toggle('active', tabIndex === 2);
+      btn3.classList.toggle('active', tabIndex === 3);
+
+      c1.style.display = (tabIndex === 1) ? 'block' : 'none';
+      c2.style.display = (tabIndex === 2) ? 'block' : 'none';
+      c3.style.display = (tabIndex === 3) ? 'block' : 'none';
 
       if (tabIndex === 1) {
-        btn1.classList.add('active');
-        btn2.classList.remove('active');
-        c1.style.display = 'block';
-        c2.style.display = 'none';
+        if (btnHeaderText) btnHeaderText.textContent = 'Tạo đề xuất giá mới';
+      } else if (tabIndex === 2) {
+        if (btnHeaderText) btnHeaderText.textContent = 'Tạo chiến dịch KM mới';
       } else {
-        btn1.classList.remove('active');
-        btn2.classList.add('active');
-        c1.style.display = 'none';
-        c2.style.display = 'block';
+        if (btnHeaderText) btnHeaderText.textContent = 'Tạo đề xuất giá mới';
+      }
+
+      filterActiveTab();
+    }
+
+    async function loadDirectorPricing() {
+      try {
+        const res = await fetch('/api/director/pricing');
+        if (res.ok) {
+          const data = await res.json();
+          allProposals = data.proposals || [];
+          allPromotions = data.promotions || [];
+          allRules = data.rules || [];
+          allBranches = data.branches || [];
+
+          // Cập nhật số lượng trên các tab badge
+          if (data.counts) {
+            const c = data.counts;
+            const b1 = document.getElementById('badgePendingProposals');
+            const b2 = document.getElementById('badgePendingPromos');
+            const b3 = document.getElementById('badgeTotalRules');
+            if (b1) b1.textContent = `${c.pendingProposals} chờ duyệt`;
+            if (b2) b2.textContent = `${c.pendingPromotions} chờ duyệt`;
+            if (b3) b3.textContent = `${allRules.length} biểu giá`;
+          }
+
+          populateSelects();
+          renderProposals(allProposals);
+          renderPromotions(allPromotions);
+          renderPricingRules(allRules);
+        } else {
+          console.error('Failed to load pricing data, status:', res.status);
+        }
+      } catch (err) {
+        console.error('Error fetching pricing data:', err);
       }
     }
 
-    function approvePricing(id) {
-      document.getElementById('statusCell' + id).innerHTML = '<span class="badge badge-success">Đã phê duyệt</span>';
-      document.getElementById('actionCell' + id).innerHTML = '<span style="color: var(--primary); font-size: 11.5px; font-weight: 600;">Đã duyệt thành công</span>';
-      showToast('Đã phê duyệt chính sách giá đề xuất thành công!', 'success');
-    }
+    function populateSelects() {
+      const bSel = document.getElementById('filterBranchSelect');
+      const propBranchSel = document.getElementById('inpPropBranch');
+      const promoScopeSel = document.getElementById('inpPromoScope');
 
-    function rejectPricing(id) {
-      if (confirm('Bạn có chắc chắn muốn từ chối đề xuất này?')) {
-        document.getElementById('statusCell' + id).innerHTML = '<span class="badge badge-danger">Từ chối</span>';
-        document.getElementById('actionCell' + id).innerHTML = '<span style="color: #ef4444; font-size: 11.5px;">Đã từ chối</span>';
+      if (bSel) {
+        bSel.innerHTML = '<option value="ALL">-- Tất cả chi nhánh --</option>';
+        allBranches.forEach(b => {
+          bSel.innerHTML += `<option value="${b.branchCode}">${b.branchCode} - ${b.branchName}</option>`;
+        });
+      }
+
+      if (propBranchSel) {
+        propBranchSel.innerHTML = '';
+        allBranches.forEach(b => {
+          propBranchSel.innerHTML += `<option value="${b.branchCode}" data-manager="${b.managerName || ''}">${b.branchCode} - ${b.branchName}</option>`;
+        });
+        syncCurrentPrice();
+      }
+
+      if (promoScopeSel) {
+        promoScopeSel.innerHTML = '<option value="Toàn chuỗi">Toàn chuỗi hệ thống</option>';
+        allBranches.forEach(b => {
+          promoScopeSel.innerHTML += `<option value="${b.branchName}">${b.branchName}</option>`;
+        });
       }
     }
 
-    function approvePromo(id) {
-      document.getElementById('promoStatus' + id).innerHTML = '<span class="badge badge-success">Đã kích hoạt</span>';
-      document.getElementById('promoAction' + id).innerHTML = '<span style="color: var(--primary); font-size: 11.5px; font-weight: 600;">Đang chạy</span>';
-      showToast('Đã phê duyệt và kích hoạt mã khuyến mãi toàn chuỗi!', 'success');
-    }
+    function syncCurrentPrice() {
+      const bCode = document.getElementById('inpPropBranch')?.value || 'CN01';
+      const slot = document.getElementById('inpPropSlotInfo')?.value || '';
+      const inpCurrent = document.getElementById('inpPropCurrentPrice');
+      const inpManager = document.getElementById('inpPropManager');
 
-    function rejectPromo(id) {
-      if (confirm('Bác bỏ chương trình khuyến mãi này?')) {
-        document.getElementById('promoStatus' + id).innerHTML = '<span class="badge badge-danger">Đã bác bỏ</span>';
-        document.getElementById('promoAction' + id).innerHTML = '<span style="color: #ef4444; font-size: 11.5px;">Bị từ chối</span>';
+      const bObj = allBranches.find(b => b.branchCode === bCode);
+      if (bObj && inpManager && !inpManager.value) {
+        inpManager.value = bObj.managerName || '';
+      }
+
+      if (inpCurrent) {
+        if (slot.includes('Giờ vàng')) inpCurrent.value = '120000';
+        else if (slot.includes('Sáng')) inpCurrent.value = '80000';
+        else inpCurrent.value = '90000';
       }
     }
+
+    function renderProposals(proposals) {
+      const tbody = document.getElementById('proposalsTableBody');
+      if (!tbody) return;
+
+      if (!proposals || proposals.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 32px; color: var(--text-muted);">Không tìm thấy đề xuất điều chỉnh giá nào</td></tr>';
+        return;
+      }
+
+      let html = '';
+      proposals.forEach(p => {
+        const isPending = (p.status === 'Chờ phê duyệt');
+        const isApproved = (p.status === 'Đã phê duyệt');
+        const badgeClass = isPending ? 'badge-warning' : (isApproved ? 'badge-success' : 'badge-danger');
+
+        const diff = p.proposedPrice - p.currentPrice;
+        const diffPct = p.currentPrice > 0 ? ((diff / p.currentPrice) * 100).toFixed(1) : 0;
+        const diffSign = diff >= 0 ? `+${diffPct}%` : `${diffPct}%`;
+        const diffColor = diff >= 0 ? '#10b981' : '#ef4444';
+
+        let actionHtml = '';
+        if (isPending) {
+          actionHtml = `
+            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+              <button type="button" class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approveProposal(${p.id})">Duyệt</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444; border-color: #fca5a5;" onclick="rejectProposal(${p.id})">Từ chối</button>
+            </div>
+          `;
+        } else if (isApproved) {
+          actionHtml = `<span style="color: var(--primary); font-size: 11.5px; font-weight: 600;">Đã áp dụng vào hệ thống</span>`;
+        } else {
+          actionHtml = `<span style="color: #ef4444; font-size: 11.5px;">Đã từ chối đề xuất</span>`;
+        }
+
+        html += `
+          <tr id="proposalRow-${p.id}">
+            <td style="font-weight: 700; color: var(--primary); font-size: 13.5px;">${p.proposalCode}</td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-dark);">${p.branchName}</div>
+              <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">${p.proposerName} gửi</div>
+            </td>
+            <td>
+              <span style="font-weight: 600; color: var(--text-dark);">${p.courtType}</span>
+            </td>
+            <td>
+              <span class="badge" style="background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa;">${p.slotInfo}</span>
+            </td>
+            <td style="text-align: right; color: var(--text-muted); font-size: 13px;">
+              ${formatVND(p.currentPrice)}
+            </td>
+            <td style="text-align: right; font-weight: 700; color: var(--primary); font-size: 13.5px;">
+              ${formatVND(p.proposedPrice)}
+              <div style="font-size: 10.5px; color: ${diffColor}; font-weight: 700;">(${diffSign})</div>
+            </td>
+            <td style="font-size: 12px; color: var(--text-muted); max-width: 260px; line-height: 1.4;">
+              ${p.reason}
+              ${p.note ? `<div style="color: #ef4444; font-size: 11px; margin-top: 3px;">* Lý do từ chối: ${p.note}</div>` : ''}
+            </td>
+            <td style="text-align: center;">
+              <span class="badge ${badgeClass}">${p.status}</span>
+            </td>
+            <td style="text-align: right;">
+              ${actionHtml}
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function renderPromotions(promos) {
+      const tbody = document.getElementById('promotionsTableBody');
+      if (!tbody) return;
+
+      if (!promos || promos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">Không tìm thấy chương trình khuyến mãi nào</td></tr>';
+        return;
+      }
+
+      let html = '';
+      promos.forEach(p => {
+        const isPending = (p.status === 'Chờ phê duyệt');
+        const isActive = (p.status === 'Đang áp dụng');
+        const badgeClass = isPending ? 'badge-warning' : (isActive ? 'badge-success' : 'badge-danger');
+
+        const discountText = p.discountType && p.discountType.includes('Phần trăm') 
+          ? `Giảm ${Math.round(p.discountValue)}%` 
+          : `Giảm ${formatVND(p.discountValue)}`;
+
+        let actionHtml = '';
+        if (isPending) {
+          actionHtml = `
+            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+              <button type="button" class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approvePromotion(${p.id})">Kích hoạt</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444; border-color: #fca5a5;" onclick="rejectPromotion(${p.id})">Bác bỏ</button>
+            </div>
+          `;
+        } else if (isActive) {
+          actionHtml = `
+            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #f59e0b; border-color: #fed7aa;" onclick="togglePromoStatus('${p.promoCode}', 'Tạm ngưng')">Tạm ngưng</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444; border-color: #fca5a5;" onclick="deletePromotion('${p.promoCode}')">Xóa</button>
+            </div>
+          `;
+        } else {
+          actionHtml = `
+            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #10b981; border-color: #a7f3d0;" onclick="togglePromoStatus('${p.promoCode}', 'Đang áp dụng')">Mở lại</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444; border-color: #fca5a5;" onclick="deletePromotion('${p.promoCode}')">Xóa</button>
+            </div>
+          `;
+        }
+
+        html += `
+          <tr>
+            <td>
+              <span style="font-family: monospace; font-weight: 700; color: var(--primary); background: rgba(16, 185, 129, 0.1); padding: 3px 8px; border-radius: 4px; font-size: 13px;">${p.promoCode}</span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: var(--text-dark);">${p.promoName}</div>
+              <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">Áp dụng tự động khi đặt sân</div>
+            </td>
+            <td>${p.discountType}</td>
+            <td style="text-align: right; font-weight: 700; color: #ea580c; font-size: 14px;">
+              ${discountText}
+            </td>
+            <td>
+              <span class="badge" style="background: var(--surface-subtle); color: var(--text-dark); border: 1px solid var(--border-subtle);">${p.scope || 'Toàn chuỗi'}</span>
+            </td>
+            <td style="font-size: 12.5px; color: var(--text-muted);">
+              ${p.startDate} → ${p.endDate}
+            </td>
+            <td style="text-align: center;">
+              <span class="badge ${badgeClass}">${p.status}</span>
+            </td>
+            <td style="text-align: right;">
+              ${actionHtml}
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function renderPricingRules(rules) {
+      const tbody = document.getElementById('pricingRulesTableBody');
+      if (!tbody) return;
+
+      if (!rules || rules.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">Không tìm thấy quy tắc bảng giá nào</td></tr>';
+        return;
+      }
+
+      let html = '';
+      rules.forEach(r => {
+        const isPeak = (r.slotCode === 'KG03' || (r.slotType && r.slotType.includes('Giờ vàng')));
+        const slotBadgeStyle = isPeak 
+          ? 'background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa;'
+          : 'background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;';
+
+        html += `
+          <tr>
+            <td style="font-weight: 700; color: var(--primary); font-size: 13.5px;">${r.pricingCode}</td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-dark);">${r.branchName}</div>
+              <div style="font-size: 11.5px; color: var(--text-muted);">Cơ sở: <strong>${r.branchCode}</strong></div>
+            </td>
+            <td>
+              <span class="badge" style="${slotBadgeStyle}">${r.slotTime}</span>
+            </td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-dark);">${r.slotType}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">${r.slotCode}</div>
+            </td>
+            <td>
+              <span style="font-size: 12.5px; color: var(--text-body);">${r.dayType}</span>
+            </td>
+            <td style="text-align: right; font-weight: 700; color: var(--primary); font-size: 14px;">
+              ${formatVND(r.hourlyRate)}
+            </td>
+            <td style="font-size: 12px; color: var(--text-muted);">
+              ${r.startDate || '01/01/2026'}
+            </td>
+            <td style="text-align: center;">
+              <span class="badge badge-success">Đang áp dụng</span>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function filterActiveTab() {
+      const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+
+      if (currentTab === 1) {
+        const sFilter = document.getElementById('filterProposalStatus')?.value || 'ALL';
+        let filtered = allProposals;
+        if (sFilter !== 'ALL') {
+          filtered = filtered.filter(p => p.status === sFilter);
+        }
+        if (q) {
+          filtered = filtered.filter(p => {
+            const text = `${p.proposalCode} ${p.branchName} ${p.proposerName} ${p.courtType} ${p.slotInfo} ${p.reason}`.toLowerCase();
+            return text.includes(q);
+          });
+        }
+        renderProposals(filtered);
+      } else if (currentTab === 2) {
+        let filtered = allPromotions;
+        if (q) {
+          filtered = filtered.filter(p => {
+            const text = `${p.promoCode} ${p.promoName} ${p.discountType} ${p.scope}`.toLowerCase();
+            return text.includes(q);
+          });
+        }
+        renderPromotions(filtered);
+      } else {
+        const bFilter = document.getElementById('filterBranchSelect')?.value || 'ALL';
+        let filtered = allRules;
+        if (bFilter !== 'ALL') {
+          filtered = filtered.filter(r => r.branchCode === bFilter);
+        }
+        if (q) {
+          filtered = filtered.filter(r => {
+            const text = `${r.pricingCode} ${r.branchName} ${r.slotCode} ${r.slotType} ${r.dayType}`.toLowerCase();
+            return text.includes(q);
+          });
+        }
+        renderPricingRules(filtered);
+      }
+    }
+
+    // ACTIONS PHÊ DUYỆT ĐỀ XUẤT GIÁ
+    async function approveProposal(id) {
+      if (!confirm('Bạn có chắc chắn muốn PHÊ DUYỆT đề xuất điều chỉnh giá này và áp dụng vào Database?')) return;
+      try {
+        const res = await fetch(`/api/director/pricing/proposals/${id}/approve`, {
+          method: 'PUT'
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'success');
+          else alert(data.message);
+          await loadDirectorPricing();
+        } else {
+          alert(data.message || 'Lỗi khi phê duyệt đề xuất giá!');
+        }
+      } catch (err) {
+        console.error('Error approving proposal:', err);
+      }
+    }
+
+    async function rejectProposal(id) {
+      const note = prompt('Vui lòng nhập lý do từ chối đề xuất này:');
+      if (note === null) return;
+      try {
+        const res = await fetch(`/api/director/pricing/proposals/${id}/reject`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ note: note })
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'warning');
+          else alert(data.message);
+          await loadDirectorPricing();
+        } else {
+          alert(data.message || 'Lỗi khi từ chối đề xuất!');
+        }
+      } catch (err) {
+        console.error('Error rejecting proposal:', err);
+      }
+    }
+
+    // MODAL ĐỀ XUẤT GIÁ
+    function openProposalModal() {
+      document.getElementById('inpPropManager').value = '';
+      document.getElementById('inpPropNewPrice').value = '';
+      document.getElementById('inpPropReason').value = '';
+      syncCurrentPrice();
+      document.getElementById('proposalModal').classList.add('active');
+    }
+
+    function closeProposalModal() {
+      document.getElementById('proposalModal').classList.remove('active');
+    }
+
+    async function saveProposal() {
+      const branch = document.getElementById('inpPropBranch').value;
+      const manager = document.getElementById('inpPropManager').value.trim();
+      const courtType = document.getElementById('inpPropCourtType').value;
+      const slot = document.getElementById('inpPropSlotInfo').value;
+      const currentPrice = document.getElementById('inpPropCurrentPrice').value;
+      const newPrice = document.getElementById('inpPropNewPrice').value;
+      const reason = document.getElementById('inpPropReason').value.trim();
+
+      if (!manager) {
+        alert('Vui lòng nhập tên người đề xuất!');
+        return;
+      }
+      if (!newPrice || parseFloat(newPrice) <= 0) {
+        alert('Vui lòng nhập mức giá đề xuất hợp lệ!');
+        return;
+      }
+      if (!reason) {
+        alert('Vui lòng nhập lý do đề xuất điều chỉnh giá!');
+        return;
+      }
+
+      const payload = {
+        branchCode: branch,
+        proposerName: manager,
+        courtType: courtType,
+        slotInfo: slot,
+        currentPrice: currentPrice,
+        proposedPrice: newPrice,
+        reason: reason
+      };
+
+      try {
+        const btn = document.getElementById('btnSaveProposal');
+        if (btn) { btn.disabled = true; btn.innerText = 'Đang gửi...'; }
+
+        const res = await fetch('/api/director/pricing/proposals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (btn) { btn.disabled = false; btn.innerText = 'Gửi đề xuất lên Giám đốc'; }
+
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'success');
+          else alert(data.message);
+          closeProposalModal();
+          await loadDirectorPricing();
+        } else {
+          alert(data.message || 'Lỗi khi gửi đề xuất!');
+        }
+      } catch (err) {
+        console.error('Error saving proposal:', err);
+      }
+    }
+
+    // ACTIONS DUYỆT KHUYẾN MÃI
+    async function approvePromotion(id) {
+      if (!confirm('Bạn có chắc chắn muốn PHÊ DUYỆT và KÍCH HOẠT chiến dịch khuyến mãi này?')) return;
+      try {
+        const res = await fetch(`/api/director/pricing/promotions/${id}/approve`, {
+          method: 'PUT'
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'success');
+          else alert(data.message);
+          await loadDirectorPricing();
+        } else {
+          alert(data.message || 'Lỗi khi kích hoạt khuyến mãi!');
+        }
+      } catch (err) {
+        console.error('Error approving promotion:', err);
+      }
+    }
+
+    async function rejectPromotion(id) {
+      if (!confirm('Bạn có chắc chắn muốn BÁC BỎ chương trình khuyến mãi này?')) return;
+      try {
+        const res = await fetch(`/api/director/pricing/promotions/${id}/reject`, {
+          method: 'PUT'
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'warning');
+          else alert(data.message);
+          await loadDirectorPricing();
+        } else {
+          alert(data.message || 'Lỗi khi bác bỏ khuyến mãi!');
+        }
+      } catch (err) {
+        console.error('Error rejecting promotion:', err);
+      }
+    }
+
+    async function togglePromoStatus(code, newStatus) {
+      try {
+        const res = await fetch(`/api/director/pricing/promotions/${code}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'success');
+          else alert(data.message);
+          await loadDirectorPricing();
+        }
+      } catch (err) {
+        console.error('Error toggling promo status:', err);
+      }
+    }
+
+    async function deletePromotion(code) {
+      if (!confirm(`Xóa vĩnh viễn mã khuyến mãi ${code} khỏi Database?`)) return;
+      try {
+        const res = await fetch(`/api/director/pricing/promotions/${code}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'success');
+          else alert(data.message);
+          await loadDirectorPricing();
+        }
+      } catch (err) {
+        console.error('Error deleting promotion:', err);
+      }
+    }
+
+    function openPromoModal() {
+      document.getElementById('inpPromoCode').value = '';
+      document.getElementById('inpPromoName').value = '';
+      document.getElementById('inpDiscountValue').value = '20';
+      const now = new Date();
+      document.getElementById('inpPromoStartDate').value = now.toISOString().split('T')[0];
+      const nextMonth = new Date(now.setMonth(now.getMonth() + 1));
+      document.getElementById('inpPromoEndDate').value = nextMonth.toISOString().split('T')[0];
+      document.getElementById('promoModal').classList.add('active');
+    }
+
+    function closePromoModal() {
+      document.getElementById('promoModal').classList.remove('active');
+    }
+
+    async function savePromotion() {
+      const code = document.getElementById('inpPromoCode').value.trim().toUpperCase();
+      const name = document.getElementById('inpPromoName').value.trim();
+      const type = document.getElementById('inpDiscountType').value;
+      const val = document.getElementById('inpDiscountValue').value;
+      const scope = document.getElementById('inpPromoScope').value;
+      const startDate = document.getElementById('inpPromoStartDate').value;
+      const endDate = document.getElementById('inpPromoEndDate').value;
+
+      if (!name) {
+        alert('Vui lòng nhập tên chương trình khuyến mãi!');
+        return;
+      }
+      if (!val || parseFloat(val) <= 0) {
+        alert('Vui lòng nhập mức giảm giá hợp lệ!');
+        return;
+      }
+
+      const payload = {
+        promoCode: code,
+        promoName: name,
+        discountType: type,
+        discountValue: val,
+        scope: scope,
+        status: 'Chờ phê duyệt',
+        startDate: startDate,
+        endDate: endDate
+      };
+
+      try {
+        const btn = document.getElementById('btnSavePromo');
+        if (btn) { btn.disabled = true; btn.innerText = 'Đang lưu...'; }
+
+        const res = await fetch('/api/director/pricing/promotions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (btn) { btn.disabled = false; btn.innerText = 'Lưu đề xuất vào Database'; }
+
+        if (data.success) {
+          if (typeof showToast === 'function') showToast('Đã gửi đề xuất khuyến mãi vào Database chờ duyệt!', 'success');
+          else alert(data.message);
+          closePromoModal();
+          await loadDirectorPricing();
+        } else {
+          alert(data.message || 'Lỗi khi tạo khuyến mãi!');
+        }
+      } catch (err) {
+        console.error('Error saving promotion:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDirectorPricing();
+    });
   </script>
   <script src="/js/global-hub.js"></script>
 </body>

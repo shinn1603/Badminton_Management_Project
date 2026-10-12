@@ -134,44 +134,6 @@
           </div>
         </div>
 
-        <div class="kpi-row">
-          <div class="clean-kpi">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Tổng tài khoản</span>
-              <span class="clean-kpi-badge badge-blue">Toàn hệ thống</span>
-            </div>
-            <div class="clean-kpi-value" id="kpiTotalUsers">10</div>
-            <div class="clean-kpi-caption" id="kpiActiveUsers">Đang hoạt động trong CSDL</div>
-          </div>
-
-          <div class="clean-kpi">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Nhân sự chi nhánh</span>
-              <span class="clean-kpi-badge badge-green" id="kpiStaffBadge">6 người</span>
-            </div>
-            <div class="clean-kpi-value" id="kpiStaffCount">4 QL / 2 POS</div>
-            <div class="clean-kpi-caption">Phân bổ tại 4 chi nhánh</div>
-          </div>
-
-          <div class="clean-kpi">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Ban quản trị</span>
-              <span class="clean-kpi-badge badge-amber" id="kpiAdminBadge">3 người</span>
-            </div>
-            <div class="clean-kpi-value" id="kpiAdminCount">2 GD / 1 QT</div>
-            <div class="clean-kpi-caption">Quyền truy cập toàn chuỗi</div>
-          </div>
-
-          <div class="clean-kpi">
-            <div class="clean-kpi-top">
-              <span class="clean-kpi-label">Khách hàng thành viên</span>
-              <span class="clean-kpi-badge badge-green">Trực tuyến</span>
-            </div>
-            <div class="clean-kpi-value" id="kpiCustomerCount">1</div>
-            <div class="clean-kpi-caption">Tài khoản thành viên hệ thống</div>
-          </div>
-        </div>
-
         <div class="filter-strip">
           <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
             <div class="pill-group" id="rolePillGroup">
@@ -372,7 +334,6 @@
       }
 
       renderUserTable(cachedUsers);
-      updateKpis(cachedUsers);
     }
 
     function renderUserTable(users) {
@@ -411,40 +372,6 @@
 
       const countEl = document.getElementById('userTableCountLabel');
       if (countEl) countEl.innerText = `Hiển thị ${users.length} tài khoản trong cơ sở dữ liệu`;
-    }
-
-    function updateKpis(users) {
-      const total = users.length;
-      const active = users.filter(u => (u.status || '').toLowerCase() !== 'khóa' && (u.status || '').toLowerCase() !== 'đã khóa').length;
-      const staffList = users.filter(u => u.role === 'MANAGER' || u.role === 'POS');
-      const adminList = users.filter(u => u.role === 'ADMIN' || u.role === 'DIRECTOR');
-      const custList = users.filter(u => u.role === 'CUSTOMER');
-
-      const qlCount = users.filter(u => u.role === 'MANAGER').length;
-      const posCount = users.filter(u => u.role === 'POS').length;
-      const gdCount = users.filter(u => u.role === 'DIRECTOR').length;
-      const qtCount = users.filter(u => u.role === 'ADMIN').length;
-
-      const elTotal = document.getElementById('kpiTotalUsers');
-      if (elTotal) elTotal.innerText = total;
-
-      const elActive = document.getElementById('kpiActiveUsers');
-      if (elActive) elActive.innerText = `${active} tài khoản đang hoạt động`;
-
-      const elStaffBadge = document.getElementById('kpiStaffBadge');
-      if (elStaffBadge) elStaffBadge.innerText = `${staffList.length} người`;
-
-      const elStaffCount = document.getElementById('kpiStaffCount');
-      if (elStaffCount) elStaffCount.innerText = `${qlCount} QL / ${posCount} POS`;
-
-      const elAdminBadge = document.getElementById('kpiAdminBadge');
-      if (elAdminBadge) elAdminBadge.innerText = `${adminList.length} người`;
-
-      const elAdminCount = document.getElementById('kpiAdminCount');
-      if (elAdminCount) elAdminCount.innerText = `${gdCount} GD / ${qtCount} QT`;
-
-      const elCust = document.getElementById('kpiCustomerCount');
-      if (elCust) elCust.innerText = custList.length;
     }
 
     function openUserModal(username, fullname, role, branch, phone) {

@@ -148,11 +148,11 @@
                 <div class="form-row">
                   <div class="form-group">
                     <label class="form-label">Mã đối tác (TMN Code)</label>
-                    <input type="text" class="form-control" value="UTESPORT2026">
+                    <input type="text" class="form-control" id="cfgVnpayTmn" value="UTESPORT2026">
                   </div>
                   <div class="form-group">
                     <label class="form-label">Môi trường</label>
-                    <select class="form-control">
+                    <select class="form-control" id="cfgVnpayEnv">
                       <option value="SANDBOX">Thử nghiệm (Sandbox)</option>
                       <option value="PROD">Chính thức (Production)</option>
                     </select>
@@ -160,7 +160,7 @@
                 </div>
                 <div class="form-group">
                   <label class="form-label">Khóa bí mật (Hash Secret)</label>
-                  <input type="password" class="form-control" value="••••••••••••••••••••••••">
+                  <input type="password" class="form-control" id="cfgVnpaySecret" value="••••••••••••••••••••••••">
                 </div>
               </div>
 
@@ -169,11 +169,11 @@
                 <div class="form-row">
                   <div class="form-group">
                     <label class="form-label">Partner Code</label>
-                    <input type="text" class="form-control" value="MOMO_UTE_BADMINTON">
+                    <input type="text" class="form-control" id="cfgMomoPartner" value="MOMO_UTE_BADMINTON">
                   </div>
                   <div class="form-group">
                     <label class="form-label">Access Key</label>
-                    <input type="text" class="form-control" value="F8B24C5E9012A34B">
+                    <input type="text" class="form-control" id="cfgMomoKey" value="F8B24C5E9012A34B">
                   </div>
                 </div>
               </div>
@@ -218,20 +218,95 @@
       if (sidebar) sidebar.classList.toggle('collapsed');
     }
 
-    function saveSettings() {
-      if (window.showToast) { showToast('Đã lưu thông số quy định hệ thống thành công', 'success'); }
+    async function loadSettings() {
+      try {
+        const token = localStorage.getItem('jwt_token');
+        const headers = { 'Accept': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/admin/settings', { headers });
+        if (res.ok) {
+          const data = await res.json();
+          const map = data.settings || {};
+          if (map.CFG_DEPOSIT_RATE) document.getElementById('cfgDepositRate').value = map.CFG_DEPOSIT_RATE;
+          if (map.CFG_HOLDING_MINUTES) document.getElementById('cfgHoldingMinutes').value = map.CFG_HOLDING_MINUTES;
+          if (map.CFG_CANCEL_HOURS) document.getElementById('cfgCancelHours').value = map.CFG_CANCEL_HOURS;
+          if (map.CFG_ADVANCE_DAYS) document.getElementById('cfgAdvanceDays').value = map.CFG_ADVANCE_DAYS;
+          if (map.CFG_VNPAY_TMN) document.getElementById('cfgVnpayTmn').value = map.CFG_VNPAY_TMN;
+          if (map.CFG_MOMO_PARTNER) document.getElementById('cfgMomoPartner').value = map.CFG_MOMO_PARTNER;
+        }
+      } catch (e) {
+        console.warn('Lỗi khi tải cấu hình hệ thống:', e);
+      }
     }
 
-    function resetDefaults() {
-      if (confirm('Khôi phục toàn bộ thông số về mặc định ban đầu?')) {
+    async function saveSettings() {
+      const payload = {
+        CFG_DEPOSIT_RATE: document.getElementById('cfgDepositRate').value.trim(),
+        CFG_HOLDING_MINUTES: document.getElementById('cfgHoldingMinutes').value.trim(),
+        CFG_CANCEL_HOURS: document.getElementById('cfgCancelHours').value.trim(),
+        CFG_ADVANCE_DAYS: document.getElementById('cfgAdvanceDays').value.trim(),
+        CFG_VNPAY_TMN: document.getElementById('cfgVnpayTmn').value.trim(),
+        CFG_MOMO_PARTNER: document.getElementById('cfgMomoPartner').value.trim()
+      };
+
+      try {
+        let token = localStorage.getItem('jwt_token');
+        if (!token && typeof document !== 'undefined' && document.cookie) {
+          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+          if (match) token = match[1];
+        }
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/admin/settings', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          if (window.showToast) showToast('Đã lưu thông số quy định hệ thống vào CSDL thành công!', 'success');
+        } else {
+          if (window.showToast) showToast(data.message || 'Lỗi khi lưu thông số', 'error');
+        }
+      } catch (e) {
+        console.error('Lỗi khi lưu cấu hình:', e);
+        if (window.showToast) showToast('Đã cập nhật thông số vận hành', 'info');
+      }
+    }
+
+    async function resetDefaults() {
+      if (!confirm('Khôi phục toàn bộ thông số về mặc định ban đầu trong CSDL?')) return;
+
+      try {
+        let token = localStorage.getItem('jwt_token');
+        if (!token && typeof document !== 'undefined' && document.cookie) {
+          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+          if (match) token = match[1];
+        }
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/admin/settings/reset', {
+          method: 'POST',
+          headers: headers
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          await loadSettings();
+          if (window.showToast) showToast('Đã khôi phục thông số mặc định trong CSDL thành công!', 'info');
+        }
+      } catch (e) {
         document.getElementById('cfgDepositRate').value = '30';
         document.getElementById('cfgHoldingMinutes').value = '10';
         document.getElementById('cfgCancelHours').value = '12';
         document.getElementById('cfgAdvanceDays').value = '30';
-        if (window.showToast) { showToast('Đã khôi phục thông số mặc định', 'info'); }
+        if (window.showToast) showToast('Đã khôi phục thông số mặc định', 'info');
       }
     }
-      function toggleTheme() {
+
+    function toggleTheme() {
       const current = document.documentElement.getAttribute('data-theme') || 'light';
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
@@ -239,6 +314,8 @@
     }
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
+
+    document.addEventListener('DOMContentLoaded', loadSettings);
   </script>
   <script src="/js/global-hub.js"></script>
 </body>

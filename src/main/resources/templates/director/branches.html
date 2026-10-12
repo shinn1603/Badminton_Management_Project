@@ -6,6 +6,16 @@
   <title>Quản lý hệ thống chi nhánh sân cầu lông - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
   <script src="/js/auth-guard.js"></script>
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
 </head>
 <body>
 
@@ -131,6 +141,12 @@
             </svg>
             <span>Thêm chi nhánh mới</span>
           </button>
+
+          <!-- USER PILL WIDGET -->
+          <div class="user-pill-header" id="headerUserWidget" title="Tài khoản đang đăng nhập">
+            <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;">GD</div>
+            <div style="font-size: 12.5px; font-weight: 600; color: var(--text-dark);">Giám đốc điều hành</div>
+          </div>
         </div>
       </header>
 
@@ -146,6 +162,7 @@
             <p class="hero-subtitle" style="margin-bottom: 0;">Điều hành cơ sở vật chất, thảm thi đấu BWF, số lượng sân và giám sát trạng thái hoạt động từng chi nhánh</p>
           </div>
         </div>
+
         <div class="kpi-grid">
           <div class="kpi-card">
             <div class="kpi-icon-wrap" style="color: var(--primary);">
@@ -155,8 +172,8 @@
               </svg>
             </div>
             <div class="kpi-label">Tổng số chi nhánh</div>
-            <div class="kpi-value">03</div>
-            <div class="kpi-subtext">Đang hoạt động 100%</div>
+            <div class="kpi-value" id="kpiTotalBranches">--</div>
+            <div class="kpi-subtext" id="kpiActiveBranches">Đang tải dữ liệu...</div>
           </div>
 
           <div class="kpi-card">
@@ -169,8 +186,8 @@
               </svg>
             </div>
             <div class="kpi-label">Tổng số sân thi đấu</div>
-            <div class="kpi-value">32 sân</div>
-            <div class="kpi-subtext">6 sân VIP, 26 sân Tiêu chuẩn</div>
+            <div class="kpi-value" id="kpiTotalCourts">-- sân</div>
+            <div class="kpi-subtext" id="kpiCourtBreakdown">Đang tải...</div>
           </div>
 
           <div class="kpi-card">
@@ -181,8 +198,8 @@
               </svg>
             </div>
             <div class="kpi-label">Tỷ lệ lấp đầy bình quân</div>
-            <div class="kpi-value">78.5%</div>
-            <div class="kpi-subtext">Cao điểm đạt 94.2%</div>
+            <div class="kpi-value" id="kpiAvgOccupancy">--%</div>
+            <div class="kpi-subtext" id="kpiOccupancySub">Toàn chuỗi hệ thống</div>
           </div>
 
           <div class="kpi-card">
@@ -193,118 +210,40 @@
               </svg>
             </div>
             <div class="kpi-label">Doanh thu trung bình/CN</div>
-            <div class="kpi-value">258.4 tr</div>
-            <div class="kpi-subtext">Tăng 8.2% so với tháng trước</div>
+            <div class="kpi-value" id="kpiAvgRevenue">-- đ</div>
+            <div class="kpi-subtext" id="kpiRevenueSub">Tổng doanh thu: -- đ</div>
           </div>
         </div>
 
         <div class="card" style="margin-top: 18px;">
-          <div class="card-header">
-            <h2 class="card-title">Danh sách cơ sở chi nhánh chuỗi UTE Sport</h2>
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+              <h2 class="card-title" style="margin-bottom: 4px;">Danh sách cơ sở chi nhánh chuỗi UTE Sport</h2>
+              <div style="font-size: 12.5px; color: var(--text-muted);">Dữ liệu quản lý cơ sở và cụm sân đồng bộ thời gian thực từ Database</div>
+            </div>
+            <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); background: var(--surface-subtle); padding: 6px 14px; border-radius: var(--radius-full); border: 1px solid var(--border-subtle);" id="tableCountBadge">
+              Hiển thị: <strong id="branchCountText" style="color: var(--primary);">0</strong> chi nhánh
+            </div>
           </div>
 
           <div class="table-container">
             <table class="data-table" id="branchTable">
               <thead>
                 <tr>
-                  <th>Mã CN</th>
+                  <th style="width: 80px;">Mã CN</th>
                   <th>Tên chi nhánh</th>
                   <th>Địa chỉ & Liên hệ</th>
                   <th>Quản lý phụ trách</th>
-                  <th style="text-align: center;">Quy mô</th>
+                  <th style="text-align: center;">Quy mô sân</th>
                   <th>Giờ hoạt động</th>
                   <th style="text-align: center;">Trạng thái</th>
-                  <th style="text-align: right;">Thao tác</th>
+                  <th style="text-align: right; width: 180px;">Thao tác</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="branchTableBody">
                 <tr>
-                  <td style="font-weight: 700;">CN01</td>
-                  <td>
-                    <div style="font-weight: 600; color: var(--text-dark);">Chi nhánh 1 - Thủ Đức</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Sân trung tâm & Hội quán chính</div>
-                  </td>
-                  <td>
-                    <div>01 Võ Văn Ngân, P. Linh Chiểu, TP. Thủ Đức</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Hotline: 028 3896 8641</div>
-                  </td>
-                  <td>
-                    <div style="font-weight: 600;">Nguyễn Văn Quản</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">QL-01 • 0903 111 222</div>
-                  </td>
-                  <td style="text-align: center;">
-                    <span style="font-weight: 700; color: var(--text-dark);">10 sân</span>
-                    <div style="font-size: 11px; color: var(--text-muted);">(2 VIP, 8 Tiêu chuẩn)</div>
-                  </td>
-                  <td>05:30 - 23:00</td>
-                  <td style="text-align: center;">
-                    <span class="badge badge-success">Đang hoạt động</span>
-                  </td>
-                  <td style="text-align: right;">
-                    <div style="display: flex; gap: 6px; justify-content: flex-end;">
-                      <a href="/booking/grid" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" title="Xem lưới sân">Lưới sân</a>
-                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="editBranch('CN01', 'Chi nhánh 1 - Thủ Đức', '01 Võ Văn Ngân, P. Linh Chiểu, TP. Thủ Đức', '028 3896 8641', 'Nguyễn Văn Quản', 10, '05:30', '23:00')">Sửa</button>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="font-weight: 700;">CN02</td>
-                  <td>
-                    <div style="font-weight: 600; color: var(--text-dark);">Chi nhánh 2 - Quận 9</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Khu liên hợp thể thao Gia Hòa</div>
-                  </td>
-                  <td>
-                    <div>450 Đỗ Xuân Hợp, P. Phước Long B, TP. Thủ Đức</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Hotline: 028 3731 5566</div>
-                  </td>
-                  <td>
-                    <div style="font-weight: 600;">Trần Hữu Nam</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">QL-02 • 0918 333 444</div>
-                  </td>
-                  <td style="text-align: center;">
-                    <span style="font-weight: 700; color: var(--text-dark);">12 sân</span>
-                    <div style="font-size: 11px; color: var(--text-muted);">(2 VIP, 10 Tiêu chuẩn)</div>
-                  </td>
-                  <td>05:30 - 23:00</td>
-                  <td style="text-align: center;">
-                    <span class="badge badge-success">Đang hoạt động</span>
-                  </td>
-                  <td style="text-align: right;">
-                    <div style="display: flex; gap: 6px; justify-content: flex-end;">
-                      <a href="/booking/grid" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" title="Xem lưới sân">Lưới sân</a>
-                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="editBranch('CN02', 'Chi nhánh 2 - Quận 9', '450 Đỗ Xuân Hợp, P. Phước Long B, TP. Thủ Đức', '028 3731 5566', 'Trần Hữu Nam', 12, '05:30', '23:00')">Sửa</button>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="font-weight: 700;">CN03</td>
-                  <td>
-                    <div style="font-weight: 600; color: var(--text-dark);">Chi nhánh 3 - Bình Thạnh</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Khu vực Cầu Sài Gòn & Văn Thánh</div>
-                  </td>
-                  <td>
-                    <div>560 Điện Biên Phủ, Phường 22, Q. Bình Thạnh</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Hotline: 028 3512 8899</div>
-                  </td>
-                  <td>
-                    <div style="font-weight: 600;">Lê Hoàng Khang</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">QL-03 • 0988 555 777</div>
-                  </td>
-                  <td style="text-align: center;">
-                    <span style="font-weight: 700; color: var(--text-dark);">10 sân</span>
-                    <div style="font-size: 11px; color: var(--text-muted);">(2 VIP, 8 Tiêu chuẩn)</div>
-                  </td>
-                  <td>05:30 - 23:00</td>
-                  <td style="text-align: center;">
-                    <span class="badge badge-success">Đang hoạt động</span>
-                  </td>
-                  <td style="text-align: right;">
-                    <div style="display: flex; gap: 6px; justify-content: flex-end;">
-                      <a href="/booking/grid" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" title="Xem lưới sân">Lưới sân</a>
-                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="editBranch('CN03', 'Chi nhánh 3 - Bình Thạnh', '560 Điện Biên Phủ, Phường 22, Q. Bình Thạnh', '028 3512 8899', 'Lê Hoàng Khang', 10, '05:30', '23:00')">Sửa</button>
-                    </div>
+                  <td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                    Đang tải dữ liệu chi nhánh từ Database...
                   </td>
                 </tr>
               </tbody>
@@ -328,58 +267,60 @@
       </div>
 
       <div class="modal-body">
+        <input type="hidden" id="isEditMode" value="false">
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Mã chi nhánh</label>
-            <input type="text" class="form-control" id="inpBranchCode" placeholder="ví dụ: CN04">
+            <label class="form-label">Mã chi nhánh <span style="color: var(--danger);">*</span></label>
+            <input type="text" class="form-control" id="inpBranchCode" placeholder="ví dụ: CN05" style="text-transform: uppercase;">
           </div>
           <div class="form-group">
-            <label class="form-label">Số lượng sân</label>
-            <input type="number" class="form-control" id="inpCourtCount" value="8" min="1" max="30">
+            <label class="form-label">Số lượng sân <span style="color: var(--danger);">*</span></label>
+            <input type="number" class="form-control" id="inpCourtCount" value="6" min="1" max="50">
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Tên chi nhánh</label>
-          <input type="text" class="form-control" id="inpBranchName" placeholder="ví dụ: Chi nhánh 4 - Gò Vấp">
+          <label class="form-label">Tên chi nhánh <span style="color: var(--danger);">*</span></label>
+          <input type="text" class="form-control" id="inpBranchName" placeholder="ví dụ: Chi nhánh 5 - Sân Cầu Lông Tân Bình">
         </div>
 
         <div class="form-group">
-          <label class="form-label">Địa chỉ cơ sở</label>
+          <label class="form-label">Địa chỉ cơ sở <span style="color: var(--danger);">*</span></label>
           <input type="text" class="form-control" id="inpBranchAddress" placeholder="Số nhà, tên đường, phường, quận...">
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Số điện thoại hotline</label>
-            <input type="text" class="form-control" id="inpBranchPhone" placeholder="028 xxxx xxxx">
+            <label class="form-label">Số điện thoại hotline <span style="color: var(--danger);">*</span></label>
+            <input type="text" class="form-control" id="inpBranchPhone" placeholder="0903 xxx xxx">
           </div>
           <div class="form-group">
             <label class="form-label">Quản lý phụ trách</label>
             <select class="form-control" id="inpBranchManager">
-              <option value="Nguyễn Văn Quản">Nguyễn Văn Quản (QL-01)</option>
-              <option value="Trần Hữu Nam">Trần Hữu Nam (QL-02)</option>
-              <option value="Lê Hoàng Khang">Lê Hoàng Khang (QL-03)</option>
-              <option value="Phạm Minh Tuấn">Phạm Minh Tuấn (QL Mới)</option>
+              <option value="">-- Chưa phân công quản lý --</option>
             </select>
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Giờ mở cửa</label>
-            <input type="time" class="form-control" id="inpOpenTime" value="05:30">
+            <label class="form-label">Giờ hoạt động</label>
+            <input type="text" class="form-control" id="inpOperatingHours" value="06:00 - 23:00 hàng ngày">
           </div>
           <div class="form-group">
-            <label class="form-label">Giờ đóng cửa</label>
-            <input type="time" class="form-control" id="inpCloseTime" value="23:00">
+            <label class="form-label">Trạng thái cơ sở</label>
+            <select class="form-control" id="inpBranchStatus">
+              <option value="Hoạt động">Hoạt động</option>
+              <option value="Tạm ngưng">Tạm ngưng</option>
+              <option value="Bảo trì">Bảo trì</option>
+            </select>
           </div>
         </div>
       </div>
 
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeBranchModal()">Hủy</button>
-        <button class="btn btn-primary" onclick="saveBranch()">
+        <button class="btn btn-primary" onclick="saveBranch()" id="btnSaveBranch">
           <svg class="svg-icon" viewBox="0 0 24 24">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
@@ -390,29 +331,195 @@
   </div>
 
   <script>
+    let allBranches = [];
+    let allManagers = [];
+
+    function formatVND(amount) {
+      return new Intl.NumberFormat('vi-VN').format(Math.round(amount || 0)) + ' đ';
+    }
+
+    function formatNumber(num) {
+      return new Intl.NumberFormat('vi-VN').format(Math.round(num || 0));
+    }
+
     function toggleSidebar() {
       const sidebar = document.getElementById('appSidebar');
       if (sidebar) sidebar.classList.toggle('collapsed');
     }
 
+    async function loadDirectorBranches() {
+      try {
+        const res = await fetch('/api/director/branches');
+        if (res.ok) {
+          const data = await res.json();
+          allBranches = data.branches || [];
+          allManagers = data.managers || [];
+
+          // Render KPIs
+          if (data.kpi) {
+            const k = data.kpi;
+            const elTotalB = document.getElementById('kpiTotalBranches');
+            const elActiveB = document.getElementById('kpiActiveBranches');
+            if (elTotalB) elTotalB.textContent = String(k.totalBranches).padStart(2, '0');
+            if (elActiveB) elActiveB.textContent = `Đang hoạt động: ${k.activeBranches}/${k.totalBranches} chi nhánh`;
+
+            const elTotalC = document.getElementById('kpiTotalCourts');
+            const elBreakC = document.getElementById('kpiCourtBreakdown');
+            if (elTotalC) elTotalC.textContent = `${k.totalCourts} sân`;
+            if (elBreakC) elBreakC.textContent = `${k.vipCourts} VIP, ${k.standardCourts} Tiêu chuẩn`;
+
+            const elAvgOcc = document.getElementById('kpiAvgOccupancy');
+            const elOccSub = document.getElementById('kpiOccupancySub');
+            if (elAvgOcc) elAvgOcc.textContent = `${k.avgOccupancy}%`;
+            if (elOccSub) elOccSub.textContent = 'Trung bình toàn chuỗi';
+
+            const elAvgRev = document.getElementById('kpiAvgRevenue');
+            const elRevSub = document.getElementById('kpiRevenueSub');
+            if (elAvgRev) elAvgRev.textContent = formatVND(k.avgRevenue);
+            if (elRevSub) elRevSub.textContent = `Tổng doanh thu: ${formatVND(k.totalRevenue)}`;
+          }
+
+          // Populate manager candidates in modal
+          populateManagerSelect(allManagers);
+
+          // Render table
+          renderBranchTable(allBranches);
+        } else {
+          console.error('Failed to load branches data, status:', res.status);
+        }
+      } catch (err) {
+        console.error('Error fetching director branches data:', err);
+      }
+    }
+
+    function populateManagerSelect(managers) {
+      const select = document.getElementById('inpBranchManager');
+      if (!select) return;
+
+      let html = '<option value="">-- Chưa phân công quản lý --</option>';
+      (managers || []).forEach(m => {
+        const detail = m.position ? ` (${m.position})` : '';
+        html += `<option value="${m.fullName}">${m.fullName}${detail}</option>`;
+      });
+      select.innerHTML = html;
+    }
+
+    function renderBranchTable(branches) {
+      const tbody = document.getElementById('branchTableBody');
+      const countText = document.getElementById('branchCountText');
+      if (!tbody) return;
+
+      if (countText) countText.textContent = branches.length;
+
+      if (!branches || branches.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 28px; color: var(--text-muted);">Không tìm thấy chi nhánh nào phù hợp</td></tr>';
+        return;
+      }
+
+      let html = '';
+      branches.forEach(b => {
+        const isAct = (b.status === 'Hoạt động' || !b.status);
+        const badgeClass = isAct ? 'badge-success' : 'badge-warning';
+        const statusText = b.status || 'Hoạt động';
+
+        html += `
+          <tr>
+            <td style="font-weight: 700; color: var(--primary); font-size: 14px;">${b.branchCode}</td>
+            <td>
+              <div style="font-weight: 700; color: var(--text-dark);">${b.branchName}</div>
+              <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">
+                Doanh thu: <strong style="color: #059669;">${formatVND(b.revenue)}</strong>
+                ${b.tournamentRevenue > 0 ? `<span style="font-size: 11px; color: #7c3aed; font-weight: 600;" title="Bao gồm giải đấu: ${formatVND(b.tournamentRevenue)}">(+${formatVND(b.tournamentRevenue)} giải đấu)</span>` : ''}
+              </div>
+            </td>
+            <td>
+              <div style="color: var(--text-dark); font-size: 13px;">${b.address || 'Chưa cập nhật địa chỉ'}</div>
+              <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">Hotline: <strong style="color: var(--text-body);">${b.phone || 'Chưa có'}</strong></div>
+            </td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-dark);">${b.managerName || 'Chưa phân công'}</div>
+              <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">${b.managerStaffCode ? b.managerStaffCode + ' • ' : ''}${b.managerPhone || ''}</div>
+            </td>
+            <td style="text-align: center;">
+              <span style="font-weight: 700; color: var(--text-dark); font-size: 13.5px;">${b.totalCourts} sân</span>
+              <div style="font-size: 11px; color: var(--text-muted);">(${b.vipCourts || 0} VIP, ${b.standardCourts || (b.totalCourts - (b.vipCourts || 0))} Tiêu chuẩn)</div>
+            </td>
+            <td style="font-size: 13px;">${b.operatingHours || '06:00 - 23:00 hàng ngày'}</td>
+            <td style="text-align: center;">
+              <span class="badge ${badgeClass}">${statusText}</span>
+            </td>
+            <td style="text-align: right;">
+              <div style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
+                <a href="/pos/grid?branchCode=${b.branchCode}" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" title="Xem sơ đồ & lưới sân">Lưới sân</a>
+                <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="editBranch('${b.branchCode}')" title="Chỉnh sửa thông tin">Sửa</button>
+                <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: ${isAct ? '#f59e0b' : '#10b981'}; border-color: ${isAct ? '#fde68a' : '#a7f3d0'};" onclick="toggleBranchStatus('${b.branchCode}', '${statusText}')" title="${isAct ? 'Tạm ngưng chi nhánh' : 'Kích hoạt lại'}">
+                  ${isAct ? 'Ngưng' : 'Mở'}
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function filterBranchTable() {
+      const q = (document.getElementById('branchSearchInput')?.value || '').toLowerCase().trim();
+      if (!q) {
+        renderBranchTable(allBranches);
+        return;
+      }
+      const filtered = allBranches.filter(b => {
+        const text = `${b.branchCode} ${b.branchName} ${b.address} ${b.managerName} ${b.phone}`.toLowerCase();
+        return text.includes(q);
+      });
+      renderBranchTable(filtered);
+    }
+
     function openBranchModal() {
       document.getElementById('modalBranchTitle').textContent = 'Thêm chi nhánh mới';
-      document.getElementById('inpBranchCode').value = '';
+      document.getElementById('isEditMode').value = 'false';
+      const inpCode = document.getElementById('inpBranchCode');
+      inpCode.value = '';
+      inpCode.disabled = false;
+      document.getElementById('inpCourtCount').value = '6';
       document.getElementById('inpBranchName').value = '';
       document.getElementById('inpBranchAddress').value = '';
       document.getElementById('inpBranchPhone').value = '';
+      document.getElementById('inpBranchManager').value = '';
+      document.getElementById('inpOperatingHours').value = '06:00 - 23:00 hàng ngày';
+      document.getElementById('inpBranchStatus').value = 'Hoạt động';
       document.getElementById('branchModal').classList.add('active');
     }
 
-    function editBranch(code, name, address, phone, manager, courts, openTime, closeTime) {
+    function editBranch(code) {
+      const b = allBranches.find(item => item.branchCode === code);
+      if (!b) return;
+
       document.getElementById('modalBranchTitle').textContent = 'Chỉnh sửa thông tin chi nhánh ' + code;
-      document.getElementById('inpBranchCode').value = code;
-      document.getElementById('inpBranchName').value = name;
-      document.getElementById('inpBranchAddress').value = address;
-      document.getElementById('inpBranchPhone').value = phone;
-      document.getElementById('inpCourtCount').value = courts;
-      document.getElementById('inpOpenTime').value = openTime;
-      document.getElementById('inpCloseTime').value = closeTime;
+      document.getElementById('isEditMode').value = 'true';
+      const inpCode = document.getElementById('inpBranchCode');
+      inpCode.value = b.branchCode;
+      inpCode.disabled = true;
+      document.getElementById('inpCourtCount').value = b.totalCourts || 6;
+      document.getElementById('inpBranchName').value = b.branchName || '';
+      document.getElementById('inpBranchAddress').value = b.address || '';
+      document.getElementById('inpBranchPhone').value = b.phone || '';
+      
+      const mgrSel = document.getElementById('inpBranchManager');
+      if (mgrSel) {
+        if (b.managerName && !Array.from(mgrSel.options).some(o => o.value === b.managerName)) {
+          const opt = document.createElement('option');
+          opt.value = b.managerName;
+          opt.textContent = b.managerName;
+          mgrSel.appendChild(opt);
+        }
+        mgrSel.value = b.managerName || '';
+      }
+
+      document.getElementById('inpOperatingHours').value = b.operatingHours || '06:00 - 23:00 hàng ngày';
+      document.getElementById('inpBranchStatus').value = b.status || 'Hoạt động';
       document.getElementById('branchModal').classList.add('active');
     }
 
@@ -420,24 +527,117 @@
       document.getElementById('branchModal').classList.remove('active');
     }
 
-    function saveBranch() {
+    async function saveBranch() {
+      const code = document.getElementById('inpBranchCode').value.trim().toUpperCase();
       const name = document.getElementById('inpBranchName').value.trim();
-      if (!name) {
-        showToast('Vui lòng nhập tên chi nhánh!', 'warning');
+      const address = document.getElementById('inpBranchAddress').value.trim();
+      const phone = document.getElementById('inpBranchPhone').value.trim();
+      const manager = document.getElementById('inpBranchManager').value;
+      const courtCount = parseInt(document.getElementById('inpCourtCount').value) || 6;
+      const status = document.getElementById('inpBranchStatus').value;
+
+      if (!code) {
+        if (typeof showToast === 'function') showToast('Vui lòng nhập mã chi nhánh!', 'warning');
+        else alert('Vui lòng nhập mã chi nhánh!');
         return;
       }
-      showToast('Đã lưu thông tin chi nhánh thành công!', 'success');
-      closeBranchModal();
+      if (!name) {
+        if (typeof showToast === 'function') showToast('Vui lòng nhập tên chi nhánh!', 'warning');
+        else alert('Vui lòng nhập tên chi nhánh!');
+        return;
+      }
+      if (!address) {
+        if (typeof showToast === 'function') showToast('Vui lòng nhập địa chỉ cơ sở!', 'warning');
+        else alert('Vui lòng nhập địa chỉ cơ sở!');
+        return;
+      }
+      if (!phone) {
+        if (typeof showToast === 'function') showToast('Vui lòng nhập số điện thoại hotline!', 'warning');
+        else alert('Vui lòng nhập số điện thoại hotline!');
+        return;
+      }
+
+      const payload = {
+        branchCode: code,
+        branchName: name,
+        address: address,
+        phone: phone,
+        managerName: manager,
+        totalCourts: courtCount,
+        status: status
+      };
+
+      try {
+        const btnSave = document.getElementById('btnSaveBranch');
+        if (btnSave) {
+          btnSave.disabled = true;
+          btnSave.innerText = 'Đang lưu...';
+        }
+
+        const res = await fetch('/api/director/branches', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          if (typeof showToast === 'function') showToast(data.message || 'Đã lưu chi nhánh thành công vào CSDL!', 'success');
+          else alert(data.message || 'Đã lưu chi nhánh thành công vào CSDL!');
+          closeBranchModal();
+          loadDirectorBranches();
+        } else {
+          const errMsg = data.message || 'Lỗi khi lưu chi nhánh!';
+          if (typeof showToast === 'function') showToast(errMsg, 'error');
+          else alert(errMsg);
+        }
+      } catch (err) {
+        console.error('Error saving branch:', err);
+        if (typeof showToast === 'function') showToast('Lỗi kết nối máy chủ khi lưu chi nhánh!', 'error');
+        else alert('Lỗi kết nối máy chủ khi lưu chi nhánh!');
+      } finally {
+        const btnSave = document.getElementById('btnSaveBranch');
+        if (btnSave) {
+          btnSave.disabled = false;
+          btnSave.innerHTML = '<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Lưu chi nhánh</span>';
+        }
+      }
     }
 
-    function filterBranchTable() {
-      const q = document.getElementById('branchSearchInput').value.toLowerCase();
-      const rows = document.querySelectorAll('#branchTable tbody tr');
-      rows.forEach(r => {
-        const txt = r.textContent.toLowerCase();
-        r.style.display = txt.includes(q) ? '' : 'none';
-      });
+    async function toggleBranchStatus(code, currentStatus) {
+      const nextStatus = (currentStatus === 'Hoạt động') ? 'Tạm ngưng' : 'Hoạt động';
+      const b = allBranches.find(item => item.branchCode === code);
+      if (!b) return;
+
+      const payload = {
+        branchCode: code,
+        branchName: b.branchName,
+        address: b.address,
+        phone: b.phone,
+        managerName: b.managerName,
+        totalCourts: b.totalCourts,
+        status: nextStatus
+      };
+
+      try {
+        const res = await fetch('/api/director/branches', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          if (typeof showToast === 'function') showToast(`Đã chuyển chi nhánh ${code} sang '${nextStatus}'!`, 'success');
+          loadDirectorBranches();
+        }
+      } catch (e) {
+        console.error('Error toggling branch status:', e);
+      }
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDirectorBranches();
+    });
   </script>
   <script src="/js/global-hub.js"></script>
 </body>

@@ -14,30 +14,30 @@ import java.time.LocalDateTime;
 public class AuditLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "log_id")
+    private Integer logId;
+
+    @Column(name = "username", length = 50)
+    private String username;
 
     @Column(name = "user_code", length = 20)
     private String userCode;
 
-    @Column(name = "full_name", nullable = false, length = 100)
-    private String fullName;
+    @Column(name = "action_type", nullable = false, length = 100)
+    private String actionType;
 
-    @Column(name = "action_name", nullable = false, length = 100)
-    private String actionName;
-
-    @Column(name = "target_module", nullable = false, length = 50)
-    private String targetModule;
+    @Column(name = "module", length = 50)
+    private String module = "Hệ thống";
 
     @Column(name = "ip_address", length = 50)
-    private String ipAddress;
+    private String ipAddress = "127.0.0.1";
 
     @Column(length = 30)
     private String status = "Thành công";
 
-    @Column(name = "log_time")
-    private LocalDateTime logTime = LocalDateTime.now();
+    @Column(name = "action_time")
+    private LocalDateTime actionTime = LocalDateTime.now();
 
-    @Lob
-    @Column(name = "details")
+    @Column(name = "details", columnDefinition = "NVARCHAR(MAX)")
     private String details;
 }

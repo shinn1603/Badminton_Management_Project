@@ -6,6 +6,150 @@
   <title>Phê duyệt giải đấu & Thống kê hội viên - UTE Sport</title>
   <link rel="stylesheet" href="/css/main.css">
   <script src="/js/auth-guard.js"></script>
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+  <style>
+    .chart-tab-bar {
+      display: inline-flex;
+      background: var(--surface-subtle);
+      padding: 4px;
+      border-radius: 10px;
+      gap: 4px;
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 20px;
+    }
+
+    .chart-tab-btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chart-tab-btn.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .tab-badge {
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(245, 158, 11, 0.15);
+      color: #d97706;
+    }
+
+    .chart-tab-btn.active .tab-badge {
+      background: #f59e0b;
+      color: #fff;
+    }
+
+    .data-table th, .data-table td {
+      padding: 11px 12px !important;
+      font-size: 12.5px !important;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 580px;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+    }
+
+    .modal-close-btn:hover {
+      color: var(--danger);
+      background: var(--surface-subtle);
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      background: var(--surface-subtle);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+  </style>
 </head>
 <body>
 
@@ -78,7 +222,6 @@
           </svg>
           <span class="menu-text">Phê duyệt giải đấu</span>
         </a>
-
       </div>
 
       <div class="sidebar-bottom">
@@ -113,7 +256,7 @@
         </div>
 
         <div class="header-right">
-          <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Chuyển đổi giao diện Sáng / Tối" style="padding: 6px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--text-dark); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; margin-right: 6px;">
+          <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Đổi giao diện Sáng / Tối" style="padding: 6px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--text-dark); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; margin-right: 6px;">
             <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
           </button>
           <div class="search-box">
@@ -121,7 +264,20 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" placeholder="Tìm tên giải đấu, hội viên...">
+            <input type="text" id="globalSearchInput" onkeyup="filterActiveTournamentTab()" placeholder="Tìm tên giải đấu, hội viên...">
+          </div>
+
+          <button class="btn btn-primary" onclick="openTourModal()">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>+ Tạo đề xuất giải đấu</span>
+          </button>
+
+          <div class="user-pill-header" title="Tài khoản Giám đốc điều hành">
+            <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;">GD</div>
+            <div style="font-size: 12.5px; font-weight: 600; color: var(--text-dark);">Giám đốc điều hành</div>
           </div>
         </div>
       </header>
@@ -132,197 +288,653 @@
           <div class="hero-banner-content">
             <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
               <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
-              Ban Giám Đốc Phê Duyệt Giải Đấu & Hội Viên VIP
+              Ban Giám Đốc Phê Duyệt Kế Hoạch Sự Kiện & Hội Viên
             </div>
             <h1 class="hero-title" style="margin-bottom: 8px;">Phê Duyệt Kế Hoạch Giải Đấu & Hội Viên</h1>
-            <p class="hero-subtitle" style="margin-bottom: 0;">Kiểm duyệt đề xuất khóa sân tổ chức sự kiện thể thao, dự toán ngân sách và chiến lược phát triển hội viên</p>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Kiểm duyệt đề xuất khóa sân tổ chức sự kiện thể thao từ các chi nhánh, phê duyệt ngân sách giải thưởng và theo dõi dữ liệu hội viên toàn chuỗi</p>
           </div>
         </div>
 
-        <div class="card" style="margin-bottom: 24px;">
-          <div class="card-header">
-            <div>
-              <h2 class="card-title">Phê duyệt kế hoạch tổ chức giải đấu liên chi nhánh</h2>
-              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Giám đốc phê duyệt địa điểm, thời gian khóa sân và ngân sách giải đấu</div>
+        <!-- TAB NAVIGATION -->
+        <div class="chart-tab-bar" style="margin-bottom: 18px;">
+          <button class="chart-tab-btn active" id="tabBtn1" onclick="switchTourTab(1)">
+            <span>Kế hoạch giải đấu liên chi nhánh</span>
+            <span class="tab-badge" id="badgePendingTournaments">0 chờ duyệt</span>
+          </button>
+          <button class="chart-tab-btn" id="tabBtn2" onclick="switchTourTab(2)">
+            <span>Thống kê xếp hạng & Phân loại Hội viên</span>
+            <span class="tab-badge" id="badgeTotalMembers" style="background: rgba(59, 130, 246, 0.15); color: #2563eb;">0 hội viên</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: PHÊ DUYỆT GIẢI ĐẤU -->
+        <div id="tourTabContent1">
+          <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 class="card-title" style="margin-bottom: 4px;">Kế hoạch tổ chức giải đấu liên chi nhánh UTE Sport</h2>
+                <div style="font-size: 12.5px; color: var(--text-muted);">Giám đốc thẩm định quy mô, duyệt phương án khóa sân thi đấu và giải ngân kinh phí giải thưởng</div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <select class="form-control" id="filterTourBranch" onchange="filterActiveTournamentTab()" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
+                  <option value="ALL">-- Tất cả chi nhánh --</option>
+                </select>
+                <select class="form-control" id="filterTourStatus" onchange="filterActiveTournamentTab()" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
+                  <option value="ALL">-- Tất cả trạng thái --</option>
+                  <option value="Chờ phê duyệt" selected>Chờ phê duyệt</option>
+                  <option value="Đang mở đăng ký">Đang mở đăng ký</option>
+                  <option value="Đã hoàn thành">Đã hoàn thành</option>
+                  <option value="Từ chối">Từ chối</option>
+                </select>
+                <button class="btn btn-primary" onclick="openTourModal()" style="font-size: 12.5px; padding: 6px 14px;">
+                  + Tạo giải đấu mới
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Mã giải</th>
-                  <th>Tên giải đấu</th>
-                  <th>Địa điểm tổ chức</th>
-                  <th>Thời gian diễn ra</th>
-                  <th>Quy mô & Số sân</th>
-                  <th>Dự toán kinh phí</th>
-                  <th style="text-align: center;">Trạng thái</th>
-                  <th style="text-align: right;">Thao tác phê duyệt</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr id="tourRow1">
-                  <td style="font-weight: 700;">GD-2026-01</td>
-                  <td>
-                    <div style="font-weight: 600; color: var(--text-dark);">Giải Cầu Lông Mở Rộng HCM-UTE Cup 2026</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Tranh tài Đôi Nam, Đôi Nữ và Đơn Nam toàn thành phố</div>
-                  </td>
-                  <td>
-                    <div style="font-weight: 600;">Chi nhánh 1 (Thủ Đức)</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Sân 01 đến Sân 06</div>
-                  </td>
-                  <td>
-                    <div>25/10/2026 - 27/10/2026</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">07:30 - 18:00 hàng ngày</div>
-                  </td>
-                  <td>32 cặp đấu (6 sân)</td>
-                  <td style="font-weight: 700; color: var(--text-dark);">35.000.000 đ</td>
-                  <td style="text-align: center;" id="tourStatus1">
-                    <span class="badge badge-warning">Chờ Giám đốc duyệt</span>
-                  </td>
-                  <td style="text-align: right;">
-                    <div style="display: flex; gap: 6px; justify-content: flex-end;" id="tourAction1">
-                      <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approveTour('1')">Phê duyệt</button>
-                      <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444;" onclick="rejectTour('1')">Từ chối</button>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="font-weight: 700;">GD-2026-00</td>
-                  <td>
-                    <div style="font-weight: 600; color: var(--text-dark);">Giao hữu Nội bộ Khối Công nghệ Thông tin UTE</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Giải đấu giao lưu giảng viên và sinh viên</div>
-                  </td>
-                  <td>
-                    <div style="font-weight: 600;">Chi nhánh 2 (Quận 9)</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Sân 01 đến Sân 04</div>
-                  </td>
-                  <td>
-                    <div>12/09/2026</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">08:00 - 16:00</div>
-                  </td>
-                  <td>16 cặp đấu (4 sân)</td>
-                  <td style="font-weight: 700; color: var(--text-dark);">12.000.000 đ</td>
-                  <td style="text-align: center;">
-                    <span class="badge badge-success">Đã hoàn thành</span>
-                  </td>
-                  <td style="text-align: right; color: var(--text-light); font-size: 11.5px;">
-                    Đã nghiệm thu
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-container">
+              <table class="data-table" id="tournamentsTable">
+                <thead>
+                  <tr>
+                    <th style="width: 85px;">Mã giải</th>
+                    <th>Tên giải đấu & Quy định</th>
+                    <th>Địa điểm tổ chức</th>
+                    <th>Thời gian diễn ra</th>
+                    <th style="text-align: center;">Quy mô & Đã ĐK</th>
+                    <th style="text-align: right;">Giải thưởng & Phí</th>
+                    <th style="text-align: center; width: 140px;">Trạng thái</th>
+                    <th style="text-align: right; width: 170px;">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="tournamentsTableBody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                      Đang tải danh sách giải đấu từ SQL Server...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <h2 class="card-title">Thống kê xếp hạng & Phân loại Hội viên toàn chuỗi</h2>
-              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Căn cứ tính điểm tích lũy, chính sách giảm giá và chiết khấu giờ thuê sân</div>
+        <!-- TAB 2: THỐNG KÊ HỘI VIÊN TOÀN CHUỖI -->
+        <div id="tourTabContent2" style="display: none;">
+          <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 class="card-title" style="margin-bottom: 4px;">Thống kê xếp hạng & Phân loại Hội viên toàn chuỗi</h2>
+                <div style="font-size: 12.5px; color: var(--text-muted);">Dữ liệu khách hàng thực tế từ bảng customers trong SQL Server: tính điểm tích lũy, phân cấp hạng thành viên và tổng giờ thuê sân</div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <select class="form-control" id="filterMemberTier" onchange="filterActiveTournamentTab()" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
+                  <option value="ALL">-- Tất cả hạng thẻ --</option>
+                  <option value="Kim Cương">Kim Cương (-15%)</option>
+                  <option value="Vàng">Vàng (-10%)</option>
+                  <option value="Bạc">Bạc (-5%)</option>
+                  <option value="Đồng">Đồng (Tiêu chuẩn)</option>
+                </select>
+              </div>
             </div>
-          </div>
 
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Mã HV</th>
-                  <th>Họ và tên hội viên</th>
-                  <th>Số điện thoại & Email</th>
-                  <th style="text-align: center;">Hạng thành viên</th>
-                  <th style="text-align: center;">Điểm tích lũy</th>
-                  <th>Tổng giờ đã chơi</th>
-                  <th>Tổng chi tiêu</th>
-                  <th>Cơ sở thường xuyên</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="font-weight: 700;">HV-0882</td>
-                  <td>
-                    <div style="font-weight: 600; color: var(--text-dark);">Trần Quốc Bảo</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Tham gia từ 01/2025</div>
-                  </td>
-                  <td>
-                    <div>0903 888 999</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">bao.tq@gmail.com</div>
-                  </td>
-                  <td style="text-align: center;">
-                    <span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 700;">Kim Cương (-15%)</span>
-                  </td>
-                  <td style="text-align: center; font-weight: 700; color: var(--primary);">4.820 pts</td>
-                  <td>148 giờ</td>
-                  <td style="font-weight: 700;">18.450.000 đ</td>
-                  <td>Chi nhánh 1 (Thủ Đức)</td>
-                </tr>
-
-                <tr>
-                  <td style="font-weight: 700;">HV-0741</td>
-                  <td>
-                    <div style="font-weight: 600; color: var(--text-dark);">Nguyễn Minh Trí</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Tham gia từ 03/2025</div>
-                  </td>
-                  <td>
-                    <div>0918 222 333</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">tri.nm@outlook.com</div>
-                  </td>
-                  <td style="text-align: center;">
-                    <span class="badge" style="background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; font-weight: 700;">Vàng (-10%)</span>
-                  </td>
-                  <td style="text-align: center; font-weight: 700; color: var(--primary);">2.450 pts</td>
-                  <td>86 giờ</td>
-                  <td style="font-weight: 700;">9.800.000 đ</td>
-                  <td>Chi nhánh 2 (Quận 9)</td>
-                </tr>
-
-                <tr>
-                  <td style="font-weight: 700;">HV-1029</td>
-                  <td>
-                    <div style="font-weight: 600; color: var(--text-dark);">Lê Thị Thu Thảo</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Tham gia từ 06/2025</div>
-                  </td>
-                  <td>
-                    <div>0933 777 888</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">thao.le@ute.edu.vn</div>
-                  </td>
-                  <td style="text-align: center;">
-                    <span class="badge" style="background: #f4f4f5; color: #52525b; border: 1px solid #e4e4e7; font-weight: 600;">Bạc (-5%)</span>
-                  </td>
-                  <td style="text-align: center; font-weight: 700; color: var(--primary);">1.100 pts</td>
-                  <td>42 giờ</td>
-                  <td style="font-weight: 700;">4.400.000 đ</td>
-                  <td>Chi nhánh 3 (Bình Thạnh)</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-container">
+              <table class="data-table" id="membersTable">
+                <thead>
+                  <tr>
+                    <th style="width: 85px;">Mã HV</th>
+                    <th>Họ và tên hội viên</th>
+                    <th>Số điện thoại & Email</th>
+                    <th style="text-align: center;">Hạng thành viên</th>
+                    <th style="text-align: center;">Điểm tích lũy</th>
+                    <th style="text-align: right;">Tổng giờ đã chơi</th>
+                    <th style="text-align: right;">Tổng chi tiêu</th>
+                    <th>Cơ sở thường xuyên</th>
+                    <th style="text-align: center; width: 110px;">Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody id="membersTableBody">
+                  <tr>
+                    <td colspan="9" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                      Đang tải danh sách hội viên từ SQL Server...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </main>
   </div>
 
+  <!-- MODAL TẠO KẾ HOẠCH GIẢI ĐẤU MỚI -->
+  <div class="modal-overlay" id="tourModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTourTitle">Tạo kế hoạch giải đấu mới</h3>
+        <button class="modal-close-btn" onclick="closeTourModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Mã giải đấu</label>
+            <input type="text" class="form-control" id="inpTourCode" placeholder="Tự sinh nếu để trống (ví dụ: GD05)" style="text-transform: uppercase;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Địa điểm tổ chức <span style="color: var(--danger);">*</span></label>
+            <select class="form-control" id="inpTourBranch">
+              <option value="CN01">CN01 - Chi nhánh 1 (Thủ Đức)</option>
+              <option value="CN02">CN02 - Chi nhánh 2 (Bình Thạnh)</option>
+              <option value="CN03">CN03 - Chi nhánh 3 (Quận 9)</option>
+              <option value="CN04">CN04 - Chi nhánh 4 (Gò Vấp)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tên giải đấu <span style="color: var(--danger);">*</span></label>
+          <input type="text" class="form-control" id="inpTourName" placeholder="Ví dụ: Giải Cầu Lông Mở Rộng Mùa Đông UTE 2026">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Ngày bắt đầu diễn ra <span style="color: var(--danger);">*</span></label>
+            <input type="datetime-local" class="form-control" id="inpTourStart">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ngày kết thúc <span style="color: var(--danger);">*</span></label>
+            <input type="datetime-local" class="form-control" id="inpTourEnd">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Quy mô số đội / VĐV tối đa</label>
+            <input type="number" class="form-control" id="inpTourMax" value="32" min="4" max="128">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Lệ phí tham gia (VNĐ / Đội)</label>
+            <input type="number" class="form-control" id="inpTourFee" value="250000" step="50000">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tổng giải thưởng dự kiến (VNĐ) <span style="color: var(--danger);">*</span></label>
+          <input type="number" class="form-control" id="inpTourPrize" value="15000000" step="1000000">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Thể thức thi đấu & Quy định khóa sân</label>
+          <textarea class="form-control" id="inpTourRules" rows="3" placeholder="Ví dụ: Thi đấu đôi nam nữ 3 hiệp 21 điểm theo luật BWF. Khóa từ Sân 01 đến Sân 04 trong khung 07:30 - 18:00..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeTourModal()">Hủy bỏ</button>
+        <button class="btn btn-primary" id="btnSaveTournament" onclick="saveTournament()">Lưu giải đấu vào Database</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL XEM DANH SÁCH ĐỘI ĐĂNG KÝ -->
+  <div class="modal-overlay" id="registrationsModal">
+    <div class="modal-card" style="max-width: 640px;">
+      <div class="modal-header">
+        <div>
+          <h3 id="regModalTitle">Danh sách đội đăng ký giải đấu</h3>
+          <div id="regModalSubtitle" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Dữ liệu bảng tournament_registrations</div>
+        </div>
+        <button class="modal-close-btn" onclick="closeRegModal()">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding: 16px 20px;">
+        <div class="table-container" style="max-height: 380px; overflow-y: auto;">
+          <table class="clean-table" id="regTable">
+            <thead>
+              <tr>
+                <th style="width: 45px;">STT</th>
+                <th>Tên cặp đấu / CLB</th>
+                <th>Mã HV</th>
+                <th>Số điện thoại</th>
+                <th>Thời gian ĐK</th>
+                <th style="text-align: center;">Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody id="regTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Không có đội đăng ký nào</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeRegModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/global-hub.js"></script>
   <script>
+    let currentTab = 1;
+    let allTournaments = [];
+    let allCustomers = [];
+    let allBranches = [];
+
+    function formatVND(amount) {
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
+    }
+
     function toggleSidebar() {
       const sidebar = document.getElementById('appSidebar');
       if (sidebar) sidebar.classList.toggle('collapsed');
     }
 
-    function approveTour(id) {
-      document.getElementById('tourStatus' + id).innerHTML = '<span class="badge badge-success">Đã phê duyệt giải</span>';
-      document.getElementById('tourAction' + id).innerHTML = '<span style="color: var(--primary); font-size: 11.5px; font-weight: 600;">Đã phê duyệt</span>';
-      showToast('Đã phê duyệt đề xuất giải đấu và cấp quyền khóa sân!', 'success');
+    function switchTourTab(tabIndex) {
+      currentTab = tabIndex;
+      const btn1 = document.getElementById('tabBtn1');
+      const btn2 = document.getElementById('tabBtn2');
+      const c1 = document.getElementById('tourTabContent1');
+      const c2 = document.getElementById('tourTabContent2');
+
+      btn1.classList.toggle('active', tabIndex === 1);
+      btn2.classList.toggle('active', tabIndex === 2);
+
+      c1.style.display = (tabIndex === 1) ? 'block' : 'none';
+      c2.style.display = (tabIndex === 2) ? 'block' : 'none';
+
+      filterActiveTournamentTab();
     }
 
-    function rejectTour(id) {
-      if (confirm('Bạn có chắc chắn từ chối đề xuất giải đấu này?')) {
-        document.getElementById('tourStatus' + id).innerHTML = '<span class="badge badge-danger">Từ chối tổ chức</span>';
-        document.getElementById('tourAction' + id).innerHTML = '<span style="color: #ef4444; font-size: 11.5px;">Bác bỏ</span>';
+    async function loadDirectorTournaments() {
+      try {
+        const res = await fetch('/api/director/tournaments');
+        if (res.ok) {
+          const data = await res.json();
+          allTournaments = data.tournaments || [];
+          allCustomers = data.customers || [];
+          allBranches = data.branches || [];
+
+          // Cập nhật số lượng trên các tab badge
+          if (data.counts) {
+            const c = data.counts;
+            const b1 = document.getElementById('badgePendingTournaments');
+            const b2 = document.getElementById('badgeTotalMembers');
+            if (b1) b1.textContent = `${c.pendingTournaments} chờ duyệt`;
+            if (b2) b2.textContent = `${c.totalMembers} hội viên`;
+          }
+
+          populateBranchSelect();
+          renderTournaments(allTournaments);
+          renderMembers(allCustomers);
+        } else {
+          console.error('Không thể tải dữ liệu giải đấu, status:', res.status);
+        }
+      } catch (err) {
+        console.error('Lỗi khi fetch dữ liệu giải đấu:', err);
       }
     }
+
+    function populateBranchSelect() {
+      const bSel = document.getElementById('filterTourBranch');
+      const inpBranch = document.getElementById('inpTourBranch');
+
+      if (bSel) {
+        bSel.innerHTML = '<option value="ALL">-- Tất cả chi nhánh --</option>';
+        allBranches.forEach(b => {
+          bSel.innerHTML += `<option value="${b.branchCode}">${b.branchCode} - ${b.branchName}</option>`;
+        });
+      }
+
+      if (inpBranch && allBranches.length > 0) {
+        inpBranch.innerHTML = '';
+        allBranches.forEach(b => {
+          inpBranch.innerHTML += `<option value="${b.branchCode}">${b.branchCode} - ${b.branchName}</option>`;
+        });
+      }
+    }
+
+    function renderTournaments(tournaments) {
+      const tbody = document.getElementById('tournamentsTableBody');
+      if (!tbody) return;
+
+      if (!tournaments || tournaments.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">Không tìm thấy giải đấu nào phù hợp</td></tr>';
+        return;
+      }
+
+      let html = '';
+      tournaments.forEach(t => {
+        const isPending = (t.status === 'Chờ phê duyệt');
+        const isActive = (t.status === 'Đang mở đăng ký' || t.status === 'Đang diễn ra');
+        const isDone = (t.status === 'Đã hoàn thành');
+        const badgeClass = isPending ? 'badge-warning' : (isActive ? 'badge-success' : (isDone ? 'badge-blue' : 'badge-danger'));
+
+        let startFormatted = t.startDate ? t.startDate.replace('T', ' ').substring(0, 16) : '';
+        let endFormatted = t.endDate ? t.endDate.replace('T', ' ').substring(0, 16) : '';
+
+        let actionHtml = '';
+        if (isPending) {
+          actionHtml = `
+            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+              <button type="button" class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approveTournament(${t.id})">Phê duyệt</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444; border-color: #fca5a5;" onclick="rejectTournament(${t.id})">Từ chối</button>
+            </div>
+          `;
+        } else if (isActive) {
+          actionHtml = `
+            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+              <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: var(--primary);" onclick="viewRegistrations('${t.tournamentCode}', '${t.tournamentName}')">DS đội (${t.currentParticipants})</button>
+            </div>
+          `;
+        } else {
+          actionHtml = `
+            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+              <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: var(--text-muted);" onclick="viewRegistrations('${t.tournamentCode}', '${t.tournamentName}')">Xem DS đội</button>
+            </div>
+          `;
+        }
+
+        html += `
+          <tr id="tourRow-${t.id}">
+            <td style="font-weight: 700; color: var(--primary); font-size: 13.5px;">${t.tournamentCode}</td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-dark);">${t.tournamentName}</div>
+              <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px; max-width: 280px; line-height: 1.35;">${t.rules || 'Quy chuẩn BWF'}</div>
+            </td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-dark);">${t.branchName}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">Mã: ${t.branchCode || 'Chuỗi'}</div>
+            </td>
+            <td>
+              <div style="font-size: 12.5px; font-weight: 600;">${startFormatted}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">đến ${endFormatted}</div>
+            </td>
+            <td style="text-align: center;">
+              <div style="font-weight: 700; color: var(--text-dark);">${t.currentParticipants} / ${t.maxParticipants}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">cặp đấu</div>
+            </td>
+            <td style="text-align: right;">
+              <div style="font-weight: 700; color: #ea580c; font-size: 13.5px;">${formatVND(t.totalPrize)}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">Phí: ${formatVND(t.entryFee)}/đội</div>
+            </td>
+            <td style="text-align: center;">
+              <span class="badge ${badgeClass}">${t.status}</span>
+            </td>
+            <td style="text-align: right;">
+              ${actionHtml}
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function renderMembers(members) {
+      const tbody = document.getElementById('membersTableBody');
+      if (!tbody) return;
+
+      if (!members || members.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 32px; color: var(--text-muted);">Không tìm thấy hội viên nào</td></tr>';
+        return;
+      }
+
+      let html = '';
+      members.forEach(m => {
+        let tierStyle = 'background: #f4f4f5; color: #52525b; border: 1px solid #e4e4e7;';
+        let discountTag = 'Tiêu chuẩn';
+
+        if (m.membershipTier === 'Kim Cương') {
+          tierStyle = 'background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 700;';
+          discountTag = '-15%';
+        } else if (m.membershipTier === 'Vàng') {
+          tierStyle = 'background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; font-weight: 700;';
+          discountTag = '-10%';
+        } else if (m.membershipTier === 'Bạc') {
+          tierStyle = 'background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-weight: 600;';
+          discountTag = '-5%';
+        }
+
+        let joinDate = m.createdAt ? m.createdAt.substring(0, 10) : '';
+
+        html += `
+          <tr>
+            <td style="font-weight: 700; color: var(--primary);">${m.customerCode}</td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-dark);">${m.fullName}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">Tham gia: ${joinDate}</div>
+            </td>
+            <td>
+              <div style="font-weight: 500;">${m.phone}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">${m.email}</div>
+            </td>
+            <td style="text-align: center;">
+              <span class="badge" style="${tierStyle}">${m.membershipTier} (${discountTag})</span>
+            </td>
+            <td style="text-align: center; font-weight: 700; color: var(--primary);">
+              ${(m.rewardPoints || 0).toLocaleString('vi-VN')} pts
+            </td>
+            <td style="text-align: right; font-weight: 600;">
+              ${m.totalPlayHours || 0} giờ
+            </td>
+            <td style="text-align: right; font-weight: 700; color: var(--text-dark);">
+              ${formatVND(m.totalSpent)}
+            </td>
+            <td>
+              <span style="font-size: 12px; color: var(--text-dark);">${m.favoriteBranch}</span>
+            </td>
+            <td style="text-align: center;">
+              <span class="badge badge-success">${m.status || 'Hoạt động'}</span>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function filterActiveTournamentTab() {
+      const q = (document.getElementById('globalSearchInput')?.value || '').toLowerCase().trim();
+
+      if (currentTab === 1) {
+        const bCode = document.getElementById('filterTourBranch')?.value || 'ALL';
+        const st = document.getElementById('filterTourStatus')?.value || 'ALL';
+
+        const filtered = allTournaments.filter(t => {
+          const matchBranch = (bCode === 'ALL' || t.branchCode === bCode);
+          const matchStatus = (st === 'ALL' || t.status === st);
+          const matchQ = !q || (
+            (t.tournamentCode && t.tournamentCode.toLowerCase().includes(q)) ||
+            (t.tournamentName && t.tournamentName.toLowerCase().includes(q)) ||
+            (t.branchName && t.branchName.toLowerCase().includes(q))
+          );
+          return matchBranch && matchStatus && matchQ;
+        });
+        renderTournaments(filtered);
+      } else {
+        const tier = document.getElementById('filterMemberTier')?.value || 'ALL';
+
+        const filtered = allCustomers.filter(c => {
+          const matchTier = (tier === 'ALL' || c.membershipTier === tier);
+          const matchQ = !q || (
+            (c.customerCode && c.customerCode.toLowerCase().includes(q)) ||
+            (c.fullName && c.fullName.toLowerCase().includes(q)) ||
+            (c.phone && c.phone.toLowerCase().includes(q)) ||
+            (c.email && c.email.toLowerCase().includes(q))
+          );
+          return matchTier && matchQ;
+        });
+        renderMembers(filtered);
+      }
+    }
+
+    function getAuthHeaders() {
+      const headers = { 'Content-Type': 'application/json' };
+      let token = localStorage.getItem('jwt_token');
+      if (!token && typeof document !== 'undefined' && document.cookie) {
+        const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+        if (match) token = match[1];
+      }
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      return headers;
+    }
+
+    async function approveTournament(id) {
+      if (!confirm('Xác nhận PHÊ DUYỆT kế hoạch tổ chức giải đấu này và cấp quyền khóa sân vận hành?')) return;
+
+      try {
+        const res = await fetch(`/api/director/tournaments/${id}/approve`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          credentials: 'include'
+        });
+        if (res.ok) {
+          const data = await res.json();
+          alert(data.message || 'Đã phê duyệt giải đấu thành công!');
+          loadDirectorTournaments();
+        } else {
+          const err = await res.json();
+          alert(err.message || 'Lỗi khi phê duyệt giải đấu!');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Lỗi kết nối máy chủ!');
+      }
+    }
+
+    async function rejectTournament(id) {
+      const reason = prompt('Nhập lý do TỪ CHỐI đề xuất giải đấu (ví dụ: Trùng lịch bảo dưỡng, ngân sách vượt mức quy định...):');
+      if (reason === null) return;
+
+      try {
+        const res = await fetch(`/api/director/tournaments/${id}/reject`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          credentials: 'include',
+          body: JSON.stringify({ reason: reason })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          alert(data.message || 'Đã từ chối kế hoạch giải đấu!');
+          loadDirectorTournaments();
+        } else {
+          const err = await res.json();
+          alert(err.message || 'Lỗi khi từ chối giải đấu!');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Lỗi kết nối máy chủ!');
+      }
+    }
+
+    function openTourModal() {
+      document.getElementById('tourModal').classList.add('active');
+    }
+
+    function closeTourModal() {
+      document.getElementById('tourModal').classList.remove('active');
+    }
+
+    async function saveTournament() {
+      const name = document.getElementById('inpTourName').value.trim();
+      const branchCode = document.getElementById('inpTourBranch').value;
+      const code = document.getElementById('inpTourCode').value.trim();
+      const start = document.getElementById('inpTourStart').value;
+      const end = document.getElementById('inpTourEnd').value;
+      const maxP = document.getElementById('inpTourMax').value;
+      const fee = document.getElementById('inpTourFee').value;
+      const prize = document.getElementById('inpTourPrize').value;
+      const rules = document.getElementById('inpTourRules').value.trim();
+
+      if (!name) {
+        alert('Vui lòng nhập tên giải đấu!');
+        return;
+      }
+
+      const payload = {
+        tournamentCode: code,
+        tournamentName: name,
+        branchCode: branchCode,
+        startDate: start,
+        endDate: end,
+        maxParticipants: maxP,
+        entryFee: fee,
+        totalPrize: prize,
+        rules: rules,
+        status: 'Chờ phê duyệt'
+      };
+
+      const btn = document.getElementById('btnSaveTournament');
+      btn.disabled = true;
+      btn.textContent = 'Đang lưu vào SQL Server...';
+
+      try {
+        const res = await fetch('/api/director/tournaments', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          alert(data.message || 'Đã tạo đề xuất giải đấu mới thành công!');
+          closeTourModal();
+          document.getElementById('inpTourName').value = '';
+          document.getElementById('inpTourRules').value = '';
+          loadDirectorTournaments();
+        } else {
+          const err = await res.json();
+          alert(err.message || 'Lỗi tạo giải đấu!');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Lỗi kết nối máy chủ!');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Lưu giải đấu vào Database';
+      }
+    }
+
+    function viewRegistrations(tournamentCode, tournamentName) {
+      const t = allTournaments.find(item => item.tournamentCode === tournamentCode);
+      const regs = (t && t.registrations) ? t.registrations : [];
+
+      document.getElementById('regModalTitle').textContent = `DS đội đăng ký: ${tournamentName}`;
+      document.getElementById('regModalSubtitle').textContent = `Mã giải: ${tournamentCode} - Tổng số đội đăng ký: ${regs.length}`;
+
+      const tbody = document.getElementById('regTableBody');
+      if (!regs || regs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Chưa có cặp đấu / đội nào đăng ký giải đấu này</td></tr>';
+      } else {
+        let html = '';
+        regs.forEach((r, idx) => {
+          let regTime = r.registrationDate ? r.registrationDate.replace('T', ' ').substring(0, 16) : '';
+          html += `
+            <tr>
+              <td style="text-align: center; font-weight: 700;">${idx + 1}</td>
+              <td style="font-weight: 600; color: var(--text-dark);">${r.teamName}</td>
+              <td><span style="font-family: monospace; color: var(--primary);">${r.customerCode || 'N/A'}</span></td>
+              <td>${r.phone || 'N/A'}</td>
+              <td style="font-size: 11.5px; color: var(--text-muted);">${regTime}</td>
+              <td style="text-align: center;"><span class="badge badge-success">${r.status || 'Đã xác nhận'}</span></td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      }
+
+      document.getElementById('registrationsModal').classList.add('active');
+    }
+
+    function closeRegModal() {
+      document.getElementById('registrationsModal').classList.remove('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDirectorTournaments();
+    });
   </script>
-  <script src="/js/global-hub.js"></script>
 </body>
 </html>

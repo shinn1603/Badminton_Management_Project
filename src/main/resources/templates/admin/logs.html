@@ -136,76 +136,8 @@
                   <th style="text-align: center;">Trạng thái</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td style="font-size: 12px; color: var(--text-muted);">19/09/2026 14:45:12</td>
-                  <td>
-                    <div style="font-weight: 600;">director (Nguyễn Phước Thọ)</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Giám đốc toàn chuỗi</div>
-                  </td>
-                  <td style="font-family: monospace; font-size: 12px;">192.168.1.105</td>
-                  <td style="font-weight: 600; color: var(--text-dark);">Phê duyệt bảng giá giờ vàng Sân VIP Yonex</td>
-                  <td>Phân hệ Giám đốc</td>
-                  <td style="text-align: center;">
-                    <span class="badge badge-success">Thành công</span>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="font-size: 12px; color: var(--text-muted);">19/09/2026 14:12:05</td>
-                  <td>
-                    <div style="font-weight: 600;">pos (Nguyễn Thanh Tâm)</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Thu ngân CN Thủ Đức</div>
-                  </td>
-                  <td style="font-family: monospace; font-size: 12px;">192.168.1.112</td>
-                  <td style="font-weight: 600; color: var(--text-dark);">Xác nhận nhận sân (Check-in) phiếu BK-1082</td>
-                  <td>Phân hệ POS Bán Hàng</td>
-                  <td style="text-align: center;">
-                    <span class="badge badge-success">Thành công</span>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="font-size: 12px; color: var(--text-muted);">19/09/2026 13:58:40</td>
-                  <td>
-                    <div style="font-weight: 600;">admin (Trần Biểu Hương)</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Quản trị kỹ thuật</div>
-                  </td>
-                  <td style="font-family: monospace; font-size: 12px;">192.168.1.200</td>
-                  <td style="font-weight: 600; color: var(--text-dark);">Cập nhật ma trận phân quyền chi nhánh</td>
-                  <td>Phân hệ Quản trị</td>
-                  <td style="text-align: center;">
-                    <span class="badge badge-success">Thành công</span>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="font-size: 12px; color: var(--text-muted);">19/09/2026 12:15:30</td>
-                  <td>
-                    <div style="font-weight: 600;">manager (Trần Phúc Bảo)</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Quản lý CN Thủ Đức</div>
-                  </td>
-                  <td style="font-family: monospace; font-size: 12px;">192.168.1.110</td>
-                  <td style="font-weight: 600; color: var(--text-dark);">Tạo phiếu nhập kho nước khoáng Revive & bóng cầu lông</td>
-                  <td>Quản lý kho chi nhánh</td>
-                  <td style="text-align: center;">
-                    <span class="badge badge-success">Thành công</span>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="font-size: 12px; color: var(--text-muted);">19/09/2026 11:30:19</td>
-                  <td>
-                    <div style="font-weight: 600;">customer (Lê Bá Đạt)</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Hội viên trực tuyến</div>
-                  </td>
-                  <td style="font-family: monospace; font-size: 12px;">14.232.18.99</td>
-                  <td style="font-weight: 600; color: var(--text-dark);">Đặt sân trực tuyến & quét mã thanh toán cọc VietQR</td>
-                  <td>Cổng đặt sân Online</td>
-                  <td style="text-align: center;">
-                    <span class="badge badge-success">Thành công</span>
-                  </td>
-                </tr>
+              <tbody id="auditLogsTableBody">
+                <!-- Dynamically loaded from /api/admin/logs -->
               </tbody>
             </table>
           </div>
@@ -232,24 +164,24 @@
               </thead>
               <tbody id="backupListTable">
                 <tr>
-                  <td style="font-family: monospace; font-weight: 600; color: var(--text-dark);">backup_ute_sport_20260919_0200.sql.gz</td>
+                  <td style="font-family: monospace; font-weight: 600; color: var(--text-dark);">backup_ute_sport_20261012_0200.sql.gz</td>
                   <td>28.4 MB</td>
-                  <td>19/09/2026 02:00:01</td>
+                  <td>12/10/2026 02:00:01</td>
                   <td><span class="badge" style="background: #eff6ff; color: #1d4ed8;">Tự động (Cron)</span></td>
                   <td style="text-align: right;">
-                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="downloadBackup('backup_ute_sport_20260919_0200.sql.gz')">Tải file</button>
-                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444;" onclick="restoreBackup('backup_ute_sport_20260919_0200.sql.gz')">Phục hồi</button>
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="downloadBackup('backup_ute_sport_20261012_0200.sql.gz')">Tải file</button>
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444;" onclick="restoreBackup('backup_ute_sport_20261012_0200.sql.gz')">Phục hồi</button>
                   </td>
                 </tr>
 
                 <tr>
-                  <td style="font-family: monospace; font-weight: 600; color: var(--text-dark);">backup_ute_sport_20260918_0200.sql.gz</td>
+                  <td style="font-family: monospace; font-weight: 600; color: var(--text-dark);">backup_ute_sport_20261011_0200.sql.gz</td>
                   <td>27.9 MB</td>
-                  <td>18/09/2026 02:00:00</td>
+                  <td>11/10/2026 02:00:00</td>
                   <td><span class="badge" style="background: #eff6ff; color: #1d4ed8;">Tự động (Cron)</span></td>
                   <td style="text-align: right;">
-                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="downloadBackup('backup_ute_sport_20260918_0200.sql.gz')">Tải file</button>
-                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444;" onclick="restoreBackup('backup_ute_sport_20260918_0200.sql.gz')">Phục hồi</button>
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="downloadBackup('backup_ute_sport_20261011_0200.sql.gz')">Tải file</button>
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444;" onclick="restoreBackup('backup_ute_sport_20261011_0200.sql.gz')">Phục hồi</button>
                   </td>
                 </tr>
               </tbody>
@@ -266,25 +198,119 @@
       if (sidebar) sidebar.classList.toggle('collapsed');
     }
 
-    function backupDatabaseNow() {
-      const tbody = document.getElementById('backupListTable');
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+      });
+    }
+
+    function formatDateTime(dtStr) {
+      if (!dtStr) return '—';
+      try {
+        const d = new Date(dtStr);
+        if (isNaN(d.getTime())) return dtStr;
+        return d.toLocaleDateString('vi-VN') + ' ' + d.toLocaleTimeString('vi-VN');
+      } catch (e) {
+        return dtStr;
+      }
+    }
+
+    async function loadAuditLogs() {
+      try {
+        const token = localStorage.getItem('jwt_token');
+        const headers = { 'Accept': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/admin/logs', { headers });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.logs && Array.isArray(data.logs)) {
+            renderAuditLogsTable(data.logs);
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('Lỗi khi tải nhật ký hoạt động:', e);
+      }
+    }
+
+    function renderAuditLogsTable(logs) {
+      const tbody = document.getElementById('auditLogsTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      logs.forEach(log => {
+        const isWarning = (log.status || '').toLowerCase().includes('cảnh báo') || (log.status || '').toLowerCase().includes('thất bại');
+        const badgeClass = isWarning ? 'badge-amber' : 'badge-green';
+        const badgeStyle = isWarning ? 'background: #fffbeb; color: #b45309; border: 1px solid #fde68a;' : 'background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;';
+        const userDisplay = log.userCode ? `${log.username} (${log.userCode})` : log.username;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-size: 12px; color: var(--text-muted); white-space: nowrap;">${formatDateTime(log.actionTime)}</td>
+          <td>
+            <div style="font-weight: 600; color: var(--text-dark);">${escapeHtml(userDisplay)}</div>
+            <div style="font-size: 11px; color: var(--text-muted); font-family: monospace;">Tài khoản hệ thống</div>
+          </td>
+          <td style="font-family: monospace; font-size: 12px;">${escapeHtml(log.ipAddress || '127.0.0.1')}</td>
+          <td>
+            <div style="font-weight: 600; color: var(--text-dark);">${escapeHtml(log.actionType)}</div>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">${escapeHtml(log.details || '')}</div>
+          </td>
+          <td><span style="font-size: 12.5px; font-weight: 500; color: var(--text-dark);">${escapeHtml(log.module || 'Hệ thống')}</span></td>
+          <td style="text-align: center;">
+            <span class="badge" style="${badgeStyle}">${escapeHtml(log.status || 'Thành công')}</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function backupDatabaseNow() {
       const now = new Date();
       const filename = 'backup_ute_sport_manual_' + now.toISOString().replace(/[-:T.]/g, '').slice(0, 14) + '.sql.gz';
       const timeStr = now.toLocaleDateString('vi-VN') + ' ' + now.toLocaleTimeString('vi-VN');
 
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td style="font-family: monospace; font-weight: 600; color: var(--text-dark);">${filename}</td>
-        <td>28.5 MB</td>
-        <td>${timeStr}</td>
-        <td><span class="badge" style="background: #f0fdfa; color: #0f766e;">Thủ công</span></td>
-        <td style="text-align: right;">
-          <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="downloadBackup('${filename}')">Tải file</button>
-          <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444;" onclick="restoreBackup('${filename}')">Phục hồi</button>
-        </td>
-      `;
-      tbody.insertBefore(tr, tbody.firstChild);
-      if (window.showToast) { showToast('Đã sao lưu CSDL: ' + filename, 'success'); }
+      try {
+        let token = localStorage.getItem('jwt_token');
+        if (!token && typeof document !== 'undefined' && document.cookie) {
+          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+          if (match) token = match[1];
+        }
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/admin/logs/backup', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ filename: filename })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          await loadAuditLogs();
+        }
+      } catch (err) {
+        console.warn('Lỗi ghi nhật ký sao lưu:', err);
+      }
+
+      const tbody = document.getElementById('backupListTable');
+      if (tbody) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-family: monospace; font-weight: 600; color: var(--text-dark);">${filename}</td>
+          <td>28.5 MB</td>
+          <td>${timeStr}</td>
+          <td><span class="badge" style="background: #f0fdfa; color: #0f766e;">Thủ công</span></td>
+          <td style="text-align: right;">
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="downloadBackup('${filename}')">Tải file</button>
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444;" onclick="restoreBackup('${filename}')">Phục hồi</button>
+          </td>
+        `;
+        tbody.insertBefore(tr, tbody.firstChild);
+      }
+
+      if (window.showToast) { showToast('Đã sao lưu CSDL thành công: ' + filename, 'success'); }
     }
 
     function downloadBackup(file) {
@@ -296,7 +322,8 @@
         if (window.showToast) { showToast('Đã phục hồi dữ liệu từ bản sao lưu thành công', 'success'); }
       }
     }
-      function toggleTheme() {
+
+    function toggleTheme() {
       const current = document.documentElement.getAttribute('data-theme') || 'light';
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
@@ -304,6 +331,8 @@
     }
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
+
+    document.addEventListener('DOMContentLoaded', loadAuditLogs);
   </script>
   <script src="/js/global-hub.js"></script>
 </body>

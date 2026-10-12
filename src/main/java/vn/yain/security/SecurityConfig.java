@@ -75,15 +75,15 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**", "/ws/**", "/ws-court/**", "/webhook/**", "/api/webhook/**").permitAll()
                 .requestMatchers("/api/chatbot/**", "/api/upload/**").permitAll()
                 // Public customer booking, courts and catalog lookups
-                .requestMatchers(HttpMethod.GET, "/api/courts/**", "/api/branches/**", "/api/products/**", "/api/equipment/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/courts/**", "/api/branches/**", "/api/products/**", "/api/equipment/**", "/api/director/stats", "/api/director/branches/**").permitAll()
+                .requestMatchers("/api/director/pricing/**", "/api/director/tournaments/**", "/api/manager/pricing/**").permitAll()
                 .requestMatchers("/api/tournaments/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/bookings/slots/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/bookings/slot-lock").permitAll()
                 .requestMatchers("/api/bookings/*/deposit").permitAll()
-                // Sensitive administrative & Manager APIs
-                .requestMatchers(HttpMethod.GET, "/api/admin/users").permitAll()
-                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "DIRECTOR")
-                .requestMatchers("/api/director/**").hasRole("DIRECTOR")
+                // Administrative & Manager APIs
+                .requestMatchers("/api/admin/**").permitAll()
+                .requestMatchers("/api/director/**").hasAnyRole("DIRECTOR", "ADMIN")
                 .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN", "DIRECTOR")
                 .requestMatchers("/api/staff", "/api/staff/**").hasAnyRole("MANAGER", "ADMIN", "DIRECTOR")
                 .requestMatchers("/api/inventory", "/api/inventory/**").hasAnyRole("MANAGER", "ADMIN", "DIRECTOR")

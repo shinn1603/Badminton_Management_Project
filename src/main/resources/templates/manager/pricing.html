@@ -179,7 +179,7 @@
 
           <button type="button" class="btn btn-primary" onclick="openPriceModal()">
             <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>Cập Nhật Bảng Giá</span>
+            <span>+ Gửi đề xuất chỉnh giá lên Giám đốc</span>
           </button>
 
           <div class="user-pill-header" onclick="window.location.href='/login'">
@@ -196,152 +196,76 @@
           <div class="hero-banner-content">
             <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
               <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
-              Chính Sách Bảng Giá Sân Chi Nhánh
+              Chính Sách Bảng Giá Sân Chi Nhánh Thủ Đức
             </div>
             <h1 class="hero-title" style="margin-bottom: 8px;">Cấu Hình Giá Theo Khung Giờ & Loại Sân</h1>
-            <p class="hero-subtitle" style="margin-bottom: 0;">Thiết lập giá giờ thấp điểm, giờ cao điểm, phụ thu cuối tuần và áp dụng tự động trên hệ thống đặt sân trực tuyến</p>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Xem biểu giá hiện hành của chi nhánh và gửi đơn đề xuất điều chỉnh giá sân lên Ban Giám Đốc chuỗi xem xét phê duyệt</p>
           </div>
         </div>
 
-        <!-- KPI METRICS -->
-        <div class="kpi-grid">
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Đơn giá thấp nhất (Sáng sớm)</span>
-              <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: var(--primary);">
-                <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <!-- BẢNG GIÁ CHI NHÁNH HIỆN HÀNH TỪ DATABASE -->
+          <div class="card" style="background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); overflow: hidden;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h3 class="card-title" style="margin-bottom: 4px; font-size: 16px; font-weight: 700;">Biểu giá sân hiện hành tại Chi nhánh Thủ Đức</h3>
+                <div style="font-size: 12.5px; color: var(--text-muted);">Dữ liệu đồng bộ trực tiếp từ Database SQL Server, áp dụng trên POS và Cổng khách hàng</div>
               </div>
-            </div>
-            <div class="kpi-val" style="color: var(--primary);">60.000 đ/h</div>
-            <div class="kpi-trend positive">Khung 05:00 - 08:00 (Thứ 2 - Thứ 6)</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Đơn giá tiêu chuẩn (Hành chính)</span>
-              <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #3b82f6;">90.000 đ/h</div>
-            <div class="kpi-trend positive">Khung 08:00 - 17:00 (Thứ 2 - Thứ 6)</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Giờ cao điểm tối (Peak Hour)</span>
-              <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #f59e0b;">120.000 đ/h</div>
-            <div class="kpi-trend">Khung 17:00 - 22:00 (Đạt 100% công suất)</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Cuối tuần & Ngày lễ</span>
-              <div class="kpi-icon-wrap" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #8b5cf6;">150.000 đ/h</div>
-            <div class="kpi-trend">Phụ thu +25% chi phí vận hành</div>
-          </div>
-        </div>
-
-        <div class="pricing-grid-layout">
-          <!-- BẢNG KHUNG GIỜ -->
-          <div class="section-card">
-            <div class="section-header-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div class="section-title-wrap">
-                <h3>Khung giờ vận hành chuẩn</h3>
-                <p>3 khung giờ áp dụng toàn chi nhánh</p>
-              </div>
+              <button class="btn btn-primary" onclick="openPriceModal()" style="font-size: 12.5px; padding: 7px 14px;">
+                + Gửi đề xuất chỉnh giá lên Giám đốc
+              </button>
             </div>
 
             <div class="table-container">
-              <table class="clean-table">
+              <table class="clean-table" id="tableCurrentPricing">
                 <thead>
                   <tr>
+                    <th style="width: 100px;">Mã giá</th>
                     <th>Khung giờ</th>
                     <th>Thời gian</th>
-                    <th>Hệ số giá</th>
+                    <th>Áp dụng ngày</th>
+                    <th style="text-align: right;">Đơn giá áp dụng</th>
+                    <th style="text-align: center; width: 140px;">Trạng thái</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="bodyCurrentPricing">
                   <tr>
-                    <td><strong>Sáng sớm</strong></td>
-                    <td>05:00 - 08:00</td>
-                    <td><span class="badge badge-green">0.7x (Ưu đãi)</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>Hành chính</strong></td>
-                    <td>08:00 - 17:00</td>
-                    <td><span class="badge badge-blue">1.0x (Tiêu chuẩn)</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>Cao điểm tối</strong></td>
-                    <td>17:00 - 22:00</td>
-                    <td><span class="badge badge-amber">1.3x (Giờ vàng)</span></td>
+                    <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải biểu giá từ Database...</td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
 
-          <!-- BẢNG GIÁ CHI TIẾT -->
-          <div class="section-card">
-            <div class="section-header-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div class="section-title-wrap">
-                <h3>Biểu giá áp dụng hiện hành</h3>
-                <p>Cập nhật tự động vào hệ thống POS và Cổng khách hàng</p>
+          <!-- LỊCH SỬ ĐỀ XUẤT ĐIỀU CHỈNH GIÁ GỬI GIÁM ĐỐC -->
+          <div class="card" style="background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); overflow: hidden;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h3 class="card-title" style="margin-bottom: 4px; font-size: 16px; font-weight: 700;">Lịch sử đề xuất điều chỉnh giá gửi Ban Giám Đốc</h3>
+                <div style="font-size: 12.5px; color: var(--text-muted);">Theo dõi tình trạng phê duyệt của các đề xuất điều chỉnh giá sân do chi nhánh gửi lên</div>
               </div>
-              <button class="btn btn-outline" onclick="openPriceModal()">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                <span>Chỉnh sửa giá</span>
-              </button>
+              <span id="badgeProposalCount" style="padding: 4px 12px; border-radius: 9999px; background: rgba(245, 158, 11, 0.15); color: #d97706; font-size: 12px; font-weight: 700;">
+                0 đề xuất
+              </span>
             </div>
 
             <div class="table-container">
-              <table class="clean-table">
+              <table class="clean-table" id="tableProposalsHistory">
                 <thead>
                   <tr>
+                    <th style="width: 90px;">Mã ĐX</th>
+                    <th>Loại sân áp dụng</th>
                     <th>Khung giờ</th>
-                    <th>Áp dụng ngày</th>
-                    <th style="text-align: right;">Đơn giá sân / 1 Giờ</th>
+                    <th style="text-align: right;">Giá hiện tại</th>
+                    <th style="text-align: right;">Giá đề xuất</th>
+                    <th style="max-width: 250px;">Lý do gửi Giám đốc</th>
+                    <th style="text-align: center; width: 130px;">Tình trạng</th>
+                    <th style="font-size: 12px; color: var(--text-muted);">Ghi chú Giám đốc</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="bodyProposalsHistory">
                   <tr>
-                    <td>Sáng sớm</td>
-                    <td>Ngày thường (Thứ 2 - Thứ 6)</td>
-                    <td style="text-align: right; color: var(--primary); font-weight: 800;">60.000 đ</td>
-                  </tr>
-                  <tr>
-                    <td>Giờ hành chính</td>
-                    <td>Ngày thường (Thứ 2 - Thứ 6)</td>
-                    <td style="text-align: right; color: var(--primary); font-weight: 800;">90.000 đ</td>
-                  </tr>
-                  <tr>
-                    <td>Cao điểm tối</td>
-                    <td>Ngày thường (Thứ 2 - Thứ 6)</td>
-                    <td style="text-align: right; color: var(--primary); font-weight: 800;">120.000 đ</td>
-                  </tr>
-                  <tr>
-                    <td>Sáng sớm</td>
-                    <td>Cuối tuần (Thứ 7 - CN)</td>
-                    <td style="text-align: right; color: var(--primary); font-weight: 800;">80.000 đ</td>
-                  </tr>
-                  <tr>
-                    <td>Giờ hành chính</td>
-                    <td>Cuối tuần (Thứ 7 - CN)</td>
-                    <td style="text-align: right; color: var(--primary); font-weight: 800;">110.000 đ</td>
-                  </tr>
-                  <tr>
-                    <td>Cao điểm tối</td>
-                    <td>Cuối tuần (Thứ 7 - CN)</td>
-                    <td style="text-align: right; color: #ef4444; font-weight: 800;">150.000 đ</td>
+                    <td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải lịch sử đề xuất...</td>
                   </tr>
                 </tbody>
               </table>
@@ -352,42 +276,69 @@
     </div>
   </div>
 
-  <!-- MODAL CẬP NHẬT GIÁ -->
+  <!-- MODAL GỬI ĐỀ XUẤT CHỈNH GIÁ LÊN BAN GIÁM ĐỐC -->
   <div class="modal-overlay" id="priceModal">
-    <div class="modal-card">
+    <div class="modal-card" style="max-width: 520px;">
       <div class="modal-header">
-        <h3 id="modalTitle">Điều chỉnh biểu giá giờ sân</h3>
+        <h3 id="modalTitle">Đề xuất điều chỉnh giá sân gửi Ban Giám Đốc</h3>
         <button class="modal-close-btn" onclick="closePriceModal()">✕</button>
       </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Chọn khung giờ áp dụng</label>
-          <select class="form-control" id="inpTimeSlot">
-            <option value="Sáng sớm (05:00 - 08:00)">Sáng sớm (05:00 - 08:00)</option>
-            <option value="Giờ hành chính (08:00 - 17:00)">Giờ hành chính (08:00 - 17:00)</option>
-            <option value="Cao điểm tối (17:00 - 22:00)">Cao điểm tối (17:00 - 22:00)</option>
-          </select>
+      <div class="modal-body" style="padding: 20px;">
+        <div style="padding: 10px 14px; border-radius: 8px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); font-size: 12px; color: #1e40af; margin-bottom: 16px;">
+          Đơn đề xuất sẽ được chuyển thẳng đến tài khoản Giám đốc chuỗi để thẩm định và phê duyệt trước khi áp dụng thực tế.
         </div>
-        <div class="form-group">
-          <label class="form-label">Loại ngày áp dụng</label>
-          <select class="form-control" id="inpDayType">
-            <option value="Ngày thường (Thứ 2 - Thứ 6)">Ngày thường (Thứ 2 - Thứ 6)</option>
-            <option value="Cuối tuần (Thứ 7, Chủ Nhật)">Cuối tuần (Thứ 7, Chủ Nhật)</option>
-            <option value="Ngày lễ Tết">Ngày lễ Tết đặc biệt (+30%)</option>
-          </select>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+          <div>
+            <label class="form-label" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Chi nhánh đề xuất</label>
+            <input type="text" class="form-control" value="CN01 - Chi nhánh Thủ Đức" readonly style="background: var(--surface-subtle);">
+          </div>
+          <div>
+            <label class="form-label" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Người gửi đề xuất</label>
+            <input type="text" class="form-control" id="inpProposerName" value="Trần Phúc Bảo" readonly style="background: var(--surface-subtle);">
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Đơn giá mới (VNĐ / 1 Giờ)</label>
-          <input type="number" class="form-control" id="inpNewPrice" placeholder="Ví dụ: 120000" value="120000" step="10000">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+          <div>
+            <label class="form-label" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Loại sân</label>
+            <select class="form-control" id="inpCourtType">
+              <option value="Sân Tiêu chuẩn BWF" selected>Sân Tiêu chuẩn BWF</option>
+              <option value="Sân VIP Lining">Sân VIP Lining</option>
+              <option value="Sân VIP Yonex">Sân VIP Yonex</option>
+              <option value="Sân VIP Victor">Sân VIP Victor</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Khung giờ</label>
+            <select class="form-control" id="inpTimeSlot" onchange="autoFillCurrentPrice()">
+              <option value="17:00 - 22:00 (Giờ vàng)">17:00 - 22:00 (Giờ vàng cao điểm)</option>
+              <option value="09:00 - 17:00 (Ban ngày)">09:00 - 17:00 (Ban ngày)</option>
+              <option value="06:00 - 09:00 (Sáng sớm)">06:00 - 09:00 (Sáng sớm)</option>
+              <option value="22:00 - 23:00 (Tối muộn)">22:00 - 23:00 (Tối muộn)</option>
+            </select>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Ghi chú áp dụng</label>
-          <input type="text" class="form-control" id="inpPriceNotes" placeholder="Ví dụ: Áp dụng từ ngày 01/10/2026">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+          <div>
+            <label class="form-label" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Mức giá hiện tại (VNĐ/h)</label>
+            <input type="number" class="form-control" id="inpCurrentPrice" value="130000" readonly style="background: var(--surface-subtle);">
+          </div>
+          <div>
+            <label class="form-label" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Mức giá đề xuất mới (VNĐ/h) <span style="color: red;">*</span></label>
+            <input type="number" class="form-control" id="inpProposedPrice" placeholder="Ví dụ: 145000" step="5000">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <label class="form-label" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Lý do đề xuất điều chỉnh <span style="color: red;">*</span></label>
+          <textarea class="form-control" id="inpReason" rows="3" placeholder="Nêu rõ lý do: ví dụ tăng chi phí điện máy lạnh, nâng cấp thảm thi đấu Yonex mới, hoặc kích cầu giờ thấp điểm..."></textarea>
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" style="padding: 14px 20px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: flex-end; gap: 10px; background: var(--surface-subtle);">
         <button class="btn btn-outline" onclick="closePriceModal()">Hủy bỏ</button>
-        <button class="btn btn-primary" onclick="savePrice()">Áp dụng giá mới vào hệ thống</button>
+        <button class="btn btn-primary" id="btnSubmitProposal" onclick="submitProposalToDirector()">Gửi đề xuất lên Giám đốc</button>
       </div>
     </div>
   </div>
@@ -408,22 +359,178 @@
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
+    function formatVND(amount) {
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
+    }
+
     function openPriceModal() {
       document.getElementById('priceModal').classList.add('open');
+      autoFillCurrentPrice();
     }
 
     function closePriceModal() {
       document.getElementById('priceModal').classList.remove('open');
     }
 
-    function savePrice() {
+    function autoFillCurrentPrice() {
       const slot = document.getElementById('inpTimeSlot').value;
-      const day = document.getElementById('inpDayType').value;
-      const price = document.getElementById('inpNewPrice').value;
-
-      showToast(`Đã cập nhật biểu giá: ${slot} cho ${day} thành công với mức ${Number(price).toLocaleString('vi-VN')} đ/h!`, 'success');
-      closePriceModal();
+      const curPriceInput = document.getElementById('inpCurrentPrice');
+      if (slot.includes('Giờ vàng')) curPriceInput.value = '130000';
+      else if (slot.includes('Sáng')) curPriceInput.value = '80000';
+      else if (slot.includes('Ban ngày')) curPriceInput.value = '90000';
+      else curPriceInput.value = '90000';
     }
+
+    async function loadManagerPricingData() {
+      try {
+        const res = await fetch('/api/director/pricing');
+        if (res.ok) {
+          const data = await res.json();
+          const branchCode = 'CN01';
+
+          // 1. Render biểu giá của chi nhánh Thủ Đức
+          const branchRules = (data.rules || []).filter(r => r.branchCode === branchCode);
+          renderBranchRules(branchRules);
+
+          // 2. Render lịch sử đề xuất của chi nhánh Thủ Đức
+          const branchProposals = (data.proposals || []).filter(p => p.branchCode === branchCode);
+          renderBranchProposals(branchProposals);
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải dữ liệu bảng giá:', err);
+      }
+    }
+
+    function renderBranchRules(rules) {
+      const tbody = document.getElementById('bodyCurrentPricing');
+      if (!tbody) return;
+
+      if (!rules || rules.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Chưa có biểu giá cấu hình cho chi nhánh này</td></tr>';
+        return;
+      }
+
+      let html = '';
+      rules.forEach(r => {
+        html += `
+          <tr>
+            <td style="font-family: monospace; font-weight: 700; color: var(--primary);">${r.pricingCode}</td>
+            <td><strong>${r.slotType || 'Khung giờ chuẩn'}</strong></td>
+            <td><span class="badge" style="background: var(--surface-subtle);">${r.slotTime}</span></td>
+            <td>${r.dayType}</td>
+            <td style="text-align: right; font-weight: 800; color: var(--primary); font-size: 14px;">${formatVND(r.hourlyRate)}</td>
+            <td style="text-align: center;"><span class="badge badge-success">Đang áp dụng</span></td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function renderBranchProposals(proposals) {
+      const tbody = document.getElementById('bodyProposalsHistory');
+      const badge = document.getElementById('badgeProposalCount');
+      if (!tbody) return;
+
+      if (badge) badge.textContent = `${proposals.length} đề xuất`;
+
+      if (!proposals || proposals.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Chưa có đề xuất điều chỉnh giá nào được gửi</td></tr>';
+        return;
+      }
+
+      let html = '';
+      proposals.forEach(p => {
+        const isPending = (p.status === 'Chờ phê duyệt');
+        const isApproved = (p.status === 'Đã phê duyệt');
+        const badgeClass = isPending ? 'badge-warning' : (isApproved ? 'badge-success' : 'badge-danger');
+
+        const diff = p.proposedPrice - p.currentPrice;
+        const diffPct = p.currentPrice > 0 ? ((diff / p.currentPrice) * 100).toFixed(1) : 0;
+        const diffSign = diff >= 0 ? `+${diffPct}%` : `${diffPct}%`;
+        const diffColor = diff >= 0 ? '#10b981' : '#ef4444';
+
+        html += `
+          <tr>
+            <td style="font-weight: 700; color: var(--primary); font-size: 13px;">${p.proposalCode}</td>
+            <td><strong>${p.courtType}</strong></td>
+            <td><span class="badge" style="background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa;">${p.slotInfo}</span></td>
+            <td style="text-align: right; color: var(--text-muted);">${formatVND(p.currentPrice)}</td>
+            <td style="text-align: right; font-weight: 700; color: var(--primary);">
+              ${formatVND(p.proposedPrice)}
+              <div style="font-size: 10.5px; color: ${diffColor};">(${diffSign})</div>
+            </td>
+            <td style="max-width: 250px; font-size: 12px; color: var(--text-muted);">${p.reason}</td>
+            <td style="text-align: center;"><span class="badge ${badgeClass}">${p.status}</span></td>
+            <td style="font-size: 11.5px; color: ${isApproved ? 'var(--primary)' : (isPending ? 'var(--text-muted)' : '#ef4444')};">
+              ${p.note ? p.note : (isApproved ? 'Giám đốc đã duyệt và cập nhật biểu giá' : (isPending ? 'Đang chờ Giám đốc duyệt' : 'Đã từ chối'))}
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    async function submitProposalToDirector() {
+      const courtType = document.getElementById('inpCourtType').value;
+      const slotInfo = document.getElementById('inpTimeSlot').value;
+      const currentPrice = document.getElementById('inpCurrentPrice').value;
+      const proposedPrice = document.getElementById('inpProposedPrice').value;
+      const reason = document.getElementById('inpReason').value.trim();
+      const proposerName = document.getElementById('inpProposerName').value || 'Trần Phúc Bảo';
+
+      if (!proposedPrice || Number(proposedPrice) <= 0) {
+        alert('Vui lòng nhập mức giá đề xuất mới hợp lệ!');
+        return;
+      }
+      if (!reason) {
+        alert('Vui lòng nhập lý do đề xuất điều chỉnh giá để Giám đốc thẩm định!');
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmitProposal');
+      btn.disabled = true;
+      btn.textContent = 'Đang gửi lên Giám đốc...';
+
+      try {
+        const payload = {
+          branchCode: 'CN01',
+          proposerName: proposerName,
+          courtType: courtType,
+          slotInfo: slotInfo,
+          currentPrice: Number(currentPrice),
+          proposedPrice: Number(proposedPrice),
+          reason: reason
+        };
+
+        const res = await fetch('/api/manager/pricing/proposals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const result = await res.json();
+          alert(result.message || 'Đã gửi đề xuất điều chỉnh giá lên Giám đốc thành công!');
+          closePriceModal();
+          document.getElementById('inpProposedPrice').value = '';
+          document.getElementById('inpReason').value = '';
+          loadManagerPricingData();
+        } else {
+          const errData = await res.json();
+          alert(errData.message || 'Có lỗi xảy ra khi gửi đề xuất!');
+        }
+      } catch (err) {
+        console.error('Lỗi gửi đề xuất:', err);
+        alert('Lỗi kết nối máy chủ!');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Gửi đề xuất lên Giám đốc';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadManagerPricingData();
+    });
   </script>
 </body>
 </html>
