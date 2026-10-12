@@ -49,6 +49,9 @@ public class BookingService {
     @Autowired
     private PricingService pricingService;
 
+    @Autowired(required = false)
+    private vn.yain.repository.CustomerRepository customerRepository;
+
     @Value("${vietqr.bank.bin:970422}")
     private String bankBin;
 
@@ -213,15 +216,44 @@ public class BookingService {
 
         // Duration and pricing
         int duration = 1;
-        int[] hours = parseSlotHours(timeSlot);
-        int startHour = hours[0];
-        if (hours[1] > hours[0]) {
-            duration = hours[1] - hours[0];
+        if (timeSlot.contains(",")) {
+            duration = timeSlot.split(",").length;
+        } else {
+            int[] hours = parseSlotHours(timeSlot);
+            if (hours[1] > hours[0]) {
+                duration = hours[1] - hours[0];
+            }
         }
 
+        int[] hours = parseSlotHours(timeSlot);
+        int startHour = hours[0];
+
         BigDecimal hourlyRate = pricingService != null ? pricingService.calculateHourlyRate(court, startHour) : (court != null && court.getHourlyRate() != null ? court.getHourlyRate() : new BigDecimal("90000"));
-        BigDecimal totalPrice = pricingService != null ? pricingService.calculateTotalPrice(hourlyRate, duration) : hourlyRate.multiply(BigDecimal.valueOf(duration));
-        BigDecimal deposit = pricingService != null ? pricingService.calculateDepositAmount(totalPrice) : totalPrice.multiply(new BigDecimal("0.3"));
+        BigDecimal courtTotal = pricingService != null ? pricingService.calculateTotalPrice(hourlyRate, duration) : hourlyRate.multiply(BigDecimal.valueOf(duration));
+
+        BigDecimal addonAmount = BigDecimal.ZERO;
+        if (payload.get("addonAmount") != null) {
+            try {
+                addonAmount = new BigDecimal(payload.get("addonAmount").toString());
+            } catch (Exception ignored) {}
+        }
+        BigDecimal totalPrice = courtTotal.add(addonAmount);
+
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        String promoCode = (String) payload.get("promoCode");
+        if (payload.get("discountAmount") != null) {
+            try {
+                discountAmount = new BigDecimal(payload.get("discountAmount").toString());
+            } catch (Exception ignored) {}
+        }
+        if (discountAmount.compareTo(BigDecimal.ZERO) > 0) {
+            totalPrice = totalPrice.subtract(discountAmount);
+            if (totalPrice.compareTo(BigDecimal.ZERO) < 0) {
+                totalPrice = BigDecimal.ZERO;
+            }
+        }
+
+        BigDecimal deposit = pricingService != null ? pricingService.calculateDepositAmount(totalPrice) : totalPrice.multiply(new BigDecimal("0.3")).setScale(0, java.math.RoundingMode.HALF_UP);
 
         String bookingCode = generateUniqueBookingCode();
         Booking booking = new Booking();
@@ -237,7 +269,25 @@ public class BookingService {
         booking.setDepositAmount(deposit);
         booking.setPaymentMethod("Chuyển khoản VietQR");
         booking.setStatus("Chờ cọc 30%");
-        booking.setNotes("Đặt qua Lưới giờ Sân trực tuyến");
+
+        String customNotes = (String) payload.get("notes");
+        StringBuilder noteBuilder = new StringBuilder();
+        if (customNotes != null && !customNotes.trim().isEmpty()) {
+            noteBuilder.append(customNotes.trim());
+        } else {
+            noteBuilder.append("Đặt qua Lưới giờ Sân trực tuyến");
+        }
+        if (promoCode != null && !promoCode.trim().isEmpty() && discountAmount.compareTo(BigDecimal.ZERO) > 0) {
+            noteBuilder.append(" | Áp dụng mã: ").append(promoCode.trim().toUpperCase())
+                       .append(" (-").append(String.format("%,d", discountAmount.longValue())).append("đ)");
+        }
+        booking.setNotes(noteBuilder.toString());
+
+        // Liên kết mã khách hàng từ cơ sở dữ liệu nếu tồn tại
+        if (customerRepository != null && customerPhone != null && !customerPhone.isBlank()) {
+            customerRepository.findByPhone(customerPhone.trim())
+                    .ifPresent(c -> booking.setCustomerCode(c.getCustomerCode()));
+        }
 
         Booking saved = bookingRepository.save(booking);
 
@@ -302,6 +352,17 @@ public class BookingService {
         booking.setDepositAmount(depositAmount != null ? depositAmount : booking.getDepositAmount());
         booking.setPaymentMethod(paymentMethod != null ? paymentMethod : "VietQR Pro");
         Booking updated = bookingRepository.save(booking);
+
+        // Tích điểm thưởng cho khách hàng nếu có mã khách hàng
+        if (customerRepository != null && updated.getCustomerCode() != null) {
+            customerRepository.findByCustomerCode(updated.getCustomerCode()).ifPresent(c -> {
+                int addPts = depositAmount != null
+                        ? depositAmount.divide(BigDecimal.valueOf(1000), java.math.RoundingMode.HALF_UP).intValue()
+                        : 30;
+                c.setRewardPoints((c.getRewardPoints() != null ? c.getRewardPoints() : 0) + addPts);
+                customerRepository.save(c);
+            });
+        }
 
         // Record payment transaction
         Payment payment = new Payment();
@@ -573,12 +634,29 @@ public class BookingService {
     public boolean isSlotOverlapping(String s1, String s2) {
         if (s1 == null || s2 == null) return false;
         if (s1.trim().equalsIgnoreCase(s2.trim())) return true;
+        if (s1.contains(",") || s2.contains(",")) {
+            String[] parts1 = s1.split(",");
+            String[] parts2 = s2.split(",");
+            for (String p1 : parts1) {
+                for (String p2 : parts2) {
+                    if (isSingleSlotOverlapping(p1.trim(), p2.trim())) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        return isSingleSlotOverlapping(s1.trim(), s2.trim());
+    }
+
+    private boolean isSingleSlotOverlapping(String s1, String s2) {
+        if (s1.equalsIgnoreCase(s2)) return true;
         try {
             int[] r1 = parseSlotHours(s1);
             int[] r2 = parseSlotHours(s2);
             return Math.max(r1[0], r2[0]) < Math.min(r1[1], r2[1]);
         } catch (Exception e) {
-            return s1.trim().equalsIgnoreCase(s2.trim());
+            return s1.equalsIgnoreCase(s2);
         }
     }
 

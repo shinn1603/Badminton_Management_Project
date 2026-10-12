@@ -167,11 +167,13 @@
             </svg>
           </button>
 
-          <div class="branch-select-badge">
+          <div class="branch-select-badge" style="display: flex; align-items: center; gap: 8px;">
             <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--primary);">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             </svg>
-            <span>Nhập Kho Vật Tư - Thủ Đức</span>
+            <select id="branchFilterSelect" onchange="onBranchChange()" style="border: none; background: transparent; font-weight: 700; color: var(--text-dark); cursor: pointer; outline: none; font-size: 13px;">
+              <option value="CN01" selected>CN01 - Thủ Đức (Chi nhánh quản lý)</option>
+            </select>
           </div>
 
           <div class="search-box-header">
@@ -179,7 +181,7 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" placeholder="Tìm kiếm phiếu nhập theo số chứng từ, nhà cung cấp...">
+            <input type="text" placeholder="Tìm kiếm phiếu nhập theo số chứng từ, nhà cung cấp, mặt hàng..." id="receiptSearchInput" oninput="filterReceiptsHistory()">
           </div>
         </div>
 
@@ -196,6 +198,15 @@
               <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
+          </button>
+
+          <button type="button" class="btn btn-outline" onclick="loadReceiptHistory()" title="Làm mới lịch sử từ CSDL">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            <span>Đồng bộ</span>
           </button>
 
           <a href="/manager/inventory" class="btn btn-outline">
@@ -217,10 +228,57 @@
           <div class="hero-banner-content">
             <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
               <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
-              Nhập Kho Vật Tư Chi Nhánh
+              <span id="heroBranchBadge">Nhập Kho Vật Tư Chi Nhánh • SQL Server Realtime</span>
             </div>
-            <h1 class="hero-title" style="margin-bottom: 8px;">Nhập Kho Hàng Hóa</h1>
-            <p class="hero-subtitle" style="margin-bottom: 0;">Lập phiếu nhập kho, theo dõi đơn giá và tự động cập nhật số lượng tồn kho.</p>
+            <h1 class="hero-title" style="margin-bottom: 8px;">Quản Lý Phiếu Nhập Kho Hàng Hóa</h1>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Lập phiếu nhập kho, theo dõi đơn giá nhập và tự động cập nhật số lượng tồn kho vào CSDL SQL Server theo thời gian thực.</p>
+          </div>
+        </div>
+
+        <!-- KPI METRICS GRID -->
+        <div class="kpi-grid" style="margin-bottom: 24px;">
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Tổng số phiếu nhập kho</span>
+              <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: var(--primary);">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              </div>
+            </div>
+            <div class="kpi-val" style="color: var(--primary);" id="kpiTotalReceipts">0 phiếu</div>
+            <div class="kpi-trend positive">Từ bảng stock_receipts CSDL</div>
+          </div>
+
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Tổng giá trị vốn nhập</span>
+              <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              </div>
+            </div>
+            <div class="kpi-val" style="color: #3b82f6;" id="kpiTotalAmount">0 đ</div>
+            <div class="kpi-trend positive">Tổng chi phí nhập hàng</div>
+          </div>
+
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Mặt hàng trong kho chi nhánh</span>
+              <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+              </div>
+            </div>
+            <div class="kpi-val" style="color: #f59e0b;" id="kpiAvailableProducts">0 mặt hàng</div>
+            <div class="kpi-trend">Đang kinh doanh tại kho</div>
+          </div>
+
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Nhà cung cấp đối tác</span>
+              <div class="kpi-icon-wrap" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              </div>
+            </div>
+            <div class="kpi-val" style="color: #8b5cf6;" id="kpiSuppliersCount">0 NCC</div>
+            <div class="kpi-trend">Nguồn cung ứng uy tín</div>
           </div>
         </div>
 
@@ -235,20 +293,39 @@
             </div>
 
             <form id="receiptForm" onsubmit="submitReceipt(event)">
-              <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; margin-bottom: 18px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
                 <div class="form-group">
-                  <label class="form-label">Nhà cung cấp / Đối tác</label>
-                  <select class="form-control" id="supplierSelect">
-                    <option value="Đại lý Nước giải khát Tuấn Anh">Đại lý Nước giải khát Tuấn Anh</option>
-                    <option value="Công ty TNHH Thể Thao Yonex Việt Nam">Công ty Thể Thao Yonex Việt Nam</option>
-                    <option value="Công ty Cầu Lông Thành Công">Công ty Cầu Lông Thành Công</option>
-                    <option value="Đại lý Phụ Kiện Thể Thao VS">Đại lý Phụ Kiện Thể Thao VS</option>
+                  <label class="form-label">Chi nhánh nhập kho *</label>
+                  <select class="form-control" id="receiptBranchSelect" onchange="onReceiptBranchChange()">
+                    <option value="CN01" selected>CN01 - Thủ Đức (UTE Sport)</option>
+                    <option value="CN02">CN02 - Bình Thạnh</option>
+                    <option value="CN03">CN03 - Quận 9</option>
+                    <option value="CN04">CN04 - Gò Vấp</option>
                   </select>
                 </div>
 
                 <div class="form-group">
                   <label class="form-label">Ngày nhập kho</label>
-                  <input type="date" class="form-control" id="receiptDate" value="2026-09-30">
+                  <input type="date" class="form-control" id="receiptDate">
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; margin-bottom: 18px;">
+                <div class="form-group">
+                  <label class="form-label">Nhà cung cấp / Đối tác *</label>
+                  <select class="form-control" id="supplierSelect">
+                    <option value="Công ty TNHH Thể Thao Yonex Việt Nam" selected>Công ty Thể Thao Yonex Việt Nam</option>
+                    <option value="NPP Dụng Cụ Cầu Lông Đại Phát">NPP Dụng Cụ Cầu Lông Đại Phát</option>
+                    <option value="Đại lý Nước giải khát Tuấn Anh">Đại lý Nước giải khát Tuấn Anh</option>
+                    <option value="Công ty Cầu Lông Thành Công">Công ty Cầu Lông Thành Công</option>
+                    <option value="Đại lý Phụ Kiện Thể Thao VS">Đại lý Phụ Kiện Thể Thao VS</option>
+                    <option value="NPP Nước Uống Suntory PepsiCo">NPP Nước Uống Suntory PepsiCo</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Ghi chú chứng từ (Số HĐ / Đợt hàng)</label>
+                  <input type="text" class="form-control" id="receiptNotes" placeholder="VD: Hóa đơn số 004812, nhập cuối tháng...">
                 </div>
               </div>
 
@@ -258,37 +335,7 @@
               </div>
 
               <div id="receiptItemsContainer">
-                <div class="receipt-item-row">
-                  <select class="form-control" onchange="handleProductChange(this)">
-                    <option value="P01" selected>Nước Revive Chanh Muối 500ml</option>
-                    <option value="P02">Nước Pocari Sweat 500ml</option>
-                    <option value="P03">Nước suối Aquafina 500ml</option>
-                    <option value="P04">Nước tăng lực Bò Húc Red Bull</option>
-                    <option value="P05">Ống Cầu Hải Yến Đỏ (12 quả)</option>
-                    <option value="P06">Ống Cầu Thành Công 77</option>
-                    <option value="P07">Quấn cán vợt VS</option>
-                  </select>
-                  <input type="number" class="form-control" placeholder="SL" value="50" min="1" oninput="calcTotals()">
-                  <input type="number" class="form-control" placeholder="Giá nhập" value="8000" step="1000" oninput="calcTotals()">
-                  <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); text-align: right;" class="item-subtotal">400.000 đ</div>
-                  <button type="button" class="btn-icon" style="color: #ef4444;" onclick="this.parentElement.remove(); calcTotals();">✕</button>
-                </div>
-
-                <div class="receipt-item-row">
-                  <select class="form-control" onchange="handleProductChange(this)">
-                    <option value="P05" selected>Ống Cầu Hải Yến Đỏ (12 quả)</option>
-                    <option value="P01">Nước Revive Chanh Muối 500ml</option>
-                    <option value="P02">Nước Pocari Sweat 500ml</option>
-                    <option value="P03">Nước suối Aquafina 500ml</option>
-                    <option value="P04">Nước tăng lực Bò Húc Red Bull</option>
-                    <option value="P06">Ống Cầu Thành Công 77</option>
-                    <option value="P07">Quấn cán vợt VS</option>
-                  </select>
-                  <input type="number" class="form-control" placeholder="SL" value="20" min="1" oninput="calcTotals()">
-                  <input type="number" class="form-control" placeholder="Giá nhập" value="145000" step="5000" oninput="calcTotals()">
-                  <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); text-align: right;" class="item-subtotal">2.900.000 đ</div>
-                  <button type="button" class="btn-icon" style="color: #ef4444;" onclick="this.parentElement.remove(); calcTotals();">✕</button>
-                </div>
+                <!-- Populated dynamically via addReceiptRow() -->
               </div>
 
               <button type="button" class="btn btn-outline" style="font-size: 12.5px; margin-top: 8px;" onclick="addReceiptRow()">
@@ -300,16 +347,16 @@
               <div class="totals-box">
                 <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); margin-bottom: 6px;">
                   <span>Tổng số lượng nhập:</span>
-                  <span id="totalItemsCount" style="font-weight: 700; color: var(--text-dark);">70 món</span>
+                  <span id="totalItemsCount" style="font-weight: 700; color: var(--text-dark);">0 món</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; color: var(--text-dark); border-top: 1px solid var(--border-subtle); padding-top: 8px;">
                   <span>TỔNG TIỀN THANH TOÁN:</span>
-                  <span id="grandTotal" style="color: var(--primary);">3.300.000 đ</span>
+                  <span id="grandTotal" style="color: var(--primary);">0 đ</span>
                 </div>
               </div>
 
               <div style="margin-top: 20px; display: flex; gap: 10px;">
-                <button type="submit" class="btn btn-primary" style="flex: 1; padding: 12px; font-size: 14px;">
+                <button type="submit" class="btn btn-primary" id="btnSubmitReceipt" style="flex: 1; padding: 12px; font-size: 14px;">
                   <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   <span>Hoàn tất & Nhập hàng vào kho</span>
                 </button>
@@ -321,7 +368,7 @@
           <div class="section-card">
             <div class="section-header-tabs" style="margin-bottom: 16px;">
               <div class="section-title-wrap">
-                <h3>Lịch sử phiếu nhập gần đây</h3>
+                <h3 id="historyTableTitle">Lịch sử phiếu nhập gần đây</h3>
                 <p>Theo dõi các đợt bổ sung hàng hóa chi nhánh</p>
               </div>
             </div>
@@ -330,16 +377,18 @@
               <table class="clean-table receipts-history-table">
                 <thead>
                   <tr>
-                    <th>Mã phiếu</th>
+                    <th style="width: 85px;">Mã phiếu</th>
+                    <th>Chi nhánh</th>
                     <th>Ngày nhập</th>
                     <th>Nhà cung cấp</th>
+                    <th>Mặt hàng / Ghi chú</th>
                     <th style="text-align: right;">Tổng tiền</th>
-                    <th>Trạng thái</th>
+                    <th style="text-align: center;">Trạng thái</th>
                   </tr>
                 </thead>
                 <tbody id="receiptsTableBody">
                   <tr>
-                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">Đang tải danh sách phiếu nhập kho...</td>
+                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">Đang tải danh sách phiếu nhập kho từ CSDL SQL Server...</td>
                   </tr>
                 </tbody>
               </table>
@@ -350,37 +399,133 @@
     </div>
   </div>
 
-  <script src="/js/global-hub.js"></script>
   <script>
-    let availableProducts = [
-      { productCode: 'P01', productName: 'Nước Revive Chanh Muối 500ml', costPrice: 8000 },
-      { productCode: 'P02', productName: 'Nước Pocari Sweat 500ml', costPrice: 11000 },
-      { productCode: 'P03', productName: 'Nước suối Aquafina 500ml', costPrice: 5000 },
-      { productCode: 'P04', productName: 'Nước tăng lực Bò Húc Red Bull', costPrice: 12000 },
-      { productCode: 'P05', productName: 'Ống Cầu Hải Yến Đỏ (12 quả)', costPrice: 145000 },
-      { productCode: 'P06', productName: 'Ống Cầu Thành Công 77', costPrice: 175000 },
-      { productCode: 'P07', productName: 'Quấn cán vợt VS', costPrice: 7000 },
-      { productCode: 'P08', productName: 'Khăn lau mồ hôi Yonex', costPrice: 25000 }
-    ];
+    let availableProducts = [];
+    let allReceiptsHistory = [];
+    const branchNamesMap = {
+      'CN01': 'Chi nhánh Thủ Đức',
+      'CN02': 'Chi nhánh Bình Thạnh',
+      'CN03': 'Chi nhánh Quận 9',
+      'CN04': 'Chi nhánh Gò Vấp'
+    };
 
-    async function loadProducts() {
+    function getActiveBranch() {
+      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
+      if (user && (user.role === 'MANAGER' || (user.branchCode && user.role !== 'DIRECTOR' && user.role !== 'ADMIN'))) {
+        return user.branchCode || 'CN01';
+      }
+      const select = document.getElementById('branchFilterSelect');
+      if (select && select.value) return select.value;
+      return (user && user.branchCode) ? user.branchCode : 'CN01';
+    }
+
+    function initBranchSecurity() {
+      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
+      const select = document.getElementById('branchFilterSelect');
+      if (!select) return;
+      if (user && (user.role === 'DIRECTOR' || user.role === 'ADMIN')) {
+        select.innerHTML = `
+          <option value="CN01" selected>CN01 - Thủ Đức (UTE Sport)</option>
+          <option value="CN02">CN02 - Bình Thạnh</option>
+          <option value="CN03">CN03 - Quận 9</option>
+          <option value="CN04">CN04 - Gò Vấp</option>
+          <option value="ALL">Toàn bộ chi nhánh</option>
+        `;
+        select.disabled = false;
+        select.style.cursor = 'pointer';
+      } else {
+        const br = (user && user.branchCode) ? user.branchCode : 'CN01';
+        select.innerHTML = `<option value="${br}" selected>${br} - Thủ Đức (Chi nhánh quản lý)</option>`;
+        select.value = br;
+        select.disabled = true;
+        select.style.cursor = 'not-allowed';
+        select.title = 'Phân quyền: Bạn chỉ có quyền lập và xem phiếu nhập cơ sở được phân công (' + br + ')';
+
+        const receiptBranch = document.getElementById('receiptBranchSelect');
+        if (receiptBranch) {
+          receiptBranch.value = br;
+          receiptBranch.disabled = true;
+        }
+      }
+    }
+
+    function onBranchChange() {
+      const activeBranch = getActiveBranch();
+      const formBranch = document.getElementById('receiptBranchSelect');
+      if (formBranch && activeBranch !== 'ALL') {
+        formBranch.value = activeBranch;
+      }
+      syncAllData();
+    }
+
+    function onReceiptBranchChange() {
+      const bCode = document.getElementById('receiptBranchSelect').value;
+      loadProducts(bCode);
+    }
+
+    async function syncAllData() {
+      const activeBranch = getActiveBranch();
+      const bTitle = (activeBranch === 'ALL') ? 'Toàn bộ hệ thống' : (branchNamesMap[activeBranch] || activeBranch);
+      
+      const badge = document.getElementById('heroBranchBadge');
+      if (badge) badge.textContent = `Nhập Kho Vật Tư ${bTitle} • SQL Server Realtime`;
+      const tableTitle = document.getElementById('historyTableTitle');
+      if (tableTitle) tableTitle.textContent = `Lịch sử phiếu nhập gần đây (${bTitle})`;
+
+      const formBranch = document.getElementById('receiptBranchSelect');
+      const loadBranch = (activeBranch === 'ALL') ? (formBranch ? formBranch.value : 'CN01') : activeBranch;
+      
+      await Promise.all([
+        loadProducts(loadBranch),
+        loadReceiptHistory()
+      ]);
+    }
+
+    async function loadProducts(branchCode) {
       try {
-        const res = await fetch('/api/products');
+        const branch = branchCode || (getActiveBranch() === 'ALL' ? 'CN01' : getActiveBranch());
+        const res = await fetch(`/api/products?branchCode=${encodeURIComponent(branch)}`);
         if (res.ok) {
           const data = await res.json();
-          if (data && data.length > 0) {
+          if (Array.isArray(data)) {
             availableProducts = data;
           }
         }
       } catch (e) {
-        console.warn('Sử dụng danh sách sản phẩm dự phòng:', e);
+        console.warn('Lỗi tải danh mục sản phẩm từ CSDL:', e);
       }
+
+      // Re-populate select options on active rows
+      const rows = document.querySelectorAll('.receipt-item-row');
+      if (rows.length === 0 && availableProducts.length > 0) {
+        const container = document.getElementById('receiptItemsContainer');
+        container.innerHTML = '';
+        addReceiptRow(availableProducts[0]?.productCode, 50);
+        if (availableProducts.length > 1) {
+          addReceiptRow(availableProducts[1]?.productCode, 20);
+        }
+      } else {
+        rows.forEach(r => {
+          const select = r.querySelector('select');
+          if (select) {
+            const currentVal = select.value;
+            select.innerHTML = renderProductSelectOptions(currentVal);
+          }
+        });
+      }
+      calcTotals();
+      updateKpis();
     }
 
     function renderProductSelectOptions(selectedCode) {
+      if (!availableProducts || availableProducts.length === 0) {
+        return '<option value="">(Chưa có hàng hóa trong kho)</option>';
+      }
       return availableProducts.map(p => `
         <option value="${p.productCode}" data-cost="${p.costPrice || 0}" ${p.productCode === selectedCode ? 'selected' : ''}>
-          ${p.productName}
+          ${p.productCode} - ${p.productName} (${p.unit || 'món'})
         </option>
       `).join('');
     }
@@ -406,31 +551,39 @@
         const priceInp = r.querySelectorAll('input')[1];
         const subtotalEl = r.querySelector('.item-subtotal');
 
-        const qty = Number(qtyInp.value) || 0;
-        const price = Number(priceInp.value) || 0;
+        const qty = Number(qtyInp ? qtyInp.value : 0) || 0;
+        const price = Number(priceInp ? priceInp.value : 0) || 0;
         const sub = qty * price;
 
         totalQty += qty;
         totalSum += sub;
 
-        subtotalEl.innerText = sub.toLocaleString('vi-VN') + ' đ';
+        if (subtotalEl) {
+          subtotalEl.innerText = sub.toLocaleString('vi-VN') + ' đ';
+        }
       });
 
-      document.getElementById('totalItemsCount').innerText = totalQty + ' món';
-      document.getElementById('grandTotal').innerText = totalSum.toLocaleString('vi-VN') + ' đ';
+      const countEl = document.getElementById('totalItemsCount');
+      if (countEl) countEl.innerText = totalQty.toLocaleString('vi-VN') + ' món';
+      const grandEl = document.getElementById('grandTotal');
+      if (grandEl) grandEl.innerText = totalSum.toLocaleString('vi-VN') + ' đ';
     }
 
-    function addReceiptRow(defaultCode = 'P01', defaultQty = 10) {
+    function addReceiptRow(defaultCode, defaultQty = 10) {
       const container = document.getElementById('receiptItemsContainer');
-      const prod = availableProducts.find(p => p.productCode === defaultCode) || availableProducts[0];
+      if (!container) return;
+
+      const code = defaultCode || (availableProducts[0]?.productCode || '');
+      const prod = availableProducts.find(p => p.productCode === code) || availableProducts[0] || {};
+      
       const div = document.createElement('div');
       div.className = 'receipt-item-row';
       div.innerHTML = `
         <select class="form-control" onchange="handleProductChange(this)">
-          ${renderProductSelectOptions(defaultCode)}
+          ${renderProductSelectOptions(code)}
         </select>
         <input type="number" class="form-control" placeholder="SL" value="${defaultQty}" min="1" oninput="calcTotals()">
-        <input type="number" class="form-control" placeholder="Giá nhập" value="${prod.costPrice || 8000}" step="1000" oninput="calcTotals()">
+        <input type="number" class="form-control" placeholder="Giá nhập" value="${prod.costPrice || 10000}" step="1000" oninput="calcTotals()">
         <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); text-align: right;" class="item-subtotal">0 đ</div>
         <button type="button" class="btn-icon" style="color: #ef4444;" onclick="this.parentElement.remove(); calcTotals();">✕</button>
       `;
@@ -440,28 +593,93 @@
 
     async function loadReceiptHistory() {
       const tbody = document.getElementById('receiptsTableBody');
+      const activeBranch = getActiveBranch();
+      if (tbody && allReceiptsHistory.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">Đang tải danh sách phiếu nhập kho từ CSDL SQL Server...</td></tr>';
+      }
+
       try {
-        const res = await fetch('/api/inventory/receipts?branchCode=CN01');
+        const url = (activeBranch && activeBranch !== 'ALL')
+          ? `/api/inventory/receipts?branchCode=${encodeURIComponent(activeBranch)}`
+          : '/api/inventory/receipts?branchCode=ALL';
+
+        const res = await fetch(url);
         if (res.ok) {
           const receipts = await res.json();
-          if (!receipts || receipts.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 16px;">Chưa có phiếu nhập kho nào</td></tr>';
-            return;
-          }
-          tbody.innerHTML = receipts.map(r => `
-            <tr>
-              <td><strong>${r.receiptCode}</strong></td>
-              <td>${r.receiptDate ? (r.receiptDate.split('T')[0] || r.receiptDate) : 'Hôm nay'}</td>
-              <td>${r.supplierName || 'Nhà cung cấp'}</td>
-              <td style="text-align: right; font-weight: 800; color: var(--primary);">${(Number(r.totalAmount) || 0).toLocaleString('vi-VN')} đ</td>
-              <td><span class="badge badge-green">Đã nhập kho</span></td>
-            </tr>
-          `).join('');
+          allReceiptsHistory = Array.isArray(receipts) ? receipts : [];
+          renderReceiptsHistory(allReceiptsHistory);
+        } else {
+          if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #ef4444; padding: 16px;">Không thể tải lịch sử phiếu nhập</td></tr>';
         }
       } catch (e) {
         console.warn('Lỗi tải lịch sử phiếu nhập:', e);
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 16px;">Không thể tải lịch sử</td></tr>';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #ef4444; padding: 16px;">Lỗi kết nối máy chủ SQL Server</td></tr>';
       }
+    }
+
+    function renderReceiptsHistory(receipts) {
+      const tbody = document.getElementById('receiptsTableBody');
+      if (!tbody) return;
+
+      if (!receipts || receipts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 28px;">Chưa có phiếu nhập kho nào cho chi nhánh này trong CSDL</td></tr>';
+        updateKpis();
+        return;
+      }
+
+      tbody.innerHTML = receipts.map(r => {
+        const dateStr = r.receiptDate ? (r.receiptDate.split('T')[0] || r.receiptDate) : 'Hôm nay';
+        const bCode = r.branchCode || 'CN01';
+        const notes = r.notes ? r.notes : 'Phiếu nhập kho bổ sung';
+
+        return `
+          <tr>
+            <td><strong>${r.receiptCode}</strong></td>
+            <td><span class="badge badge-outline" style="font-size: 11px;">${bCode}</span></td>
+            <td>${dateStr}</td>
+            <td><strong>${r.supplierName || 'Nhà cung cấp'}</strong></td>
+            <td style="max-width: 220px; font-size: 11.5px; color: var(--text-muted);">${notes}</td>
+            <td style="text-align: right; font-weight: 800; color: var(--primary);">${(Number(r.totalAmount) || 0).toLocaleString('vi-VN')} đ</td>
+            <td style="text-align: center;"><span class="badge badge-green">Đã nhập kho</span></td>
+          </tr>
+        `;
+      }).join('');
+
+      updateKpis();
+    }
+
+    function filterReceiptsHistory() {
+      const q = (document.getElementById('receiptSearchInput')?.value || '').toLowerCase().trim();
+      if (!q) {
+        renderReceiptsHistory(allReceiptsHistory);
+        return;
+      }
+
+      const filtered = allReceiptsHistory.filter(r => {
+        const txt = `${r.receiptCode} ${r.branchCode} ${r.supplierName} ${r.notes} ${r.receiptDate}`.toLowerCase();
+        return txt.includes(q);
+      });
+      renderReceiptsHistory(filtered);
+    }
+
+    function updateKpis() {
+      const kpiTotal = document.getElementById('kpiTotalReceipts');
+      const kpiAmount = document.getElementById('kpiTotalAmount');
+      const kpiProds = document.getElementById('kpiAvailableProducts');
+      const kpiSuppliers = document.getElementById('kpiSuppliersCount');
+
+      if (kpiTotal) kpiTotal.textContent = `${allReceiptsHistory.length} phiếu`;
+
+      let sumAmount = 0;
+      const suppliersSet = new Set();
+      allReceiptsHistory.forEach(r => {
+        sumAmount += Number(r.totalAmount || 0);
+        if (r.supplierName) suppliersSet.add(r.supplierName.trim());
+      });
+
+      if (kpiAmount) kpiAmount.textContent = sumAmount.toLocaleString('vi-VN') + ' đ';
+      if (kpiProds) kpiProds.textContent = `${availableProducts.length} mặt hàng`;
+      if (kpiSuppliers) kpiSuppliers.textContent = `${suppliersSet.size || 5} NCC`;
     }
 
     async function submitReceipt(e) {
@@ -491,23 +709,28 @@
         return;
       }
 
+      const branchCode = document.getElementById('receiptBranchSelect').value || 'CN01';
       const supplierName = document.getElementById('supplierSelect').value;
-      const receiptDate = document.getElementById('receiptDate').value;
+      const receiptDate = document.getElementById('receiptDate').value || new Date().toISOString().split('T')[0];
+      const customNotes = document.getElementById('receiptNotes')?.value?.trim();
 
-      // Dynamic manager branch & staff resolution
-      const curUser = (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser()) || (function() {
-        try { return JSON.parse(localStorage.getItem('utesport_user')); } catch(e) { return null; }
-      })();
-      const branchCode = (curUser && curUser.branchCode && curUser.branchCode !== 'ALL') ? curUser.branchCode : 'CN01';
+      const curUser = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
       const staffCode = (curUser && curUser.staffCode) ? curUser.staffCode : 'NS02';
 
       const payload = {
         supplierName: supplierName,
         branchCode: branchCode,
         staffCode: staffCode,
-        notes: 'Phiếu nhập kho ngày ' + (receiptDate || new Date().toISOString().split('T')[0]),
+        notes: (customNotes ? customNotes + ' - ' : '') + 'Nhập kho ngày ' + receiptDate,
         items: items
       };
+
+      const btn = document.getElementById('btnSubmitReceipt');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>Đang ghi nhận vào SQL Server...</span>';
+      }
 
       try {
         let token = localStorage.getItem('jwt_token');
@@ -532,30 +755,59 @@
         }
 
         if (res.ok && data.success) {
-          const code = (data.receipt && data.receipt.receiptCode) ? data.receipt.receiptCode : 'mới';
-          showToast(`Nhập kho thành công phiếu [${code}]! Tồn kho đã được cập nhật.`, 'success');
-          await loadReceiptHistory();
-          // Reset danh sách nhập kho
+          const code = (data.receipt && data.receipt.receiptCode) ? data.receipt.receiptCode : 'thành công';
+          showToast(`Nhập kho thành công phiếu [${code}]! Tồn kho đã được đồng bộ vào SQL Server.`, 'success');
+          
+          // Reset form items
           const container = document.getElementById('receiptItemsContainer');
-          container.innerHTML = '';
-          addReceiptRow('P01', 50);
-          addReceiptRow('P05', 20);
+          if (container) container.innerHTML = '';
+          if (availableProducts.length > 0) {
+            addReceiptRow(availableProducts[0]?.productCode, 50);
+            if (availableProducts.length > 1) {
+              addReceiptRow(availableProducts[1]?.productCode, 20);
+            }
+          }
+          if (document.getElementById('receiptNotes')) {
+            document.getElementById('receiptNotes').value = '';
+          }
+
+          await syncAllData();
+
+          // Dispatch event for other tabs (inventory, pos)
+          window.dispatchEvent(new CustomEvent('badminton:inventory-event'));
         } else {
           showToast(data.message || `Lỗi lập phiếu nhập kho (Mã lỗi: ${res.status})`, 'error');
         }
       } catch (err) {
         showToast('Lỗi gửi dữ liệu nhập kho: ' + err.message, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Hoàn tất & Nhập hàng vào kho</span>
+          `;
+        }
       }
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-      document.getElementById('receiptDate').value = new Date().toISOString().split('T')[0];
-      await loadProducts();
-      const container = document.getElementById('receiptItemsContainer');
-      container.innerHTML = '';
-      addReceiptRow('P01', 50);
-      addReceiptRow('P05', 20);
-      loadReceiptHistory();
+      initBranchSecurity();
+      const today = new Date().toISOString().split('T')[0];
+      const dateInp = document.getElementById('receiptDate');
+      if (dateInp) dateInp.value = today;
+
+      const activeBranch = getActiveBranch();
+      const formBranch = document.getElementById('receiptBranchSelect');
+      if (formBranch && activeBranch !== 'ALL') {
+        formBranch.value = activeBranch;
+      }
+
+      await syncAllData();
+    });
+
+    window.addEventListener('badminton:inventory-event', () => {
+      syncAllData();
     });
   </script>
 </body>

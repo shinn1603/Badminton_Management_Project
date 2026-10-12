@@ -21,6 +21,9 @@ public class Booking {
     @Column(name = "booking_code", nullable = false, unique = true, length = 30)
     private String bookingCode;
 
+    @Column(name = "customer_code", length = 20)
+    private String customerCode;
+
     @Column(name = "customer_name", nullable = false, length = 100)
     private String customerName;
 

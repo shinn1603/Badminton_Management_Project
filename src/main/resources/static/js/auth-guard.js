@@ -271,6 +271,36 @@
           el.style.display = 'none';
         });
       }
+
+      // Strict branch-level isolation:
+      // If user is MANAGER or has a specific branch assigned and is not DIRECTOR or ADMIN,
+      // lock down all branch selection dropdowns across the application to their assigned branch.
+      if (currentUser.role === 'MANAGER' || (currentUser.branchCode && currentUser.branchCode !== 'ALL' && currentUser.role !== 'DIRECTOR' && currentUser.role !== 'ADMIN')) {
+        const assignedBranch = currentUser.branchCode || 'CN01';
+        const assignedBranchName = currentUser.branchName || 'CN Thủ Đức';
+        localStorage.setItem('manager_active_branch', assignedBranch);
+
+        document.querySelectorAll('select#branchFilterSelect, select#dashboardBranchSelect').forEach(sel => {
+          sel.innerHTML = `<option value="${assignedBranch}" selected>${assignedBranch} - ${assignedBranchName} (Chi nhánh quản lý)</option>`;
+          sel.value = assignedBranch;
+          sel.disabled = true;
+          sel.style.cursor = 'not-allowed';
+          sel.style.opacity = '0.9';
+          sel.title = 'Phân quyền: Bạn chỉ có quyền quản lý và theo dõi chi nhánh được phân công (' + assignedBranch + ')';
+
+          const badge = sel.closest('.branch-select-badge');
+          if (badge) {
+            badge.style.cursor = 'default';
+            badge.title = 'Phân quyền chi nhánh: ' + assignedBranchName;
+          }
+        });
+
+        document.querySelectorAll('select#inpItemBranch, select#inpStaffBranch, select#receiptBranchCode').forEach(sel => {
+          sel.value = assignedBranch;
+          sel.disabled = true;
+          sel.style.cursor = 'not-allowed';
+        });
+      }
     }
 
     // Globally synchronize Customer Nav User Area across all customer pages
@@ -510,6 +540,15 @@
         options.headers['Authorization'] = 'Bearer ' + token;
       }
     }
+
+    // Strict branch isolation for MANAGER or branch-scoped roles:
+    // If user is MANAGER and requests API with branchCode, sanitize to their assigned branchCode.
+    if (currentUser && (currentUser.role === 'MANAGER' || (currentUser.branchCode && currentUser.branchCode !== 'ALL' && currentUser.role !== 'DIRECTOR' && currentUser.role !== 'ADMIN'))) {
+      const assignedBranch = currentUser.branchCode || 'CN01';
+      if (typeof url === 'string' && url.includes('branchCode=')) {
+        url = url.replace(/branchCode=[^&]*/g, 'branchCode=' + encodeURIComponent(assignedBranch));
+      }
+    }
     const response = await originalFetch(url, options);
     if (response.status === 401 && typeof url === 'string' && url.startsWith('/api') && !url.includes('/api/auth/login')) {
       const p = window.location.pathname.toLowerCase();
@@ -547,4 +586,5 @@
       console.warn('Direct role mutation via navigation is disabled. Authenticated session is preserved.');
     }
   };
+  window.AuthGuard = window.RBAC;
 })();

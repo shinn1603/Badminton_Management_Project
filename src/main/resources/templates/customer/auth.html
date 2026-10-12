@@ -27,52 +27,6 @@
       padding: 0;
     }
 
-    /* Common Header */
-    .cust-header {
-      background: #ffffff;
-      border-bottom: 1px solid var(--cust-border);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-    }
-    .cust-nav-container {
-      max-width: 1240px;
-      margin: 0 auto;
-      padding: 0 24px;
-      height: 68px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .cust-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: var(--cust-text-main);
-    }
-    .cust-brand-logo {
-      width: 40px;
-      height: 40px;
-      background: var(--cust-primary);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-      box-shadow: 0 2px 6px rgba(13, 148, 136, 0.2);
-    }
-    .cust-brand-title {
-      font-size: 16.5px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-    }
-    .cust-brand-sub {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--cust-primary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
     /* Clean Auth Page Layout - LUXURY EMERALD SPORT */
     .auth-page-wrapper {
       min-height: calc(100vh - 130px);
@@ -302,6 +256,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 16px;
+      flex-wrap: nowrap;
     }
     .cust-brand-wrap {
       display: flex;
@@ -309,6 +265,7 @@
       gap: 12px;
       text-decoration: none;
       color: var(--text-dark);
+      flex-shrink: 0;
     }
     .cust-logo-icon {
       width: 44px;
@@ -320,6 +277,7 @@
       justify-content: center;
       color: #ffffff;
       box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      flex-shrink: 0;
     }
     .cust-brand-title {
       font-size: 18px;
@@ -327,6 +285,7 @@
       letter-spacing: -0.4px;
       color: var(--text-dark);
       line-height: 1.2;
+      white-space: nowrap;
     }
     .cust-brand-sub {
       font-size: 11px;
@@ -334,11 +293,13 @@
       color: var(--primary);
       text-transform: uppercase;
       letter-spacing: 0.8px;
+      white-space: nowrap;
     }
     .cust-nav-menu {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 16px;
+      flex-shrink: 1;
     }
     .cust-nav-link {
       text-decoration: none;
@@ -347,10 +308,11 @@
       color: var(--text-muted);
       transition: all 0.2s ease;
       position: relative;
-      padding: 8px 0;
+      padding: 8px 4px;
       display: flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
     }
     .cust-nav-link:hover, .cust-nav-link.active {
       color: var(--primary);
@@ -370,6 +332,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      flex-shrink: 0;
     }
     @media (max-width: 768px) {
       .cust-nav-menu { display: none; }
@@ -450,7 +413,8 @@
             <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
             <path d="M2 12h20"></path>
           </svg>
-              <div>
+        </div>
+        <div>
           <div class="cust-brand-title">UTE SPORT</div>
           <div class="cust-brand-sub">Hệ Thống Sân Cầu Lông</div>
         </div>
@@ -517,7 +481,7 @@
 
       <!-- Quick Account State Bar -->
       <div id="alreadyLoggedInBanner" style="display: none; padding: 14px 20px; background: rgba(16, 185, 129, 0.1); border-bottom: 1px solid rgba(16, 185, 129, 0.25); text-align: center; font-size: 13px;">
-        <span style="color: var(--text-dark);">Tài khoản hiện tại: <strong id="loggedUserName">Lê Bá Đạt</strong></span>
+        <span style="color: var(--text-dark);">Tài khoản hiện tại: <strong id="loggedUserName">---</strong></span>
         <div style="display: flex; gap: 10px; justify-content: center; margin-top: 8px;">
           <a href="/customer/home" class="btn btn-primary" id="btnContinueCurrent" style="padding: 6px 14px; font-size: 12px; border-radius: 8px; text-decoration: none;">Vào Hệ Thống</a>
           <button type="button" class="btn btn-outline" onclick="window.RBAC ? window.RBAC.logoutCustomer() : logoutLocalCustomer()" style="padding: 6px 14px; font-size: 12px; border-radius: 8px;">Đăng Xuất</button>
@@ -832,43 +796,8 @@
           showToast(data.message || 'Tài khoản hoặc mật khẩu không chính xác.', false);
         }
       } catch (err) {
-        console.warn('API error, falling back locally:', err);
-        let fallbackRole = 'CUSTOMER';
-        let fallbackName = 'Lê Bá Đạt';
-        let fallbackUrl = '/customer/home';
-        const uname = phoneOrUser.toLowerCase();
-
-        if (uname === 'director') {
-          fallbackRole = 'DIRECTOR';
-          fallbackName = 'Nguyễn Phước Thọ';
-          fallbackUrl = '/director/dashboard';
-        } else if (uname === 'manager') {
-          fallbackRole = 'MANAGER';
-          fallbackName = 'Trần Phúc Bảo';
-          fallbackUrl = '/manager/dashboard';
-        } else if (uname === 'pos') {
-          fallbackRole = 'POS';
-          fallbackName = 'Nguyễn Thanh Tâm';
-          fallbackUrl = '/pos/grid';
-        } else if (uname === 'admin') {
-          fallbackRole = 'ADMIN';
-          fallbackName = 'Trần Biểu Hương';
-          fallbackUrl = '/admin/users';
-        } else {
-          fallbackRole = 'CUSTOMER';
-          fallbackName = 'Khách Hàng (' + phoneOrUser + ')';
-          fallbackUrl = '/customer/home';
-        }
-
-        localStorage.setItem('utesport_user', JSON.stringify({
-          success: true,
-          username: phoneOrUser,
-          fullName: fallbackName,
-          role: fallbackRole,
-          branchCode: 'CN01'
-        }));
-        showToast('Đăng nhập thành công.');
-        setTimeout(() => { window.location.href = fallbackUrl; }, 700);
+        console.error('Lỗi khi gọi API đăng nhập:', err);
+        showToast('Không thể kết nối đến hệ thống máy chủ hoặc lỗi mạng. Vui lòng thử lại!', false);
       }
     }
 
@@ -918,17 +847,8 @@
           showToast(data.message || 'Đăng ký không thành công.', false);
         }
       } catch (err) {
-        console.warn('API error, local fallback:', err);
-        localStorage.setItem('utesport_user', JSON.stringify({
-          username: phone,
-          fullName: name,
-          phone: phone,
-          email: email,
-          role: 'CUSTOMER',
-          branchCode: 'CN01'
-        }));
-        showToast('Đăng ký tài khoản thành công.');
-        setTimeout(() => { window.location.href = '/customer/profile'; }, 1000);
+        console.error('Lỗi khi gọi API đăng ký:', err);
+        showToast('Không thể kết nối đến hệ thống máy chủ hoặc lỗi mạng. Vui lòng thử lại!', false);
       }
     }
 

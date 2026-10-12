@@ -247,6 +247,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 16px;
+      flex-wrap: nowrap;
     }
     .cust-brand-wrap {
       display: flex;
@@ -254,6 +256,7 @@
       gap: 12px;
       text-decoration: none;
       color: var(--text-dark);
+      flex-shrink: 0;
     }
     .cust-logo-icon {
       width: 44px;
@@ -265,6 +268,7 @@
       justify-content: center;
       color: #ffffff;
       box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      flex-shrink: 0;
     }
     .cust-brand-title {
       font-size: 18px;
@@ -272,6 +276,7 @@
       letter-spacing: -0.4px;
       color: var(--text-dark);
       line-height: 1.2;
+      white-space: nowrap;
     }
     .cust-brand-sub {
       font-size: 11px;
@@ -279,11 +284,13 @@
       color: var(--primary);
       text-transform: uppercase;
       letter-spacing: 0.8px;
+      white-space: nowrap;
     }
     .cust-nav-menu {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 16px;
+      flex-shrink: 1;
     }
     .cust-nav-link {
       text-decoration: none;
@@ -292,10 +299,11 @@
       color: var(--text-muted);
       transition: all 0.2s ease;
       position: relative;
-      padding: 8px 0;
+      padding: 8px 4px;
       display: flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
     }
     .cust-nav-link:hover, .cust-nav-link.active {
       color: var(--primary);
@@ -315,6 +323,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      flex-shrink: 0;
     }
     @media (max-width: 768px) {
       .cust-nav-menu { display: none; }
@@ -471,76 +480,52 @@
 
       <div class="qr-showcase-box">
         <div style="font-size: 14.5px; font-weight: 700; color: var(--cust-text-main);">Quét Mã QR Chuyển Khoản</div>
-        <div style="font-size: 11.5px; color: var(--cust-text-muted); margin-top: 4px;">Hỗ trợ ứng dụng ngân hàng và ví điện tử qua VietQR</div>
+        <div style="font-size: 11.5px; color: var(--cust-text-muted); margin-top: 4px;">Hỗ trợ ứng dụng ngân hàng và ví điện tử qua VietQR Napas 247</div>
 
         <div class="qr-frame">
-          <svg class="qr-code-img" viewBox="0 0 100 100" fill="#0f172a">
-            <rect x="0" y="0" width="28" height="28" fill="#0f172a"/>
-            <rect x="4" y="4" width="20" height="20" fill="#ffffff"/>
-            <rect x="8" y="8" width="12" height="12" fill="#0f172a"/>
-
-            <rect x="72" y="0" width="28" height="28" fill="#0f172a"/>
-            <rect x="76" y="4" width="20" height="20" fill="#ffffff"/>
-            <rect x="80" y="8" width="12" height="12" fill="#0f172a"/>
-
-            <rect x="0" y="72" width="28" height="28" fill="#0f172a"/>
-            <rect x="4" y="76" width="20" height="20" fill="#ffffff"/>
-            <rect x="8" y="80" width="12" height="12" fill="#0f172a"/>
-
-            <rect x="40" y="40" width="20" height="20" fill="#ffffff" rx="3"/>
-            <rect x="42" y="42" width="16" height="16" fill="#0d9488" rx="2"/>
-
-            <rect x="34" y="6" width="4" height="4"/><rect x="42" y="6" width="4" height="4"/><rect x="54" y="6" width="4" height="4"/>
-            <rect x="34" y="16" width="4" height="4"/><rect x="46" y="16" width="4" height="4"/>
-            <rect x="6" y="36" width="4" height="4"/><rect x="18" y="36" width="4" height="4"/><rect x="26" y="36" width="4" height="4"/>
-            <rect x="68" y="36" width="4" height="4"/><rect x="82" y="36" width="4" height="4"/>
-            <rect x="14" y="48" width="4" height="4"/><rect x="72" y="48" width="4" height="4"/>
-            <rect x="36" y="66" width="4" height="4"/><rect x="48" y="66" width="4" height="4"/><rect x="76" y="66" width="4" height="4"/>
-            <rect x="50" y="78" width="4" height="4"/><rect x="68" y="78" width="4" height="4"/>
-            <rect x="44" y="88" width="4" height="4"/><rect x="60" y="88" width="4" height="4"/>
-          </svg>
-          <div style="font-size: 11px; font-weight: 700; color: var(--cust-primary); margin-top: 4px;">VIETQR 24/7 - XÁC NHẬN TỨC THÌ</div>
+          <img id="qrCodeImg" class="qr-code-img" src="/images/vietqr-bank.png" onerror="this.src='https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=30000&addInfo=CK%20DAT%20SAN&accountName=UTE%20BADMINTON%20CLUB'" alt="Mã VietQR Chuyển Khoản" style="width: 200px; height: 200px; object-fit: contain; display: block; margin: 0 auto;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--cust-primary); margin-top: 6px;">VIETQR 24/7 - ĐỐI SOÁT TỰ ĐỘNG</div>
         </div>
 
         <table class="bank-info-table">
           <tr>
             <td>Ngân hàng:</td>
-            <td>MB Bank (Ngân Hàng Quân Đội)</td>
+            <td id="qrBankName">MBBank (Ngân Hàng Quân Đội)</td>
           </tr>
           <tr>
             <td>Số tài khoản:</td>
             <td>
-              <span>9999UTEBADMINTON</span>
-              <button type="button" class="btn-copy-tag" onclick="copyText('9999UTEBADMINTON')">Sao chép</button>
+              <span id="qrAccountNo">0903123456</span>
+              <button type="button" class="btn-copy-tag" onclick="copyText(document.getElementById('qrAccountNo').textContent)">Sao chép</button>
             </td>
           </tr>
           <tr>
             <td>Tên thụ hưởng:</td>
-            <td>CLB CAU LONG UTE SPORT</td>
+            <td id="qrAccountName">UTE BADMINTON CLUB</td>
           </tr>
           <tr>
             <td>Số tiền cọc (30%):</td>
             <td>
-              <span id="qrDepositAmount" style="color: var(--cust-primary-hover); font-size: 14px; font-weight: 700;">94.500 đ</span>
-              <button type="button" class="btn-copy-tag" onclick="copyText('94500')">Sao chép</button>
+              <span id="qrDepositAmount" style="color: var(--cust-primary-hover); font-size: 14px; font-weight: 700;">Đang nạp...</span>
+              <button type="button" class="btn-copy-tag" onclick="copyText(document.getElementById('qrDepositAmount').textContent.replace(/\D/g, ''))">Sao chép</button>
             </td>
           </tr>
           <tr>
             <td>Nội dung CK:</td>
             <td>
-              <span id="qrTransferContent" style="color: var(--cust-primary-hover); font-family: monospace; font-size: 13.5px; font-weight: 700;">BK202609224412</span>
+              <span id="qrTransferContent" style="color: #ef4444; font-family: monospace; font-size: 13.5px; font-weight: 700;">Đang nạp...</span>
               <button type="button" class="btn-copy-tag" onclick="copyText(document.getElementById('qrTransferContent').textContent)">Sao chép</button>
             </td>
           </tr>
         </table>
 
         <div style="margin-top: 18px;">
-          <button type="button" class="btn btn-primary" onclick="confirmPaymentSuccess()" style="width: 100%; height: 40px; font-size: 13.5px; font-weight: 600; border-radius: 6px;">
+          <button type="button" class="btn btn-primary" id="btnConfirmPay" onclick="confirmPaymentSuccess()" style="width: 100%; height: 42px; font-size: 13.5px; font-weight: 700; border-radius: 8px;">
             <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            Đã Chuyển Khoản
+            Tôi Đã Chuyển Khoản Thành Công
           </button>
-          <a href="/customer/booking" style="display: block; margin-top: 10px; font-size: 11.5px; color: var(--cust-text-muted); text-decoration: none;">
-            Hủy và chọn lại sân
+          <a href="/customer/booking" style="display: block; margin-top: 12px; font-size: 12px; color: var(--cust-text-muted); text-decoration: none;">
+            ← Quay lại trang chọn sân & giờ
           </a>
         </div>
       </div>
@@ -551,57 +536,57 @@
       <div class="invoice-card">
         <div class="invoice-header">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <div style="font-size: 11px; text-transform: uppercase; color: var(--cust-primary); font-weight: 600;">Phiếu Giữ Chỗ</div>
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--cust-primary); font-weight: 600;">Phiếu Giữ Chỗ Trực Tuyến</div>
             <div style="font-size: 11.5px; font-weight: 700; color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 2px 8px; border-radius: 6px;">
-              Giữ chỗ: <span id="payTimer">09:48</span>
+              Giữ chỗ: <span id="payTimer">10:00</span>
             </div>
           </div>
-          <div style="font-size: 16px; font-weight: 800; color: var(--cust-text-main);">Chi Tiết Đặt Sân</div>
-          <div class="invoice-code" id="invCode">BK-20260922-4412</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--cust-text-main);">Chi Tiết Đơn Đặt Sân</div>
+          <div class="invoice-code" id="invCode">Đang tải dữ liệu...</div>
         </div>
 
         <div class="invoice-body">
           <div class="invoice-row">
             <span class="lbl">Họ tên khách:</span>
-            <span class="val" id="invCustomer">Nguyễn Văn An</span>
+            <span class="val" id="invCustomer">Đang tải...</span>
           </div>
           <div class="invoice-row">
             <span class="lbl">Số điện thoại:</span>
-            <span class="val" id="invPhone">0912345678</span>
+            <span class="val" id="invPhone">Đang tải...</span>
           </div>
           <div class="invoice-row">
             <span class="lbl">Chi nhánh:</span>
-            <span class="val" id="invBranch">CN1 - Võ Văn Ngân, Thủ Đức</span>
+            <span class="val" id="invBranch">Đang tải...</span>
           </div>
           <div class="invoice-row">
             <span class="lbl">Sân thi đấu:</span>
-            <span class="val" id="invCourt">Sân Số 01 (Tiêu Chuẩn)</span>
+            <span class="val" id="invCourt">Đang tải...</span>
           </div>
           <div class="invoice-row">
             <span class="lbl">Ngày thi đấu:</span>
-            <span class="val" id="invDate">22/09/2026</span>
+            <span class="val" id="invDate">Đang tải...</span>
           </div>
           <div class="invoice-row">
             <span class="lbl">Khung giờ:</span>
-            <span class="val" id="invSlots">17:00 - 19:00 (2 giờ)</span>
+            <span class="val" id="invSlots">Đang tải...</span>
           </div>
 
           <div class="invoice-total-highlight">
             <div class="invoice-row" style="margin-bottom: 6px;">
               <span class="lbl">Tổng phí dịch vụ:</span>
-              <span class="val" id="invTotal" style="font-size: 14px;">315.000 đ</span>
+              <span class="val" id="invTotal" style="font-size: 14px;">0 đ</span>
             </div>
             <div class="invoice-row" style="margin-bottom: 6px;">
               <span class="lbl" style="color: var(--cust-primary-hover); font-weight: 700;">Tiền cọc giữ sân (30%):</span>
-              <span class="val" id="invDeposit" style="color: var(--cust-primary-hover); font-size: 16px; font-weight: 800;">94.500 đ</span>
+              <span class="val" id="invDeposit" style="color: var(--cust-primary-hover); font-size: 16px; font-weight: 800;">0 đ</span>
             </div>
             <div class="invoice-row" style="margin-bottom: 0;">
               <span class="lbl" style="font-size: 11.5px;">Còn lại thanh toán tại quầy:</span>
-              <span class="val" id="invRemaining" style="font-size: 11.5px; color: var(--cust-text-muted);">220.500 đ (70%)</span>
+              <span class="val" id="invRemaining" style="font-size: 11.5px; color: var(--cust-text-muted);">0 đ (70%)</span>
             </div>
           </div>
 
-          <div style="background: var(--cust-primary-light); border: 1px solid var(--cust-primary-border); border-radius: 6px; padding: 10px 12px; font-size: 11.5px; color: var(--cust-primary-hover); line-height: 1.5;">
+          <div id="bookingStatusAlert" style="background: var(--cust-primary-light); border: 1px solid var(--cust-primary-border); border-radius: 6px; padding: 10px 12px; font-size: 11.5px; color: var(--cust-primary-hover); line-height: 1.5;">
             <strong>Chính sách hoàn cọc:</strong> Hoàn 100% tự động khi hủy trước giờ chơi tối thiểu 4 tiếng.
           </div>
         </div>
@@ -617,7 +602,7 @@
       </div>
       <h3 style="font-size: 18px; font-weight: 800; color: var(--cust-text-main); margin-bottom: 6px;">Đặt Cọc Thành Công!</h3>
       <p style="font-size: 12.5px; color: var(--cust-text-muted); line-height: 1.5; margin-bottom: 18px;">
-        Hệ thống đã xác nhận tiền cọc <strong id="modalDepositTxt" style="color: var(--cust-primary);">94.500 đ</strong>. Mã vé điện tử QR đã sẵn sàng để quét nhận sân tại quầy POS!
+        Hệ thống đã ghi nhận tiền cọc <strong id="modalDepositTxt" style="color: var(--cust-primary);">0 đ</strong> vào cơ sở dữ liệu. Mã vé QR điện tử đã sẵn sàng để quét nhận sân tại quầy POS!
       </p>
       <button type="button" class="btn btn-primary" onclick="window.location.href='/customer/history'" style="width: 100%; height: 40px; font-size: 13px; font-weight: 600; border-radius: 6px;">
         Xem Vé Điện Tử & Lịch Sử Đặt Chỗ
@@ -626,50 +611,11 @@
   </div>
 
   <script>
-    const saved = sessionStorage.getItem('ute_booking');
-    if (saved) {
-      try {
-        const b = JSON.parse(saved);
-        if (b.id) {
-          document.getElementById('invCode').textContent = b.id;
-          document.getElementById('qrTransferContent').textContent = b.id.replace(/-/g, '');
-        }
-        if (b.customerName) document.getElementById('invCustomer').textContent = b.customerName;
-        if (b.customerPhone) document.getElementById('invPhone').textContent = b.customerPhone;
-        if (b.branch) document.getElementById('invBranch').textContent = b.branch;
-        if (b.court) document.getElementById('invCourt').textContent = b.court;
-        if (b.date) document.getElementById('invDate').textContent = b.date;
-        if (b.slots) document.getElementById('invSlots').textContent = b.slots;
-        if (b.total) document.getElementById('invTotal').textContent = b.total;
-        if (b.deposit) {
-          document.getElementById('invDeposit').textContent = b.deposit;
-          document.getElementById('qrDepositAmount').textContent = b.deposit;
-          document.getElementById('modalDepositTxt').textContent = b.deposit;
-
-          const cleanNum = parseInt(b.total.replace(/\D/g, '')) || 315000;
-          const depNum = parseInt(b.deposit.replace(/\D/g, '')) || 94500;
-          const rem = cleanNum - depNum;
-          document.getElementById('invRemaining').textContent = rem.toLocaleString('vi-VN') + ' đ (70%)';
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    let secondsLeft = 588;
-    const pTimer = setInterval(() => {
-      if (secondsLeft <= 0) {
-        clearInterval(pTimer);
-        showToast('Hết hạn thanh toán! Slot đã được mở lại.', 'info');
-        window.location.href = '/customer/booking';
-        return;
-      }
-      secondsLeft--;
-      const m = Math.floor(secondsLeft / 60);
-      const s = secondsLeft % 60;
-      document.getElementById('payTimer').textContent = 
-        String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-    }, 1000);
+    let currentBooking = null;
+    let currentBookingCode = '';
+    let currentDepositAmount = 0;
+    let selectedMethod = 'VietQR';
+    let isSubmitting = false;
 
     function selectPayMethod(method) {
       document.getElementById('tabVietQR').classList.remove('active');
@@ -678,14 +624,18 @@
 
       if (method === 'vietqr') {
         document.getElementById('tabVietQR').classList.add('active');
+        selectedMethod = 'VietQR';
       } else if (method === 'vnpay') {
         document.getElementById('tabVNPay').classList.add('active');
+        selectedMethod = 'VNPAY';
       } else {
         document.getElementById('tabMoMo').classList.add('active');
+        selectedMethod = 'MoMo';
       }
     }
 
     function copyText(text) {
+      if (!text) return;
       navigator.clipboard.writeText(text).then(() => {
         showToast('Đã sao chép: ' + text, 'info');
       }).catch(() => {
@@ -693,9 +643,219 @@
       });
     }
 
-    function confirmPaymentSuccess() {
-      document.getElementById('successModal').classList.add('open');
+    let secondsLeft = 600;
+    const pTimer = setInterval(() => {
+      if (secondsLeft <= 0) {
+        clearInterval(pTimer);
+        const timerEl = document.getElementById('payTimer');
+        if (timerEl) timerEl.textContent = '00:00 (Hết hạn)';
+        showToast('Đã hết hạn phiên giữ slot! Bạn có thể chọn đặt lại.', 'warning');
+        return;
+      }
+      secondsLeft--;
+      const m = Math.floor(secondsLeft / 60);
+      const s = secondsLeft % 60;
+      const timerEl = document.getElementById('payTimer');
+      if (timerEl) {
+        timerEl.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+      }
+    }, 1000);
+
+    async function loadBookingPaymentDetails() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let code = urlParams.get('bookingCode') || urlParams.get('code');
+
+      // Check session storage if not in URL
+      if (!code) {
+        const saved = sessionStorage.getItem('ute_booking');
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            code = parsed.id || parsed.bookingCode;
+          } catch(e) {}
+        }
+      }
+
+      if (!code) {
+        // Try to fetch latest booking from customer API if logged in
+        const token = localStorage.getItem('jwt_token');
+        if (token) {
+          try {
+            const res = await fetch('/api/customer/my-bookings', {
+              headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (res.ok) {
+              const list = await res.json();
+              if (Array.isArray(list) && list.length > 0) {
+                const pending = list.find(b => b.status && b.status.includes('30%')) || list[0];
+                code = pending.bookingCode;
+              }
+            }
+          } catch(e) {}
+        }
+      }
+
+      if (!code) {
+        document.getElementById('invCode').textContent = 'Chưa chọn đơn đặt';
+        document.getElementById('invCustomer').textContent = 'Vui lòng đặt sân trước';
+        document.getElementById('invPhone').textContent = '---';
+        document.getElementById('invBranch').textContent = '---';
+        document.getElementById('invCourt').textContent = '---';
+        document.getElementById('invDate').textContent = '---';
+        document.getElementById('invSlots').textContent = '---';
+        document.getElementById('qrTransferContent').textContent = 'CHUA_CO_MA';
+        document.getElementById('qrDepositAmount').textContent = '0 đ';
+        const btnPay = document.getElementById('btnConfirmPay');
+        if (btnPay) {
+          btnPay.disabled = true;
+          btnPay.textContent = 'Vui lòng chọn sân từ trang Đặt Sân';
+        }
+        showToast('Chưa có mã đơn đặt sân! Vui lòng chọn sân trước.', 'warning');
+        return;
+      }
+
+      currentBookingCode = code.trim().toUpperCase();
+
+      try {
+        const res = await fetch(`/api/bookings/${encodeURIComponent(currentBookingCode)}`);
+        if (!res.ok) {
+          showToast(`Không tìm thấy đơn đặt sân ${currentBookingCode} trong cơ sở dữ liệu!`, 'error');
+          document.getElementById('invCode').textContent = currentBookingCode + ' (Không tồn tại)';
+          const btnPay = document.getElementById('btnConfirmPay');
+          if (btnPay) btnPay.disabled = true;
+          return;
+        }
+
+        const data = await res.json();
+        const b = data.booking || data;
+        currentBooking = b;
+
+        const total = Number(b.totalPrice || 0);
+        let deposit = Number(b.depositAmount || 0);
+        if (deposit <= 0) {
+          deposit = Math.round(total * 0.3);
+        }
+        currentDepositAmount = deposit;
+        const remaining = Math.max(0, total - deposit);
+
+        document.getElementById('invCode').textContent = b.bookingCode;
+        document.getElementById('invCustomer').textContent = b.customerName || 'Khách hàng';
+        document.getElementById('invPhone').textContent = b.customerPhone || '---';
+
+        const branchText = (data.branchName ? `${b.branchCode} - ${data.branchName}` : b.branchCode) || 'Hệ thống UTE Sport';
+        document.getElementById('invBranch').textContent = branchText;
+
+        const courtText = (data.courtName ? `${b.courtCode} (${data.courtName})` : b.courtCode) || 'Sân thi đấu';
+        document.getElementById('invCourt').textContent = courtText;
+
+        document.getElementById('invDate').textContent = b.bookingDate || '---';
+        document.getElementById('invSlots').textContent = b.timeSlot || '---';
+
+        document.getElementById('invTotal').textContent = total.toLocaleString('vi-VN') + ' đ';
+        document.getElementById('invDeposit').textContent = deposit.toLocaleString('vi-VN') + ' đ';
+        document.getElementById('invRemaining').textContent = remaining.toLocaleString('vi-VN') + ' đ (70%)';
+
+        document.getElementById('qrDepositAmount').textContent = deposit.toLocaleString('vi-VN') + ' đ';
+        document.getElementById('qrTransferContent').textContent = `CK ${b.bookingCode}`;
+        document.getElementById('modalDepositTxt').textContent = deposit.toLocaleString('vi-VN') + ' đ';
+
+        // Dynamic VietQR generator link
+        const qrImg = document.getElementById('qrCodeImg');
+        if (qrImg) {
+          qrImg.src = `https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=${deposit}&addInfo=CK%20${b.bookingCode}&accountName=UTE%20BADMINTON%20CLUB`;
+        }
+
+        // Check booking status
+        const status = b.status || '';
+        const alertBox = document.getElementById('bookingStatusAlert');
+        const btnPay = document.getElementById('btnConfirmPay');
+
+        if (status.includes('Đã cọc') || status.includes('hoàn thành') || status.includes('Hoàn thành') || status.includes('thanh toán')) {
+          if (alertBox) {
+            alertBox.style.background = 'rgba(16, 185, 129, 0.12)';
+            alertBox.style.color = '#059669';
+            alertBox.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+            alertBox.innerHTML = `<strong>Trạng thái: ${status}</strong><br>Đơn này đã được ghi nhận thanh toán tiền cọc thành công trong cơ sở dữ liệu!`;
+          }
+          if (btnPay) {
+            btnPay.disabled = true;
+            btnPay.textContent = 'Đã Xác Nhận Tiền Cọc Thành Công';
+            btnPay.classList.remove('btn-primary');
+            btnPay.classList.add('btn-outline');
+          }
+        } else if (status.includes('hủy') || status.includes('Hủy')) {
+          if (alertBox) {
+            alertBox.style.background = 'rgba(239, 68, 68, 0.1)';
+            alertBox.style.color = '#dc2626';
+            alertBox.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+            alertBox.innerHTML = `<strong>Trạng thái: Đơn đã bị hủy</strong><br>Không thể thanh toán cho đơn này. Vui lòng đặt lại sân mới!`;
+          }
+          if (btnPay) {
+            btnPay.disabled = true;
+            btnPay.textContent = 'Đơn Đặt Sân Đã Bị Hủy';
+          }
+        }
+      } catch (err) {
+        console.error('Lỗi nạp dữ liệu đơn đặt sân:', err);
+        showToast('Lỗi kết nối cơ sở dữ liệu khi tải đơn!', 'error');
+      }
     }
+
+    async function confirmPaymentSuccess() {
+      if (isSubmitting) return;
+      if (!currentBookingCode) {
+        showToast('Không tìm thấy mã đơn đặt sân để xác nhận!', 'error');
+        return;
+      }
+
+      isSubmitting = true;
+      const btn = document.getElementById('btnConfirmPay');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Đang ghi nhận tiền cọc vào CSDL...';
+      }
+
+      showToast(`Đang đối soát giao dịch và ghi nhận tiền cọc cho đơn ${currentBookingCode}...`, 'info');
+
+      try {
+        const payload = {
+          amount: currentDepositAmount,
+          paymentMethod: selectedMethod + ' Pro',
+          txRef: `${selectedMethod}-${currentBookingCode}-${Date.now() % 1000000}`
+        };
+
+        const res = await fetch(`/api/bookings/${encodeURIComponent(currentBookingCode)}/deposit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (res.ok && (data.success || data.booking)) {
+          showToast(`Đã ghi nhận tiền cọc thành công cho đơn ${currentBookingCode} trong Database!`, 'success');
+          document.getElementById('successModal').classList.add('open');
+        } else {
+          showToast(data.message || 'Xác nhận tiền cọc thất bại, vui lòng thử lại!', 'error');
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Tôi Đã Chuyển Khoản Thành Công';
+          }
+        }
+      } catch (err) {
+        console.error('Lỗi khi gửi xác nhận tiền cọc:', err);
+        showToast('Lỗi máy chủ khi cập nhật thanh toán!', 'error');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Tôi Đã Chuyển Khoản Thành Công';
+        }
+      } finally {
+        isSubmitting = false;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadBookingPaymentDetails();
+    });
   </script>
   
   <footer class="cust-footer-dark">

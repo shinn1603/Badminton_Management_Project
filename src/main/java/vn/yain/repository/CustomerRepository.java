@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
     Optional<Customer> findByCustomerCode(String customerCode);
     Optional<Customer> findByPhone(String phone);
+    Optional<Customer> findByEmail(String email);
     Optional<Customer> findByPhoneAndPassword(String phone, String password);
 }

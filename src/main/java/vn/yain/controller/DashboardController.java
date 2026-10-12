@@ -18,7 +18,7 @@ public class DashboardController {
     }
 
     // CUSTOMER PORTAL ENDPOINTS (Phan he Cong Khach Hang - Tran Bieu Huong)
-    @GetMapping({ "/", "/customer", "/customer/home" })
+    @GetMapping("/customer/home")
     public String customerHome() {
         return "customer/home";
     }

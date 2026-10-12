@@ -16,5 +16,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByCourtCodeAndBookingDate(String courtCode, LocalDate bookingDate);
     List<Booking> findByCustomerPhone(String customerPhone);
     List<Booking> findByCustomerPhoneOrderByBookingDateDesc(String customerPhone);
+    List<Booking> findByCustomerCodeOrderByBookingDateDesc(String customerCode);
     List<Booking> findByCustomerNameContainingIgnoreCase(String customerName);
 }

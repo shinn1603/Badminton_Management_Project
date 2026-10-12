@@ -179,8 +179,8 @@ public class WarehouseService {
     }
 
     public List<StockReceipt> getReceiptsByBranch(String branchCode) {
-        if (branchCode != null && !branchCode.trim().isEmpty()) {
-            return stockReceiptRepository.findByBranchCodeOrderByReceiptDateDesc(branchCode);
+        if (branchCode != null && !branchCode.trim().isEmpty() && !"ALL".equalsIgnoreCase(branchCode.trim())) {
+            return stockReceiptRepository.findByBranchCodeOrderByReceiptDateDesc(branchCode.trim());
         }
         return stockReceiptRepository.findAll();
     }

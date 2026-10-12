@@ -315,6 +315,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 16px;
+      flex-wrap: nowrap;
     }
     .cust-brand-wrap {
       display: flex;
@@ -322,6 +324,7 @@
       gap: 12px;
       text-decoration: none;
       color: var(--text-dark);
+      flex-shrink: 0;
     }
     .cust-logo-icon {
       width: 44px;
@@ -333,6 +336,7 @@
       justify-content: center;
       color: #ffffff;
       box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      flex-shrink: 0;
     }
     .cust-brand-title {
       font-size: 18px;
@@ -340,6 +344,7 @@
       letter-spacing: -0.4px;
       color: var(--text-dark);
       line-height: 1.2;
+      white-space: nowrap;
     }
     .cust-brand-sub {
       font-size: 11px;
@@ -347,11 +352,13 @@
       color: var(--primary);
       text-transform: uppercase;
       letter-spacing: 0.8px;
+      white-space: nowrap;
     }
     .cust-nav-menu {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 16px;
+      flex-shrink: 1;
     }
     .cust-nav-link {
       text-decoration: none;
@@ -360,10 +367,11 @@
       color: var(--text-muted);
       transition: all 0.2s ease;
       position: relative;
-      padding: 8px 0;
+      padding: 8px 4px;
       display: flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
     }
     .cust-nav-link:hover, .cust-nav-link.active {
       color: var(--primary);
@@ -383,6 +391,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      flex-shrink: 0;
     }
     @media (max-width: 768px) {
       .cust-nav-menu { display: none; }
@@ -645,6 +654,19 @@
   <script>
     let allBookingsData = [];
     let activeFilter = 'all';
+    let branchMap = {};
+
+    async function loadBranchesMap() {
+      try {
+        const res = await fetch('/api/branches');
+        const branches = await res.json() || [];
+        branches.forEach(b => {
+          branchMap[b.branchCode] = `${b.branchCode} - ${b.branchName}${b.address ? ' (' + b.address + ')' : ''}`;
+        });
+      } catch (e) {
+        console.warn('Lỗi nạp danh mục chi nhánh:', e);
+      }
+    }
 
     function filterHistory(status, btn) {
       activeFilter = status;
@@ -741,7 +763,7 @@
         const deposit = Number(item.depositAmount || Math.round(total * 0.3));
         const remaining = Math.max(0, total - deposit);
         const courtLabel = item.courtCode ? `Sân ${item.courtCode}` : 'Sân thi đấu tiêu chuẩn';
-        const branchLabel = item.branchCode === 'CN02' ? 'Chi nhánh 2 - Lê Văn Việt, TP. Thủ Đức' : 'Chi nhánh 1 - Võ Văn Ngân, TP. Thủ Đức';
+        const branchLabel = branchMap[item.branchCode] || (item.branchCode ? `Chi nhánh ${item.branchCode}` : 'Hệ thống UTE Sport');
         const dateLabel = item.bookingDate || '2026-09-22';
         const slotLabel = item.timeSlot || '18:00 - 20:00';
 
@@ -893,7 +915,8 @@
       closeModals();
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadBranchesMap();
       loadBookingsFromDb();
     });
   </script>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,6 +30,7 @@
       color: var(--text-muted);
       margin-bottom: 6px;
     }
+
     .breadcrumb-row a:hover {
       color: var(--primary);
     }
@@ -48,6 +50,7 @@
       color: var(--text-dark);
       letter-spacing: -0.3px;
     }
+
     .booking-header-title p {
       font-size: 13.5px;
       color: var(--text-muted);
@@ -79,6 +82,7 @@
       box-shadow: var(--shadow-sm);
       transition: all var(--transition-fast);
     }
+
     .mini-stat-card:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
@@ -99,11 +103,13 @@
       display: flex;
       flex-direction: column;
     }
+
     .mini-stat-label {
       font-size: 12px;
       font-weight: 500;
       color: var(--text-muted);
     }
+
     .mini-stat-val {
       font-size: 20px;
       font-weight: 800;
@@ -129,6 +135,7 @@
       padding: 3px;
       gap: 2px;
     }
+
     .view-btn {
       padding: 5px 12px;
       border-radius: 6px;
@@ -143,6 +150,7 @@
       gap: 6px;
       transition: all 0.15s ease;
     }
+
     .view-btn.active {
       background: var(--surface);
       color: var(--text-dark);
@@ -156,6 +164,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="layout-container">
@@ -218,7 +227,9 @@
 
         <a href="/manager/inventory" class="menu-item">
           <svg class="svg-icon" viewBox="0 0 24 24">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+            </path>
           </svg>
           <span class="menu-text">Kho vật tư</span>
         </a>
@@ -311,12 +322,15 @@
         <!-- LUXURY HERO BANNER -->
         <div class="hero-banner" style="margin-bottom: 24px;">
           <div class="hero-banner-content">
-            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
-              <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
+            <div
+              style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
+              <span
+                style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
               Quản Lý Đặt Sân Chi Nhánh
             </div>
             <h1 class="hero-title" style="margin-bottom: 8px;">Quản Lý Lịch Đặt Sân</h1>
-            <p class="hero-subtitle" style="margin-bottom: 0;">Tiếp nhận đặt sân, xác nhận thanh toán cọc và quản lý hóa đơn dịch vụ.</p>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Tiếp nhận đặt sân, xác nhận thanh toán cọc và quản lý hóa
+              đơn dịch vụ.</p>
           </div>
         </div>
 
@@ -436,19 +450,29 @@
             <div class="card-body">
               <!-- CONTROLS & FILTER -->
               <div class="table-control-bar">
-                <div style="display: flex; gap: 10px; align-items: center; flex: 1; min-width: 260px;">
-                  <input type="text" id="filterKeyword" class="form-control" placeholder="Tìm tên khách, SĐT, mã đơn..." oninput="applyFilters()" style="flex: 1;">
+                <div style="display: flex; gap: 10px; align-items: center; flex: 1; min-width: 260px; flex-wrap: wrap;">
+                  <select id="filterBranch" class="form-control"
+                    style="width: auto; font-weight: 700; color: var(--primary);" onchange="onBranchFilterChange()">
+                    <option value="CN01" selected>Chi nhánh 1 (Thủ Đức)</option>
+                    <option value="CN02">Chi nhánh 2 (Bình Thạnh)</option>
+                    <option value="CN03">Chi nhánh 3 (Quận 9)</option>
+                    <option value="CN04">Chi nhánh 4 (Gò Vấp)</option>
+                    <option value="ALL">Toàn bộ chi nhánh</option>
+                  </select>
+                  <input type="text" id="filterKeyword" class="form-control" placeholder="Tìm tên khách, SĐT, mã đơn..."
+                    oninput="applyFilters()" style="flex: 1; min-width: 170px;">
                   <select id="filterStatus" class="form-control" style="width: auto;" onchange="applyFilters()">
                     <option value="ALL">Tất cả trạng thái</option>
                     <option value="Chờ xác nhận">Chờ xác nhận</option>
+                    <option value="Đã cọc 30%">Đã cọc 30%</option>
                     <option value="Đã xác nhận">Đã xác nhận</option>
                     <option value="Đang sử dụng">Đang sử dụng</option>
                     <option value="Hoàn thành">Hoàn thành</option>
                     <option value="Đã hủy">Đã hủy</option>
-                    <option value="Đã cọc 30%">Đã cọc 30%</option>
                   </select>
                 </div>
-                <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;" id="recordsCountText">7 / 7 bản ghi</span>
+                <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;" id="recordsCountText">0 bản
+                  ghi</span>
               </div>
 
               <!-- VIEW 1: TABLE VIEW (DEFAULT) -->
@@ -466,7 +490,7 @@
                     </tr>
                   </thead>
                   <tbody id="bookingsTableBody">
-                    <!-- Populated by JS -->
+                    <!-- Populated dynamically from SQL Server -->
                   </tbody>
                 </table>
               </div>
@@ -477,7 +501,7 @@
                 <div class="kanban-column" id="kanbanPending">
                   <div class="kanban-column-header">
                     <span>Chờ xác nhận</span>
-                    <span class="badge badge-pending" id="kCountPending">2</span>
+                    <span class="badge badge-pending" id="kCountPending">0</span>
                   </div>
                   <div class="kanban-cards-wrap" id="kListPending"></div>
                 </div>
@@ -485,8 +509,8 @@
                 <!-- Col 2: Đã xác nhận / Đã cọc -->
                 <div class="kanban-column" id="kanbanConfirmed">
                   <div class="kanban-column-header">
-                    <span>Đã xác nhận</span>
-                    <span class="badge badge-available" id="kCountConfirmed">3</span>
+                    <span>Đã xác nhận / Cọc</span>
+                    <span class="badge badge-available" id="kCountConfirmed">0</span>
                   </div>
                   <div class="kanban-cards-wrap" id="kListConfirmed"></div>
                 </div>
@@ -495,7 +519,7 @@
                 <div class="kanban-column" id="kanbanInUse">
                   <div class="kanban-column-header">
                     <span>Đang sử dụng</span>
-                    <span class="badge badge-in-use" id="kCountInUse">1</span>
+                    <span class="badge badge-in-use" id="kCountInUse">0</span>
                   </div>
                   <div class="kanban-cards-wrap" id="kListInUse"></div>
                 </div>
@@ -504,7 +528,7 @@
                 <div class="kanban-column" id="kanbanCompleted">
                   <div class="kanban-column-header">
                     <span>Hoàn thành / Hủy</span>
-                    <span class="badge badge-completed" id="kCountCompleted">1</span>
+                    <span class="badge badge-completed" id="kCountCompleted">0</span>
                   </div>
                   <div class="kanban-cards-wrap" id="kListCompleted"></div>
                 </div>
@@ -522,7 +546,8 @@
                 </svg>
                 <span>Phiếu đặt sân</span>
               </div>
-              <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 12px;" onclick="resetFormForNew()">
+              <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 12px;"
+                onclick="resetFormForNew()">
                 + Thêm mới
               </button>
             </div>
@@ -530,76 +555,101 @@
             <form id="bookingEditForm" onsubmit="saveBookingForm(event)" class="card-body">
               <div class="form-group">
                 <label class="form-label">Mã đặt sân</label>
-                <input type="text" id="fBookingCode" class="form-control" value="DS0108" readonly style="background: var(--surface-subtle); font-weight: 700;">
+                <input type="text" id="fBookingCode" class="form-control" value="DS0108" readonly
+                  style="background: var(--surface-subtle); font-weight: 700;">
               </div>
 
               <div class="form-group">
                 <label class="form-label">Khách hàng</label>
-                <input type="text" id="fCustomerName" class="form-control" placeholder="Tên khách hàng" value="Nguyễn Hoàng Nam" required>
+                <input type="text" id="fCustomerName" class="form-control" placeholder="Tên khách hàng" required>
               </div>
 
               <div class="form-group">
                 <label class="form-label">Số điện thoại</label>
-                <input type="tel" id="fCustomerPhone" class="form-control" placeholder="09xx xxx xxx" value="0903123456" required>
+                <input type="tel" id="fCustomerPhone" class="form-control" placeholder="09xx xxx xxx" required>
               </div>
 
               <div class="form-group">
-                <label class="form-label">Sân</label>
+                <label class="form-label">Sân thi đấu</label>
                 <select id="fCourtName" class="form-control" onchange="calculateFormPrice()">
-                  <option value="Sân cầu lông 1">Sân cầu lông 1 (90.000đ/h)</option>
-                  <option value="Sân cầu lông 2" selected>Sân cầu lông 2 (90.000đ/h)</option>
-                  <option value="Sân cầu lông 3">Sân cầu lông 3 (90.000đ/h)</option>
-                  <option value="Sân cầu lông 4 (VIP)">Sân cầu lông 4 (VIP 120.000đ/h)</option>
-                  <option value="Sân cầu lông 5 (VIP)">Sân cầu lông 5 (VIP 120.000đ/h)</option>
+                  <!-- Dynamically populated from /api/courts -->
                 </select>
               </div>
 
               <div class="form-group">
                 <label class="form-label">Ngày đặt</label>
-                <input type="date" id="fBookingDate" class="form-control" value="2026-09-25" required>
+                <input type="date" id="fBookingDate" class="form-control" required>
               </div>
 
               <div class="form-group">
                 <label class="form-label">Khung giờ</label>
                 <select id="fTimeSlot" class="form-control" onchange="calculateFormPrice()">
+                  <option value="06:00 - 08:00" data-hours="2">06:00 - 08:00 (2 tiếng)</option>
                   <option value="08:00 - 10:00" data-hours="2" selected>08:00 - 10:00 (2 tiếng)</option>
                   <option value="09:00 - 10:00" data-hours="1">09:00 - 10:00 (1 tiếng)</option>
+                  <option value="10:00 - 12:00" data-hours="2">10:00 - 12:00 (2 tiếng)</option>
                   <option value="14:00 - 16:00" data-hours="2">14:00 - 16:00 (2 tiếng)</option>
+                  <option value="16:00 - 17:00" data-hours="1">16:00 - 17:00 (1 tiếng)</option>
                   <option value="17:00 - 18:00" data-hours="1">17:00 - 18:00 (1 tiếng)</option>
+                  <option value="17:00 - 19:00" data-hours="2">17:00 - 19:00 (2 tiếng)</option>
                   <option value="18:00 - 20:00" data-hours="2">18:00 - 20:00 (2 tiếng)</option>
+                  <option value="19:00 - 20:00" data-hours="1">19:00 - 20:00 (1 tiếng)</option>
+                  <option value="19:00 - 21:00" data-hours="2">19:00 - 21:00 (2 tiếng)</option>
                   <option value="20:00 - 22:00" data-hours="2">20:00 - 22:00 (2 tiếng)</option>
                 </select>
               </div>
 
               <div class="form-group">
                 <label class="form-label">Tổng tiền (đ)</label>
-                <input type="text" id="fTotalPrice" class="form-control" value="180.000" readonly style="font-weight: 700; color: var(--primary);">
+                <input type="text" id="fTotalPrice" class="form-control" value="0" readonly
+                  style="font-weight: 700; color: var(--primary);">
               </div>
 
               <div class="form-group">
                 <label class="form-label">Trạng thái</label>
                 <select id="fBookingStatus" class="form-control">
                   <option value="Chờ xác nhận">Chờ xác nhận</option>
-                  <option value="Đã xác nhận" selected>Đã xác nhận</option>
+                  <option value="Đã cọc 30%">Đã cọc 30%</option>
+                  <option value="Đã xác nhận">Đã xác nhận</option>
                   <option value="Đang sử dụng">Đang sử dụng</option>
                   <option value="Hoàn thành">Hoàn thành</option>
-                  <option value="Đã cọc 30%">Đã cọc 30%</option>
-                  <option value="Quá giờ check-in">Quá giờ check-in (Cảnh báo)</option>
                   <option value="Đã hủy">Đã hủy</option>
                 </select>
               </div>
 
+              <!-- THAO TÁC NGHIỆP VỤ NHANH -->
+              <div
+                style="margin-top: 14px; padding: 12px; background: var(--surface-subtle); border-radius: 8px; border: 1px solid var(--border);">
+                <div
+                  style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                  Xử lý nhanh đơn đặt sân</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                  <button type="button" class="btn btn-outline" style="font-size: 11.5px; padding: 6px 4px;"
+                    onclick="quickDeposit()">Xác nhận cọc 30%</button>
+                  <button type="button" class="btn btn-primary" style="font-size: 11.5px; padding: 6px 4px;"
+                    onclick="quickCheckin()">Nhận sân (Check-in)</button>
+                  <button type="button" class="btn btn-outline" style="font-size: 11.5px; padding: 6px 4px;"
+                    onclick="quickCheckout()">Trả sân & Hóa đơn</button>
+                  <button type="button" class="btn btn-outline"
+                    style="font-size: 11.5px; padding: 6px 4px; border-color: var(--danger-border); color: var(--danger);"
+                    onclick="quickCancel()">Hủy đặt sân</button>
+                </div>
+              </div>
+
               <!-- BUTTONS (REFERENCE IMAGE 3: Lưu / Làm mới / Xóa) -->
-              <div style="display: flex; gap: 8px; margin-top: 20px;">
+              <div style="display: flex; gap: 8px; margin-top: 14px;">
                 <button type="submit" class="btn btn-primary" style="flex: 2;">
                   <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                     <polyline points="17 21 17 13 7 13 7 21"></polyline>
                   </svg>
-                  <span>Lưu</span>
+                  <span>Lưu CSDL</span>
                 </button>
-                <button type="button" class="btn btn-outline" style="flex: 1;" onclick="resetFormForNew()">Làm mới</button>
-                <button type="button" class="btn btn-outline" style="flex: 1; border-color: var(--danger-border); color: var(--danger);" onclick="deleteCurrentBooking()">Xóa</button>
+                <button type="button" class="btn btn-outline" style="flex: 1;" onclick="resetFormForNew()">Làm
+                  mới</button>
+                <button type="button" class="btn btn-outline"
+                  style="flex: 1; border-color: var(--danger-border); color: var(--danger);"
+                  onclick="deleteCurrentBooking()">Xóa</button>
               </div>
             </form>
           </div>
@@ -612,27 +662,33 @@
 
   <!-- BOOKINGS CRUD & DATA LOGIC -->
   <script>
-    // Initial 7 records matching Reference Image 3:
-    let initialBookings = [
-      { code: 'DS0101', name: 'Nguyễn Hoàng Nam', phone: '0903123456', court: 'Sân cầu lông 2', date: '2026-09-25', time: '08:00 - 10:00', price: 180000, status: 'Đã xác nhận' },
-      { code: 'DS0102', name: 'Lê Minh Đức', phone: '0912888999', court: 'Sân cầu lông 1', date: '2026-09-25', time: '09:00 - 10:00', price: 90000, status: 'Hoàn thành' },
-      { code: 'DS0103', name: 'Phạm Gia Huy', phone: '0988777666', court: 'Sân cầu lông 4 (VIP)', date: '2026-09-25', time: '18:00 - 20:00', price: 240000, status: 'Đã xác nhận' },
-      { code: 'DS0104', name: 'Vũ Thị Mai Anh', phone: '0977555444', court: 'Sân cầu lông 5 (VIP)', date: '2026-09-25', time: '19:00 - 20:00', price: 120000, status: 'Chờ xác nhận' },
-      { code: 'DS0105', name: 'Trần Thanh Hằng', phone: '0933444555', court: 'Sân cầu lông 1', date: '2026-09-26', time: '17:00 - 18:00', price: 90000, status: 'Chờ xác nhận' },
-      { code: 'DS0106', name: 'Bùi Khánh Linh', phone: '0909111222', court: 'Sân cầu lông 3', date: '2026-09-26', time: '20:00 - 22:00', price: 180000, status: 'Đã xác nhận' },
-      { code: 'DS0107', name: 'Đỗ Quang Vinh', phone: '0944333222', court: 'Sân cầu lông 2', date: '2026-09-24', time: '15:00 - 16:00', price: 90000, status: 'Đã hủy' }
-    ];
+    let bookings = [];
+    let courtsList = [];
+    let courtMap = {};
+    let selectedBookingCode = null;
 
-    let bookings = JSON.parse(localStorage.getItem('utesport_bookings_v2')) || initialBookings;
-
-    function saveToStorage() {
-      localStorage.setItem('utesport_bookings_v2', JSON.stringify(bookings));
+    function getActiveBranch() {
+      const select = document.getElementById('filterBranch');
+      if (select && select.value) return select.value;
+      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
+      return (user && user.branchCode && user.branchCode !== 'ALL') ? user.branchCode : 'CN01';
     }
 
     function init() {
       const savedTheme = localStorage.getItem('utesport_theme') || 'light';
       document.documentElement.setAttribute('data-theme', savedTheme);
-      renderAll();
+
+      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
+      if (user && user.branchCode) {
+        const branchSelect = document.getElementById('filterBranch');
+        if (branchSelect) branchSelect.value = user.branchCode;
+      }
+
+      const todayStr = new Date().toISOString().split('T')[0];
+      const dateInp = document.getElementById('fBookingDate');
+      if (dateInp) dateInp.value = todayStr;
     }
 
     function toggleTheme() {
@@ -647,10 +703,8 @@
       document.getElementById('appSidebar').classList.toggle('collapsed');
     }
 
-    // TOAST NOTIFICATION: Handled globally by /js/global-hub.js with z-index 999999 and modal support
-
     function getBadgeClass(status) {
-      switch(status) {
+      switch (status) {
         case 'Đang sử dụng': return 'badge-in-use';
         case 'Đã xác nhận': return 'badge-available';
         case 'Chờ xác nhận': return 'badge-pending';
@@ -672,7 +726,7 @@
       const total = bookings.length;
       const pending = bookings.filter(b => b.status === 'Chờ xác nhận').length;
       const confirmed = bookings.filter(b => b.status === 'Đã xác nhận' || b.status === 'Đã cọc 30%').length;
-      const rev = bookings.filter(b => b.status !== 'Đã hủy').reduce((acc, cur) => acc + cur.price, 0);
+      const rev = bookings.filter(b => b.status !== 'Đã hủy').reduce((acc, cur) => acc + (cur.price || 0), 0);
 
       document.getElementById('statTotalCount').textContent = total;
       document.getElementById('statPendingCount').textContent = pending;
@@ -682,11 +736,11 @@
 
     function renderTable() {
       const tbody = document.getElementById('bookingsTableBody');
-      const kw = document.getElementById('filterKeyword').value.toLowerCase();
+      const kw = document.getElementById('filterKeyword').value.toLowerCase().trim();
       const st = document.getElementById('filterStatus').value;
 
       const filtered = bookings.filter(b => {
-        const matchKw = b.code.toLowerCase().includes(kw) || b.name.toLowerCase().includes(kw) || b.phone.includes(kw);
+        const matchKw = !kw || b.code.toLowerCase().includes(kw) || b.name.toLowerCase().includes(kw) || b.phone.includes(kw);
         const matchSt = st === 'ALL' || b.status === st;
         return matchKw && matchSt;
       });
@@ -694,17 +748,24 @@
       document.getElementById('recordsCountText').textContent = `${filtered.length} / ${bookings.length} bản ghi`;
 
       tbody.innerHTML = '';
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">Không có bản ghi đặt sân nào phù hợp.</td></tr>';
+        return;
+      }
+
       filtered.forEach(b => {
         const tr = document.createElement('tr');
         tr.style.cursor = 'pointer';
+        if (b.code === selectedBookingCode) tr.style.background = 'rgba(16, 185, 129, 0.08)';
         tr.onclick = () => selectBookingToEdit(b.code);
+        const friendlyCourt = courtMap[b.court] || b.court;
         tr.innerHTML = `
           <td><strong>${b.code}</strong></td>
-          <td>${b.name} <br><span style="font-size: 11px; color: var(--text-muted);">${b.phone}</span></td>
-          <td>${b.court}</td>
+          <td>${b.name} <br><span style="font-size: 11px; color: var(--text-muted);">${b.phone || 'Chưa có SĐT'}</span></td>
+          <td><span style="font-weight: 600;">${friendlyCourt}</span> <small style="color: var(--text-muted);">(${b.court})</small></td>
           <td>${b.date}</td>
           <td>${b.time}</td>
-          <td><strong>${b.price.toLocaleString('vi-VN')}</strong></td>
+          <td><strong>${Number(b.price || 0).toLocaleString('vi-VN')}đ</strong></td>
           <td><span class="badge ${getBadgeClass(b.status)}">${b.status}</span></td>
         `;
         tbody.appendChild(tr);
@@ -727,15 +788,17 @@
       bookings.forEach(b => {
         const card = document.createElement('div');
         card.className = 'kanban-card';
+        if (b.code === selectedBookingCode) card.style.borderColor = 'var(--primary)';
         card.onclick = () => selectBookingToEdit(b.code);
+        const friendlyCourt = courtMap[b.court] || b.court;
         card.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <strong>${b.code}</strong>
             <span class="badge ${getBadgeClass(b.status)}" style="font-size: 10px;">${b.status}</span>
           </div>
-          <div style="font-weight: 600; font-size: 13px;">${b.name}</div>
-          <div style="font-size: 11.5px; color: var(--text-muted);">${b.court} • ${b.time}</div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--primary); margin-top: 4px;">${b.price.toLocaleString('vi-VN')}đ</div>
+          <div style="font-weight: 600; font-size: 13px; margin-top: 4px;">${b.name}</div>
+          <div style="font-size: 11.5px; color: var(--text-muted);">${friendlyCourt} • ${b.time}</div>
+          <div style="font-size: 12.5px; font-weight: 700; color: var(--primary); margin-top: 4px;">${Number(b.price || 0).toLocaleString('vi-VN')}đ</div>
         `;
 
         if (b.status === 'Chờ xác nhận') {
@@ -782,24 +845,112 @@
       renderTable();
     }
 
+    async function onBranchFilterChange() {
+      const branch = getActiveBranch();
+      showToast(`Đang chuyển sang dữ liệu chi nhánh ${branch}...`, 'info');
+      await loadCourts();
+      await loadFromSqlServer();
+    }
+
+    async function loadCourts() {
+      try {
+        const branch = getActiveBranch();
+        const url = (branch && branch !== 'ALL') ? `/api/courts?branchCode=${encodeURIComponent(branch)}` : '/api/courts';
+        const res = await fetch(url);
+        if (res.ok) {
+          courtsList = await res.json();
+          courtMap = {};
+          const select = document.getElementById('fCourtName');
+          select.innerHTML = '';
+          courtsList.forEach(c => {
+            courtMap[c.courtCode] = c.courtName;
+            const opt = document.createElement('option');
+            opt.value = c.courtCode;
+            opt.setAttribute('data-price', c.hourlyRate || 90000);
+            opt.textContent = `${c.courtName} (${c.courtCode}) - ${Number(c.hourlyRate || 90000).toLocaleString('vi-VN')}đ/h`;
+            select.appendChild(opt);
+          });
+          calculateFormPrice();
+        }
+      } catch (err) {
+        console.warn('Lỗi nạp danh sách sân:', err);
+      }
+    }
+
+    function calculateFormPrice() {
+      const courtSelect = document.getElementById('fCourtName');
+      const slotEl = document.getElementById('fTimeSlot');
+      if (!courtSelect || courtSelect.selectedIndex < 0 || !slotEl) return;
+
+      const selectedOption = courtSelect.options[courtSelect.selectedIndex];
+      const hourlyRate = Number(selectedOption.getAttribute('data-price') || 90000);
+      const hours = parseInt(slotEl.options[slotEl.selectedIndex].getAttribute('data-hours') || '1', 10);
+      const total = hourlyRate * hours;
+      document.getElementById('fTotalPrice').value = total.toLocaleString('vi-VN');
+    }
+
     function selectBookingToEdit(code) {
+      selectedBookingCode = code;
       const item = bookings.find(b => b.code === code);
       if (!item) return;
 
       document.getElementById('fBookingCode').value = item.code;
       document.getElementById('fCustomerName').value = item.name;
       document.getElementById('fCustomerPhone').value = item.phone;
-      document.getElementById('fCourtName').value = item.court;
+
+      const courtSelect = document.getElementById('fCourtName');
+      if (courtSelect) {
+        let optFound = false;
+        for (let i = 0; i < courtSelect.options.length; i++) {
+          if (courtSelect.options[i].value === item.court) {
+            courtSelect.selectedIndex = i;
+            optFound = true;
+            break;
+          }
+        }
+        if (!optFound) {
+          const opt = document.createElement('option');
+          opt.value = item.court;
+          opt.setAttribute('data-price', 90000);
+          opt.textContent = `${courtMap[item.court] || item.court} (${item.court})`;
+          courtSelect.appendChild(opt);
+          courtSelect.value = item.court;
+        }
+      }
+
       document.getElementById('fBookingDate').value = item.date;
-      document.getElementById('fTimeSlot').value = item.time;
-      document.getElementById('fTotalPrice').value = item.price.toLocaleString('vi-VN');
+
+      const timeSelect = document.getElementById('fTimeSlot');
+      if (timeSelect) {
+        let timeFound = false;
+        for (let i = 0; i < timeSelect.options.length; i++) {
+          if (timeSelect.options[i].value === item.time) {
+            timeSelect.selectedIndex = i;
+            timeFound = true;
+            break;
+          }
+        }
+        if (!timeFound) {
+          const opt = document.createElement('option');
+          opt.value = item.time;
+          opt.setAttribute('data-hours', 2);
+          opt.textContent = item.time;
+          timeSelect.appendChild(opt);
+          timeSelect.value = item.time;
+        }
+      }
+
+      document.getElementById('fTotalPrice').value = Number(item.price || 0).toLocaleString('vi-VN');
       document.getElementById('fBookingStatus').value = item.status;
 
-      showToast(`Đã chọn đơn ${item.code} của ${item.name}`, 'info');
+      renderTable();
+      renderKanban();
+      showToast(`Đã chọn đơn ${item.code} (${item.name})`, 'info');
     }
 
     function resetFormForNew() {
-      const nextCode = 'DS0' + (101 + bookings.length);
+      selectedBookingCode = null;
+      const nextCode = 'DS' + String(Math.floor(100000 + Math.random() * 900000));
       document.getElementById('fBookingCode').value = nextCode;
       document.getElementById('fCustomerName').value = '';
       document.getElementById('fCustomerPhone').value = '';
@@ -807,114 +958,219 @@
       document.getElementById('fBookingStatus').value = 'Chờ xác nhận';
       calculateFormPrice();
       document.getElementById('fCustomerName').focus();
-      showToast('Đã làm mới form tạo đặt sân', 'info');
+      renderTable();
+      renderKanban();
+      showToast('Đã làm mới form tạo đơn đặt sân', 'info');
     }
 
-    function calculateFormPrice() {
-      const court = document.getElementById('fCourtName').value;
-      const slotEl = document.getElementById('fTimeSlot');
-      const hours = parseInt(slotEl.options[slotEl.selectedIndex].getAttribute('data-hours') || '1', 10);
-      const rate = court.includes('VIP') ? 120000 : 90000;
-      const total = rate * hours;
-      document.getElementById('fTotalPrice').value = total.toLocaleString('vi-VN');
-    }
-
-    function saveBookingForm(e) {
+    async function saveBookingForm(e) {
       e.preventDefault();
-      const code = document.getElementById('fBookingCode').value;
-      const name = document.getElementById('fCustomerName').value;
-      const phone = document.getElementById('fCustomerPhone').value;
+      const code = document.getElementById('fBookingCode').value.trim();
+      const name = document.getElementById('fCustomerName').value.trim();
+      const phone = document.getElementById('fCustomerPhone').value.trim();
       const court = document.getElementById('fCourtName').value;
       const date = document.getElementById('fBookingDate').value;
       const time = document.getElementById('fTimeSlot').value;
       const price = parseInt(document.getElementById('fTotalPrice').value.replace(/\./g, ''), 10);
       const status = document.getElementById('fBookingStatus').value;
+      const branch = getActiveBranch() === 'ALL' ? 'CN01' : getActiveBranch();
 
-      const idx = bookings.findIndex(b => b.code === code);
-      const newBooking = { code, name, phone, court, date, time, price, status };
-      if (idx >= 0) {
-        bookings[idx] = newBooking;
-        showToast(`Đã cập nhật đơn đặt sân ${code}!`, 'success');
-      } else {
-        bookings.unshift(newBooking);
-        showToast(`Đã thêm mới đơn đặt sân ${code}!`, 'success');
+      const courtSelect = document.getElementById('fCourtName');
+      const hourlyRate = courtSelect ? Number(courtSelect.options[courtSelect.selectedIndex]?.getAttribute('data-price') || 90000) : 90000;
+
+      const payload = {
+        bookingCode: code,
+        customerName: name,
+        customerPhone: phone,
+        courtCode: court,
+        branchCode: branch,
+        bookingDate: date,
+        timeSlot: time,
+        hourlyPrice: hourlyRate,
+        totalPrice: price,
+        status: status
+      };
+
+      try {
+        const res = await fetch('/api/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          showToast(`Đã lưu đơn đặt sân ${code} thành công vào SQL Server!`, 'success');
+          await loadFromSqlServer();
+          selectBookingToEdit(code);
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(`Lỗi lưu đơn: ${err.message || 'Không thể lưu'}`, 'error');
+        }
+      } catch (err) {
+        showToast(`Lỗi kết nối máy chủ: ${err.message}`, 'error');
       }
-
-      const userBranch = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser().branchCode)
-        || (window.RBAC && window.RBAC.getCurrentUser() && window.RBAC.getCurrentUser().branchCode)
-        || 'CN01';
-
-      // Sync to SQL Server database
-      fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          bookingCode: code,
-          customerName: name,
-          customerPhone: phone,
-          courtCode: court,
-          branchCode: userBranch,
-          bookingDate: date,
-          timeSlot: time,
-          hourlyPrice: 90000,
-          totalPrice: price,
-          status: status
-        })
-      }).catch(e => console.warn('SQL save error:', e));
-
-      saveToStorage();
-      renderAll();
     }
 
     async function loadFromSqlServer() {
       try {
-        const res = await fetch('/api/bookings');
+        const branch = getActiveBranch();
+        const url = (branch && branch !== 'ALL') ? `/api/bookings?branchCode=${encodeURIComponent(branch)}` : '/api/bookings';
+        const res = await fetch(url);
         if (res.ok) {
           const data = await res.json();
-          if (data && data.length > 0) {
-            bookings = data.map(b => ({
-              code: b.bookingCode,
-              name: b.customerName,
-              phone: b.customerPhone,
-              court: b.courtCode,
-              date: b.bookingDate,
-              time: b.timeSlot,
-              price: Number(b.totalPrice),
-              status: b.status
-            }));
-            saveToStorage();
-            renderAll();
+          bookings = (data || []).map(b => ({
+            code: b.bookingCode,
+            name: b.customerName || 'Khách đặt sân',
+            phone: b.customerPhone || '',
+            court: b.courtCode,
+            branch: b.branchCode,
+            date: b.bookingDate,
+            time: b.timeSlot,
+            price: Number(b.totalPrice || 0),
+            status: b.status || 'Chờ xác nhận'
+          }));
+          renderAll();
+          if (bookings.length > 0 && !selectedBookingCode) {
+            selectBookingToEdit(bookings[0].code);
           }
+        } else {
+          showToast(`Không thể tải dữ liệu CSDL (HTTP ${res.status})`, 'error');
         }
       } catch (err) {
-        console.warn('SQL API load fallback to local:', err);
+        console.error('Lỗi nạp dữ liệu SQL Server:', err);
+        showToast(`Lỗi tải dữ liệu: ${err.message}`, 'error');
+      }
+    }
+
+    async function quickDeposit() {
+      const code = document.getElementById('fBookingCode').value;
+      if (!code) return;
+      const b = bookings.find(item => item.code === code);
+      const depAmount = b ? Math.round(b.price * 0.3) : 50000;
+
+      try {
+        const res = await fetch(`/api/bookings/${encodeURIComponent(code)}/deposit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: depAmount, paymentMethod: 'Chuyển khoản VietQR' })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast(`Đã xác nhận tiền cọc (${depAmount.toLocaleString('vi-VN')}đ) cho đơn ${code}!`, 'success');
+          await loadFromSqlServer();
+          selectBookingToEdit(code);
+        } else {
+          showToast(data.message || 'Không thể xác nhận cọc', 'error');
+        }
+      } catch (e) {
+        showToast('Lỗi gửi yêu cầu xác nhận cọc: ' + e.message, 'error');
+      }
+    }
+
+    async function quickCheckin() {
+      const code = document.getElementById('fBookingCode').value;
+      if (!code) return;
+
+      try {
+        const res = await fetch(`/api/bookings/${encodeURIComponent(code)}/checkin`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast(`Đã check-in nhận sân cho khách đơn ${code}!`, 'success');
+          await loadFromSqlServer();
+          selectBookingToEdit(code);
+        } else {
+          showToast(data.message || 'Không thể check-in đơn này', 'error');
+        }
+      } catch (e) {
+        showToast('Lỗi gửi yêu cầu check-in: ' + e.message, 'error');
+      }
+    }
+
+    async function quickCheckout() {
+      const code = document.getElementById('fBookingCode').value;
+      if (!code) return;
+
+      if (!confirm(`Xác nhận hoàn tất trả sân và lập hóa đơn cho đơn ${code}?`)) return;
+
+      try {
+        const res = await fetch(`/api/bookings/${encodeURIComponent(code)}/checkout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            equipmentFee: 0,
+            productFee: 0,
+            paymentMethod: 'Tiền mặt',
+            staffCode: 'QL01'
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast(`Đã trả sân và xuất hóa đơn #${data.invoice?.invoiceCode || code} thành công!`, 'success');
+          await loadFromSqlServer();
+          selectBookingToEdit(code);
+        } else {
+          showToast(data.message || 'Không thể check-out đơn này', 'error');
+        }
+      } catch (e) {
+        showToast('Lỗi gửi yêu cầu check-out: ' + e.message, 'error');
+      }
+    }
+
+    async function quickCancel() {
+      const code = document.getElementById('fBookingCode').value;
+      if (!code) return;
+      const reason = prompt(`Nhập lý do hủy đơn ${code}:`, 'Quản lý chi nhánh hủy theo yêu cầu');
+      if (reason === null) return;
+
+      try {
+        const res = await fetch(`/api/bookings/${encodeURIComponent(code)}/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: reason || 'Quản lý chi nhánh hủy' })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast(`Đã hủy lịch đặt sân ${code} thành công!`, 'success');
+          await loadFromSqlServer();
+          selectBookingToEdit(code);
+        } else {
+          showToast(data.message || 'Không thể hủy đơn', 'error');
+        }
+      } catch (e) {
+        showToast('Lỗi gửi yêu cầu hủy: ' + e.message, 'error');
       }
     }
 
     async function deleteCurrentBooking() {
       const code = document.getElementById('fBookingCode').value;
-      if (!confirm(`Bạn có chắc chắn muốn xóa đơn ${code}?`)) return;
+      if (!confirm(`Bạn có chắc chắn muốn hủy / xóa đơn ${code}?`)) return;
 
       try {
-        await fetch(`/api/bookings/${encodeURIComponent(code)}/cancel`, {
+        const res = await fetch(`/api/bookings/${encodeURIComponent(code)}/cancel`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reason: 'Quản lý chi nhánh hủy đơn' })
+          body: JSON.stringify({ reason: 'Quản lý chi nhánh xóa đơn' })
         });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast(`Đã cập nhật hủy đơn ${code} trong CSDL`, 'success');
+          await loadFromSqlServer();
+          resetFormForNew();
+        } else {
+          showToast(data.message || 'Lỗi khi xóa đơn', 'error');
+        }
       } catch (e) {
-        console.warn('SQL cancel error:', e);
+        showToast('Lỗi kết nối khi xóa đơn: ' + e.message, 'error');
       }
-
-      bookings = bookings.filter(b => b.code !== code);
-      saveToStorage();
-      renderAll();
-      resetFormForNew();
-      showToast(`Đã xóa đơn ${code}`, 'error');
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       init();
-      loadFromSqlServer();
+      await loadCourts();
+      await loadFromSqlServer();
     });
 
     window.addEventListener('badminton:booking-event', () => {
@@ -923,5 +1179,5 @@
   </script>
   <script src="/js/global-hub.js"></script>
 </body>
-</html>
 
+</html>

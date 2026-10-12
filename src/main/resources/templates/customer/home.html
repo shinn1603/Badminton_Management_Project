@@ -47,6 +47,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 16px;
+      flex-wrap: nowrap;
     }
     .cust-brand-wrap {
       display: flex;
@@ -54,6 +56,7 @@
       gap: 12px;
       text-decoration: none;
       color: var(--text-dark);
+      flex-shrink: 0;
     }
     .cust-logo-icon {
       width: 44px;
@@ -65,6 +68,7 @@
       justify-content: center;
       color: #ffffff;
       box-shadow: 0 4px 14px var(--emerald-glow);
+      flex-shrink: 0;
     }
     .cust-brand-title {
       font-size: 18px;
@@ -72,6 +76,7 @@
       letter-spacing: -0.4px;
       color: var(--text-dark);
       line-height: 1.2;
+      white-space: nowrap;
     }
     .cust-brand-sub {
       font-size: 11px;
@@ -79,11 +84,13 @@
       color: var(--primary);
       text-transform: uppercase;
       letter-spacing: 0.8px;
+      white-space: nowrap;
     }
     .cust-nav-menu {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 16px;
+      flex-shrink: 1;
     }
     .cust-nav-link {
       text-decoration: none;
@@ -92,10 +99,11 @@
       color: var(--text-muted);
       transition: all 0.2s ease;
       position: relative;
-      padding: 8px 0;
+      padding: 8px 4px;
       display: flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
     }
     .cust-nav-link:hover, .cust-nav-link.active {
       color: var(--primary);
@@ -116,6 +124,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      flex-shrink: 0;
     }
 
     /* DASHBOARD HERO BANNER (EMERALD SPORTS COMPLEX) */
@@ -1126,7 +1135,7 @@
       <div>
         <div class="hero-badge-tag">
           <span class="hero-pulse-dot"></span>
-          <span>4 Chi Nhánh • 26 Sân Thi Đấu Hoạt Động</span>
+          <span id="heroBranchesSummary">Chuỗi Sân Thi Đấu Hoạt Động</span>
         </div>
         <h1 class="hero-title">
           Đặt Sân Cầu Lông Trực Tuyến<br>
@@ -1169,10 +1178,7 @@
                 Chi Nhánh
               </label>
               <select id="heroBranchSelect" class="finder-select" onchange="updateCourtsByBranch()">
-                <option value="CN01" selected>CN01 - Võ Văn Ngân, TP. Thủ Đức (8 Sân)</option>
-                <option value="CN02">CN02 - Nguyễn Thị Thập, Quận 7 (6 Sân)</option>
-                <option value="CN03">CN03 - Điện Biên Phủ, Bình Thạnh (6 Sân)</option>
-                <option value="CN04">CN04 - Quang Trung, Gò Vấp (6 Sân)</option>
+                <option value="CN01" selected>Đang tải chi nhánh...</option>
               </select>
             </div>
 
@@ -1302,10 +1308,7 @@
         <div class="dash-branch-filter">
           <span style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Chi nhánh:</span>
           <select id="dashBranchPicker" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px; font-weight: 600;" onchange="onDashBranchChanged(this.value)">
-            <option value="CN01" selected>CN01 - Võ Văn Ngân, TP. Thủ Đức (8 Sân)</option>
-            <option value="CN02">CN02 - Nguyễn Thị Thập, Quận 7 (6 Sân)</option>
-            <option value="CN03">CN03 - Điện Biên Phủ, Bình Thạnh (6 Sân)</option>
-            <option value="CN04">CN04 - Quang Trung, Gò Vấp (6 Sân)</option>
+            <option value="CN01" selected>Đang tải chi nhánh...</option>
           </select>
         </div>
       </div>
@@ -1326,12 +1329,6 @@
             <h4 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-dark);">Lưới Lịch Sân Trực Tuyến</h4>
             <p style="margin: 2px 0 0; font-size: 12.5px; color: var(--text-muted);">Theo dõi lịch sân từ 06:00 đến 22:00. Bấm vào ô trống để chọn và đặt lịch.</p>
           </div>
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <label style="font-size: 12.5px; font-weight: 700; color: var(--text-dark);">Ngày xem:</label>
-            <input type="date" id="matrixViewDate" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;" onchange="loadMatrixSchedule()">
-            <button type="button" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;" onclick="setMatrixDateToday()">Hôm nay</button>
-          </div>
-        </div>
           <div style="display: flex; align-items: center; gap: 10px;">
             <label style="font-size: 12.5px; font-weight: 700; color: var(--text-dark);">Ngày xem:</label>
             <input type="date" id="matrixViewDate" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;" onchange="loadMatrixSchedule()">
@@ -1368,57 +1365,62 @@
         </div>
       </div>
 
-      <!-- PANE 2: PRICING MATRIX -->
+      <!-- PANE 2: PRICING MATRIX (CONNECTED TO SQL SERVER DATABASE) -->
       <div id="tab-pricing" class="tab-pane" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
+          <div>
+            <h4 id="pricingBranchTitle" style="margin: 0; font-size: 17px; font-weight: 800; color: var(--text-dark);">
+              Bảng Giá Áp Dụng: Đang tải...
+            </h4>
+            <p style="margin: 3px 0 0; font-size: 12.5px; color: var(--text-muted);">
+              Dữ liệu giá theo giờ và chính sách giảm giá được đồng bộ trực tiếp từ CSDL SQL Server theo từng chi nhánh.
+            </p>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 6px 14px; text-align: center;">
+              <span style="font-size: 11px; color: var(--text-muted); display: block;">Sân Tiêu Chuẩn:</span>
+              <strong id="pricingStdRate" style="color: var(--primary); font-size: 13.5px;">90.000 đ/h</strong>
+            </div>
+            <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 6px 14px; text-align: center;">
+              <span style="font-size: 11px; color: var(--text-muted); display: block;">Sân VIP Thảm BWF:</span>
+              <strong id="pricingVipRate" style="color: #d97706; font-size: 13.5px;">120.000 đ/h</strong>
+            </div>
+          </div>
+        </div>
+
         <div class="pricing-matrix-box">
           <table class="pricing-table-clean">
             <thead>
               <tr>
                 <th>Khung Giờ</th>
-                <th>Thời Gian</th>
+                <th>Thời Gian & Ngày Áp Dụng</th>
                 <th>Sân Tiêu Chuẩn</th>
                 <th>Sân VIP</th>
                 <th>Ghi Chú</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="pricingTableBody">
               <tr>
-                <td><strong>Buổi Sáng</strong></td>
-                <td>06:00 - 10:00 (Hàng ngày)</td>
-                <td><strong style="color: var(--primary);">80.000 đ/h</strong></td>
-                <td><strong style="color: #d97706;">110.000 đ/h</strong></td>
-                <td>Phù hợp rèn luyện thể lực</td>
-              </tr>
-              <tr>
-                <td><strong>Buổi Ngày</strong></td>
-                <td>10:00 - 16:00 (Thứ 2 - Thứ 6)</td>
-                <td><strong style="color: var(--primary);">70.000 đ/h</strong></td>
-                <td><strong style="color: #d97706;">100.000 đ/h</strong></td>
-                <td>Ưu đãi học sinh, sinh viên</td>
-              </tr>
-              <tr>
-                <td><strong>Giờ Cao Điểm</strong></td>
-                <td>17:00 - 21:00 (Hàng ngày)</td>
-                <td><strong style="color: var(--primary);">90.000 đ/h</strong></td>
-                <td><strong style="color: #d97706;">120.000 đ/h</strong></td>
-                <td>Cọc 30% VietQR giữ chỗ</td>
-              </tr>
-              <tr>
-                <td><strong>Buổi Tối Muộn</strong></td>
-                <td>21:00 - 22:30 (Hàng ngày)</td>
-                <td><strong style="color: var(--primary);">80.000 đ/h</strong></td>
-                <td><strong style="color: #d97706;">110.000 đ/h</strong></td>
-                <td>Giao lưu sau giờ làm việc</td>
-              </tr>
-              <tr>
-                <td><strong>Cuối Tuần & Lễ</strong></td>
-                <td>Thứ 7, CN & Lễ Tết</td>
-                <td>Phụ thu <strong>+10.000 đ/h</strong></td>
-                <td>Phụ thu <strong>+15.000 đ/h</strong></td>
-                <td>Áp dụng theo quy định CLB</td>
+                <td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải bảng giá từ cơ sở dữ liệu...</td>
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- ACTIVE PROMOTIONS FROM DATABASE -->
+        <div style="margin-top: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-dark); display: flex; align-items: center; gap: 8px;">
+              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 17px; height: 17px; color: #ef4444;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              Chính Sách Khuyến Mãi & Giảm Giá Đang Áp Dụng (Từ CSDL)
+            </h4>
+            <span style="font-size: 12px; color: var(--text-muted);">Quản lý phê duyệt</span>
+          </div>
+          <div id="pricingPromosBox">
+            <div style="background: var(--surface-subtle); border: 1px dashed var(--border-subtle); border-radius: 10px; padding: 18px; text-align: center; color: var(--text-muted); font-size: 13px;">
+              Đang tải danh sách chương trình ưu đãi...
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1730,8 +1732,11 @@
       const target = document.getElementById(tabId);
       if (target) target.style.display = 'block';
 
+      const curBranch = document.getElementById('dashBranchPicker') ? document.getElementById('dashBranchPicker').value : 'CN01';
       if (tabId === 'tab-matrix') {
         loadMatrixSchedule();
+      } else if (tabId === 'tab-pricing') {
+        loadBranchPricing(curBranch);
       }
     }
 
@@ -1747,6 +1752,100 @@
       const matrixTab = document.getElementById('tab-matrix');
       if (matrixTab && matrixTab.style.display === 'block') {
         loadMatrixSchedule();
+      }
+      const pricingTab = document.getElementById('tab-pricing');
+      if (pricingTab && pricingTab.style.display === 'block') {
+        loadBranchPricing(branchCode);
+      }
+    }
+
+    // Load dynamic pricing matrix and promotions from SQL Server database
+    async function loadBranchPricing(branchCode) {
+      const bCode = branchCode || (document.getElementById('dashBranchPicker') ? document.getElementById('dashBranchPicker').value : 'CN01');
+      const tableBody = document.getElementById('pricingTableBody');
+      const promoBox = document.getElementById('pricingPromosBox');
+      const headerTitle = document.getElementById('pricingBranchTitle');
+      const stdRateEl = document.getElementById('pricingStdRate');
+      const vipRateEl = document.getElementById('pricingVipRate');
+
+      if (tableBody) {
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải bảng giá chi nhánh ${escapeHtml(bCode)} từ CSDL...</td></tr>`;
+      }
+
+      try {
+        const res = await fetch(`/api/pricing/summary?branchCode=${encodeURIComponent(bCode)}`);
+        const data = await res.json();
+
+        if (headerTitle) {
+          headerTitle.innerText = `Bảng Giá Áp Dụng: ${data.branchName || bCode}`;
+        }
+        if (stdRateEl) {
+          stdRateEl.innerText = `${(data.standardRate || 90000).toLocaleString('vi-VN')} đ/h`;
+        }
+        if (vipRateEl) {
+          vipRateEl.innerText = `${(data.vipRate || 120000).toLocaleString('vi-VN')} đ/h`;
+        }
+
+        if (tableBody) {
+          if (!data.pricingRules || data.pricingRules.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">Chưa có cấu hình riêng cho chi nhánh này. Áp dụng giá chuẩn ${(data.standardRate || 90000).toLocaleString('vi-VN')} đ/h.</td></tr>`;
+          } else {
+            let html = '';
+            data.pricingRules.forEach(r => {
+              const rate = r.hourlyRate || 90000;
+              const vipRate = Math.round(rate * 1.3);
+              const isPeak = (r.slotName && r.slotName.toLowerCase().includes('cao điểm')) || 
+                             (r.timeRange && (r.timeRange.includes('17:00') || r.timeRange.includes('18:00') || r.timeRange.includes('19:00') || r.timeRange.includes('20:00')));
+              html += `
+                <tr>
+                  <td><strong>${escapeHtml(r.slotName || 'Khung giờ')}</strong> ${isPeak ? '<span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 6px;">Giờ vàng</span>' : ''}</td>
+                  <td>${escapeHtml(r.timeRange || 'Toàn thời gian')} (${escapeHtml(r.dayType || 'Hàng ngày')})</td>
+                  <td><strong style="color: var(--primary);">${rate.toLocaleString('vi-VN')} đ/h</strong></td>
+                  <td><strong style="color: #d97706;">${vipRate.toLocaleString('vi-VN')} đ/h</strong></td>
+                  <td style="color: var(--text-muted); font-size: 12.5px;">${isPeak ? 'Cọc 30% VietQR giữ slot' : 'Ưu đãi đặt trực tuyến'}</td>
+                </tr>
+              `;
+            });
+            tableBody.innerHTML = html;
+          }
+        }
+
+        if (promoBox) {
+          if (!data.activePromotions || data.activePromotions.length === 0) {
+            promoBox.innerHTML = `
+              <div style="background: var(--surface-subtle); border: 1px dashed var(--border-subtle); border-radius: 10px; padding: 18px; text-align: center; color: var(--text-muted); font-size: 13px;">
+                Chi nhánh hiện đang áp dụng giá niêm yết chuẩn, chưa có mã voucher ưu đãi riêng từ quản lý.
+              </div>
+            `;
+          } else {
+            let phtml = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px;">';
+            data.activePromotions.forEach(p => {
+              phtml += `
+                <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 14px 16px; position: relative;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                    <span style="background: var(--primary); color: #fff; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px; font-family: monospace;">${escapeHtml(p.promoCode)}</span>
+                    <span style="font-size: 11.5px; color: #10b981; font-weight: 700;">Đang áp dụng</span>
+                  </div>
+                  <div style="font-weight: 800; font-size: 14px; color: var(--text-dark); margin-bottom: 4px;">${escapeHtml(p.promoName)}</div>
+                  <div style="font-size: 13px; color: #d97706; font-weight: 700; margin-bottom: 8px;">
+                    Giảm ${p.discountType && p.discountType.includes('%') ? (p.discountValue + '%') : (Number(p.discountValue).toLocaleString('vi-VN') + ' đ')}
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-muted); border-top: 1px dashed var(--border-subtle); padding-top: 8px; margin-top: 8px;">
+                    <span>HSD: ${p.endDate || 'Vô thời hạn'}</span>
+                    <a href="/customer/booking?branchCode=${encodeURIComponent(bCode)}&promo=${encodeURIComponent(p.promoCode)}" style="color: var(--primary); font-weight: 700; text-decoration: none;">Đặt sân áp dụng ngay &rarr;</a>
+                  </div>
+                </div>
+              `;
+            });
+            phtml += '</div>';
+            promoBox.innerHTML = phtml;
+          }
+        }
+      } catch (err) {
+        console.error('Error loading branch pricing:', err);
+        if (tableBody) {
+          tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 24px; color: #ef4444;">Không thể tải bảng giá từ CSDL. Vui lòng thử lại sau.</td></tr>`;
+        }
       }
     }
 
@@ -2227,8 +2326,34 @@
       }
     }
 
+    async function loadHomeBranchesFromDb() {
+      try {
+        const res = await fetch('/api/branches');
+        const branches = await res.json() || [];
+        if (branches && branches.length > 0) {
+          const heroSelect = document.getElementById('heroBranchSelect');
+          const dashSelect = document.getElementById('dashBranchPicker');
+          const opts = branches.map((b, i) => 
+            `<option value="${escapeHtml(b.branchCode)}" ${i === 0 ? 'selected' : ''}>${escapeHtml(b.branchCode)} - ${escapeHtml(b.branchName)} (${b.totalCourts || 6} Sân)</option>`
+          ).join('');
+          if (heroSelect) heroSelect.innerHTML = opts;
+          if (dashSelect) dashSelect.innerHTML = opts;
+
+          const totalCourts = branches.reduce((sum, b) => sum + (b.totalCourts || 6), 0);
+          const badgeEl = document.getElementById('heroBranchesSummary');
+          if (badgeEl) {
+            badgeEl.textContent = `${branches.length} Chi Nhánh • ${totalCourts} Sân Thi Đấu Hoạt Động`;
+          }
+          return branches[0].branchCode;
+        }
+      } catch (e) {
+        console.warn('Lỗi tải danh sách chi nhánh:', e);
+      }
+      return 'CN01';
+    }
+
     // Initialize on DOM Ready
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       const today = new Date().toISOString().split('T')[0];
       const dateInput = document.getElementById('heroBookingDate');
       if (dateInput) dateInput.value = today;
@@ -2241,8 +2366,10 @@
         window.RBAC.syncNavUserArea();
       }
 
-      // Initial court load for CN01
-      loadBranchCourts('CN01');
+      // Initial branch & court load from database
+      const firstBranch = await loadHomeBranchesFromDb();
+      loadBranchCourts(firstBranch || 'CN01');
+      loadBranchPricing(firstBranch || 'CN01');
     });
 
     function handleQuickSearch(e) {

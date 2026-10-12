@@ -148,11 +148,13 @@
             </svg>
           </button>
 
-          <div class="branch-select-badge">
+          <div class="branch-select-badge" style="display: flex; align-items: center; gap: 8px;">
             <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--primary);">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             </svg>
-            <span>Báo Cáo Hoạt Động - Thủ Đức</span>
+            <select id="branchFilterSelect" onchange="onBranchChange()" style="border: none; background: transparent; font-weight: 700; color: var(--text-dark); cursor: pointer; outline: none; font-size: 13px;">
+              <option value="CN01" selected>CN01 - Thủ Đức (Chi nhánh quản lý)</option>
+            </select>
           </div>
 
           <div class="search-box-header">
@@ -160,7 +162,7 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" placeholder="Tìm kiếm theo kỳ báo cáo, loại doanh thu...">
+            <input type="text" placeholder="Tìm kiếm theo mã sân, tên sân, loại sân, hiệu quả..." id="reportsSearchInput" oninput="filterReportsTable()">
           </div>
         </div>
 
@@ -177,6 +179,15 @@
               <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
+          </button>
+
+          <button type="button" class="btn btn-outline" onclick="loadReportData()" title="Làm mới từ CSDL">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            <span>Đồng bộ</span>
           </button>
 
           <button type="button" class="btn btn-outline" onclick="window.print()">
@@ -203,10 +214,10 @@
           <div class="hero-banner-content">
             <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
               <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
-              Báo Cáo Hiệu Quả & Doanh Thu Chi Nhánh
+              <span id="heroBranchBadge">Báo Cáo Hiệu Quả & Doanh Thu Chi Nhánh • SQL Server Realtime</span>
             </div>
             <h1 class="hero-title" style="margin-bottom: 8px;">Thống Kê Doanh Thu & Hiệu Suất Sân</h1>
-            <p class="hero-subtitle" style="margin-bottom: 0;">Phân tích cơ cấu nguồn thu từ tiền sân, dịch vụ F&B, tỷ lệ lấp đầy khung giờ cao điểm và hỗ trợ xuất báo cáo</p>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Phân tích cơ cấu nguồn thu từ tiền sân, dịch vụ F&B, tỷ lệ lấp đầy khung giờ cao điểm đồng bộ trực tiếp từ SQL Server.</p>
           </div>
         </div>
 
@@ -217,6 +228,7 @@
             <button type="button" class="btn btn-outline" onclick="selectPeriod('this_week', this)" style="font-size: 12px; padding: 6px 12px;">Tuần này</button>
             <button type="button" class="btn btn-primary" id="btnCurrentMonth" onclick="selectPeriod('this_month', this)" style="font-size: 12px; padding: 6px 12px;">Tháng này</button>
             <button type="button" class="btn btn-outline" onclick="selectPeriod('quarter', this)" style="font-size: 12px; padding: 6px 12px;">Quý này</button>
+            <button type="button" class="btn btn-outline" onclick="selectPeriod('all_time', this)" style="font-size: 12px; padding: 6px 12px;">Toàn thời gian</button>
           </div>
 
           <div style="display: flex; gap: 8px; align-items: center; font-size: 13px;">
@@ -236,8 +248,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: var(--primary);">68.450.000 đ</div>
-            <div class="kpi-trend positive" id="kpiComparisonLabel">+14.2% so với kỳ trước</div>
+            <div class="kpi-val" style="color: var(--primary);" id="kpiTotalRevenue">0 đ</div>
+            <div class="kpi-trend positive" id="kpiComparisonLabel">Tính từ CSDL SQL Server</div>
           </div>
 
           <div class="kpi-card-unified">
@@ -247,8 +259,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #3b82f6;">54.800.000 đ</div>
-            <div class="kpi-trend positive">Chiếm 80.1% tổng doanh thu</div>
+            <div class="kpi-val" style="color: #3b82f6;" id="kpiCourtRevenue">0 đ</div>
+            <div class="kpi-trend positive" id="kpiCourtRevenuePercent">Chiếm 0% tổng thu</div>
           </div>
 
           <div class="kpi-card-unified">
@@ -258,8 +270,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #f59e0b;">13.650.000 đ</div>
-            <div class="kpi-trend positive">Chiếm 19.9% (Tăng trưởng tốt)</div>
+            <div class="kpi-val" style="color: #f59e0b;" id="kpiServiceRevenue">0 đ</div>
+            <div class="kpi-trend positive" id="kpiServiceRevenuePercent">Chiếm 0% tổng thu</div>
           </div>
 
           <div class="kpi-card-unified">
@@ -269,8 +281,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #8b5cf6;">78.5%</div>
-            <div class="kpi-trend positive">Giờ vàng tối đạt 96.2%</div>
+            <div class="kpi-val" style="color: #8b5cf6;" id="kpiOccupancyRate">0%</div>
+            <div class="kpi-trend positive" id="kpiTotalHoursLabel">0 giờ thi đấu</div>
           </div>
         </div>
 
@@ -278,7 +290,7 @@
         <div class="grid-charts-layout">
           <div class="section-card">
             <div class="section-title-wrap" style="margin-bottom: 16px;">
-              <h3>Diễn biến doanh thu theo tuần (Tháng 09/2026)</h3>
+              <h3 id="chartTrendTitle">Diễn biến doanh thu theo kỳ báo cáo</h3>
               <p>So sánh giữa doanh thu giờ sân và doanh thu dịch vụ bán quầy</p>
             </div>
             <div style="height: 280px; position: relative;">
@@ -288,7 +300,7 @@
 
           <div class="section-card">
             <div class="section-title-wrap" style="margin-bottom: 16px;">
-              <h3>Cơ cấu nguồn thu</h3>
+              <h3 id="chartPieTitle">Cơ cấu nguồn thu</h3>
               <p>Tỷ trọng đóng góp vào doanh thu chi nhánh</p>
             </div>
             <div style="height: 280px; position: relative;">
@@ -301,8 +313,8 @@
         <div class="section-card">
           <div class="section-header-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div class="section-title-wrap">
-              <h3>Báo cáo hiệu suất khai thác theo từng sân</h3>
-              <p>Thống kê số giờ thi đấu thực tế và doanh thu từng sân chi nhánh Thủ Đức</p>
+              <h3 id="tableCourtTitle">Báo cáo hiệu suất khai thác theo từng sân</h3>
+              <p id="tableCourtSubtitle">Thống kê số giờ thi đấu thực tế và doanh thu từng sân từ CSDL SQL Server</p>
             </div>
           </div>
 
@@ -312,6 +324,7 @@
                 <tr>
                   <th style="width: 50px; text-align: center;">STT</th>
                   <th>Mã sân</th>
+                  <th>Chi nhánh</th>
                   <th>Tên sân</th>
                   <th>Phân loại</th>
                   <th style="text-align: center;">Tổng số giờ thuê</th>
@@ -320,66 +333,9 @@
                   <th>Hiệu quả</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="courtPerformanceTableBody">
                 <tr>
-                  <td style="text-align: center;">1</td>
-                  <td><strong>CL01</strong></td>
-                  <td>Sân cầu lông 1 (VIP)</td>
-                  <td>Cầu lông VIP</td>
-                  <td style="text-align: center; font-weight: 700;">118 giờ</td>
-                  <td style="text-align: center;">84.2%</td>
-                  <td style="text-align: right; color: var(--primary); font-weight: 800;">14.160.000 đ</td>
-                  <td><span class="badge badge-green">Xuất sắc</span></td>
-                </tr>
-                <tr>
-                  <td style="text-align: center;">2</td>
-                  <td><strong>CL02</strong></td>
-                  <td>Sân cầu lông 2</td>
-                  <td>Cầu lông tiêu chuẩn</td>
-                  <td style="text-align: center; font-weight: 700;">126 giờ</td>
-                  <td style="text-align: center;">90.0%</td>
-                  <td style="text-align: right; color: var(--primary); font-weight: 800;">11.340.000 đ</td>
-                  <td><span class="badge badge-green">Cao điểm</span></td>
-                </tr>
-                <tr>
-                  <td style="text-align: center;">3</td>
-                  <td><strong>CL03</strong></td>
-                  <td>Sân cầu lông 3</td>
-                  <td>Cầu lông tiêu chuẩn</td>
-                  <td style="text-align: center; font-weight: 700;">112 giờ</td>
-                  <td style="text-align: center;">80.0%</td>
-                  <td style="text-align: right; color: var(--primary); font-weight: 800;">10.080.000 đ</td>
-                  <td><span class="badge badge-green">Tốt</span></td>
-                </tr>
-                <tr>
-                  <td style="text-align: center;">4</td>
-                  <td><strong>CL04</strong></td>
-                  <td>Sân cầu lông 4</td>
-                  <td>Cầu lông tiêu chuẩn</td>
-                  <td style="text-align: center; font-weight: 700;">108 giờ</td>
-                  <td style="text-align: center;">77.1%</td>
-                  <td style="text-align: right; color: var(--primary); font-weight: 800;">9.720.000 đ</td>
-                  <td><span class="badge badge-blue">Ổn định</span></td>
-                </tr>
-                <tr>
-                  <td style="text-align: center;">5</td>
-                  <td><strong>CL05</strong></td>
-                  <td>Sân cầu lông 5</td>
-                  <td>Cầu lông tiêu chuẩn</td>
-                  <td style="text-align: center; font-weight: 700;">65 giờ</td>
-                  <td style="text-align: center;">69.5%</td>
-                  <td style="text-align: right; color: var(--primary); font-weight: 800;">5.850.000 đ</td>
-                  <td><span class="badge badge-blue">Đang tăng</span></td>
-                </tr>
-                <tr>
-                  <td style="text-align: center;">6</td>
-                  <td><strong>CL06</strong></td>
-                  <td>Sân cầu lông 6</td>
-                  <td>Cầu lông VIP</td>
-                  <td style="text-align: center; font-weight: 700;">14 giờ</td>
-                  <td style="text-align: center;">15.0%</td>
-                  <td style="text-align: right; color: var(--text-muted); font-weight: 800;">1.680.000 đ</td>
-                  <td><span class="badge badge-amber">Bảo trì</span></td>
+                  <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 28px;">Đang tính toán báo cáo từ Database SQL Server...</td>
                 </tr>
               </tbody>
             </table>
@@ -399,7 +355,9 @@
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('theme', next);
-      initCharts();
+      if (lastReportData) {
+        updateCharts(lastReportData);
+      }
     }
 
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -407,8 +365,191 @@
 
     let trendChart = null;
     let pieChart = null;
+    let lastReportData = null;
+    let cachedCourtStats = [];
+    let currentPeriodType = 'this_month';
+    let currentPeriodName = 'Tháng này';
 
-    function initCharts() {
+    const branchNamesMap = {
+      'CN01': 'Chi nhánh Thủ Đức',
+      'CN02': 'Chi nhánh Bình Thạnh',
+      'CN03': 'Chi nhánh Quận 9',
+      'CN04': 'Chi nhánh Gò Vấp'
+    };
+
+    function getActiveBranch() {
+      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
+      if (user && (user.role === 'MANAGER' || (user.branchCode && user.role !== 'DIRECTOR' && user.role !== 'ADMIN'))) {
+        return user.branchCode || 'CN01';
+      }
+      const select = document.getElementById('branchFilterSelect');
+      if (select && select.value) return select.value;
+      return (user && user.branchCode) ? user.branchCode : 'CN01';
+    }
+
+    function initBranchSecurity() {
+      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
+      const select = document.getElementById('branchFilterSelect');
+      if (!select) return;
+      if (user && (user.role === 'DIRECTOR' || user.role === 'ADMIN')) {
+        select.innerHTML = `
+          <option value="CN01" selected>CN01 - Thủ Đức (UTE Sport)</option>
+          <option value="CN02">CN02 - Bình Thạnh</option>
+          <option value="CN03">CN03 - Quận 9</option>
+          <option value="CN04">CN04 - Gò Vấp</option>
+          <option value="ALL">Toàn bộ chi nhánh</option>
+        `;
+        select.disabled = false;
+        select.style.cursor = 'pointer';
+      } else {
+        const br = (user && user.branchCode) ? user.branchCode : 'CN01';
+        select.innerHTML = `<option value="${br}" selected>${br} - Thủ Đức (Chi nhánh quản lý)</option>`;
+        select.value = br;
+        select.disabled = true;
+        select.style.cursor = 'not-allowed';
+        select.title = 'Phân quyền: Bạn chỉ có quyền xem báo cáo cơ sở được phân công (' + br + ')';
+      }
+    }
+
+    function onBranchChange() {
+      loadReportData();
+    }
+
+    function formatVND(amount) {
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
+    }
+
+    async function loadReportData() {
+      const activeBranch = getActiveBranch();
+      const bTitle = (activeBranch === 'ALL') ? 'Toàn bộ chi nhánh' : (branchNamesMap[activeBranch] || activeBranch);
+
+      const badge = document.getElementById('heroBranchBadge');
+      if (badge) badge.textContent = `Báo Cáo Hiệu Quả & Doanh Thu ${bTitle} • SQL Server Realtime`;
+
+      const tTitle = document.getElementById('tableCourtTitle');
+      if (tTitle) tTitle.textContent = `Báo cáo hiệu suất khai thác từng sân (${bTitle})`;
+      const tSub = document.getElementById('tableCourtSubtitle');
+      if (tSub) tSub.textContent = `Thống kê số giờ thi đấu thực tế và doanh thu từng sân từ CSDL SQL Server`;
+
+      const from = document.getElementById('reportFromDate')?.value || '';
+      const to = document.getElementById('reportToDate')?.value || '';
+
+      const tbody = document.getElementById('courtPerformanceTableBody');
+      if (tbody && cachedCourtStats.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 28px;">Đang tính toán báo cáo từ Database SQL Server...</td></tr>';
+      }
+
+      try {
+        const query = new URLSearchParams({
+          branchCode: activeBranch,
+          startDate: from,
+          endDate: to
+        });
+
+        const res = await fetch(`/api/manager/reports/data?${query.toString()}`);
+        if (res.ok) {
+          const data = await res.json();
+          lastReportData = data;
+          cachedCourtStats = data.courtStats || [];
+
+          // 1. Update KPI
+          renderKpis(data.kpi);
+
+          // 2. Update Charts
+          updateCharts(data);
+
+          // 3. Render Court Table
+          renderCourtTable(cachedCourtStats);
+        } else {
+          if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #ef4444; padding: 20px;">Không thể tải dữ liệu báo cáo từ máy chủ!</td></tr>';
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải dữ liệu báo cáo:', err);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #ef4444; padding: 20px;">Lỗi kết nối máy chủ SQL Server!</td></tr>';
+      }
+    }
+
+    function renderKpis(kpi) {
+      if (!kpi) return;
+      const totalRev = Number(kpi.totalRevenue || 0);
+      const courtRev = Number(kpi.courtRevenue || 0);
+      const serviceRev = Number(kpi.serviceRevenue || 0);
+      const occRate = Number(kpi.occupancyRate || 0);
+      const totalHours = Number(kpi.totalHours || 0);
+
+      const elTotal = document.getElementById('kpiTotalRevenue');
+      if (elTotal) elTotal.textContent = formatVND(totalRev);
+
+      const elCourt = document.getElementById('kpiCourtRevenue');
+      if (elCourt) elCourt.textContent = formatVND(courtRev);
+      const elCourtPct = document.getElementById('kpiCourtRevenuePercent');
+      if (elCourtPct) {
+        const pct = totalRev > 0 ? ((courtRev / totalRev) * 100).toFixed(1) : '0';
+        elCourtPct.textContent = `Chiếm ${pct}% tổng doanh thu`;
+      }
+
+      const elService = document.getElementById('kpiServiceRevenue');
+      if (elService) elService.textContent = formatVND(serviceRev);
+      const elServicePct = document.getElementById('kpiServiceRevenuePercent');
+      if (elServicePct) {
+        const pct = totalRev > 0 ? ((serviceRev / totalRev) * 100).toFixed(1) : '0';
+        elServicePct.textContent = `Chiếm ${pct}% tổng doanh thu`;
+      }
+
+      const elOcc = document.getElementById('kpiOccupancyRate');
+      if (elOcc) elOcc.textContent = occRate.toFixed(1) + '%';
+      const elHours = document.getElementById('kpiTotalHoursLabel');
+      if (elHours) elHours.textContent = `${totalHours} giờ thi đấu thực tế`;
+    }
+
+    function renderCourtTable(courtStats) {
+      const tbody = document.getElementById('courtPerformanceTableBody');
+      if (!tbody) return;
+
+      if (!courtStats || courtStats.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 28px;">Không có dữ liệu khai thác sân trong kỳ này</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = courtStats.map((c, i) => {
+        let badgeClass = 'badge-blue';
+        if (c.performance === 'Xuất sắc') badgeClass = 'badge-green';
+        else if (c.performance === 'Tốt') badgeClass = 'badge-green';
+        else if (c.performance === 'Bảo trì') badgeClass = 'badge-amber';
+
+        return `
+          <tr>
+            <td style="text-align: center;">${c.stt || (i + 1)}</td>
+            <td><strong>${c.courtCode}</strong></td>
+            <td><span class="badge badge-outline" style="font-size: 11px;">${c.branchCode || 'CN01'}</span></td>
+            <td><strong>${c.courtName}</strong></td>
+            <td><span class="badge" style="background: var(--surface-subtle);">${c.courtType}</span></td>
+            <td style="text-align: center; font-weight: 700;">${c.totalHours} giờ</td>
+            <td style="text-align: center; font-weight: 600;">${(c.occupancyRate || 0).toFixed(1)}%</td>
+            <td style="text-align: right; color: var(--primary); font-weight: 800;">${formatVND(c.revenue)}</td>
+            <td><span class="badge ${badgeClass}">${c.performance}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterReportsTable() {
+      const query = (document.getElementById('reportsSearchInput')?.value || '').toLowerCase().trim();
+      if (!query) {
+        renderCourtTable(cachedCourtStats);
+        return;
+      }
+
+      const filtered = cachedCourtStats.filter(c => {
+        const txt = `${c.courtCode} ${c.courtName} ${c.branchCode} ${c.courtType} ${c.performance} ${c.status}`.toLowerCase();
+        return txt.includes(query);
+      });
+      renderCourtTable(filtered);
+    }
+
+    function updateCharts(data) {
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const textColor = isDark ? '#94a3b8' : '#475569';
       const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9';
@@ -416,22 +557,30 @@
       if (trendChart) trendChart.destroy();
       if (pieChart) pieChart.destroy();
 
-      // Trend Bar Chart
+      // Trend Chart
+      const trendData = data.trend || {};
+      const labels = trendData.labels || [];
+      const courtRevData = trendData.courtRevenue || [];
+      const serviceRevData = trendData.serviceRevenue || [];
+
+      const chartTrendTitle = document.getElementById('chartTrendTitle');
+      if (chartTrendTitle) chartTrendTitle.textContent = `Diễn biến doanh thu (${currentPeriodName})`;
+
       const ctxTrend = document.getElementById('revenueTrendChart').getContext('2d');
       trendChart = new Chart(ctxTrend, {
         type: 'bar',
         data: {
-          labels: ['Tuần 1 (01-07)', 'Tuần 2 (08-14)', 'Tuần 3 (15-21)', 'Tuần 4 (22-28)', 'Tuần 5 (29-30)'],
+          labels: labels.length > 0 ? labels : ['Không có dữ liệu'],
           datasets: [
             {
               label: 'Tiền giờ sân (VNĐ)',
-              data: [12400000, 13800000, 14200000, 11500000, 2900000],
+              data: courtRevData.length > 0 ? courtRevData : [0],
               backgroundColor: '#10b981',
               borderRadius: 6
             },
             {
-              label: 'Dịch vụ nước & Vợt (VNĐ)',
-              data: [3100000, 3400000, 3900000, 2600000, 650000],
+              label: 'Dịch vụ nước & Phụ kiện (VNĐ)',
+              data: serviceRevData.length > 0 ? serviceRevData : [0],
               backgroundColor: '#3b82f6',
               borderRadius: 6
             }
@@ -441,7 +590,7 @@
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            x: { grid: { display: false }, ticks: { color: textColor } },
+            x: { grid: { display: false }, ticks: { color: textColor, maxRotation: 45 } },
             y: { grid: { color: gridColor }, ticks: { color: textColor } }
           },
           plugins: {
@@ -451,6 +600,25 @@
       });
 
       // Pie Chart
+      const bk = data.breakdown || {};
+      const cRev = Number(bk.courtRevenue || 0);
+      const bRev = Number(bk.beverageRevenue || 0);
+      const sRev = Number(bk.shuttlecockRevenue || 0);
+      const eRev = Number(bk.equipmentRevenue || 0);
+      const totRev = cRev + bRev + sRev + eRev;
+
+      const pieData = (totRev > 0) ? [cRev, bRev, sRev, eRev] : [1];
+      const pieLabels = (totRev > 0)
+        ? [
+            `Tiền giờ sân (${((cRev / totRev) * 100).toFixed(1)}%)`,
+            `Nước giải khát (${((bRev / totRev) * 100).toFixed(1)}%)`,
+            `Ống cầu lông (${((sRev / totRev) * 100).toFixed(1)}%)`,
+            `Thuê vợt & Phụ kiện (${((eRev / totRev) * 100).toFixed(1)}%)`
+          ]
+        : ['Chưa có doanh thu'];
+
+      const pieColors = (totRev > 0) ? ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'] : ['#94a3b8'];
+
       const ctxPie = document.getElementById('revenuePieChart').getContext('2d');
       const centerTextPlugin = {
         id: 'centerText',
@@ -464,9 +632,10 @@
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           
-          ctx.font = '800 20px "Plus Jakarta Sans", sans-serif';
+          ctx.font = '800 18px "Plus Jakarta Sans", sans-serif';
           ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
-          ctx.fillText('68.4M', x, y - 8);
+          const millions = (totRev / 1000000.0).toFixed(1) + 'M';
+          ctx.fillText(millions, x, y - 8);
           
           ctx.font = '600 10.5px "Inter", sans-serif';
           ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
@@ -478,10 +647,10 @@
       pieChart = new Chart(ctxPie, {
         type: 'doughnut',
         data: {
-          labels: ['Tiền giờ sân (80.1%)', 'Nước giải khát (11.5%)', 'Ống cầu lông (5.8%)', 'Thuê vợt & Căng cước (2.6%)'],
+          labels: pieLabels,
           datasets: [{
-            data: [54800000, 7850000, 3970000, 1830000],
-            backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'],
+            data: pieData,
+            backgroundColor: pieColors,
             borderWidth: 0,
             hoverOffset: 6
           }]
@@ -508,9 +677,6 @@
       });
     }
 
-    let currentPeriodType = 'this_month';
-    let currentPeriodName = 'Tháng này';
-
     function selectPeriod(type, btn) {
       currentPeriodType = type;
       if (btn) {
@@ -530,7 +696,7 @@
       let end = new Date(now);
 
       if (type === 'today') {
-        // start and end are today
+        // start & end are today
       } else if (type === 'this_week') {
         const day = now.getDay() || 7;
         start.setDate(now.getDate() - day + 1);
@@ -542,6 +708,9 @@
         const quarter = Math.floor(now.getMonth() / 3);
         start = new Date(now.getFullYear(), quarter * 3, 1);
         end = new Date(now.getFullYear(), (quarter + 1) * 3, 0);
+      } else if (type === 'all_time') {
+        start = new Date(2026, 0, 1);
+        end = new Date(now.getFullYear(), 11, 31);
       }
 
       const fromStr = `${start.getFullYear()}-${pad(start.getMonth() + 1)}-${pad(start.getDate())}`;
@@ -550,6 +719,7 @@
       if (toEl) toEl.value = toStr;
 
       updatePeriodLabels(currentPeriodName);
+      loadReportData();
     }
 
     function handleCustomDateChange() {
@@ -560,58 +730,59 @@
         b.className = 'btn btn-outline';
       });
       updatePeriodLabels(currentPeriodName);
+      loadReportData();
     }
 
     function updatePeriodLabels(label) {
       const kpiLabel = document.getElementById('kpiTotalRevenueLabel');
       if (kpiLabel) kpiLabel.innerText = `Tổng doanh thu (${label})`;
       const compLabel = document.getElementById('kpiComparisonLabel');
-      if (compLabel) compLabel.innerText = `So với kỳ trước`;
+      if (compLabel) compLabel.innerText = `Đồng bộ từ CSDL SQL Server`;
     }
 
     function exportReportsToExcel() {
       const from = document.getElementById('reportFromDate')?.value || '2026-09-01';
       const to = document.getElementById('reportToDate')?.value || '2026-09-30';
-      const table = document.querySelector('.table-container table');
-      if (!table) return;
+      const activeBranch = getActiveBranch();
+      const bTitle = (activeBranch === 'ALL') ? 'Toan_Chu_Kho' : activeBranch;
 
       let csv = "\uFEFF";
       csv += "BAO CAO HIEU SUAT & DOANH THU SAN - UTE SPORT ARENA\n";
-      csv += `Ky bao cao: ${currentPeriodName} (Tu ${from} Den ${to})\n`;
+      csv += `Chi nhanh: ${activeBranch} - Ky bao cao: ${currentPeriodName} (Tu ${from} Den ${to})\n`;
       csv += `Ngay xuat: ${new Date().toLocaleDateString('vi-VN')} ${new Date().toLocaleTimeString('vi-VN')}\n\n`;
 
-      const rows = table.querySelectorAll('tr');
-      rows.forEach(tr => {
-        const cells = tr.querySelectorAll('th, td');
-        const rowArr = [];
-        cells.forEach(td => {
-          let text = td.innerText.replace(/"/g, '""').trim();
-          rowArr.push(`"${text}"`);
-        });
-        csv += rowArr.join(',') + '\n';
+      csv += `"STT","Ma San","Chi Nhanh","Ten San","Phan Loai","Tong So Gio Thue","Ty Le Lap Day","Doanh Thu Gio San","Hieu Qua"\n`;
+
+      cachedCourtStats.forEach((c, idx) => {
+        csv += `"${idx + 1}","${c.courtCode}","${c.branchCode || ''}","${c.courtName}","${c.courtType}","${c.totalHours} gio","${(c.occupancyRate || 0).toFixed(1)}%","${c.revenue}","${c.performance}"\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Bao_Cao_Doanh_Thu_San_${from}_den_${to}.csv`;
+      a.download = `Bao_Cao_Doanh_Thu_${bTitle}_${from}_den_${to}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      alert(`Đã xuất và tải về thành công file báo cáo ${currentPeriodName} (${from} đến ${to})!`);
+      if (window.showToast) {
+        showToast(`Đã xuất báo cáo ${currentPeriodName} (${from} đến ${to}) thành công!`, 'success');
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Initialize current month dynamic title
+      initBranchSecurity();
       const now = new Date();
       const monthTitle = `Tháng ${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
       const btnMonth = document.getElementById('btnCurrentMonth');
       if (btnMonth) btnMonth.innerText = monthTitle;
       selectPeriod('this_month', btnMonth);
-      initCharts();
+    });
+
+    window.addEventListener('badminton:booking-event', () => {
+      loadReportData();
     });
   </script>
 </body>

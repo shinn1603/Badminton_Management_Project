@@ -40,7 +40,8 @@ public class UserService {
             throw new IllegalArgumentException("Vui lòng nhập tài khoản và mật khẩu!");
         }
 
-        String userKey = username.trim().toLowerCase();
+        String identifier = username.trim();
+        String userKey = identifier.toLowerCase();
         Long lockoutUntil = lockoutExpiry.get(userKey);
         if (lockoutUntil != null) {
             if (System.currentTimeMillis() < lockoutUntil) {
@@ -52,30 +53,87 @@ public class UserService {
             }
         }
 
-        User user = userRepository.findByUsername(username.trim())
-                .orElseThrow(() -> new IllegalArgumentException("Tài khoản hoặc mật khẩu không chính xác!"));
+        // 1. Tìm kiếm trong bảng users theo username, phone, hoặc email
+        User user = userRepository.findByUsername(identifier)
+                .or(() -> userRepository.findByPhone(identifier))
+                .or(() -> identifier.contains("@") ? userRepository.findByEmail(identifier) : Optional.empty())
+                .orElse(null);
 
-        String storedPassword = user.getPassword();
-        boolean isMatch = false;
+        // 2. Nếu chưa có trong bảng users, tìm trong bảng customers (KH001 - KH006, SĐT, Email)
+        if (user == null) {
+            Customer cust = customerRepository.findByPhone(identifier)
+                    .or(() -> customerRepository.findByCustomerCode(identifier))
+                    .or(() -> identifier.contains("@") ? customerRepository.findByEmail(identifier) : Optional.empty())
+                    .orElse(null);
 
-        if (storedPassword != null && (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$"))) {
-            isMatch = passwordEncoder.matches(password.trim(), storedPassword);
-        } else {
-            // Legacy plaintext fallback - verify and upgrade to BCrypt immediately
-            if (storedPassword != null && storedPassword.equals(password.trim())) {
-                isMatch = true;
+            if (cust != null) {
+                // Xác thực mật khẩu theo hồ sơ khách hàng
+                String custStoredPass = cust.getPassword();
+                boolean custMatch = false;
+                if (custStoredPass != null && (custStoredPass.startsWith("$2a$") || custStoredPass.startsWith("$2b$") || custStoredPass.startsWith("$2y$"))) {
+                    custMatch = passwordEncoder.matches(password.trim(), custStoredPass);
+                } else if (custStoredPass != null && custStoredPass.equals(password.trim())) {
+                    custMatch = true;
+                    // Nâng cấp mật khẩu khách hàng lên BCrypt
+                    cust.setPassword(passwordEncoder.encode(password.trim()));
+                    customerRepository.save(cust);
+                }
+
+                if (!custMatch) {
+                    int attempts = failedAttempts.merge(userKey, 1, Integer::sum);
+                    if (attempts >= 5) {
+                        lockoutExpiry.put(userKey, System.currentTimeMillis() + 15 * 60 * 1000);
+                    }
+                    throw new IllegalArgumentException("Tài khoản hoặc mật khẩu không chính xác!");
+                }
+
+                // Tự động tạo và đồng bộ tài khoản người dùng tương ứng
+                String preferredUsername = (cust.getPhone() != null && !cust.getPhone().trim().isEmpty())
+                        ? cust.getPhone().trim()
+                        : cust.getCustomerCode().toLowerCase();
+                if (userRepository.findByUsername(preferredUsername).isPresent()) {
+                    preferredUsername = cust.getCustomerCode().toLowerCase();
+                }
+
+                user = new User();
+                user.setUsername(preferredUsername);
                 user.setPassword(passwordEncoder.encode(password.trim()));
-                userRepository.save(user);
-                log.info("Nâng cấp mật khẩu sang BCrypt thành công cho người dùng: {}", user.getUsername());
+                user.setFullName(cust.getFullName() != null ? cust.getFullName() : "Khách Hàng");
+                user.setPhone(cust.getPhone() != null ? cust.getPhone() : "");
+                user.setEmail(cust.getEmail() != null ? cust.getEmail() : "");
+                user.setRole("CUSTOMER");
+                user.setBranchCode("CN01");
+                user.setStatus(cust.getStatus() != null ? cust.getStatus() : "Hoạt động");
+                user.setCreatedAt(LocalDateTime.now());
+                user = userRepository.save(user);
+                log.info("Tự động đồng bộ tài khoản người dùng cho khách hàng: {}", user.getUsername());
+            } else {
+                throw new IllegalArgumentException("Tài khoản hoặc mật khẩu không chính xác!");
             }
-        }
+        } else {
+            // Xác thực mật khẩu với bản ghi User
+            String storedPassword = user.getPassword();
+            boolean isMatch = false;
 
-        if (!isMatch) {
-            int attempts = failedAttempts.merge(userKey, 1, Integer::sum);
-            if (attempts >= 5) {
-                lockoutExpiry.put(userKey, System.currentTimeMillis() + 15 * 60 * 1000);
+            if (storedPassword != null && (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2y$"))) {
+                isMatch = passwordEncoder.matches(password.trim(), storedPassword);
+            } else {
+                // Legacy plaintext fallback - verify and upgrade to BCrypt immediately
+                if (storedPassword != null && storedPassword.equals(password.trim())) {
+                    isMatch = true;
+                    user.setPassword(passwordEncoder.encode(password.trim()));
+                    userRepository.save(user);
+                    log.info("Nâng cấp mật khẩu sang BCrypt thành công cho người dùng: {}", user.getUsername());
+                }
             }
-            throw new IllegalArgumentException("Tài khoản hoặc mật khẩu không chính xác!");
+
+            if (!isMatch) {
+                int attempts = failedAttempts.merge(userKey, 1, Integer::sum);
+                if (attempts >= 5) {
+                    lockoutExpiry.put(userKey, System.currentTimeMillis() + 15 * 60 * 1000);
+                }
+                throw new IllegalArgumentException("Tài khoản hoặc mật khẩu không chính xác!");
+            }
         }
 
         // Reset failed attempts upon successful login
@@ -252,22 +310,48 @@ public class UserService {
         String search = identifier.trim();
         User user = userRepository.findByUsername(search)
                 .or(() -> userRepository.findByPhone(search))
-                .or(() -> userRepository.findAll().stream().filter(u -> search.equalsIgnoreCase(u.getEmail())).findFirst())
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản với thông tin đã cung cấp!"));
+                .or(() -> search.contains("@") ? userRepository.findByEmail(search) : Optional.empty())
+                .orElse(null);
 
-        user.setPassword(passwordEncoder.encode(newPassword.trim()));
-        userRepository.save(user);
+        if (user == null) {
+            Customer cust = customerRepository.findByPhone(search)
+                    .or(() -> customerRepository.findByCustomerCode(search))
+                    .or(() -> search.contains("@") ? customerRepository.findByEmail(search) : Optional.empty())
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản với thông tin đã cung cấp!"));
 
-        // Also update Customer record if exists
-        customerRepository.findAll().stream()
-                .filter(c -> search.equalsIgnoreCase(c.getPhone()) || search.equalsIgnoreCase(c.getEmail()))
-                .findFirst()
-                .ifPresent(cust -> {
-                    cust.setPassword(user.getPassword());
-                    customerRepository.save(cust);
+            String encodedNewPass = passwordEncoder.encode(newPassword.trim());
+            cust.setPassword(encodedNewPass);
+            customerRepository.save(cust);
+
+            String preferredUsername = (cust.getPhone() != null && !cust.getPhone().trim().isEmpty())
+                    ? cust.getPhone().trim()
+                    : cust.getCustomerCode().toLowerCase();
+            User newUser = new User();
+            newUser.setUsername(preferredUsername);
+            newUser.setPassword(encodedNewPass);
+            newUser.setFullName(cust.getFullName() != null ? cust.getFullName() : "Khách Hàng");
+            newUser.setPhone(cust.getPhone() != null ? cust.getPhone() : "");
+            newUser.setEmail(cust.getEmail() != null ? cust.getEmail() : "");
+            newUser.setRole("CUSTOMER");
+            newUser.setBranchCode("CN01");
+            newUser.setStatus("Hoạt động");
+            newUser.setCreatedAt(LocalDateTime.now());
+            userRepository.save(newUser);
+            log.info("Đặt lại mật khẩu thành công cho tài khoản khách hàng: {}", newUser.getUsername());
+        } else {
+            String encodedNewPass = passwordEncoder.encode(newPassword.trim());
+            user.setPassword(encodedNewPass);
+            userRepository.save(user);
+
+            // Cập nhật bản ghi customer nếu tồn tại
+            if (user.getPhone() != null && !user.getPhone().isBlank()) {
+                customerRepository.findByPhone(user.getPhone().trim()).ifPresent(c -> {
+                    c.setPassword(encodedNewPass);
+                    customerRepository.save(c);
                 });
-
-        log.info("Đặt lại mật khẩu thành công cho tài khoản: {}", user.getUsername());
+            }
+            log.info("Đặt lại mật khẩu thành công cho tài khoản: {}", user.getUsername());
+        }
     }
 
     public User toggleUserStatus(String username) {

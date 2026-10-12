@@ -178,6 +178,20 @@ public class CourtService {
         return saved;
     }
 
+    public void deleteCourt(String courtCode) {
+        Court court = courtRepository.findByCourtCode(courtCode.trim())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sân với mã: " + courtCode));
+        String branch = court.getBranchCode();
+        courtRepository.delete(court);
+        broadcastCourtEvent(CourtEventDto.builder()
+                .eventType("COURT_DELETED")
+                .courtCode(courtCode)
+                .branchCode(branch)
+                .status("Đã xóa")
+                .timestamp(LocalDateTime.now())
+                .build());
+    }
+
     private void broadcastCourtEvent(CourtEventDto event) {
         if (messagingTemplate != null) {
             try {

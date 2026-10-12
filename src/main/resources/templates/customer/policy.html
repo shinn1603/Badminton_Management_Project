@@ -49,6 +49,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 16px;
+      flex-wrap: nowrap;
     }
     .cust-brand-wrap {
       display: flex;
@@ -56,10 +58,11 @@
       gap: 12px;
       text-decoration: none;
       color: var(--text-dark);
+      flex-shrink: 0;
     }
     .cust-logo-icon {
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
       border-radius: 12px;
       display: flex;
@@ -67,35 +70,40 @@
       justify-content: center;
       color: #ffffff;
       box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+      flex-shrink: 0;
     }
     .cust-brand-title {
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 800;
       letter-spacing: -0.3px;
+      white-space: nowrap;
     }
     .cust-brand-sub {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--primary);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
+      white-space: nowrap;
     }
     .cust-nav-menu {
       display: flex;
       align-items: center;
-      gap: 24px;
+      gap: 16px;
+      flex-shrink: 1;
     }
     .cust-nav-link {
       text-decoration: none;
-      font-size: 13.5px;
-      font-weight: 500;
+      font-size: 14px;
+      font-weight: 600;
       color: var(--text-muted);
       transition: all 0.15s ease;
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 0;
+      padding: 8px 4px;
       position: relative;
+      white-space: nowrap;
     }
     .cust-nav-link:hover { color: var(--text-dark); }
     .cust-nav-link.active {
@@ -106,6 +114,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      flex-shrink: 0;
     }
 
     /* CONTAINER & HERO */
@@ -447,14 +456,14 @@
         <div class="policy-kpi-desc">Hoàn toàn bộ số tiền cọc đã thanh toán khi hủy đúng thời hạn quy định.</div>
       </div>
       <div class="policy-kpi-card">
-        <div class="policy-kpi-val">&ge; 4 Tiếng</div>
+        <div class="policy-kpi-val" id="kpiCancelHours">&ge; 4 Tiếng</div>
         <div class="policy-kpi-title">Thời Gian Hủy Tối Thiểu</div>
-        <div class="policy-kpi-desc">Chỉ cần gửi yêu cầu hủy trước giờ bắt đầu chơi tối thiểu 4 tiếng đồng hồ.</div>
+        <div class="policy-kpi-desc" id="kpiCancelDesc">Chỉ cần gửi yêu cầu hủy trước giờ bắt đầu chơi tối thiểu 4 tiếng đồng hồ.</div>
       </div>
       <div class="policy-kpi-card">
-        <div class="policy-kpi-val">0 VNĐ</div>
-        <div class="policy-kpi-title">Phí Xử Lý Hủy</div>
-        <div class="policy-kpi-desc">Hoàn toàn không thu phụ phí, không trừ chiết khấu vận hành hệ thống.</div>
+        <div class="policy-kpi-val" id="kpiHoldingMinutes">10 Phút</div>
+        <div class="policy-kpi-title">Thời Gian Khóa Giữ Chỗ</div>
+        <div class="policy-kpi-desc">Khóa slot thời gian thực chờ thanh toán cọc VietQR (CFG_HOLDING_MINUTES).</div>
       </div>
       <div class="policy-kpi-card">
         <div class="policy-kpi-val">1 - 24h</div>
@@ -472,11 +481,11 @@
       <p class="policy-text">
         Chính sách hoàn cọc 100% được kích hoạt tự động trên toàn bộ hệ thống chuỗi cơ sở UTE Sport đối với các trường hợp sau:
       </p>
-      <div class="rule-box-green">
-        <strong>Quy định hủy trước 4 giờ:</strong> Khách hàng chủ động hủy lịch đặt sân trên giao diện trực tuyến hoặc thông báo qua tổng đài trước giờ nhận sân tối thiểu <strong>4 tiếng (240 phút)</strong> sẽ được hoàn trả 100% số tiền đặt cọc (theo cấu hình hệ thống quy định tại QĐ-KH03).
+      <div class="rule-box-green" id="ruleCancelBox">
+        <strong>Quy định hủy trước giờ chơi:</strong> Khách hàng chủ động hủy lịch đặt sân trên giao diện trực tuyến hoặc thông báo qua tổng đài trước giờ nhận sân tối thiểu <strong id="ruleCancelHours">4 tiếng (240 phút)</strong> sẽ được hoàn trả 100% số tiền đặt cọc (theo cấu hình hệ thống quy định tại QĐ-KH03).
       </div>
       <p class="policy-text">
-        <strong>Trường hợp bất khả kháng:</strong> Khách hàng được hoàn 100% không phụ thuộc vào mốc thời gian 4 tiếng trong các sự cố khách quan:
+        <strong>Trường hợp bất khả kháng:</strong> Khách hàng được hoàn 100% không phụ thuộc vào mốc thời gian quy định trong các sự cố khách quan:
       </p>
       <ul style="padding-left: 20px; font-size: 14px; margin-bottom: 0;">
         <li>Cơ sở gặp sự cố kỹ thuật về mặt sàn, hệ thống chiếu sáng hoặc bảo trì đột xuất.</li>
@@ -494,8 +503,8 @@
       <p class="policy-text">
         Để đảm bảo công bằng cho các khách hàng khác có nhu cầu sử dụng sân và duy trì chi phí vận hành cơ sở, hệ thống sẽ <strong>không hỗ trợ hoàn cọc</strong> trong các tình huống:
       </p>
-      <div class="rule-box-amber">
-        <strong>Hủy cận giờ:</strong> Khách hàng thực hiện hủy lịch trong khoảng thời gian dưới 4 tiếng trước giờ bắt đầu thi đấu. Số tiền cọc 30% sẽ được bù đắp vào chi phí giữ chỗ của khung giờ trống.
+      <div class="rule-box-amber" id="ruleLateBox">
+        <strong>Hủy cận giờ:</strong> Khách hàng thực hiện hủy lịch trong khoảng thời gian dưới <span id="ruleCancelLimit">4 tiếng</span> trước giờ bắt đầu thi đấu. Số tiền cọc <span id="ruleDepositRate">30%</span> sẽ được bù đắp vào chi phí giữ chỗ của khung giờ trống.
       </div>
       <ul style="padding-left: 20px; font-size: 14px; margin-bottom: 0;">
         <li><strong>Vắng mặt không nhận sân (No-show):</strong> Sau 15 phút kể từ giờ bắt đầu ca chơi mà khách hàng không đến check-in và không thông báo trước cho quầy thu ngân.</li>
@@ -568,7 +577,7 @@
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 14px;">
         <div>
           <div style="font-size: 11.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Hotline Hỗ Trợ 24/7</div>
-          <div style="font-size: 16px; font-weight: 800; color: var(--primary); margin-top: 2px;">1900 6868</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--primary); margin-top: 2px;" id="policyHotline">1900 6868</div>
         </div>
         <div>
           <div style="font-size: 11.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Hộp Thư Tiếp Nhận</div>
@@ -576,7 +585,13 @@
         </div>
         <div>
           <div style="font-size: 11.5px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Trụ Sở Điều Hành</div>
-          <div style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-top: 2px;">Võ Văn Ngân, TP. Thủ Đức</div>
+          <div style="font-size: 13px; font-weight: 600; color: var(--text-dark); margin-top: 2px;" id="policyHeadquarters">Võ Văn Ngân, TP. Thủ Đức</div>
+        </div>
+      </div>
+      <div style="margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--border-subtle);">
+        <div style="font-size: 12px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">CÁC CHI NHÁNH ÁP DỤNG TRÊN TOÀN HỆ THỐNG:</div>
+        <div id="policyBranchesList" style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <span style="font-size: 12px; color: var(--text-muted);">Đang nạp danh sách chi nhánh từ cơ sở dữ liệu...</span>
         </div>
       </div>
     </div>
@@ -603,12 +618,8 @@
 
       <div>
         <div class="footer-col-title">Chi Nhánh Sân Cầu Lông</div>
-        <ul class="footer-links-list">
-          <li>• CN 1: Võ Văn Ngân, TP. Thủ Đức</li>
-          <li>• CN 2: Nguyễn Thị Thập, Quận 7</li>
-          <li>• CN 3: Điện Biên Phủ, Bình Thạnh</li>
-          <li>• CN 4: Quang Trung, Gò Vấp</li>
-          <li>• Giờ mở cửa: <strong>05:30 - 22:30</strong> (Thứ 2 - CN)</li>
+        <ul class="footer-links-list" id="footerBranchList">
+          <li>Đang nạp chi nhánh...</li>
         </ul>
       </div>
 
@@ -649,5 +660,67 @@
 
   <script src="/js/global-hub.js"></script>
   <script src="/js/auth-guard.js"></script>
+  <script>
+    async function loadPolicySettingsFromDb() {
+      try {
+        const res = await fetch('/api/policy/settings');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.success && data.settings) {
+          const cfg = data.settings;
+          const cancelHours = cfg.CFG_CANCEL_HOURS || '4';
+          const holdingMins = cfg.CFG_HOLDING_MINUTES || '10';
+          const depositRate = cfg.CFG_DEPOSIT_RATE || '30';
+
+          const kpiHoursEl = document.getElementById('kpiCancelHours');
+          if (kpiHoursEl) kpiHoursEl.innerHTML = `&ge; ${cancelHours} Tiếng`;
+
+          const kpiDescEl = document.getElementById('kpiCancelDesc');
+          if (kpiDescEl) kpiDescEl.textContent = `Chỉ cần gửi yêu cầu hủy trước giờ bắt đầu chơi tối thiểu ${cancelHours} tiếng đồng hồ.`;
+
+          const kpiHoldEl = document.getElementById('kpiHoldingMinutes');
+          if (kpiHoldEl) kpiHoldEl.textContent = `${holdingMins} Phút`;
+
+          const ruleHoursEl = document.getElementById('ruleCancelHours');
+          if (ruleHoursEl) ruleHoursEl.textContent = `${cancelHours} tiếng (${parseInt(cancelHours) * 60} phút)`;
+
+          const ruleLimitEl = document.getElementById('ruleCancelLimit');
+          if (ruleLimitEl) ruleLimitEl.textContent = `${cancelHours} tiếng`;
+
+          const ruleDepEl = document.getElementById('ruleDepositRate');
+          if (ruleDepEl) ruleDepEl.textContent = `${depositRate}%`;
+        }
+
+        if (data.branches && Array.isArray(data.branches) && data.branches.length > 0) {
+          const bListEl = document.getElementById('policyBranchesList');
+          if (bListEl) {
+            bListEl.innerHTML = data.branches.map(b => `
+              <span style="font-size: 12px; background: var(--surface); border: 1px solid var(--border-subtle); padding: 5px 12px; border-radius: 6px; color: var(--text-dark);">
+                <strong>${b.branchCode}:</strong> ${b.branchName} (${b.address || 'TP.HCM'})
+              </span>
+            `).join('');
+          }
+
+          const footerListEl = document.getElementById('footerBranchList');
+          if (footerListEl) {
+            footerListEl.innerHTML = data.branches.map(b => `
+              <li>• ${b.branchCode}: ${b.branchName}</li>
+            `).join('') + '<li>• Giờ mở cửa: <strong>05:30 - 22:30</strong> (Thứ 2 - CN)</li>';
+          }
+
+          const hqEl = document.getElementById('policyHeadquarters');
+          if (hqEl && data.branches[0].address) {
+            hqEl.textContent = data.branches[0].address;
+          }
+        }
+      } catch (e) {
+        console.warn('Lỗi tải chính sách từ CSDL:', e);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadPolicySettingsFromDb();
+    });
+  </script>
 </body>
 </html>

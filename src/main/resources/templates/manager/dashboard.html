@@ -171,14 +171,17 @@
             </svg>
           </button>
 
-          <div class="branch-select-badge" onclick="alert('Đang hiển thị dữ liệu Chi nhánh 1 - Thủ Đức')">
+          <div class="branch-select-badge" style="display: flex; align-items: center; gap: 8px;">
             <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--primary);">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             </svg>
-            <span>Trung Tâm Thể Thao UTE Sport - Thủ Đức</span>
-            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; color: var(--text-muted);">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+            <select id="dashboardBranchSelect" onchange="onBranchChange()" style="border: none; background: transparent; font-weight: 700; color: var(--text-dark); cursor: pointer; outline: none; font-size: 13px;">
+              <option value="CN01" selected>CN01 - Thủ Đức (UTE Sport)</option>
+              <option value="CN02">CN02 - Bình Thạnh</option>
+              <option value="CN03">CN03 - Quận 9</option>
+              <option value="CN04">CN04 - Gò Vấp</option>
+              <option value="ALL">Toàn bộ chi nhánh</option>
+            </select>
           </div>
 
           <div class="search-box-header">
@@ -268,13 +271,9 @@
                   </svg>
                 </div>
               </div>
-              <div class="stat-value">248</div>
+              <div class="stat-value" id="kpiTotalBookings">0</div>
               <div class="stat-trend stat-trend-up">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
-                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                  <polyline points="17 6 23 6 23 12"></polyline>
-                </svg>
-                <span>↑ 12% so với tuần trước</span>
+                <span id="kpiTotalBookingsSub">Dữ liệu từ CSDL SQL Server</span>
               </div>
             </div>
 
@@ -289,20 +288,16 @@
                   </svg>
                 </div>
               </div>
-              <div class="stat-value">12.450.000đ</div>
+              <div class="stat-value" id="kpiTodayRevenue">0đ</div>
               <div class="stat-trend stat-trend-up">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
-                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                  <polyline points="17 6 23 6 23 12"></polyline>
-                </svg>
-                <span>↑ 18% so với hôm qua</span>
+                <span id="kpiTodayRevenueSub">Tổng DT: 0đ</span>
               </div>
             </div>
 
             <!-- Stat 3 -->
             <div class="stat-card" onclick="window.location.href='/manager/courts'">
               <div class="stat-card-top">
-                <span class="stat-label">Tỷ lệ lấp đầy</span>
+                <span class="stat-label">Tỷ lệ lấp đầy sân</span>
                 <div class="stat-icon-wrap stat-icon-orange">
                   <svg class="svg-icon" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -310,20 +305,16 @@
                   </svg>
                 </div>
               </div>
-              <div class="stat-value">78%</div>
+              <div class="stat-value" id="kpiOccupancyRate">0%</div>
               <div class="stat-trend stat-trend-up">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
-                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                  <polyline points="17 6 23 6 23 12"></polyline>
-                </svg>
-                <span>↑ 6% so với tuần trước</span>
+                <span id="kpiCourtsRatio">0/0 sân đang hoạt động</span>
               </div>
             </div>
 
             <!-- Stat 4 -->
-            <div class="stat-card" onclick="window.location.href='/manager/staff'">
+            <div class="stat-card" onclick="window.location.href='/manager/bookings'">
               <div class="stat-card-top">
-                <span class="stat-label">Khách hàng mới</span>
+                <span class="stat-label">Khách hàng chi nhánh</span>
                 <div class="stat-icon-wrap stat-icon-purple">
                   <svg class="svg-icon" viewBox="0 0 24 24">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -333,13 +324,9 @@
                   </svg>
                 </div>
               </div>
-              <div class="stat-value">36</div>
+              <div class="stat-value" id="kpiNewCustomers">0</div>
               <div class="stat-trend stat-trend-up">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
-                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                  <polyline points="17 6 23 6 23 12"></polyline>
-                </svg>
-                <span>↑ 20% so với tuần trước</span>
+                <span id="kpiNewCustomersSub">Khách hàng đã đặt sân</span>
               </div>
             </div>
 
@@ -437,53 +424,9 @@
                 <a href="/manager/courts" style="font-size: 12.5px; font-weight: 600; color: var(--primary);">Xem tất cả →</a>
               </div>
               <div class="card-body">
-                <div class="courts-thumbs-grid">
-                  <!-- Court 1 -->
-                  <div class="court-thumb-card" onclick="window.location.href='/manager/courts'">
-                    <div class="court-thumb-img-wrap">
-                      <img src="/images/badminton-court.jpg" alt="Sân Cầu Lông 1">
-                      <span class="badge badge-available court-thumb-badge">● Trống</span>
-                    </div>
-                    <div class="court-thumb-body">
-                      <div class="court-thumb-title">Sân cầu lông 1</div>
-                      <div class="court-thumb-meta">Thảm Taraflex cao cấp • 05:00 - 23:00</div>
-                    </div>
-                  </div>
-
-                  <!-- Court 2 -->
-                  <div class="court-thumb-card" onclick="window.location.href='/manager/courts'">
-                    <div class="court-thumb-img-wrap">
-                      <img src="/images/badminton-court.jpg" alt="Sân Cầu Lông 2">
-                      <span class="badge badge-in-use court-thumb-badge">● Đang sử dụng</span>
-                    </div>
-                    <div class="court-thumb-body">
-                      <div class="court-thumb-title">Sân cầu lông 2</div>
-                      <div class="court-thumb-meta">Sân tiêu chuẩn thi đấu • 05:00 - 23:00</div>
-                    </div>
-                  </div>
-
-                  <!-- Court 3 -->
-                  <div class="court-thumb-card" onclick="window.location.href='/manager/courts'">
-                    <div class="court-thumb-img-wrap">
-                      <img src="/images/badminton-court.jpg" alt="Sân Cầu Lông 3">
-                      <span class="badge badge-available court-thumb-badge">● Trống</span>
-                    </div>
-                    <div class="court-thumb-body">
-                      <div class="court-thumb-title">Sân Cầu Lông 3</div>
-                      <div class="court-thumb-meta">Thảm Enlio tiêu chuẩn • 06:00 - 22:00</div>
-                    </div>
-                  </div>
-
-                  <!-- Court 4 -->
-                  <div class="court-thumb-card" onclick="window.location.href='/manager/courts'">
-                    <div class="court-thumb-img-wrap">
-                      <img src="/images/badminton-court.jpg" alt="Sân Cầu Lông 4 (VIP)">
-                      <span class="badge badge-maintenance court-thumb-badge">● Bảo trì đèn</span>
-                    </div>
-                    <div class="court-thumb-body">
-                      <div class="court-thumb-title">Sân Cầu Lông 4 (VIP)</div>
-                      <div class="court-thumb-meta">Thảm Yonex BWF • Hoàn thành 14:00</div>
-                    </div>
+                <div class="courts-thumbs-grid" id="courtsThumbsGrid">
+                  <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 30px;">
+                    Đang nạp danh sách sân từ SQL Server...
                   </div>
                 </div>
               </div>
@@ -517,47 +460,8 @@
                     </thead>
                     <tbody id="recentBookingsTbody">
                       <tr>
-                        <td><strong>#DS0101</strong></td>
-                        <td>Nguyễn Hoàng Nam <br><span style="font-size: 11px; color: var(--text-muted);">0903.123.456</span></td>
-                        <td>Sân cầu lông 2</td>
-                        <td>Hôm nay • 08:00 - 10:00</td>
-                        <td><strong>180.000đ</strong></td>
-                        <td><span class="badge badge-in-use">Đang sử dụng</span></td>
-                        <td>
-                          <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="window.location.href='/manager/bookings'">Xem đơn</button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td><strong>#DS0102</strong></td>
-                        <td>Lê Minh Đức <br><span style="font-size: 11px; color: var(--text-muted);">0912.888.999</span></td>
-                        <td>Sân cầu lông 1</td>
-                        <td>Hôm nay • 14:00 - 16:00</td>
-                        <td><strong>180.000đ</strong></td>
-                        <td><span class="badge badge-pending">Đã cọc 30%</span></td>
-                        <td>
-                          <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="showToast('Đã xác nhận đơn #DS0102', 'success')">Duyệt</button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td><strong>#DS0103</strong></td>
-                        <td>Phạm Gia Huy <br><span style="font-size: 11px; color: var(--text-muted);">0988.777.666</span></td>
-                        <td>Sân Cầu Lông 2</td>
-                        <td>Hôm nay • 18:00 - 20:00</td>
-                        <td><strong>240.000đ</strong></td>
-                        <td><span class="badge badge-available">Đã xác nhận</span></td>
-                        <td>
-                          <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="window.location.href='/manager/bookings'">Nhận sân</button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td><strong>#DS0104</strong></td>
-                        <td>Vũ Thị Mai Anh <br><span style="font-size: 11px; color: var(--text-muted);">0977.555.444</span></td>
-                        <td>Sân cầu lông 3</td>
-                        <td>Hôm nay • 19:00 - 20:00</td>
-                        <td><strong>90.000đ</strong></td>
-                        <td><span class="badge badge-pending">Chờ xác nhận</span></td>
-                        <td>
-                          <button class="btn btn-primary" style="padding: 4px 8px; font-size: 11.5px;" onclick="showToast('Đã nhận đơn đặt online #DS0104', 'success')">Nhận đơn</button>
+                        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                          Đang tải danh sách đặt sân gần đây từ CSDL...
                         </td>
                       </tr>
                     </tbody>
@@ -584,56 +488,14 @@
               <div class="card-body">
                 <!-- Date bar -->
                 <div class="timeline-date-bar">
-                  <button type="button" class="btn-icon" style="width: 26px; height: 26px;" onclick="changeTimelineDate(-1)">‹</button>
-                  <span id="timelineDateLabel">Hôm nay, 30/09/2026</span>
-                  <button type="button" class="btn-icon" style="width: 26px; height: 26px;" onclick="changeTimelineDate(1)">›</button>
+                  <span id="timelineDateLabel" style="font-weight: 700; color: var(--text-dark);">Lịch thi đấu hôm nay</span>
+                  <a href="/manager/bookings" class="btn btn-outline" style="font-size: 11.5px; padding: 4px 8px; text-decoration: none;">Xem bảng đặt sân</a>
                 </div>
 
                 <!-- Slots List -->
-                <div class="timeline-slots-list">
-                  <div class="timeline-slot-item">
-                    <span class="timeline-hour">07:00</span>
-                    <div class="timeline-court-info">
-                      <div class="timeline-court-name">Sân cầu lông 1</div>
-                      <div class="timeline-court-sub">Khung giờ sáng sớm</div>
-                    </div>
-                    <span class="badge badge-available">Trống</span>
-                  </div>
-
-                  <div class="timeline-slot-item" style="border-left: 3px solid #2563eb;">
-                    <span class="timeline-hour">08:00</span>
-                    <div class="timeline-court-info">
-                      <div class="timeline-court-name">Sân cầu lông 2</div>
-                      <div class="timeline-court-sub">Nguyễn Hoàng Nam • Khách quen</div>
-                    </div>
-                    <span class="badge badge-in-use">Đang chơi</span>
-                  </div>
-
-                  <div class="timeline-slot-item" style="border-left: 3px solid #f59e0b;">
-                    <span class="timeline-hour">09:00</span>
-                    <div class="timeline-court-info">
-                      <div class="timeline-court-name">Sân Cầu Lông 2</div>
-                      <div class="timeline-court-sub">Lê Minh Đức • Đã cọc 30%</div>
-                    </div>
-                    <span class="badge badge-pending">Đã cọc</span>
-                  </div>
-
-                  <div class="timeline-slot-item">
-                    <span class="timeline-hour">10:00</span>
-                    <div class="timeline-court-info">
-                      <div class="timeline-court-name">Sân cầu lông 3</div>
-                      <div class="timeline-court-sub">Sân tiêu chuẩn</div>
-                    </div>
-                    <span class="badge badge-available">Trống</span>
-                  </div>
-
-                  <div class="timeline-slot-item" style="border-left: 3px solid #2563eb;">
-                    <span class="timeline-hour">11:00</span>
-                    <div class="timeline-court-info">
-                      <div class="timeline-court-name">Sân cầu lông 1</div>
-                      <div class="timeline-court-sub">Khách vãng lai check-in quầy</div>
-                    </div>
-                    <span class="badge badge-in-use">Đang chơi</span>
+                <div class="timeline-slots-list" id="timelineSlotsList">
+                  <div style="text-align: center; color: var(--text-muted); padding: 24px;">
+                    Đang nạp lịch sân hôm nay từ CSDL...
                   </div>
                 </div>
               </div>
@@ -727,9 +589,10 @@
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('utesport_theme', next);
-      showToast(`Đã chuyển sang chế độ ${next === 'dark' ? 'Tối (Dark Mode)' : 'Sáng (Light Mode)'}`, 'info');
-      // Re-render chart styles
-      renderCharts();
+      showToast(`Đã chuyển sang chế độ ${next === 'dark' ? 'Tối' : 'Sáng'}`, 'info');
+      if (lastDashboardData) {
+        renderChartsWithData(lastDashboardData);
+      }
     }
 
     // SIDEBAR TOGGLE
@@ -738,79 +601,189 @@
       sidebar.classList.toggle('collapsed');
     }
 
-    // TOAST NOTIFICATION: Handled globally by /js/global-hub.js with z-index 999999 and modal support
+    function getActiveBranch() {
+      const select = document.getElementById('dashboardBranchSelect');
+      if (select && select.value) return select.value;
+      const saved = localStorage.getItem('manager_active_branch');
+      if (saved) return saved;
+      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
+      return (user && user.branchCode && user.branchCode !== 'ALL') ? user.branchCode : 'CN01';
+    }
+
+    function onBranchChange() {
+      const b = getActiveBranch();
+      localStorage.setItem('manager_active_branch', b);
+      showToast(`Chuyển sang xem dữ liệu chi nhánh ${b}...`, 'info');
+      loadDashboardRealData();
+    }
+
+    let lastDashboardData = null;
+    let currentChartDays = 7;
+    let comboChartInstance = null;
+    let donutChartInstance = null;
+    let availableCourtsList = [];
 
     // MODAL CONTROL
     function openCreateBookingModal() {
       document.getElementById('createBookingModal').classList.add('active');
       document.getElementById('mBookingDate').value = new Date().toISOString().split('T')[0];
+      populateModalCourts();
       calculateModalTotal();
     }
+
     function closeCreateBookingModal() {
       document.getElementById('createBookingModal').classList.remove('active');
     }
 
+    function populateModalCourts() {
+      const select = document.getElementById('mCourtSelect');
+      if (!select) return;
+      select.innerHTML = '';
+      if (!availableCourtsList || availableCourtsList.length === 0) {
+        select.innerHTML = '<option value="CL01" data-price="90000">Sân tiêu chuẩn (CL01 - 90.000đ/h)</option>';
+        return;
+      }
+      availableCourtsList.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.courtCode;
+        opt.setAttribute('data-price', c.hourlyRate || 90000);
+        opt.textContent = `${c.courtName} (${c.courtCode}) - ${Number(c.hourlyRate || 90000).toLocaleString('vi-VN')}đ/h`;
+        select.appendChild(opt);
+      });
+    }
+
     function calculateModalTotal() {
-      const court = document.getElementById('mCourtSelect').value;
+      const select = document.getElementById('mCourtSelect');
+      if (!select || select.selectedIndex < 0) return;
+      const opt = select.options[select.selectedIndex];
+      const rate = Number(opt?.getAttribute('data-price') || 90000);
       const hours = parseInt(document.getElementById('mTimeSlot').value || '1', 10);
-      const rate = court.includes('VIP') ? 120000 : 90000;
       const total = rate * hours;
       document.getElementById('mTotalDisplay').value = total.toLocaleString('vi-VN') + 'đ';
     }
 
-    function handleCreateBooking(e) {
+    async function handleCreateBooking(e) {
       e.preventDefault();
       const cust = document.getElementById('mCustName').value.trim();
       const phone = document.getElementById('mCustPhone').value.trim();
       if (/\d/.test(cust) || !/^[\p{L}\s'-]{2,50}$/u.test(cust)) {
-        alert('Tên khách hàng chỉ được chứa chữ cái (không bao gồm số)!');
+        showToast('Tên khách hàng chỉ được chứa chữ cái (không bao gồm số)!', 'warning');
         return;
       }
       if (!/^0\d{9}$/.test(phone)) {
-        alert('Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số (bắt đầu bằng số 0).');
+        showToast('Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số.', 'warning');
         return;
       }
-      const court = document.getElementById('mCourtSelect').value;
-      const status = document.getElementById('mStatusSelect').value;
-      const total = document.getElementById('mTotalDisplay').value;
 
-      const code = '#DS' + Math.floor(1000 + Math.random() * 9000);
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><strong>${code}</strong></td>
-        <td>${cust} <br><span style="font-size: 11px; color: var(--text-muted);">${phone}</span></td>
-        <td>${court}</td>
-        <td>Hôm nay • 08:00 - 10:00</td>
-        <td><strong>${total}</strong></td>
-        <td><span class="badge ${status === 'Đang sử dụng' ? 'badge-in-use' : status === 'Đã cọc 30%' ? 'badge-pending' : 'badge-available'}">${status}</span></td>
-        <td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="window.location.href='/manager/bookings'">Chi tiết</button></td>
-      `;
-      document.getElementById('recentBookingsTbody').prepend(tr);
-      closeCreateBookingModal();
-      showToast(`Đã tạo thành công đơn ${code} cho ${cust}!`, 'success');
+      const courtSelect = document.getElementById('mCourtSelect');
+      const courtCode = courtSelect.value;
+      const hourlyRate = Number(courtSelect.options[courtSelect.selectedIndex]?.getAttribute('data-price') || 90000);
+      const hours = parseInt(document.getElementById('mTimeSlot').value || '1', 10);
+      const timeSlotText = document.getElementById('mTimeSlot').options[document.getElementById('mTimeSlot').selectedIndex].text;
+      const status = document.getElementById('mStatusSelect').value;
+      const date = document.getElementById('mBookingDate').value;
+      const branch = getActiveBranch() === 'ALL' ? 'CN01' : getActiveBranch();
+      const totalNum = hourlyRate * hours;
+      const code = 'DS' + Math.floor(100000 + Math.random() * 900000);
+
+      const payload = {
+        bookingCode: code,
+        customerName: cust,
+        customerPhone: phone,
+        courtCode: courtCode,
+        branchCode: branch,
+        bookingDate: date,
+        timeSlot: timeSlotText,
+        hourlyPrice: hourlyRate,
+        totalPrice: totalNum,
+        status: status
+      };
+
+      try {
+        const res = await fetch('/api/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          showToast(`Đã tạo thành công đơn ${code} và lưu vào SQL Server!`, 'success');
+          closeCreateBookingModal();
+          await loadDashboardRealData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(`Lỗi tạo đơn: ${err.message || 'Không thể tạo đơn'}`, 'error');
+        }
+      } catch (err) {
+        showToast(`Lỗi kết nối máy chủ: ${err.message}`, 'error');
+      }
     }
 
-    // CHARTS RENDERING
-    let comboChartInstance = null;
-    let donutChartInstance = null;
+    function updateComboChart(days) {
+      currentChartDays = parseInt(days, 10);
+      loadDashboardRealData();
+    }
 
-    function renderCharts() {
+    // REAL SQL SERVER DATA FETCH VIA /api/manager/stats
+    async function loadDashboardRealData() {
+      const branch = getActiveBranch();
+      try {
+        const res = await fetch(`/api/manager/stats?branchCode=${encodeURIComponent(branch)}&days=${currentChartDays}`);
+        if (!res.ok) {
+          showToast(`Lỗi nạp dữ liệu thống kê SQL Server (HTTP ${res.status})`, 'error');
+          return;
+        }
+
+        const data = await res.json();
+        lastDashboardData = data;
+        availableCourtsList = data.courts || [];
+
+        // 1. Update KPI Cards
+        if (data.kpi) {
+          document.getElementById('kpiTotalBookings').textContent = data.kpi.totalBookings || 0;
+          document.getElementById('kpiTodayRevenue').textContent = Number(data.kpi.todayRevenue || 0).toLocaleString('vi-VN') + 'đ';
+          document.getElementById('kpiTodayRevenueSub').textContent = 'Tổng DT: ' + Number(data.kpi.totalRevenue || 0).toLocaleString('vi-VN') + 'đ';
+          document.getElementById('kpiOccupancyRate').textContent = (data.kpi.occupancyRate || 0) + '%';
+          document.getElementById('kpiCourtsRatio').textContent = `${data.kpi.inUseCourts || 0}/${data.kpi.totalCourts || 0} sân đang hoạt động`;
+          document.getElementById('kpiNewCustomers').textContent = data.kpi.newCustomers || 0;
+        }
+
+        // 2. Render Charts
+        renderChartsWithData(data);
+
+        // 3. Render Courts Grid
+        renderCourtsThumbs(data.courts || []);
+
+        // 4. Render Recent Bookings Table
+        renderRecentBookings(data.recentBookings || []);
+
+        // 5. Render Timeline Schedule
+        renderTimelineSlots(data.todayBookings || []);
+
+      } catch (err) {
+        console.error('Lỗi API Dashboard:', err);
+        showToast('Lỗi nạp dữ liệu Dashboard từ SQL Server: ' + err.message, 'error');
+      }
+    }
+
+    function renderChartsWithData(data) {
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const textColor = isDark ? '#94a3b8' : '#64748b';
       const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)';
 
-      // 1. Combo Chart (Bookings & Revenue)
+      // 1. Combo Chart (Daily Bookings & Revenue from SQL Server)
       const ctxCombo = document.getElementById('comboChart').getContext('2d');
       if (comboChartInstance) comboChartInstance.destroy();
 
+      const daily = data.dailyStats || { labels: [], bookings: [], revenueMillions: [] };
       comboChartInstance = new Chart(ctxCombo, {
         data: {
-          labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+          labels: daily.labels && daily.labels.length ? daily.labels : ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
           datasets: [
             {
               type: 'bar',
               label: 'Lượt đặt sân',
-              data: [32, 45, 52, 58, 48, 72, 65],
+              data: daily.bookings && daily.bookings.length ? daily.bookings : [0, 0, 0, 0, 0, 0, 0],
               backgroundColor: '#10b981',
               borderRadius: 6,
               barThickness: 24,
@@ -819,7 +792,7 @@
             {
               type: 'line',
               label: 'Doanh thu (triệu đ)',
-              data: [4.2, 5.8, 7.1, 7.5, 6.8, 10.5, 9.2],
+              data: daily.revenueMillions && daily.revenueMillions.length ? daily.revenueMillions : [0, 0, 0, 0, 0, 0, 0],
               borderColor: '#3b82f6',
               backgroundColor: 'rgba(59, 130, 246, 0.1)',
               borderWidth: 3,
@@ -849,7 +822,7 @@
               type: 'linear',
               position: 'left',
               grid: { color: gridColor },
-              ticks: { color: textColor }
+              ticks: { color: textColor, precision: 0 }
             },
             y1: {
               type: 'linear',
@@ -861,10 +834,12 @@
         }
       });
 
-      // 2. Donut Chart (Sport Category Breakdown)
-      // 2. Donut Chart (Badminton Court Carpet Breakdown)
+      // 2. Donut Chart (Court Type Distribution from SQL Server)
       const ctxDonut = document.getElementById('donutChart').getContext('2d');
       if (donutChartInstance) donutChartInstance.destroy();
+
+      const donutInfo = data.courtTypeDistribution || { labels: [], data: [], total: 0 };
+      const centerTotal = donutInfo.total || (data.kpi ? data.kpi.totalCourts : 0);
 
       const centerTextPlugin = {
         id: 'centerText',
@@ -880,11 +855,11 @@
           
           ctx.font = '800 24px "Plus Jakarta Sans", sans-serif';
           ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
-          ctx.fillText('248', x, y - 9);
+          ctx.fillText(String(centerTotal), x, y - 9);
           
           ctx.font = '600 11px "Inter", sans-serif';
           ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
-          ctx.fillText('LƯỢT ĐẶT', x, y + 13);
+          ctx.fillText('SÂN ĐẤU', x, y + 13);
           ctx.restore();
         }
       };
@@ -892,10 +867,10 @@
       donutChartInstance = new Chart(ctxDonut, {
         type: 'doughnut',
         data: {
-          labels: ['Thảm VIP Yonex (48%)', 'Thảm Tiêu chuẩn Enlio (32%)', 'Thảm Quốc Tế (20%)'],
+          labels: donutInfo.labels && donutInfo.labels.length ? donutInfo.labels : ['Cầu lông tiêu chuẩn (100%)'],
           datasets: [{
-            data: [48, 32, 20],
-            backgroundColor: ['#10b981', '#3b82f6', '#f59e0b'],
+            data: donutInfo.data && donutInfo.data.length ? donutInfo.data : [1],
+            backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'],
             borderWidth: 0,
             hoverOffset: 6
           }]
@@ -909,9 +884,9 @@
               position: 'bottom',
               labels: {
                 color: textColor,
-                font: { family: 'Inter', size: 12, weight: '500' },
+                font: { family: 'Inter', size: 11.5, weight: '500' },
                 boxWidth: 8,
-                padding: 14,
+                padding: 12,
                 usePointStyle: true,
                 pointStyle: 'circle'
               }
@@ -922,54 +897,137 @@
       });
     }
 
-    function updateComboChart(days) {
-      showToast(`Đang tải dữ liệu báo cáo trong ${days} ngày qua...`, 'info');
+    function renderCourtsThumbs(courts) {
+      const container = document.getElementById('courtsThumbsGrid');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (courts.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 30px;">Không có sân thi đấu nào ở chi nhánh này trong SQL Server.</div>';
+        return;
+      }
+
+      courts.slice(0, 6).forEach(c => {
+        let badgeClass = 'badge-available';
+        let statusDot = '● Trống';
+        if (c.status === 'Đang sử dụng' || c.status === 'Đang giữ chỗ') {
+          badgeClass = 'badge-in-use';
+          statusDot = '● Đang dùng';
+        } else if (c.status === 'Bảo trì') {
+          badgeClass = 'badge-maintenance';
+          statusDot = '● Bảo trì';
+        }
+
+        const card = document.createElement('div');
+        card.className = 'court-thumb-card';
+        card.onclick = () => window.location.href = '/manager/courts';
+        card.innerHTML = `
+          <div class="court-thumb-img-wrap">
+            <img src="${c.imageUrl || '/images/badminton-court.jpg'}" alt="${c.courtName}">
+            <span class="badge ${badgeClass} court-thumb-badge">${statusDot}</span>
+          </div>
+          <div class="court-thumb-body">
+            <div class="court-thumb-title">${c.courtName} (${c.courtCode})</div>
+            <div class="court-thumb-meta">${c.courtType} • ${Number(c.hourlyRate || 90000).toLocaleString('vi-VN')} đ/h</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
     }
 
-    function changeTimelineDate(delta) {
-      showToast(`Chuyển lịch xem ngày ${delta > 0 ? 'tiếp theo' : 'trước đó'}`, 'info');
+    function renderRecentBookings(bookings) {
+      const tbody = document.getElementById('recentBookingsTbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (bookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">Chưa có đơn đặt sân nào trong hệ thống CSDL.</td></tr>';
+        return;
+      }
+
+      bookings.forEach(b => {
+        let badgeClass = 'badge-pending';
+        if (b.status === 'Đang sử dụng') badgeClass = 'badge-in-use';
+        else if (b.status === 'Đã xác nhận' || b.status === 'Hoàn thành') badgeClass = 'badge-available';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>#${b.bookingCode}</strong></td>
+          <td>${b.customerName} <br><span style="font-size: 11px; color: var(--text-muted);">${b.customerPhone}</span></td>
+          <td>${b.courtCode}</td>
+          <td>${b.bookingDate} • ${b.timeSlot}</td>
+          <td><strong>${Number(b.totalPrice || 0).toLocaleString('vi-VN')}đ</strong></td>
+          <td><span class="badge ${badgeClass}">${b.status}</span></td>
+          <td>
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="window.location.href='/manager/bookings'">Xem đơn</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
-    // REAL SQL SERVER DATA FETCH
-    async function loadRealSqlData() {
-      try {
-        const res = await fetch('/api/bookings');
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.length > 0) {
-            const tbody = document.getElementById('recentBookingsTbody');
-            if (tbody) {
-              tbody.innerHTML = '';
-              data.slice(0, 5).forEach(b => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                  <td><strong>#${b.bookingCode}</strong></td>
-                  <td>${b.customerName} <br><span style="font-size: 11px; color: var(--text-muted);">${b.customerPhone}</span></td>
-                  <td>${b.courtCode}</td>
-                  <td>${b.bookingDate} • ${b.timeSlot}</td>
-                  <td><strong>${Number(b.totalPrice).toLocaleString('vi-VN')}đ</strong></td>
-                  <td><span class="badge ${b.status === 'Đang sử dụng' ? 'badge-in-use' : b.status === 'Hoàn thành' ? 'badge-completed' : 'badge-pending'}">${b.status}</span></td>
-                  <td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="window.location.href='/manager/bookings'">Chi tiết</button></td>
-                `;
-                tbody.appendChild(tr);
-              });
-            }
+    function renderTimelineSlots(todayBookings) {
+      const container = document.getElementById('timelineSlotsList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (todayBookings.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; color: var(--text-muted); padding: 24px; font-size: 13px;">
+            Chưa có lịch đặt sân hôm nay. Các sân đều sẵn sàng đón khách!
+          </div>
+        `;
+        return;
+      }
+
+      todayBookings.forEach(b => {
+        let badgeClass = 'badge-pending';
+        if (b.status === 'Đang sử dụng') badgeClass = 'badge-in-use';
+        else if (b.status === 'Đã xác nhận' || b.status === 'Hoàn thành') badgeClass = 'badge-available';
+
+        const item = document.createElement('div');
+        item.className = 'timeline-slot-item';
+        item.style.borderLeft = b.status === 'Đang sử dụng' ? '3px solid #10b981' : '3px solid #3b82f6';
+        item.innerHTML = `
+          <span class="timeline-hour">${b.timeSlot ? b.timeSlot.split('-')[0].trim() : '08:00'}</span>
+          <div class="timeline-court-info">
+            <div class="timeline-court-name">Sân ${b.courtCode} • ${b.timeSlot}</div>
+            <div class="timeline-court-sub">${b.customerName} (${b.bookingCode})</div>
+          </div>
+          <span class="badge ${badgeClass}">${b.status}</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
+      if (user) {
+        if (user.branchCode) {
+          const select = document.getElementById('dashboardBranchSelect');
+          if (select) select.value = user.branchCode;
+        }
+        if (user.fullName) {
+          const nameEl = document.getElementById('sidebarName');
+          if (nameEl) nameEl.textContent = user.fullName;
+          const avatarEl = document.getElementById('sidebarAvatar');
+          if (avatarEl) {
+            const parts = user.fullName.trim().split(' ');
+            avatarEl.textContent = parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : user.fullName.substring(0, 2).toUpperCase();
           }
         }
-      } catch (e) {
-        console.warn('Real SQL fetch failed, using fallback:', e);
       }
-    }
 
-    // Run charts and real SQL load
-    window.addEventListener('DOMContentLoaded', () => {
-      renderCharts();
-      loadRealSqlData();
+      loadDashboardRealData();
     });
 
-    // Realtime reactive reload on WebSocket booking events
+    // Realtime reactive reload on WebSocket booking and court events
     window.addEventListener('badminton:booking-event', () => {
-      loadRealSqlData();
+      loadDashboardRealData();
+    });
+    window.addEventListener('badminton:court-event', () => {
+      loadDashboardRealData();
     });
   </script>
   <script src="/js/global-hub.js"></script>

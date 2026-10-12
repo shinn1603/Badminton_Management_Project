@@ -46,6 +46,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 16px;
+      flex-wrap: nowrap;
     }
     .cust-brand-wrap {
       display: flex;
@@ -53,6 +55,7 @@
       gap: 12px;
       text-decoration: none;
       color: var(--text-dark);
+      flex-shrink: 0;
     }
     .cust-logo-icon {
       width: 44px;
@@ -64,6 +67,7 @@
       justify-content: center;
       color: #ffffff;
       box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      flex-shrink: 0;
     }
     .cust-brand-title {
       font-size: 18px;
@@ -71,6 +75,7 @@
       letter-spacing: -0.4px;
       color: var(--text-dark);
       line-height: 1.2;
+      white-space: nowrap;
     }
     .cust-brand-sub {
       font-size: 11px;
@@ -78,11 +83,13 @@
       color: var(--primary);
       text-transform: uppercase;
       letter-spacing: 0.8px;
+      white-space: nowrap;
     }
     .cust-nav-menu {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 16px;
+      flex-shrink: 1;
     }
     .cust-nav-link {
       text-decoration: none;
@@ -91,10 +98,11 @@
       color: var(--text-muted);
       transition: all 0.2s ease;
       position: relative;
-      padding: 8px 0;
+      padding: 8px 4px;
       display: flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
     }
     .cust-nav-link:hover, .cust-nav-link.active {
       color: var(--primary);
@@ -114,6 +122,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      flex-shrink: 0;
     }
     @media (max-width: 768px) {
       .cust-nav-menu { display: none; }
@@ -631,10 +640,7 @@
           <div>
             <label class="form-label" style="font-size: 12px; font-weight: 700; margin-bottom: 6px; display: block;">Chi Nhánh</label>
             <select id="selBranch" class="form-control" onchange="onBranchChanged()">
-              <option value="CN01" selected>CN01 - Võ Văn Ngân, TP. Thủ Đức (8 Sân)</option>
-              <option value="CN02">CN02 - Nguyễn Thị Thập, Quận 7 (6 Sân)</option>
-              <option value="CN03">CN03 - Điện Biên Phủ, Bình Thạnh (6 Sân)</option>
-              <option value="CN04">CN04 - Quang Trung, Gò Vấp (6 Sân)</option>
+              <option value="CN01" selected>Đang nạp danh sách chi nhánh...</option>
             </select>
           </div>
           <div>
@@ -687,10 +693,10 @@
           </div>
           <span style="font-size: 11.5px; color: var(--cust-text-muted);">Thanh toán cùng tiền sân</span>
         </div>
-        <div>
+        <div id="addonsContainer">
           <label class="addon-item">
             <div style="display: flex; align-items: center; gap: 12px;">
-              <input type="checkbox" id="addonRacket" value="20000" onchange="updateSummary()" style="width: 17px; height: 17px;">
+              <input type="checkbox" class="addon-checkbox" id="addonRacket" data-name="Thuê Vợt Yonex Astrox" value="20000" onchange="updateSummary()" style="width: 17px; height: 17px; accent-color: var(--primary);">
               <div>
                 <div style="font-weight: 700; font-size: 13px; color: var(--cust-text-main);">Thuê Vợt Yonex Astrox</div>
                 <div style="font-size: 11.5px; color: var(--cust-text-muted);">Căng sẵn 10.5kg, kèm quấn cán mới</div>
@@ -701,7 +707,7 @@
 
           <label class="addon-item">
             <div style="display: flex; align-items: center; gap: 12px;">
-              <input type="checkbox" id="addonShuttle" value="45000" onchange="updateSummary()" style="width: 17px; height: 17px;">
+              <input type="checkbox" class="addon-checkbox" id="addonShuttle" data-name="Ống Cầu Yonex Aerosensa (3 quả)" value="45000" onchange="updateSummary()" style="width: 17px; height: 17px; accent-color: var(--primary);">
               <div>
                 <div style="font-weight: 700; font-size: 13px; color: var(--cust-text-main);">Ống Cầu Yonex Aerosensa (3 quả)</div>
                 <div style="font-size: 11.5px; color: var(--cust-text-muted);">Tốc độ 77, độ bền và quỹ đạo chuẩn BWF</div>
@@ -712,7 +718,7 @@
 
           <label class="addon-item">
             <div style="display: flex; align-items: center; gap: 12px;">
-              <input type="checkbox" id="addonDrink" value="30000" onchange="updateSummary()" style="width: 17px; height: 17px;">
+              <input type="checkbox" class="addon-checkbox" id="addonDrink" data-name="Combo 2 Chai Pocari Sweat 500ml" value="30000" onchange="updateSummary()" style="width: 17px; height: 17px; accent-color: var(--primary);">
               <div>
                 <div style="font-weight: 700; font-size: 13px; color: var(--cust-text-main);">Combo 2 Chai Pocari Sweat 500ml</div>
                 <div style="font-size: 11.5px; color: var(--cust-text-muted);">Bổ sung ion khoáng chất khi vận động</div>
@@ -761,6 +767,12 @@
           <span class="summary-val" id="sumAddonPrice">0 đ</span>
         </div>
 
+        <!-- Promo discount line -->
+        <div class="summary-line" id="promoDiscountLine" style="display: none;">
+          <span class="summary-label" style="color: #10b981; font-weight: 700;">Giảm giá khuyến mãi:</span>
+          <span class="summary-val" id="sumDiscountPrice" style="color: #10b981; font-weight: 800;">-0 đ</span>
+        </div>
+
         <div class="summary-divider"></div>
 
         <div class="summary-line" style="font-size: 14.5px;">
@@ -773,6 +785,17 @@
           <div class="deposit-label">Tiền Cọc Giữ Chỗ (30%)</div>
           <div class="deposit-val" id="sumDeposit">0 đ</div>
           <div class="deposit-sub" id="depositRemainingText">70% còn lại thanh toán tại quầy POS khi nhận sân.</div>
+        </div>
+
+        <!-- Voucher / Promo Code Box -->
+        <div style="background: var(--surface-subtle); border: 1px dashed rgba(16, 185, 129, 0.4); border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+          <label style="font-size: 11.5px; font-weight: 700; color: var(--cust-text-main); display: block; margin-bottom: 5px;">Mã Ưu Đãi / Voucher (CSDL):</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="promoCodeInput" class="form-control" placeholder="vd: KM01, KM02..." style="font-size: 12.5px; padding: 7px 10px; text-transform: uppercase;" autocomplete="off">
+            <button type="button" class="btn btn-outline" id="btnApplyPromo" onclick="applyPromoCode()" style="padding: 7px 12px; font-size: 12px; font-weight: 700; white-space: nowrap;">Áp Dụng</button>
+          </div>
+          <div id="promoFeedback" style="font-size: 11.5px; margin-top: 6px; display: none;"></div>
+          <div id="activePromosTags" style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px;"></div>
         </div>
 
         <!-- Customer Inputs -->
@@ -927,6 +950,7 @@
     let branchCourts = [];
     let selectedCourt = null;
     let selectedSlots = [];
+    let currentAppliedPromo = null;
     let modalTimerInterval = null;
 
     function escapeHtml(str) {
@@ -1078,7 +1102,79 @@
       const branchSel = document.getElementById('selBranch');
       document.getElementById('sumBranch').textContent = branchSel.options[branchSel.selectedIndex].text.split('(')[0];
       selectedSlots = [];
+      currentAppliedPromo = null;
+      const feedback = document.getElementById('promoFeedback');
+      if (feedback) feedback.style.display = 'none';
+      const promoInput = document.getElementById('promoCodeInput');
+      if (promoInput) promoInput.value = '';
       loadBranchCourts();
+      loadBranchAddons(branchSel.value);
+      loadBranchPromotions(branchSel.value);
+    }
+
+    async function loadBranchAddons(branchCode) {
+      const container = document.getElementById('addonsContainer');
+      if (!container) return;
+
+      try {
+        const [equipmentRes, productsRes] = await Promise.all([
+          fetch(`/api/equipment?branchCode=${branchCode}`).then(r => r.json()).catch(() => []),
+          fetch(`/api/products?branchCode=${branchCode}`).then(r => r.json()).catch(() => [])
+        ]);
+
+        let items = [];
+        if (Array.isArray(equipmentRes) && equipmentRes.length > 0) {
+          equipmentRes.forEach(eq => {
+            items.push({
+              id: 'addon_eq_' + eq.equipmentCode,
+              name: eq.equipmentName,
+              sub: `Tình trạng: ${eq.condition || 'Tốt'} • Kho: ${eq.stockQuantity || 0}`,
+              price: Number(eq.rentalPrice) || 20000,
+              unit: '/ cây / ca'
+            });
+          });
+        }
+        if (Array.isArray(productsRes) && productsRes.length > 0) {
+          productsRes.forEach(p => {
+            items.push({
+              id: 'addon_p_' + p.productCode,
+              name: p.productName,
+              sub: `Danh mục: ${p.category} • Kho: ${p.stockQuantity || 0} ${p.unit || ''}`,
+              price: Number(p.unitPrice) || 30000,
+              unit: `/ ${p.unit || 'món'}`
+            });
+          });
+        }
+
+        // If no items returned from DB for this branch, fallback gracefully
+        if (items.length === 0) {
+          items = [
+            { id: 'addonRacket', name: 'Thuê Vợt Yonex Astrox', sub: 'Căng sẵn 10.5kg, kèm quấn cán mới', price: 20000, unit: '/ cây' },
+            { id: 'addonShuttle', name: 'Ống Cầu Yonex Aerosensa (3 quả)', sub: 'Tốc độ 77, độ bền và quỹ đạo chuẩn BWF', price: 45000, unit: '/ ống' },
+            { id: 'addonDrink', name: 'Combo 2 Chai Pocari Sweat 500ml', sub: 'Bổ sung ion khoáng chất khi vận động', price: 30000, unit: '/ combo' }
+          ];
+        }
+
+        let html = '';
+        items.forEach(it => {
+          html += `
+            <label class="addon-item">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <input type="checkbox" class="addon-checkbox" id="${it.id}" data-name="${escapeHtml(it.name)}" value="${it.price}" onchange="updateSummary()" style="width: 17px; height: 17px; accent-color: var(--primary);">
+                <div>
+                  <div style="font-weight: 700; font-size: 13px; color: var(--cust-text-main);">${escapeHtml(it.name)}</div>
+                  <div style="font-size: 11.5px; color: var(--cust-text-muted);">${escapeHtml(it.sub)}</div>
+                </div>
+              </div>
+              <strong style="color: var(--primary); font-size: 12.5px;">+${it.price.toLocaleString('vi-VN')} đ ${it.unit}</strong>
+            </label>
+          `;
+        });
+        container.innerHTML = html;
+        updateSummary();
+      } catch (err) {
+        console.error('Error loading branch addons:', err);
+      }
     }
 
     function onDateChanged() {
@@ -1107,6 +1203,8 @@
         document.getElementById('sumCourtPrice').textContent = '0 đ';
         document.getElementById('sumTotalPrice').textContent = '0 đ';
         document.getElementById('sumDeposit').textContent = '0 đ';
+        const dLine = document.getElementById('promoDiscountLine');
+        if (dLine) dLine.style.display = 'none';
         document.getElementById('depositRemainingText').textContent = 'Vui lòng chọn ít nhất 1 khung giờ.';
         document.getElementById('btnSubmitLockBooking').disabled = true;
         return;
@@ -1120,12 +1218,27 @@
       document.getElementById('sumCourtPrice').textContent = courtTotal.toLocaleString('vi-VN') + ' đ';
 
       let addonTotal = 0;
-      if (document.getElementById('addonRacket')?.checked) addonTotal += 20000;
-      if (document.getElementById('addonShuttle')?.checked) addonTotal += 45000;
-      if (document.getElementById('addonDrink')?.checked) addonTotal += 30000;
+      document.querySelectorAll('.addon-checkbox:checked').forEach(cb => {
+        addonTotal += Number(cb.value) || 0;
+      });
       document.getElementById('sumAddonPrice').textContent = addonTotal.toLocaleString('vi-VN') + ' đ';
 
-      const grandTotal = courtTotal + addonTotal;
+      const subtotal = courtTotal + addonTotal;
+      let discount = 0;
+      if (currentAppliedPromo && currentAppliedPromo.discountAmount) {
+        discount = Math.min(currentAppliedPromo.discountAmount, subtotal);
+      }
+
+      const discountLine = document.getElementById('promoDiscountLine');
+      const discountEl = document.getElementById('sumDiscountPrice');
+      if (discount > 0) {
+        if (discountLine) discountLine.style.display = 'flex';
+        if (discountEl) discountEl.textContent = `-${discount.toLocaleString('vi-VN')} đ`;
+      } else {
+        if (discountLine) discountLine.style.display = 'none';
+      }
+
+      const grandTotal = Math.max(0, subtotal - discount);
       const deposit30 = Math.round(grandTotal * 0.3);
       const remaining70 = grandTotal - deposit30;
 
@@ -1134,6 +1247,116 @@
       document.getElementById('depositRemainingText').textContent = `70% còn lại (${remaining70.toLocaleString('vi-VN')} đ) thanh toán tại quầy POS.`;
 
       document.getElementById('btnSubmitLockBooking').disabled = false;
+    }
+
+    // Load active promotional vouchers from database for the selected branch
+    async function loadBranchPromotions(branchCode) {
+      const container = document.getElementById('activePromosTags');
+      if (!container) return;
+      try {
+        const res = await fetch(`/api/pricing/summary?branchCode=${encodeURIComponent(branchCode)}`);
+        const data = await res.json();
+        if (data.activePromotions && data.activePromotions.length > 0) {
+          let html = '<span style="font-size: 11px; color: var(--cust-text-muted); width: 100%;">Mã gợi ý hôm nay (bấm để dùng):</span>';
+          data.activePromotions.forEach(p => {
+            const discText = p.discountType && p.discountType.includes('%') ? (p.discountValue + '%') : (Number(p.discountValue).toLocaleString('vi-VN') + 'đ');
+            html += `
+              <button type="button" onclick="selectPromoTag('${escapeHtml(p.promoCode)}')" class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px dashed rgba(16, 185, 129, 0.4); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">
+                ${escapeHtml(p.promoCode)} (-${discText})
+              </button>
+            `;
+          });
+          container.innerHTML = html;
+        } else {
+          container.innerHTML = '<span style="font-size: 11px; color: var(--cust-text-muted);">Chi nhánh áp dụng giá chuẩn, chưa có voucher ưu đãi.</span>';
+        }
+      } catch (e) {
+        container.innerHTML = '';
+      }
+    }
+
+    function selectPromoTag(code) {
+      const input = document.getElementById('promoCodeInput');
+      if (input) input.value = code;
+      applyPromoCode(code);
+    }
+
+    async function applyPromoCode(codeToApply) {
+      const input = document.getElementById('promoCodeInput');
+      const code = (codeToApply || (input ? input.value : '')).trim().toUpperCase();
+      const feedback = document.getElementById('promoFeedback');
+      const branchSel = document.getElementById('selBranch');
+      const branchCode = branchSel ? branchSel.value : 'CN01';
+
+      if (!code) {
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.style.color = '#ef4444';
+          feedback.innerText = 'Vui lòng nhập mã ưu đãi!';
+        }
+        return;
+      }
+
+      let courtTotal = 0;
+      selectedSlots.forEach(s => courtTotal += s.price);
+      let addonTotal = 0;
+      document.querySelectorAll('.addon-checkbox:checked').forEach(cb => {
+        addonTotal += Number(cb.value) || 0;
+      });
+      const orderAmount = courtTotal + addonTotal;
+
+      if (orderAmount <= 0) {
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.style.color = '#ef4444';
+          feedback.innerText = 'Vui lòng chọn ít nhất 1 khung giờ trước khi áp dụng mã!';
+        }
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/promotions/apply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            promoCode: code,
+            branchCode: branchCode,
+            orderAmount: orderAmount
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          currentAppliedPromo = {
+            promoCode: data.promoCode,
+            promoName: data.promoName,
+            discountAmount: data.discountAmount
+          };
+          if (input) input.value = data.promoCode;
+          if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.color = '#10b981';
+            feedback.innerText = data.message;
+          }
+          showToast(data.message, 'success');
+          updateSummary();
+        } else {
+          currentAppliedPromo = null;
+          if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.color = '#ef4444';
+            feedback.innerText = data.message || 'Mã không hợp lệ hoặc không áp dụng cho chi nhánh này!';
+          }
+          showToast(data.message || 'Mã không hợp lệ!', 'warning');
+          updateSummary();
+        }
+      } catch (e) {
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.style.color = '#ef4444';
+          feedback.innerText = 'Lỗi kết nối máy chủ khi kiểm tra mã!';
+        }
+      }
     }
 
     async function executeBookingLock() {
@@ -1173,15 +1396,26 @@
       const date = document.getElementById('selDate').value;
 
       try {
-        // Lock primary slot or combined slot
+        let addonTotal = 0;
+        const selectedAddonNames = [];
+        document.querySelectorAll('.addon-checkbox:checked').forEach(cb => {
+          addonTotal += Number(cb.value) || 0;
+          selectedAddonNames.push(cb.dataset.name || cb.id);
+        });
+
+        // Lock primary slot or combined slot with promo discount
         const timeSlotString = selectedSlots.map(s => s.time).join(', ');
         const payload = {
           courtCode: selectedCourt.courtCode,
           branchCode: branch,
           date: date,
-          timeSlot: selectedSlots[0].time, // slot check
+          timeSlot: timeSlotString,
           customerName: name,
-          customerPhone: phone
+          customerPhone: phone,
+          addonAmount: addonTotal,
+          discountAmount: currentAppliedPromo ? currentAppliedPromo.discountAmount : 0,
+          promoCode: currentAppliedPromo ? currentAppliedPromo.promoCode : null,
+          notes: selectedAddonNames.length > 0 ? ('Dịch vụ đi kèm: ' + selectedAddonNames.join(', ')) : 'Đặt qua cổng trực tuyến'
         };
 
         const res = await fetch('/api/bookings/slot-lock', {
@@ -1192,7 +1426,7 @@
 
         const data = await res.json();
         if (data.success) {
-          showToast(`Khóa thành công ${selectedCourt.courtName} lúc ${selectedSlots[0].time}!`, 'success');
+          showToast(`Khóa thành công ${selectedCourt.courtName} lúc ${timeSlotString}!`, 'success');
           openBookingVietQrModal(data);
           loadSlotsForCourt();
         } else {
@@ -1302,8 +1536,27 @@
       }
     }
 
+    async function loadBranchesFromDb(targetBranch = null) {
+      try {
+        const res = await fetch('/api/branches');
+        const branches = await res.json() || [];
+        if (branches && branches.length > 0) {
+          const sel = document.getElementById('selBranch');
+          const currentVal = targetBranch || sel.value || branches[0].branchCode;
+          sel.innerHTML = branches.map(b => {
+            const isSelected = (b.branchCode === currentVal) ? 'selected' : '';
+            return `<option value="${escapeHtml(b.branchCode)}" ${isSelected}>${escapeHtml(b.branchCode)} - ${escapeHtml(b.branchName)} (${b.totalCourts || 6} Sân)</option>`;
+          }).join('');
+          const activeBranch = branches.find(b => b.branchCode === sel.value) || branches[0];
+          document.getElementById('sumBranch').textContent = activeBranch.branchName;
+        }
+      } catch (err) {
+        console.warn('Lỗi tải danh sách chi nhánh từ cơ sở dữ liệu:', err);
+      }
+    }
+
     // Initialize Page
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       const today = new Date().toISOString().split('T')[0];
       const dateInput = document.getElementById('selDate');
       if (dateInput) {
@@ -1323,20 +1576,28 @@
 
       // Check query params (e.g. from home page)
       const urlParams = new URLSearchParams(window.location.search);
-      const branchParam = urlParams.get('branch');
+      const branchParam = urlParams.get('branch') || urlParams.get('branchCode');
       const courtParam = urlParams.get('courtId') || urlParams.get('courtCode');
       const dateParam = urlParams.get('date');
       const slotParam = urlParams.get('slot');
+      const promoParam = urlParams.get('promo') || urlParams.get('promoCode');
 
-      if (branchParam) {
-        const branchSel = document.getElementById('selBranch');
-        if (branchSel) branchSel.value = branchParam;
-      }
       if (dateParam && dateInput) {
         dateInput.value = dateParam;
       }
 
+      // Load branches dynamically from Database SQL Server
+      await loadBranchesFromDb(branchParam);
+      const initialBranch = document.getElementById('selBranch')?.value || 'CN01';
+      loadBranchAddons(initialBranch);
       loadBranchCourts(courtParam);
+      loadBranchPromotions(initialBranch);
+
+      if (promoParam) {
+        const pInput = document.getElementById('promoCodeInput');
+        if (pInput) pInput.value = promoParam.toUpperCase();
+        setTimeout(() => applyPromoCode(promoParam), 500);
+      }
     });
   </script>
 </body>

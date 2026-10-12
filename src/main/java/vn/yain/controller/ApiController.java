@@ -19,6 +19,7 @@ import vn.yain.service.PricingService;
 import vn.yain.service.UserService;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -44,6 +45,29 @@ public class ApiController {
             return e.getMessage();
         }
         return "Đã xảy ra lỗi trong quá trình xử lý hệ thống. Vui lòng liên hệ ban quản trị.";
+    }
+
+    /**
+     * Resolves effective branch code strictly based on user's role and assigned branch.
+     * - ROLE_DIRECTOR and ROLE_ADMIN: Can view/query any branchCode or ALL.
+     * - ROLE_MANAGER, ROLE_POS, or any branch staff: Strictly locked to their assigned branchCode (e.g., CN01 for Bảo).
+     *   Any request to query other branches or ALL is overridden to their assigned branchCode.
+     */
+    private String resolveEffectiveBranchCode(String requestedBranchCode) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            boolean isDirectorOrAdmin = auth.getAuthorities().stream().anyMatch(a ->
+                    a.getAuthority().equals("ROLE_DIRECTOR") || a.getAuthority().equals("ROLE_ADMIN"));
+            if (!isDirectorOrAdmin) {
+                String username = auth.getName();
+                Optional<User> userOpt = userRepository.findByUsername(username);
+                if (userOpt.isPresent() && userOpt.get().getBranchCode() != null && !userOpt.get().getBranchCode().isBlank()) {
+                    return userOpt.get().getBranchCode().trim();
+                }
+                return "CN01"; // Default branch for manager Bảo
+            }
+        }
+        return (requestedBranchCode != null && !requestedBranchCode.isBlank()) ? requestedBranchCode.trim() : "CN01";
     }
 
     @Autowired
@@ -312,13 +336,27 @@ public class ApiController {
         resp.put("email", u.getEmail() != null ? u.getEmail() : "");
         resp.put("customerCode", customerCode);
         resp.put("cardNumber", cardNumber);
+        BigDecimal discountRate = new BigDecimal("0.01");
+        if ("Kim Cương".equalsIgnoreCase(tier)) discountRate = new BigDecimal("0.15");
+        else if ("Vàng".equalsIgnoreCase(tier)) discountRate = new BigDecimal("0.10");
+        else if ("Bạc".equalsIgnoreCase(tier)) discountRate = new BigDecimal("0.05");
+        BigDecimal savings = totalSpent.multiply(discountRate);
+
+        int tournCount = 0;
+        if (cust != null && cust.getCustomerCode() != null) {
+            tournCount = tournamentRegistrationRepository.findByCustomerCode(cust.getCustomerCode()).size();
+        }
+        if (tournCount == 0 && u.getPhone() != null && !u.getPhone().isBlank()) {
+            tournCount = tournamentRegistrationRepository.findByCustomerCode(u.getPhone().trim()).size();
+        }
+
         resp.put("membershipTier", tier);
         resp.put("rewardPoints", points);
         resp.put("totalPlayHours", totalHours.setScale(1, java.math.RoundingMode.HALF_UP));
         resp.put("totalSpent", totalSpent);
-        resp.put("savings", totalSpent.multiply(new BigDecimal("0.10")));
+        resp.put("savings", savings);
         resp.put("joinDate", joinDate);
-        resp.put("tournamentCount", tournamentRepository.count());
+        resp.put("tournamentCount", tournCount);
         resp.put("bookingCount", userBookings.size());
         resp.put("recentBookings", userBookings);
 
@@ -347,6 +385,7 @@ public class ApiController {
         String newName = payload.get("fullName");
         String newPhone = payload.get("phone");
         String newEmail = payload.get("email");
+        String newPassword = payload.get("newPassword");
 
         if (newName != null && !newName.trim().isEmpty()) {
             u.setFullName(newName.trim());
@@ -358,6 +397,10 @@ public class ApiController {
             u.setEmail(newEmail.trim());
         }
         userRepository.save(u);
+
+        if (newPassword != null && newPassword.trim().length() >= 6) {
+            userService.resetPassword(u.getUsername(), newPassword.trim());
+        }
 
         if (u.getPhone() != null && !u.getPhone().trim().isEmpty()) {
             Optional<Customer> cOpt = customerRepository.findByPhone(u.getPhone().trim());
@@ -472,6 +515,31 @@ public class ApiController {
             auditLogRepository.save(auditLog);
 
             return ResponseEntity.ok(Map.of("success", true, "updatedCount", count));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/policy/settings")
+    public ResponseEntity<?> getPublicPolicySettings() {
+        try {
+            List<SystemSetting> list = systemSettingRepository.findAll();
+            Map<String, String> map = new HashMap<>();
+            for (SystemSetting s : list) {
+                map.put(s.getSettingCode(), s.getSettingValue());
+            }
+            map.putIfAbsent("CFG_DEPOSIT_RATE", "30");
+            map.putIfAbsent("CFG_HOLDING_MINUTES", "10");
+            map.putIfAbsent("CFG_CANCEL_HOURS", "4");
+            map.putIfAbsent("CFG_ADVANCE_DAYS", "30");
+
+            List<Branch> branches = branchRepository.findAll();
+
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "settings", map,
+                "branches", branches
+            ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
@@ -601,7 +669,8 @@ public class ApiController {
 
     @GetMapping("/courts")
     public List<Court> getCourts(@RequestParam(required = false) String branchCode) {
-        return courtService.getCourts(branchCode);
+        String effectiveBranch = resolveEffectiveBranchCode(branchCode);
+        return courtService.getCourts(effectiveBranch);
     }
 
     @PostMapping("/courts/hold")
@@ -641,6 +710,16 @@ public class ApiController {
         }
     }
 
+    @DeleteMapping("/courts/{courtCode}")
+    public ResponseEntity<?> deleteCourt(@PathVariable String courtCode) {
+        try {
+            courtService.deleteCourt(courtCode);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Đã xóa sân " + courtCode + " thành công!"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
     // ==========================================
     // 3. BOOKINGS & WORKFLOW (XL-03, XL-04, XL-07)
     // ==========================================
@@ -649,12 +728,35 @@ public class ApiController {
     public List<Booking> getBookings(
             @RequestParam(required = false) String branchCode,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        if (branchCode != null && !branchCode.trim().isEmpty() && date != null) {
-            return bookingRepository.findByBranchCodeAndBookingDate(branchCode.trim(), date);
-        } else if (branchCode != null && !branchCode.trim().isEmpty()) {
-            return bookingRepository.findByBranchCodeOrderByBookingDateDesc(branchCode.trim());
+        String effectiveBranch = resolveEffectiveBranchCode(branchCode);
+        boolean isAll = effectiveBranch == null || "ALL".equalsIgnoreCase(effectiveBranch.trim());
+        if (!isAll && date != null) {
+            return bookingRepository.findByBranchCodeAndBookingDate(effectiveBranch.trim(), date);
+        } else if (!isAll) {
+            return bookingRepository.findByBranchCodeOrderByBookingDateDesc(effectiveBranch.trim());
         }
         return bookingService.getAllBookings();
+    }
+
+    @GetMapping("/bookings/{code}")
+    public ResponseEntity<?> getBookingByCode(@PathVariable String code) {
+        return bookingRepository.findByBookingCode(code)
+                .map(b -> {
+                    Map<String, Object> resp = new HashMap<>();
+                    resp.put("success", true);
+                    resp.put("booking", b);
+                    courtRepository.findByCourtCode(b.getCourtCode()).ifPresent(c -> {
+                        resp.put("courtName", c.getCourtName());
+                        resp.put("courtType", c.getCourtType());
+                    });
+                    branchRepository.findByBranchCode(b.getBranchCode()).ifPresent(br -> {
+                        resp.put("branchName", br.getBranchName());
+                        resp.put("branchAddress", br.getAddress());
+                    });
+                    return ResponseEntity.ok(resp);
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("success", false, "message", "Không tìm thấy đơn đặt sân: " + code)));
     }
 
     @PostMapping("/bookings")
@@ -890,7 +992,11 @@ public class ApiController {
     // ==========================================
 
     @GetMapping("/products")
-    public List<Product> getProducts() {
+    public List<Product> getProducts(@RequestParam(required = false) String branchCode) {
+        String effectiveBranch = resolveEffectiveBranchCode(branchCode);
+        if (effectiveBranch != null && !effectiveBranch.trim().isEmpty() && !"ALL".equalsIgnoreCase(effectiveBranch.trim())) {
+            return productRepository.findByBranchCode(effectiveBranch.trim());
+        }
         return productRepository.findAll();
     }
 
@@ -999,7 +1105,7 @@ public class ApiController {
     }
 
     @GetMapping("/tournaments")
-    public List<Tournament> getTournaments() {
+    public List<Map<String, Object>> getTournaments() {
         List<Tournament> list = tournamentRepository.findAll();
         if (list.isEmpty()) {
             Tournament t1 = new Tournament();
@@ -1036,11 +1142,45 @@ public class ApiController {
                 list = List.of(t1, t2);
             }
         }
-        return list;
+
+        Map<String, String> branchMap = branchRepository.findAll().stream()
+                .collect(Collectors.toMap(Branch::getBranchCode, Branch::getBranchName, (a, b) -> a));
+
+        List<TournamentRegistration> allRegs = tournamentRegistrationRepository.findAll();
+        Map<String, Long> regCountMap = allRegs.stream()
+                .collect(Collectors.groupingBy(TournamentRegistration::getTournamentCode, Collectors.counting()));
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Tournament t : list) {
+            if ("Từ chối".equalsIgnoreCase(t.getStatus())) {
+                continue;
+            }
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", t.getId());
+            map.put("tournamentCode", t.getTournamentCode());
+            map.put("tournamentName", t.getTournamentName());
+            map.put("branchCode", t.getBranchCode());
+            map.put("branchName", branchMap.getOrDefault(t.getBranchCode(), "Chi nhánh 1 (Võ Văn Ngân)"));
+            map.put("startDate", t.getStartDate() != null ? t.getStartDate().toString() : "");
+            map.put("endDate", t.getEndDate() != null ? t.getEndDate().toString() : "");
+            map.put("rules", t.getRules() != null ? t.getRules() : "");
+            map.put("maxParticipants", t.getMaxParticipants() != null ? t.getMaxParticipants() : 32);
+
+            long regCount = regCountMap.getOrDefault(t.getTournamentCode(), 0L);
+            int current = regCount > 0 ? (int) regCount : (t.getCurrentParticipants() != null ? t.getCurrentParticipants() : 0);
+            map.put("currentParticipants", current);
+            map.put("entryFee", t.getEntryFee() != null ? t.getEntryFee() : BigDecimal.ZERO);
+            map.put("totalPrize", t.getTotalPrize() != null ? t.getTotalPrize() : BigDecimal.ZERO);
+            map.put("status", t.getStatus() != null ? t.getStatus() : "Đang mở đăng ký");
+            result.add(map);
+        }
+        return result;
     }
 
     @PostMapping("/tournaments/register")
-    public ResponseEntity<?> registerTournament(@RequestBody Map<String, Object> payload) {
+    public ResponseEntity<?> registerTournament(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestBody Map<String, Object> payload) {
         String tournamentCode = (String) payload.getOrDefault("tournamentCode", "GD01");
         Optional<Tournament> opt = tournamentRepository.findByTournamentCode(tournamentCode);
         if (opt.isEmpty()) {
@@ -1071,6 +1211,46 @@ public class ApiController {
             ));
         }
 
+        String teamName = (String) payload.getOrDefault("teamName", "Đội VĐV");
+        String phone = (String) payload.getOrDefault("phone", "");
+        String player1Name = (String) payload.getOrDefault("player1Name", "");
+        String category = (String) payload.getOrDefault("category", "Đôi Nam Nữ");
+        String customerCode = (String) payload.getOrDefault("customerCode", "");
+
+        if (customerCode == null || customerCode.isBlank()) {
+            try {
+                if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                    String token = authHeader.substring(7);
+                    if (jwtTokenProvider.validateToken(token)) {
+                        String username = jwtTokenProvider.getUsernameFromToken(token);
+                        Optional<User> uOpt = userRepository.findByUsername(username);
+                        if (uOpt.isPresent()) {
+                            User u = uOpt.get();
+                            Customer cust = customerRepository.findByPhone(u.getPhone()).orElse(null);
+                            if (cust != null && cust.getCustomerCode() != null) {
+                                customerCode = cust.getCustomerCode();
+                            } else if (u.getPhone() != null) {
+                                customerCode = u.getPhone().trim();
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ignored) {}
+        }
+
+        if (customerCode == null || customerCode.isBlank()) {
+            customerCode = phone.isBlank() ? "GUEST" : phone.trim();
+        }
+
+        TournamentRegistration reg = new TournamentRegistration();
+        reg.setTournamentCode(t.getTournamentCode());
+        reg.setTeamName(teamName + (player1Name.isBlank() ? "" : " - " + player1Name) + (category.isBlank() ? "" : " (" + category + ")"));
+        reg.setPhone(phone);
+        reg.setCustomerCode(customerCode);
+        reg.setRegistrationDate(LocalDateTime.now());
+        reg.setStatus("Đã xác nhận");
+        tournamentRegistrationRepository.save(reg);
+
         current++;
         t.setCurrentParticipants(current);
         if (current >= max) {
@@ -1081,7 +1261,7 @@ public class ApiController {
         int remaining = max - current;
         return ResponseEntity.ok(Map.of(
                 "success", true,
-                "message", "Đăng ký tham gia giải đấu thành công!",
+                "message", "Đăng ký tham gia giải đấu thành công! Hồ sơ đã được lưu vào hệ thống cơ sở dữ liệu.",
                 "tournamentCode", t.getTournamentCode(),
                 "tournamentName", t.getTournamentName(),
                 "currentParticipants", current,
@@ -1177,7 +1357,8 @@ public class ApiController {
 
     @GetMapping("/staff")
     public List<Staff> getStaffList(@RequestParam(required = false) String branchCode) {
-        return shiftService.getAllStaff(branchCode);
+        String effectiveBranch = resolveEffectiveBranchCode(branchCode);
+        return shiftService.getAllStaff(effectiveBranch);
     }
 
     @PostMapping("/staff")
@@ -1202,7 +1383,8 @@ public class ApiController {
 
     @GetMapping("/shifts/week")
     public ResponseEntity<?> getWeeklySchedule(@RequestParam(required = false) String branchCode) {
-        return ResponseEntity.ok(shiftService.getWeeklySchedule(branchCode));
+        String effectiveBranch = resolveEffectiveBranchCode(branchCode);
+        return ResponseEntity.ok(shiftService.getWeeklySchedule(effectiveBranch));
     }
 
     @PostMapping("/shifts/assign")
@@ -1524,6 +1706,385 @@ public class ApiController {
         } catch (Exception e) {
             return 1.0;
         }
+    // ==========================================
+    // 9.1 MANAGER DASHBOARD METRICS & STATS - TRUY VẤN DỮ LIỆU THẬT TỪ SQL SERVER
+    // ==========================================
+    @GetMapping("/manager/stats")
+    public ResponseEntity<?> getManagerStats(
+            @RequestParam(required = false, defaultValue = "CN01") String branchCode,
+            @RequestParam(required = false, defaultValue = "7") int days) {
+        try {
+            String effectiveBranch = resolveEffectiveBranchCode(branchCode);
+            LocalDate today = LocalDate.now();
+            boolean isAll = effectiveBranch == null || "ALL".equalsIgnoreCase(effectiveBranch.trim());
+
+            List<Branch> branches = branchRepository.findAll();
+            String branchName = isAll ? "Toàn bộ chi nhánh UTE Sport" : branches.stream()
+                    .filter(b -> effectiveBranch.equalsIgnoreCase(b.getBranchCode()))
+                    .map(Branch::getBranchName)
+                    .findFirst()
+                    .orElse("Chi nhánh " + effectiveBranch);
+
+            List<Court> branchCourts = isAll
+                    ? courtRepository.findAll()
+                    : courtRepository.findByBranchCode(effectiveBranch);
+
+            List<Booking> branchBookings = isAll
+                    ? bookingRepository.findAll()
+                    : bookingRepository.findByBranchCodeOrderByBookingDateDesc(effectiveBranch);
+
+            // 1. KPI Calculations
+            int totalBookingsCount = branchBookings.size();
+
+            long todayRevenue = branchBookings.stream()
+                    .filter(b -> b.getBookingDate() != null && b.getBookingDate().isEqual(today))
+                    .filter(b -> !"Đã hủy".equalsIgnoreCase(b.getStatus()))
+                    .mapToLong(b -> b.getTotalPrice() != null ? b.getTotalPrice().longValue() : 0)
+                    .sum();
+
+            long totalRevenue = branchBookings.stream()
+                    .filter(b -> !"Đã hủy".equalsIgnoreCase(b.getStatus()))
+                    .mapToLong(b -> b.getTotalPrice() != null ? b.getTotalPrice().longValue() : 0)
+                    .sum();
+
+            int totalCourts = branchCourts.size();
+            long availableCourts = branchCourts.stream().filter(c -> "Trống".equalsIgnoreCase(c.getStatus())).count();
+            long inUseCourts = branchCourts.stream().filter(c -> "Đang sử dụng".equalsIgnoreCase(c.getStatus()) || "Đang giữ chỗ".equalsIgnoreCase(c.getStatus())).count();
+            long maintenanceCourts = branchCourts.stream().filter(c -> "Bảo trì".equalsIgnoreCase(c.getStatus())).count();
+
+            double occupancyRate = totalCourts > 0
+                    ? Math.round(((double) inUseCourts / totalCourts) * 1000.0) / 10.0
+                    : 0.0;
+
+            long uniqueCustomers = branchBookings.stream()
+                    .map(Booking::getCustomerPhone)
+                    .filter(p -> p != null && !p.isBlank())
+                    .distinct()
+                    .count();
+
+            // 2. Daily stats for chart (Past N days)
+            int numDays = Math.max(3, Math.min(days, 30));
+            List<String> dailyLabels = new ArrayList<>();
+            List<Integer> dailyBookings = new ArrayList<>();
+            List<Double> dailyRevenueMillions = new ArrayList<>();
+            List<Long> dailyRawRevenue = new ArrayList<>();
+
+            java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM");
+            for (int i = numDays - 1; i >= 0; i--) {
+                LocalDate d = today.minusDays(i);
+                dailyLabels.add(d.format(fmt));
+
+                List<Booking> dayBookings = branchBookings.stream()
+                        .filter(b -> b.getBookingDate() != null && b.getBookingDate().isEqual(d))
+                        .filter(b -> !"Đã hủy".equalsIgnoreCase(b.getStatus()))
+                        .collect(Collectors.toList());
+
+                dailyBookings.add(dayBookings.size());
+                long dayRev = dayBookings.stream()
+                        .mapToLong(b -> b.getTotalPrice() != null ? b.getTotalPrice().longValue() : 0)
+                        .sum();
+                dailyRawRevenue.add(dayRev);
+                dailyRevenueMillions.add(Math.round((dayRev / 1000000.0) * 100.0) / 100.0);
+            }
+
+            // 3. Court Type Distribution for Donut Chart
+            Map<String, Long> courtTypeCounts = branchCourts.stream()
+                    .collect(Collectors.groupingBy(c -> c.getCourtType() != null ? c.getCourtType() : "Cầu lông tiêu chuẩn", Collectors.counting()));
+
+            List<String> donutLabels = new ArrayList<>();
+            List<Long> donutData = new ArrayList<>();
+            courtTypeCounts.forEach((type, count) -> {
+                int pct = totalCourts > 0 ? (int) Math.round((count * 100.0) / totalCourts) : 0;
+                donutLabels.add(type + " (" + pct + "%)");
+                donutData.add(count);
+            });
+
+            // 4. Recent Bookings (Top 8)
+            List<Map<String, Object>> recentList = branchBookings.stream()
+                    .sorted((b1, b2) -> {
+                        if (b1.getId() != null && b2.getId() != null) return b2.getId().compareTo(b1.getId());
+                        return 0;
+                    })
+                    .limit(8)
+                    .map(b -> {
+                        Map<String, Object> map = new LinkedHashMap<>();
+                        map.put("bookingCode", b.getBookingCode());
+                        map.put("customerName", b.getCustomerName());
+                        map.put("customerPhone", b.getCustomerPhone());
+                        map.put("courtCode", b.getCourtCode());
+                        map.put("bookingDate", b.getBookingDate() != null ? b.getBookingDate().toString() : "");
+                        map.put("timeSlot", b.getTimeSlot());
+                        map.put("totalPrice", b.getTotalPrice() != null ? b.getTotalPrice().longValue() : 0);
+                        map.put("status", b.getStatus());
+                        return map;
+                    })
+                    .collect(Collectors.toList());
+
+            // 5. Today's Bookings for Timeline
+            List<Map<String, Object>> todayList = branchBookings.stream()
+                    .filter(b -> b.getBookingDate() != null && b.getBookingDate().isEqual(today))
+                    .sorted(Comparator.comparing(Booking::getTimeSlot, Comparator.nullsLast(String::compareTo)))
+                    .map(b -> {
+                        Map<String, Object> map = new LinkedHashMap<>();
+                        map.put("bookingCode", b.getBookingCode());
+                        map.put("courtCode", b.getCourtCode());
+                        map.put("customerName", b.getCustomerName());
+                        map.put("timeSlot", b.getTimeSlot());
+                        map.put("status", b.getStatus());
+                        return map;
+                    })
+                    .collect(Collectors.toList());
+
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("success", true);
+            result.put("branchCode", effectiveBranch);
+            result.put("branchName", branchName);
+            result.put("kpi", Map.of(
+                    "totalBookings", totalBookingsCount,
+                    "todayRevenue", todayRevenue,
+                    "totalRevenue", totalRevenue,
+                    "occupancyRate", occupancyRate,
+                    "newCustomers", uniqueCustomers,
+                    "totalCourts", totalCourts,
+                    "availableCourts", availableCourts,
+                    "inUseCourts", inUseCourts,
+                    "maintenanceCourts", maintenanceCourts
+            ));
+            result.put("dailyStats", Map.of(
+                    "labels", dailyLabels,
+                    "bookings", dailyBookings,
+                    "revenueMillions", dailyRevenueMillions,
+                    "rawRevenue", dailyRawRevenue
+            ));
+            result.put("courtTypeDistribution", Map.of(
+                    "labels", donutLabels,
+                    "data", donutData,
+                    "total", totalCourts
+            ));
+            result.put("recentBookings", recentList);
+            result.put("todayBookings", todayList);
+            result.put("courts", branchCourts);
+
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            log.error("Lỗi lấy dữ liệu Manager Dashboard: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    // ==========================================
+    // 9.2 MANAGER REPORTS & REVENUE ANALYTICS - BÁO CÁO DOANH THU & HIỆU SUẤT TỪ SQL SERVER
+    // ==========================================
+    @GetMapping({"/manager/reports/data", "/manager/reports/summary"})
+    public ResponseEntity<?> getManagerReportsData(
+            @RequestParam(required = false, defaultValue = "CN01") String branchCode,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        try {
+            String effectiveBranch = resolveEffectiveBranchCode(branchCode);
+            boolean isAll = effectiveBranch == null || "ALL".equalsIgnoreCase(effectiveBranch.trim());
+
+            LocalDate start = (startDate != null && !startDate.isBlank())
+                    ? LocalDate.parse(startDate.trim())
+                    : LocalDate.now().withDayOfMonth(1);
+            LocalDate end = (endDate != null && !endDate.isBlank())
+                    ? LocalDate.parse(endDate.trim())
+                    : LocalDate.now();
+
+            if (start.isAfter(end)) {
+                LocalDate tmp = start;
+                start = end;
+                end = tmp;
+            }
+
+            List<Branch> branches = branchRepository.findAll();
+            String branchName = isAll ? "Toàn bộ chi nhánh UTE Sport" : branches.stream()
+                    .filter(b -> effectiveBranch.equalsIgnoreCase(b.getBranchCode()))
+                    .map(Branch::getBranchName)
+                    .findFirst()
+                    .orElse("Chi nhánh " + effectiveBranch);
+
+            List<Court> branchCourts = isAll
+                    ? courtRepository.findAll()
+                    : courtRepository.findByBranchCode(effectiveBranch);
+
+            List<Booking> allBookings = isAll
+                    ? bookingRepository.findAll()
+                    : bookingRepository.findByBranchCodeOrderByBookingDateDesc(effectiveBranch);
+
+            final LocalDate fStart = start;
+            final LocalDate fEnd = end;
+
+            List<Booking> periodBookings = allBookings.stream()
+                    .filter(b -> b.getBookingDate() != null
+                            && !b.getBookingDate().isBefore(fStart)
+                            && !b.getBookingDate().isAfter(fEnd))
+                    .filter(b -> !"Đã hủy".equalsIgnoreCase(b.getStatus()))
+                    .collect(Collectors.toList());
+
+            long totalRevenue = 0;
+            long courtRevenue = 0;
+            long serviceRevenue = 0;
+            double totalHours = 0;
+
+            for (Booking b : periodBookings) {
+                long total = b.getTotalPrice() != null ? b.getTotalPrice().longValue() : 0;
+                totalRevenue += total;
+
+                double hours = 1.0;
+                if (b.getTimeSlot() != null && b.getTimeSlot().contains("-")) {
+                    try {
+                        String[] parts = b.getTimeSlot().split("-");
+                        String s1 = parts[0].trim();
+                        String s2 = parts[1].trim();
+                        if (s1.contains(":") && s2.contains(":")) {
+                            int h1 = Integer.parseInt(s1.split(":")[0].trim());
+                            int m1 = Integer.parseInt(s1.split(":")[1].trim());
+                            int h2 = Integer.parseInt(s2.split(":")[0].trim());
+                            int m2 = Integer.parseInt(s2.split(":")[1].trim());
+                            double diff = (h2 * 60 + m2 - (h1 * 60 + m1)) / 60.0;
+                            if (diff > 0) hours = diff;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                totalHours += hours;
+
+                long courtPart = (b.getHourlyPrice() != null)
+                        ? (long) Math.round(b.getHourlyPrice().doubleValue() * hours)
+                        : total;
+                if (courtPart > total) courtPart = total;
+                courtRevenue += courtPart;
+                serviceRevenue += (total - courtPart);
+            }
+
+            long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(start, end) + 1;
+            int totalCourts = branchCourts.size();
+            double maxPossibleHours = totalCourts * 14.0 * daysBetween;
+            double occupancyRate = (maxPossibleHours > 0)
+                    ? Math.min(100.0, Math.round((totalHours / maxPossibleHours) * 1000.0) / 10.0)
+                    : 0.0;
+
+            Map<String, List<Booking>> courtBookingMap = periodBookings.stream()
+                    .filter(b -> b.getCourtCode() != null)
+                    .collect(Collectors.groupingBy(Booking::getCourtCode));
+
+            List<Map<String, Object>> courtStats = new ArrayList<>();
+            int idx = 1;
+            for (Court c : branchCourts) {
+                List<Booking> cBookings = courtBookingMap.getOrDefault(c.getCourtCode(), Collections.emptyList());
+                double cHours = 0;
+                long cRevenue = 0;
+                for (Booking b : cBookings) {
+                    double h = 1.0;
+                    if (b.getTimeSlot() != null && b.getTimeSlot().contains("-")) {
+                        try {
+                            String[] p = b.getTimeSlot().split("-");
+                            int h1 = Integer.parseInt(p[0].trim().split(":")[0].trim());
+                            int m1 = Integer.parseInt(p[0].trim().split(":")[1].trim());
+                            int h2 = Integer.parseInt(p[1].trim().split(":")[0].trim());
+                            int m2 = Integer.parseInt(p[1].trim().split(":")[1].trim());
+                            double d = (h2 * 60 + m2 - (h1 * 60 + m1)) / 60.0;
+                            if (d > 0) h = d;
+                        } catch (Exception ignored) {}
+                    }
+                    cHours += h;
+                    cRevenue += (b.getTotalPrice() != null ? b.getTotalPrice().longValue() : 0);
+                }
+
+                double cMaxHours = 14.0 * daysBetween;
+                double cOccupancy = cMaxHours > 0 ? Math.min(100.0, Math.round((cHours / cMaxHours) * 1000.0) / 10.0) : 0.0;
+                String performance;
+                if ("Bảo trì".equalsIgnoreCase(c.getStatus())) {
+                    performance = "Bảo trì";
+                } else if (cOccupancy >= 75.0) {
+                    performance = "Xuất sắc";
+                } else if (cOccupancy >= 50.0) {
+                    performance = "Tốt";
+                } else {
+                    performance = "Ổn định";
+                }
+
+                Map<String, Object> cMap = new LinkedHashMap<>();
+                cMap.put("stt", idx++);
+                cMap.put("courtCode", c.getCourtCode());
+                cMap.put("courtName", c.getCourtName());
+                cMap.put("branchCode", c.getBranchCode());
+                cMap.put("courtType", c.getCourtType());
+                cMap.put("totalHours", Math.round(cHours * 10.0) / 10.0);
+                cMap.put("occupancyRate", cOccupancy);
+                cMap.put("revenue", cRevenue);
+                cMap.put("performance", performance);
+                cMap.put("status", c.getStatus());
+                courtStats.add(cMap);
+            }
+
+            Map<String, long[]> trendMap = new TreeMap<>();
+            java.time.format.DateTimeFormatter dFmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM");
+            LocalDate cur = start;
+            while (!cur.isAfter(end)) {
+                trendMap.put(cur.format(dFmt), new long[]{0, 0});
+                cur = cur.plusDays(1);
+            }
+
+            for (Booking b : periodBookings) {
+                if (b.getBookingDate() != null) {
+                    String dKey = b.getBookingDate().format(dFmt);
+                    long[] arr = trendMap.get(dKey);
+                    if (arr != null) {
+                        long total = b.getTotalPrice() != null ? b.getTotalPrice().longValue() : 0;
+                        long cPart = (b.getHourlyPrice() != null) ? b.getHourlyPrice().longValue() : total;
+                        if (cPart > total) cPart = total;
+                        arr[0] += cPart;
+                        arr[1] += (total - cPart);
+                    }
+                }
+            }
+
+            List<String> trendLabels = new ArrayList<>(trendMap.keySet());
+            List<Long> trendCourtRevenue = new ArrayList<>();
+            List<Long> trendServiceRevenue = new ArrayList<>();
+            List<Long> trendTotalRevenue = new ArrayList<>();
+            for (String lbl : trendLabels) {
+                long[] arr = trendMap.get(lbl);
+                trendCourtRevenue.add(arr[0]);
+                trendServiceRevenue.add(arr[1]);
+                trendTotalRevenue.add(arr[0] + arr[1]);
+            }
+
+            Map<String, Object> resp = new LinkedHashMap<>();
+            resp.put("success", true);
+            resp.put("branchCode", effectiveBranch);
+            resp.put("branchName", branchName);
+            resp.put("startDate", start.toString());
+            resp.put("endDate", end.toString());
+            resp.put("daysCount", daysBetween);
+            resp.put("kpi", Map.of(
+                    "totalRevenue", totalRevenue,
+                    "courtRevenue", courtRevenue,
+                    "serviceRevenue", serviceRevenue,
+                    "occupancyRate", occupancyRate,
+                    "totalBookings", periodBookings.size(),
+                    "totalHours", Math.round(totalHours * 10.0) / 10.0
+            ));
+            resp.put("courtStats", courtStats);
+            resp.put("trend", Map.of(
+                    "labels", trendLabels,
+                    "courtRevenue", trendCourtRevenue,
+                    "serviceRevenue", trendServiceRevenue,
+                    "totalRevenue", trendTotalRevenue
+            ));
+            resp.put("breakdown", Map.of(
+                    "courtRevenue", courtRevenue,
+                    "beverageRevenue", Math.round(serviceRevenue * 0.6),
+                    "shuttlecockRevenue", Math.round(serviceRevenue * 0.25),
+                    "equipmentRevenue", Math.round(serviceRevenue * 0.15)
+            ));
+
+            return ResponseEntity.ok(resp);
+        } catch (Exception e) {
+            log.error("Lỗi lấy dữ liệu báo cáo: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi dữ liệu báo cáo: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/director/branches")
@@ -1834,6 +2395,169 @@ public class ApiController {
         resp.put("branches", branches);
 
         return ResponseEntity.ok(resp);
+    }
+
+    // ==========================================
+    // 10.5 CUSTOMER PRICING & PROMOTION SUMMARY - LẤY BẢNG GIÁ THEO CHI NHÁNH & ÁP DỤNG MÃ KHUYẾN MÃI
+    // ==========================================
+    @GetMapping("/pricing/summary")
+    public ResponseEntity<?> getCustomerPricingSummary(@RequestParam(value = "branchCode", defaultValue = "CN01") String branchCode) {
+        String bCode = branchCode != null ? branchCode.trim().toUpperCase() : "CN01";
+        Optional<Branch> branchOpt = branchRepository.findByBranchCode(bCode);
+        String branchName = branchOpt.map(Branch::getBranchName).orElse("Chi nhánh " + bCode);
+
+        List<PricingRule> rules = pricingRuleRepository.findByBranchCode(bCode);
+        List<TimeSlot> slots = timeSlotRepository.findAll();
+        Map<String, TimeSlot> slotMap = slots.stream()
+                .collect(Collectors.toMap(TimeSlot::getSlotCode, s -> s, (s1, s2) -> s1));
+
+        List<Map<String, Object>> formattedRules = new ArrayList<>();
+        if (!rules.isEmpty()) {
+            for (PricingRule r : rules) {
+                Map<String, Object> item = new LinkedHashMap<>();
+                item.put("pricingCode", r.getPricingCode());
+                item.put("slotCode", r.getSlotCode());
+                TimeSlot ts = slotMap.get(r.getSlotCode());
+                if (ts != null) {
+                    item.put("slotName", ts.getSlotType() != null ? ts.getSlotType() : ("Khung giờ " + r.getSlotCode()));
+                    item.put("timeRange", ts.getStartTime() + " - " + ts.getEndTime());
+                } else {
+                    item.put("slotName", "Khung giờ " + r.getSlotCode());
+                    item.put("timeRange", "Toàn thời gian");
+                }
+                item.put("dayType", r.getDayType() != null ? r.getDayType() : "Hàng ngày");
+                item.put("hourlyRate", r.getHourlyRate() != null ? r.getHourlyRate().longValue() : 90000L);
+                formattedRules.add(item);
+            }
+        } else {
+            // Trường hợp chi nhánh chưa có cấu hình riêng trong pricing_rules, dùng các khung giờ mặc định
+            formattedRules.add(Map.of("slotName", "Buổi Sáng", "timeRange", "06:00 - 10:00", "dayType", "Hàng ngày", "hourlyRate", 80000L));
+            formattedRules.add(Map.of("slotName", "Buổi Ngày", "timeRange", "10:00 - 16:00", "dayType", "Thứ 2 - Thứ 6", "hourlyRate", 70000L));
+            formattedRules.add(Map.of("slotName", "Giờ Cao Điểm", "timeRange", "17:00 - 21:00", "dayType", "Hàng ngày", "hourlyRate", 90000L));
+            formattedRules.add(Map.of("slotName", "Buổi Tối Muộn", "timeRange", "21:00 - 22:30", "dayType", "Hàng ngày", "hourlyRate", 80000L));
+        }
+
+        // Tỷ lệ giá sân theo chi nhánh từ bảng courts
+        List<Court> branchCourts = courtRepository.findByBranchCode(bCode);
+        long stdPrice = 90000L;
+        long vipPrice = 120000L;
+        for (Court c : branchCourts) {
+            if (c.getCourtType() != null && c.getCourtType().toUpperCase().contains("VIP")) {
+                if (c.getHourlyRate() != null) vipPrice = c.getHourlyRate().longValue();
+            } else {
+                if (c.getHourlyRate() != null) stdPrice = c.getHourlyRate().longValue();
+            }
+        }
+
+        // Khuyến mãi đang áp dụng từ bảng promotions trong CSDL
+        LocalDate today = LocalDate.now();
+        List<Promotion> allPromos = promotionRepository.findAll();
+        List<Map<String, Object>> activePromos = new ArrayList<>();
+        for (Promotion p : allPromos) {
+            boolean isActive = "Đang áp dụng".equalsIgnoreCase(p.getStatus());
+            boolean dateValid = (p.getStartDate() == null || !today.isBefore(p.getStartDate())) &&
+                                (p.getEndDate() == null || !today.isAfter(p.getEndDate()));
+            boolean scopeValid = p.getScope() == null ||
+                                 "Toàn chuỗi".equalsIgnoreCase(p.getScope()) ||
+                                 p.getScope().contains(bCode) ||
+                                 p.getScope().contains(branchName);
+
+            if (isActive && dateValid && scopeValid) {
+                Map<String, Object> promoMap = new LinkedHashMap<>();
+                promoMap.put("promoCode", p.getPromoCode());
+                promoMap.put("promoName", p.getPromoName());
+                promoMap.put("discountType", p.getDiscountType());
+                promoMap.put("discountValue", p.getDiscountValue() != null ? p.getDiscountValue().longValue() : 0L);
+                promoMap.put("startDate", p.getStartDate() != null ? p.getStartDate().toString() : "");
+                promoMap.put("endDate", p.getEndDate() != null ? p.getEndDate().toString() : "");
+                promoMap.put("scope", p.getScope());
+                activePromos.add(promoMap);
+            }
+        }
+
+        Map<String, Object> res = new LinkedHashMap<>();
+        res.put("branchCode", bCode);
+        res.put("branchName", branchName);
+        res.put("standardRate", stdPrice);
+        res.put("vipRate", vipPrice);
+        res.put("pricingRules", formattedRules);
+        res.put("activePromotions", activePromos);
+
+        return ResponseEntity.ok(res);
+    }
+
+    @PostMapping("/promotions/apply")
+    public ResponseEntity<?> applyPromotionCode(@RequestBody Map<String, Object> payload) {
+        try {
+            String promoCode = (String) payload.get("promoCode");
+            String branchCode = (String) payload.getOrDefault("branchCode", "CN01");
+            BigDecimal orderAmount = BigDecimal.ZERO;
+            if (payload.get("orderAmount") != null) {
+                try {
+                    orderAmount = new BigDecimal(payload.get("orderAmount").toString());
+                } catch (Exception ignored) {}
+            }
+
+            if (promoCode == null || promoCode.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Vui lòng nhập mã khuyến mãi!"));
+            }
+
+            Optional<Promotion> promoOpt = promotionRepository.findByPromoCode(promoCode.trim().toUpperCase());
+            if (promoOpt.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã khuyến mãi '" + promoCode + "' không tồn tại trong hệ thống!"));
+            }
+
+            Promotion p = promoOpt.get();
+            if (!"Đang áp dụng".equalsIgnoreCase(p.getStatus())) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã khuyến mãi '" + promoCode + "' hiện không khả dụng (Trạng thái: " + p.getStatus() + ")!"));
+            }
+
+            LocalDate today = LocalDate.now();
+            if (p.getStartDate() != null && today.isBefore(p.getStartDate())) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã khuyến mãi chưa đến thời gian áp dụng (Bắt đầu từ " + p.getStartDate() + ")!"));
+            }
+            if (p.getEndDate() != null && today.isAfter(p.getEndDate())) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã khuyến mãi đã hết hạn sử dụng (Hết hạn vào " + p.getEndDate() + ")!"));
+            }
+
+            if (p.getScope() != null && !"Toàn chuỗi".equalsIgnoreCase(p.getScope())) {
+                if (branchCode != null && !p.getScope().contains(branchCode)) {
+                    return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã khuyến mãi chỉ áp dụng cho " + p.getScope() + "!"));
+                }
+            }
+
+            BigDecimal discountValue = p.getDiscountValue() != null ? p.getDiscountValue() : BigDecimal.ZERO;
+            BigDecimal discountAmount;
+            String type = p.getDiscountType() != null ? p.getDiscountType() : "";
+            if (type.contains("%") || type.toLowerCase().contains("phần trăm") || type.toLowerCase().contains("percent")) {
+                discountAmount = orderAmount.multiply(discountValue).divide(new BigDecimal("100"), 0, RoundingMode.HALF_UP);
+            } else {
+                discountAmount = discountValue;
+            }
+
+            if (discountAmount.compareTo(orderAmount) > 0) {
+                discountAmount = orderAmount;
+            }
+
+            BigDecimal finalAmount = orderAmount.subtract(discountAmount);
+            if (finalAmount.compareTo(BigDecimal.ZERO) < 0) {
+                finalAmount = BigDecimal.ZERO;
+            }
+
+            Map<String, Object> resp = new LinkedHashMap<>();
+            resp.put("success", true);
+            resp.put("promoCode", p.getPromoCode());
+            resp.put("promoName", p.getPromoName());
+            resp.put("discountType", p.getDiscountType());
+            resp.put("discountValue", p.getDiscountValue());
+            resp.put("discountAmount", discountAmount.longValue());
+            resp.put("finalAmount", finalAmount.longValue());
+            resp.put("message", "Áp dụng thành công mã " + p.getPromoCode() + " (" + p.getPromoName() + ")! Giảm " + String.format("%,d", discountAmount.longValue()) + " đ.");
+
+            return ResponseEntity.ok(resp);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi kiểm tra mã khuyến mãi: " + e.getMessage()));
+        }
     }
 
     @PutMapping("/director/pricing/proposals/{id}/approve")

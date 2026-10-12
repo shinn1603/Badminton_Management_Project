@@ -45,10 +45,7 @@ public class ShiftService {
     public List<Staff> getAllStaff(String branchCode) {
         ensureDefaultStaffSeeded();
         if (branchCode != null && !branchCode.trim().isEmpty() && !"ALL".equalsIgnoreCase(branchCode.trim())) {
-            List<Staff> list = staffRepository.findByBranchCode(branchCode.trim());
-            if (!list.isEmpty()) {
-                return list;
-            }
+            return staffRepository.findByBranchCode(branchCode.trim());
         }
         return staffRepository.findAll();
     }
@@ -118,13 +115,17 @@ public class ShiftService {
 
     public Map<String, Object> getWeeklySchedule(String branchCode) {
         ensureDefaultStaffSeeded();
-        ensureDefaultShiftsSeeded(branchCode);
-
-        String branch = (branchCode != null && !branchCode.trim().isEmpty()) ? branchCode.trim() : "CN01";
-        List<WorkShift> shifts = workShiftRepository.findByBranchCode(branch);
-        if (shifts.isEmpty()) {
-            shifts = workShiftRepository.findAll();
+        boolean isAll = branchCode == null || "ALL".equalsIgnoreCase(branchCode.trim());
+        String branch = isAll ? "ALL" : branchCode.trim();
+        if (!isAll) {
+            ensureDefaultShiftsSeeded(branch);
+        } else {
+            ensureDefaultShiftsSeeded("CN01");
         }
+
+        List<WorkShift> shifts = isAll
+                ? workShiftRepository.findAll()
+                : workShiftRepository.findByBranchCode(branch);
 
         Map<String, Map<String, List<Map<String, Object>>>> schedule = new LinkedHashMap<>();
         for (String day : DAYS_ORDER) {

@@ -146,11 +146,13 @@
             </svg>
           </button>
 
-          <div class="branch-select-badge">
+          <div class="branch-select-badge" style="display: flex; align-items: center; gap: 8px;">
             <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--primary);">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             </svg>
-            <span>Trung Tâm Thể Thao UTE Sport - Thủ Đức</span>
+            <select id="branchFilterSelect" onchange="onBranchChange()" style="border: none; background: transparent; font-weight: 700; color: var(--text-dark); cursor: pointer; outline: none; font-size: 13px;">
+              <option value="CN01" selected>CN01 - Thủ Đức (Chi nhánh quản lý)</option>
+            </select>
           </div>
 
           <div class="search-box-header">
@@ -158,7 +160,7 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" placeholder="Tìm kiếm khung giờ, loại ngày, chính sách giá...">
+            <input type="text" placeholder="Tìm kiếm khung giờ, loại ngày, chính sách giá..." id="pricingSearchInput" oninput="filterPricingData()">
           </div>
         </div>
 
@@ -175,6 +177,15 @@
               <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
+          </button>
+
+          <button type="button" class="btn btn-outline" onclick="loadManagerPricingData()" title="Làm mới từ CSDL">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            <span>Đồng bộ</span>
           </button>
 
           <button type="button" class="btn btn-primary" onclick="openPriceModal()">
@@ -196,10 +207,57 @@
           <div class="hero-banner-content">
             <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
               <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
-              Chính Sách Bảng Giá Sân Chi Nhánh Thủ Đức
+              <span id="pricingHeroBadge">Chính Sách Bảng Giá Sân Chi Nhánh • SQL Server Realtime</span>
             </div>
             <h1 class="hero-title" style="margin-bottom: 8px;">Cấu Hình Giá Theo Khung Giờ & Loại Sân</h1>
-            <p class="hero-subtitle" style="margin-bottom: 0;">Xem biểu giá hiện hành của chi nhánh và gửi đơn đề xuất điều chỉnh giá sân lên Ban Giám Đốc chuỗi xem xét phê duyệt</p>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Xem biểu giá hiện hành đồng bộ từ SQL Server và gửi đơn đề xuất điều chỉnh giá sân lên Ban Giám Đốc chuỗi phê duyệt theo quy trình nghiệp vụ chuẩn.</p>
+          </div>
+        </div>
+
+        <!-- KPI METRICS GRID -->
+        <div class="kpi-grid" style="margin-bottom: 24px;">
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Số khung giờ áp dụng</span>
+              <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: var(--primary);">
+                <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </div>
+            </div>
+            <div class="kpi-val" style="color: var(--primary);" id="kpiTotalRules">0 khung giờ</div>
+            <div class="kpi-trend positive">Từ bảng pricing_rules CSDL</div>
+          </div>
+
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Đơn giá thấp nhất</span>
+              <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              </div>
+            </div>
+            <div class="kpi-val" style="color: #3b82f6;" id="kpiMinPrice">0 đ/h</div>
+            <div class="kpi-trend positive">Giờ sáng / thấp điểm</div>
+          </div>
+
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Đơn giá giờ vàng (Peak)</span>
+              <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              </div>
+            </div>
+            <div class="kpi-val" style="color: #f59e0b;" id="kpiMaxPrice">0 đ/h</div>
+            <div class="kpi-trend">Khung giờ 17:00 - 22:00</div>
+          </div>
+
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Đề xuất chờ Giám đốc duyệt</span>
+              <div class="kpi-icon-wrap" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              </div>
+            </div>
+            <div class="kpi-val" style="color: #8b5cf6;" id="kpiPendingProposals">0 đề xuất</div>
+            <div class="kpi-trend">Đang thẩm định</div>
           </div>
         </div>
 
@@ -208,7 +266,7 @@
           <div class="card" style="background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); overflow: hidden;">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
               <div>
-                <h3 class="card-title" style="margin-bottom: 4px; font-size: 16px; font-weight: 700;">Biểu giá sân hiện hành tại Chi nhánh Thủ Đức</h3>
+                <h3 class="card-title" id="pricingTableTitle" style="margin-bottom: 4px; font-size: 16px; font-weight: 700;">Biểu giá sân hiện hành tại Chi nhánh</h3>
                 <div style="font-size: 12.5px; color: var(--text-muted);">Dữ liệu đồng bộ trực tiếp từ Database SQL Server, áp dụng trên POS và Cổng khách hàng</div>
               </div>
               <button class="btn btn-primary" onclick="openPriceModal()" style="font-size: 12.5px; padding: 7px 14px;">
@@ -220,17 +278,19 @@
               <table class="clean-table" id="tableCurrentPricing">
                 <thead>
                   <tr>
-                    <th style="width: 100px;">Mã giá</th>
+                    <th style="width: 90px;">Mã giá</th>
+                    <th>Chi nhánh</th>
                     <th>Khung giờ</th>
                     <th>Thời gian</th>
                     <th>Áp dụng ngày</th>
                     <th style="text-align: right;">Đơn giá áp dụng</th>
-                    <th style="text-align: center; width: 140px;">Trạng thái</th>
+                    <th style="text-align: center; width: 130px;">Trạng thái</th>
+                    <th style="text-align: right; width: 140px;">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody id="bodyCurrentPricing">
                   <tr>
-                    <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải biểu giá từ Database...</td>
+                    <td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải biểu giá từ Database...</td>
                   </tr>
                 </tbody>
               </table>
@@ -254,18 +314,19 @@
                 <thead>
                   <tr>
                     <th style="width: 90px;">Mã ĐX</th>
+                    <th>Chi nhánh</th>
                     <th>Loại sân áp dụng</th>
                     <th>Khung giờ</th>
                     <th style="text-align: right;">Giá hiện tại</th>
                     <th style="text-align: right;">Giá đề xuất</th>
-                    <th style="max-width: 250px;">Lý do gửi Giám đốc</th>
+                    <th style="max-width: 230px;">Lý do gửi Giám đốc</th>
                     <th style="text-align: center; width: 130px;">Tình trạng</th>
                     <th style="font-size: 12px; color: var(--text-muted);">Ghi chú Giám đốc</th>
                   </tr>
                 </thead>
                 <tbody id="bodyProposalsHistory">
                   <tr>
-                    <td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải lịch sử đề xuất...</td>
+                    <td colspan="9" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải lịch sử đề xuất...</td>
                   </tr>
                 </tbody>
               </table>
@@ -290,8 +351,13 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
           <div>
-            <label class="form-label" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Chi nhánh đề xuất</label>
-            <input type="text" class="form-control" value="CN01 - Chi nhánh Thủ Đức" readonly style="background: var(--surface-subtle);">
+            <label class="form-label" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Chi nhánh đề xuất *</label>
+            <select class="form-control" id="inpProposalBranch" onchange="onModalBranchChange()">
+              <option value="CN01" selected>CN01 - Thủ Đức (UTE Sport)</option>
+              <option value="CN02">CN02 - Bình Thạnh</option>
+              <option value="CN03">CN03 - Quận 9</option>
+              <option value="CN04">CN04 - Gò Vấp</option>
+            </select>
           </div>
           <div>
             <label class="form-label" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Người gửi đề xuất</label>
@@ -310,12 +376,9 @@
             </select>
           </div>
           <div>
-            <label class="form-label" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Khung giờ</label>
-            <select class="form-control" id="inpTimeSlot" onchange="autoFillCurrentPrice()">
-              <option value="17:00 - 22:00 (Giờ vàng)">17:00 - 22:00 (Giờ vàng cao điểm)</option>
-              <option value="09:00 - 17:00 (Ban ngày)">09:00 - 17:00 (Ban ngày)</option>
-              <option value="06:00 - 09:00 (Sáng sớm)">06:00 - 09:00 (Sáng sớm)</option>
-              <option value="22:00 - 23:00 (Tối muộn)">22:00 - 23:00 (Tối muộn)</option>
+            <label class="form-label" style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Khung giờ biểu giá *</label>
+            <select class="form-control" id="inpTimeSlot" onchange="onModalSlotChange()">
+              <option value="">-- Chọn khung giờ --</option>
             </select>
           </div>
         </div>
@@ -345,60 +408,254 @@
 
   <script src="/js/global-hub.js"></script>
   <script>
-    function toggleSidebar() {
-      document.getElementById('appSidebar').classList.toggle('collapsed');
+    let allPricingRules = [];
+    let allPricingProposals = [];
+    let branchNamesMap = {
+      'CN01': 'Chi nhánh Thủ Đức',
+      'CN02': 'Chi nhánh Bình Thạnh',
+      'CN03': 'Chi nhánh Quận 9',
+      'CN04': 'Chi nhánh Gò Vấp'
+    };
+
+    function getActiveBranch() {
+      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
+      if (user && (user.role === 'MANAGER' || (user.branchCode && user.role !== 'DIRECTOR' && user.role !== 'ADMIN'))) {
+        return user.branchCode || 'CN01';
+      }
+      const select = document.getElementById('branchFilterSelect');
+      if (select && select.value) return select.value;
+      return (user && user.branchCode) ? user.branchCode : 'CN01';
     }
 
-    function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme') || 'light';
-      const next = current === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
+    function initBranchSecurity() {
+      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
+      const select = document.getElementById('branchFilterSelect');
+      if (!select) return;
+      if (user && (user.role === 'DIRECTOR' || user.role === 'ADMIN')) {
+        select.innerHTML = `
+          <option value="CN01" selected>CN01 - Thủ Đức (UTE Sport)</option>
+          <option value="CN02">CN02 - Bình Thạnh</option>
+          <option value="CN03">CN03 - Quận 9</option>
+          <option value="CN04">CN04 - Gò Vấp</option>
+          <option value="ALL">Toàn bộ chi nhánh</option>
+        `;
+        select.disabled = false;
+        select.style.cursor = 'pointer';
+      } else {
+        const br = (user && user.branchCode) ? user.branchCode : 'CN01';
+        select.innerHTML = `<option value="${br}" selected>${br} - Thủ Đức (Chi nhánh quản lý)</option>`;
+        select.value = br;
+        select.disabled = true;
+        select.style.cursor = 'not-allowed';
+        select.title = 'Phân quyền: Bạn chỉ có quyền quản lý chính sách giá cơ sở được phân công (' + br + ')';
+
+        const modalBranch = document.getElementById('inpProposalBranch');
+        if (modalBranch) {
+          modalBranch.value = br;
+          modalBranch.disabled = true;
+        }
+      }
     }
 
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
+    function onBranchChange() {
+      applyFiltersAndRender();
+    }
 
     function formatVND(amount) {
       return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
     }
 
-    function openPriceModal() {
-      document.getElementById('priceModal').classList.add('open');
-      autoFillCurrentPrice();
+    function openPriceModal(prefillBranch, prefillSlotInfo, prefillRate) {
+      const modal = document.getElementById('priceModal');
+      const activeBranch = prefillBranch || (getActiveBranch() === 'ALL' ? 'CN01' : getActiveBranch());
+      
+      const branchSelect = document.getElementById('inpProposalBranch');
+      if (branchSelect) branchSelect.value = activeBranch;
+
+      // Populate current user
+      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
+      if (user && user.fullName) {
+        document.getElementById('inpProposerName').value = user.fullName;
+      }
+
+      populateModalSlotOptions(activeBranch, prefillSlotInfo, prefillRate);
+      modal.classList.add('open');
     }
 
     function closePriceModal() {
       document.getElementById('priceModal').classList.remove('open');
     }
 
-    function autoFillCurrentPrice() {
-      const slot = document.getElementById('inpTimeSlot').value;
+    function onModalBranchChange() {
+      const bCode = document.getElementById('inpProposalBranch').value;
+      populateModalSlotOptions(bCode);
+    }
+
+    function populateModalSlotOptions(branchCode, selectSlotInfo, explicitRate) {
+      const slotSelect = document.getElementById('inpTimeSlot');
+      if (!slotSelect) return;
+
+      const rulesForBranch = allPricingRules.filter(r => r.branchCode === branchCode);
+      slotSelect.innerHTML = '';
+
+      if (rulesForBranch.length === 0) {
+        // Fallback default slots
+        const defaultSlots = [
+          { name: '17:00 - 22:00 (Giờ vàng cao điểm)', rate: 130000 },
+          { name: '09:00 - 17:00 (Ban ngày)', rate: 90000 },
+          { name: '06:00 - 09:00 (Sáng sớm)', rate: 80000 },
+          { name: '22:00 - 23:00 (Tối muộn)', rate: 90000 }
+        ];
+        defaultSlots.forEach(ds => {
+          const opt = document.createElement('option');
+          opt.value = ds.name;
+          opt.dataset.rate = ds.rate;
+          opt.textContent = `${ds.name} - ${formatVND(ds.rate)}/h`;
+          slotSelect.appendChild(opt);
+        });
+      } else {
+        rulesForBranch.forEach(r => {
+          const slotLabel = `${r.slotTime} (${r.slotType || 'Tiêu chuẩn'} - ${r.dayType})`;
+          const opt = document.createElement('option');
+          opt.value = `${r.slotTime} (${r.slotType || 'Tiêu chuẩn'})`;
+          opt.dataset.rate = r.hourlyRate || 90000;
+          opt.textContent = `${slotLabel} - ${formatVND(r.hourlyRate)}/h`;
+          if (selectSlotInfo && (r.slotTime.includes(selectSlotInfo) || opt.value.includes(selectSlotInfo))) {
+            opt.selected = true;
+          }
+          slotSelect.appendChild(opt);
+        });
+      }
+
+      if (explicitRate !== undefined) {
+        document.getElementById('inpCurrentPrice').value = explicitRate;
+      } else {
+        onModalSlotChange();
+      }
+    }
+
+    function onModalSlotChange() {
+      const slotSelect = document.getElementById('inpTimeSlot');
       const curPriceInput = document.getElementById('inpCurrentPrice');
-      if (slot.includes('Giờ vàng')) curPriceInput.value = '130000';
-      else if (slot.includes('Sáng')) curPriceInput.value = '80000';
-      else if (slot.includes('Ban ngày')) curPriceInput.value = '90000';
-      else curPriceInput.value = '90000';
+      const selectedOption = slotSelect.options[slotSelect.selectedIndex];
+      if (selectedOption && selectedOption.dataset.rate) {
+        curPriceInput.value = selectedOption.dataset.rate;
+      } else {
+        curPriceInput.value = '90000';
+      }
+    }
+
+    function openProposalForRule(pricingCode, branchCode, slotTime, hourlyRate) {
+      openPriceModal(branchCode, slotTime, hourlyRate);
     }
 
     async function loadManagerPricingData() {
+      const tbodyRules = document.getElementById('bodyCurrentPricing');
+      const tbodyProps = document.getElementById('bodyProposalsHistory');
+      if (tbodyRules && allPricingRules.length === 0) {
+        tbodyRules.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải biểu giá từ Database SQL Server...</td></tr>';
+      }
+
       try {
         const res = await fetch('/api/director/pricing');
         if (res.ok) {
           const data = await res.json();
-          const branchCode = 'CN01';
+          allPricingRules = data.rules || [];
+          allPricingProposals = data.proposals || [];
 
-          // 1. Render biểu giá của chi nhánh Thủ Đức
-          const branchRules = (data.rules || []).filter(r => r.branchCode === branchCode);
-          renderBranchRules(branchRules);
+          if (Array.isArray(data.branches)) {
+            data.branches.forEach(b => {
+              if (b.branchCode && b.branchName) branchNamesMap[b.branchCode] = b.branchName;
+            });
+          }
 
-          // 2. Render lịch sử đề xuất của chi nhánh Thủ Đức
-          const branchProposals = (data.proposals || []).filter(p => p.branchCode === branchCode);
-          renderBranchProposals(branchProposals);
+          applyFiltersAndRender();
+        } else {
+          showToast('Không thể tải dữ liệu bảng giá từ máy chủ!', 'warning');
         }
       } catch (err) {
         console.error('Lỗi khi tải dữ liệu bảng giá:', err);
+        if (tbodyRules) {
+          tbodyRules.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: #ef4444;">Không thể kết nối máy chủ SQL Server!</td></tr>';
+        }
       }
+    }
+
+    function applyFiltersAndRender() {
+      const activeBranch = getActiveBranch();
+      const searchQuery = (document.getElementById('pricingSearchInput')?.value || '').toLowerCase().trim();
+
+      // Dynamic titles
+      const bTitle = (activeBranch === 'ALL') ? 'Toàn bộ hệ thống' : (branchNamesMap[activeBranch] || activeBranch);
+      const heroBadge = document.getElementById('pricingHeroBadge');
+      if (heroBadge) heroBadge.textContent = `Chính Sách Bảng Giá Sân ${bTitle} • SQL Server Realtime`;
+      const tableTitle = document.getElementById('pricingTableTitle');
+      if (tableTitle) tableTitle.textContent = `Biểu giá sân hiện hành tại ${bTitle}`;
+
+      // Filter Rules
+      let filteredRules = (activeBranch === 'ALL')
+        ? allPricingRules
+        : allPricingRules.filter(r => r.branchCode === activeBranch);
+
+      if (searchQuery) {
+        filteredRules = filteredRules.filter(r => {
+          const txt = `${r.pricingCode} ${r.branchCode} ${r.branchName} ${r.slotType} ${r.slotTime} ${r.dayType} ${r.hourlyRate}`.toLowerCase();
+          return txt.includes(searchQuery);
+        });
+      }
+
+      // Filter Proposals
+      let filteredProposals = (activeBranch === 'ALL')
+        ? allPricingProposals
+        : allPricingProposals.filter(p => p.branchCode === activeBranch);
+
+      if (searchQuery) {
+        filteredProposals = filteredProposals.filter(p => {
+          const txt = `${p.proposalCode} ${p.branchCode} ${p.courtType} ${p.slotInfo} ${p.reason} ${p.status}`.toLowerCase();
+          return txt.includes(searchQuery);
+        });
+      }
+
+      // Update KPIs
+      updatePricingKpis(filteredRules, filteredProposals);
+
+      // Render
+      renderBranchRules(filteredRules);
+      renderBranchProposals(filteredProposals);
+    }
+
+    function filterPricingData() {
+      applyFiltersAndRender();
+    }
+
+    function updatePricingKpis(rules, proposals) {
+      const kpiRules = document.getElementById('kpiTotalRules');
+      const kpiMin = document.getElementById('kpiMinPrice');
+      const kpiMax = document.getElementById('kpiMaxPrice');
+      const kpiPending = document.getElementById('kpiPendingProposals');
+
+      if (kpiRules) kpiRules.textContent = `${rules.length} khung giờ`;
+
+      if (rules.length > 0) {
+        let minRate = Infinity;
+        let maxRate = 0;
+        rules.forEach(r => {
+          const rate = Number(r.hourlyRate) || 0;
+          if (rate > 0 && rate < minRate) minRate = rate;
+          if (rate > maxRate) maxRate = rate;
+        });
+        if (kpiMin) kpiMin.textContent = `${formatVND(minRate === Infinity ? 0 : minRate)}/h`;
+        if (kpiMax) kpiMax.textContent = `${formatVND(maxRate)}/h`;
+      } else {
+        if (kpiMin) kpiMin.textContent = '0 đ/h';
+        if (kpiMax) kpiMax.textContent = '0 đ/h';
+      }
+
+      const pendingCount = proposals.filter(p => p.status === 'Chờ phê duyệt').length;
+      if (kpiPending) kpiPending.textContent = `${pendingCount} đề xuất`;
     }
 
     function renderBranchRules(rules) {
@@ -406,24 +663,27 @@
       if (!tbody) return;
 
       if (!rules || rules.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Chưa có biểu giá cấu hình cho chi nhánh này</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 28px; color: var(--text-muted);">Chưa có biểu giá cấu hình cho chi nhánh này trong CSDL SQL Server</td></tr>';
         return;
       }
 
-      let html = '';
-      rules.forEach(r => {
-        html += `
-          <tr>
-            <td style="font-family: monospace; font-weight: 700; color: var(--primary);">${r.pricingCode}</td>
-            <td><strong>${r.slotType || 'Khung giờ chuẩn'}</strong></td>
-            <td><span class="badge" style="background: var(--surface-subtle);">${r.slotTime}</span></td>
-            <td>${r.dayType}</td>
-            <td style="text-align: right; font-weight: 800; color: var(--primary); font-size: 14px;">${formatVND(r.hourlyRate)}</td>
-            <td style="text-align: center;"><span class="badge badge-success">Đang áp dụng</span></td>
-          </tr>
-        `;
-      });
-      tbody.innerHTML = html;
+      tbody.innerHTML = rules.map(r => `
+        <tr>
+          <td style="font-family: monospace; font-weight: 700; color: var(--primary);">${r.pricingCode}</td>
+          <td><span class="badge badge-outline" style="font-size: 11px;">${r.branchCode || 'CN01'}</span></td>
+          <td><strong>${r.slotType || 'Khung giờ chuẩn'}</strong></td>
+          <td><span class="badge" style="background: var(--surface-subtle);">${r.slotTime}</span></td>
+          <td>${r.dayType}</td>
+          <td style="text-align: right; font-weight: 800; color: var(--primary); font-size: 14px;">${formatVND(r.hourlyRate)}</td>
+          <td style="text-align: center;"><span class="badge badge-success">Đang áp dụng</span></td>
+          <td style="text-align: right;">
+            <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px;" 
+                    onclick="openProposalForRule('${r.pricingCode}', '${r.branchCode}', '${r.slotTime}', ${r.hourlyRate})">
+              Đề xuất đổi giá
+            </button>
+          </td>
+        </tr>
+      `).join('');
     }
 
     function renderBranchProposals(proposals) {
@@ -434,12 +694,11 @@
       if (badge) badge.textContent = `${proposals.length} đề xuất`;
 
       if (!proposals || proposals.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Chưa có đề xuất điều chỉnh giá nào được gửi</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 28px; color: var(--text-muted);">Chưa có đề xuất điều chỉnh giá nào được gửi từ chi nhánh</td></tr>';
         return;
       }
 
-      let html = '';
-      proposals.forEach(p => {
+      tbody.innerHTML = proposals.map(p => {
         const isPending = (p.status === 'Chờ phê duyệt');
         const isApproved = (p.status === 'Đã phê duyệt');
         const badgeClass = isPending ? 'badge-warning' : (isApproved ? 'badge-success' : 'badge-danger');
@@ -449,9 +708,10 @@
         const diffSign = diff >= 0 ? `+${diffPct}%` : `${diffPct}%`;
         const diffColor = diff >= 0 ? '#10b981' : '#ef4444';
 
-        html += `
+        return `
           <tr>
             <td style="font-weight: 700; color: var(--primary); font-size: 13px;">${p.proposalCode}</td>
+            <td><span class="badge badge-outline" style="font-size: 11px;">${p.branchCode || 'CN01'}</span></td>
             <td><strong>${p.courtType}</strong></td>
             <td><span class="badge" style="background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa;">${p.slotInfo}</span></td>
             <td style="text-align: right; color: var(--text-muted);">${formatVND(p.currentPrice)}</td>
@@ -459,31 +719,31 @@
               ${formatVND(p.proposedPrice)}
               <div style="font-size: 10.5px; color: ${diffColor};">(${diffSign})</div>
             </td>
-            <td style="max-width: 250px; font-size: 12px; color: var(--text-muted);">${p.reason}</td>
+            <td style="max-width: 230px; font-size: 12px; color: var(--text-muted);">${p.reason}</td>
             <td style="text-align: center;"><span class="badge ${badgeClass}">${p.status}</span></td>
             <td style="font-size: 11.5px; color: ${isApproved ? 'var(--primary)' : (isPending ? 'var(--text-muted)' : '#ef4444')};">
               ${p.note ? p.note : (isApproved ? 'Giám đốc đã duyệt và cập nhật biểu giá' : (isPending ? 'Đang chờ Giám đốc duyệt' : 'Đã từ chối'))}
             </td>
           </tr>
         `;
-      });
-      tbody.innerHTML = html;
+      }).join('');
     }
 
     async function submitProposalToDirector() {
+      const branchCode = document.getElementById('inpProposalBranch').value || 'CN01';
       const courtType = document.getElementById('inpCourtType').value;
       const slotInfo = document.getElementById('inpTimeSlot').value;
       const currentPrice = document.getElementById('inpCurrentPrice').value;
       const proposedPrice = document.getElementById('inpProposedPrice').value;
       const reason = document.getElementById('inpReason').value.trim();
-      const proposerName = document.getElementById('inpProposerName').value || 'Trần Phúc Bảo';
+      const proposerName = document.getElementById('inpProposerName').value || 'Quản lý chi nhánh';
 
       if (!proposedPrice || Number(proposedPrice) <= 0) {
-        alert('Vui lòng nhập mức giá đề xuất mới hợp lệ!');
+        showToast('Vui lòng nhập mức giá đề xuất mới hợp lệ!', 'warning');
         return;
       }
       if (!reason) {
-        alert('Vui lòng nhập lý do đề xuất điều chỉnh giá để Giám đốc thẩm định!');
+        showToast('Vui lòng nhập lý do đề xuất điều chỉnh giá để Giám đốc thẩm định!', 'warning');
         return;
       }
 
@@ -493,7 +753,7 @@
 
       try {
         const payload = {
-          branchCode: 'CN01',
+          branchCode: branchCode,
           proposerName: proposerName,
           courtType: courtType,
           slotInfo: slotInfo,
@@ -510,18 +770,18 @@
 
         if (res.ok) {
           const result = await res.json();
-          alert(result.message || 'Đã gửi đề xuất điều chỉnh giá lên Giám đốc thành công!');
+          showToast(result.message || 'Đã gửi đề xuất điều chỉnh giá lên Giám đốc thành công!', 'success');
           closePriceModal();
           document.getElementById('inpProposedPrice').value = '';
           document.getElementById('inpReason').value = '';
-          loadManagerPricingData();
+          await loadManagerPricingData();
         } else {
           const errData = await res.json();
-          alert(errData.message || 'Có lỗi xảy ra khi gửi đề xuất!');
+          showToast(errData.message || 'Có lỗi xảy ra khi gửi đề xuất!', 'error');
         }
       } catch (err) {
         console.error('Lỗi gửi đề xuất:', err);
-        alert('Lỗi kết nối máy chủ!');
+        showToast('Lỗi kết nối máy chủ SQL Server!', 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = 'Gửi đề xuất lên Giám đốc';
@@ -529,6 +789,14 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      initBranchSecurity();
+      loadManagerPricingData();
+    });
+
+    window.addEventListener('badminton:pricing-event', () => {
+      loadManagerPricingData();
+    });
+    window.addEventListener('badminton:booking-event', () => {
       loadManagerPricingData();
     });
   </script>
