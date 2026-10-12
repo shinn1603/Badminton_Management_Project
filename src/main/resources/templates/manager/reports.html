@@ -236,8 +236,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: var(--primary);">68.450.000 đ</div>
-            <div class="kpi-trend positive" id="kpiComparisonLabel">+14.2% so với kỳ trước</div>
+            <div class="kpi-val" id="kpiTotalRevenueVal" style="color: var(--primary);">29.500.000 đ</div>
+            <div class="kpi-trend positive" id="kpiComparisonLabel">Lũy kế từ 01/10 đến 13/10/2026 (Hôm nay)</div>
           </div>
 
           <div class="kpi-card-unified">
@@ -247,8 +247,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #3b82f6;">54.800.000 đ</div>
-            <div class="kpi-trend positive">Chiếm 80.1% tổng doanh thu</div>
+            <div class="kpi-val" id="kpiCourtRevenueVal" style="color: #3b82f6;">23.600.000 đ</div>
+            <div class="kpi-trend positive">Chiếm 80.0% tổng doanh thu</div>
           </div>
 
           <div class="kpi-card-unified">
@@ -258,8 +258,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #f59e0b;">13.650.000 đ</div>
-            <div class="kpi-trend positive">Chiếm 19.9% (Tăng trưởng tốt)</div>
+            <div class="kpi-val" id="kpiServiceRevenueVal" style="color: #f59e0b;">5.900.000 đ</div>
+            <div class="kpi-trend positive">Chiếm 20.0% tổng doanh thu</div>
           </div>
 
           <div class="kpi-card-unified">
@@ -269,7 +269,7 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #8b5cf6;">78.5%</div>
+            <div class="kpi-val" id="kpiAvgOccupancyVal" style="color: #8b5cf6;">78.5%</div>
             <div class="kpi-trend positive">Giờ vàng tối đạt 96.2%</div>
           </div>
         </div>
@@ -278,8 +278,8 @@
         <div class="grid-charts-layout">
           <div class="section-card">
             <div class="section-title-wrap" style="margin-bottom: 16px;">
-              <h3>Diễn biến doanh thu theo tuần (Tháng 09/2026)</h3>
-              <p>So sánh giữa doanh thu giờ sân và doanh thu dịch vụ bán quầy</p>
+              <h3 id="trendChartTitle">Diễn biến doanh thu theo tuần (Tháng 10/2026)</h3>
+              <p id="trendChartSubtitle">So sánh doanh thu giờ sân và dịch vụ (Tuần 1-2 thực tế, Tuần 3-5 chưa tới = 0đ)</p>
             </div>
             <div style="height: 280px; position: relative;">
               <canvas id="revenueTrendChart"></canvas>
@@ -289,7 +289,7 @@
           <div class="section-card">
             <div class="section-title-wrap" style="margin-bottom: 16px;">
               <h3>Cơ cấu nguồn thu</h3>
-              <p>Tỷ trọng đóng góp vào doanh thu chi nhánh</p>
+              <p>Tỷ trọng đóng góp vào doanh thu chi nhánh (Lũy kế)</p>
             </div>
             <div style="height: 280px; position: relative;">
               <canvas id="revenuePieChart"></canvas>
@@ -320,15 +320,15 @@
                   <th>Hiệu quả</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="courtReportTbody">
                 <tr>
                   <td style="text-align: center;">1</td>
                   <td><strong>CL01</strong></td>
                   <td>Sân cầu lông 1 (VIP)</td>
                   <td>Cầu lông VIP</td>
-                  <td style="text-align: center; font-weight: 700;">118 giờ</td>
+                  <td style="text-align: center; font-weight: 700;">42 giờ</td>
                   <td style="text-align: center;">84.2%</td>
-                  <td style="text-align: right; color: var(--primary); font-weight: 800;">14.160.000 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">5.040.000 đ</td>
                   <td><span class="badge badge-green">Xuất sắc</span></td>
                 </tr>
                 <tr>
@@ -336,9 +336,9 @@
                   <td><strong>CL02</strong></td>
                   <td>Sân cầu lông 2</td>
                   <td>Cầu lông tiêu chuẩn</td>
-                  <td style="text-align: center; font-weight: 700;">126 giờ</td>
+                  <td style="text-align: center; font-weight: 700;">44 giờ</td>
                   <td style="text-align: center;">90.0%</td>
-                  <td style="text-align: right; color: var(--primary); font-weight: 800;">11.340.000 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">3.960.000 đ</td>
                   <td><span class="badge badge-green">Cao điểm</span></td>
                 </tr>
                 <tr>
@@ -346,9 +346,9 @@
                   <td><strong>CL03</strong></td>
                   <td>Sân cầu lông 3</td>
                   <td>Cầu lông tiêu chuẩn</td>
-                  <td style="text-align: center; font-weight: 700;">112 giờ</td>
+                  <td style="text-align: center; font-weight: 700;">40 giờ</td>
                   <td style="text-align: center;">80.0%</td>
-                  <td style="text-align: right; color: var(--primary); font-weight: 800;">10.080.000 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">3.600.000 đ</td>
                   <td><span class="badge badge-green">Tốt</span></td>
                 </tr>
                 <tr>
@@ -356,9 +356,9 @@
                   <td><strong>CL04</strong></td>
                   <td>Sân cầu lông 4</td>
                   <td>Cầu lông tiêu chuẩn</td>
-                  <td style="text-align: center; font-weight: 700;">108 giờ</td>
+                  <td style="text-align: center; font-weight: 700;">38 giờ</td>
                   <td style="text-align: center;">77.1%</td>
-                  <td style="text-align: right; color: var(--primary); font-weight: 800;">9.720.000 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">3.420.000 đ</td>
                   <td><span class="badge badge-blue">Ổn định</span></td>
                 </tr>
                 <tr>
@@ -366,9 +366,9 @@
                   <td><strong>CL05</strong></td>
                   <td>Sân cầu lông 5</td>
                   <td>Cầu lông tiêu chuẩn</td>
-                  <td style="text-align: center; font-weight: 700;">65 giờ</td>
+                  <td style="text-align: center; font-weight: 700;">24 giờ</td>
                   <td style="text-align: center;">69.5%</td>
-                  <td style="text-align: right; color: var(--primary); font-weight: 800;">5.850.000 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">2.160.000 đ</td>
                   <td><span class="badge badge-blue">Đang tăng</span></td>
                 </tr>
                 <tr>
@@ -376,10 +376,30 @@
                   <td><strong>CL06</strong></td>
                   <td>Sân cầu lông 6</td>
                   <td>Cầu lông VIP</td>
-                  <td style="text-align: center; font-weight: 700;">14 giờ</td>
+                  <td style="text-align: center; font-weight: 700;">6 giờ</td>
                   <td style="text-align: center;">15.0%</td>
-                  <td style="text-align: right; color: var(--text-muted); font-weight: 800;">1.680.000 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">720.000 đ</td>
                   <td><span class="badge badge-amber">Bảo trì</span></td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">7</td>
+                  <td><strong>CL07</strong></td>
+                  <td>Sân cầu lông 7</td>
+                  <td>Cầu lông tiêu chuẩn</td>
+                  <td style="text-align: center; font-weight: 700;">28 giờ</td>
+                  <td style="text-align: center;">65.7%</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">2.520.000 đ</td>
+                  <td><span class="badge badge-blue">Ổn định</span></td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">8</td>
+                  <td><strong>CL08</strong></td>
+                  <td>Sân cầu lông 8</td>
+                  <td>Cầu lông tiêu chuẩn</td>
+                  <td style="text-align: center; font-weight: 700;">24 giờ</td>
+                  <td style="text-align: center;">62.8%</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">2.160.000 đ</td>
+                  <td><span class="badge badge-blue">Ổn định</span></td>
                 </tr>
               </tbody>
             </table>
@@ -407,8 +427,9 @@
 
     let trendChart = null;
     let pieChart = null;
+    let centerTotalFormatted = '29.5M';
 
-    function initCharts() {
+    function initCharts(trendLabels, courtData, serviceData, pieLabels, pieData, centerText) {
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const textColor = isDark ? '#94a3b8' : '#475569';
       const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9';
@@ -416,22 +437,24 @@
       if (trendChart) trendChart.destroy();
       if (pieChart) pieChart.destroy();
 
-      // Trend Bar Chart
+      if (centerText) centerTotalFormatted = centerText;
+
+      // Trend Bar Chart: Tuần 1-2 thực tế, Tuần 3-5 chưa tới = 0 VNĐ
       const ctxTrend = document.getElementById('revenueTrendChart').getContext('2d');
       trendChart = new Chart(ctxTrend, {
         type: 'bar',
         data: {
-          labels: ['Tuần 1 (01-07)', 'Tuần 2 (08-14)', 'Tuần 3 (15-21)', 'Tuần 4 (22-28)', 'Tuần 5 (29-30)'],
+          labels: trendLabels || ['Tuần 1 (01-07)', 'Tuần 2 (08-14)', 'Tuần 3 (15-21)', 'Tuần 4 (22-28)', 'Tuần 5 (29-31)'],
           datasets: [
             {
               label: 'Tiền giờ sân (VNĐ)',
-              data: [12400000, 13800000, 14200000, 11500000, 2900000],
+              data: courtData || [12400000, 11200000, 0, 0, 0],
               backgroundColor: '#10b981',
               borderRadius: 6
             },
             {
               label: 'Dịch vụ nước & Vợt (VNĐ)',
-              data: [3100000, 3400000, 3900000, 2600000, 650000],
+              data: serviceData || [3100000, 2800000, 0, 0, 0],
               backgroundColor: '#3b82f6',
               borderRadius: 6
             }
@@ -466,7 +489,7 @@
           
           ctx.font = '800 20px "Plus Jakarta Sans", sans-serif';
           ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
-          ctx.fillText('68.4M', x, y - 8);
+          ctx.fillText(centerTotalFormatted || '29.5M', x, y - 8);
           
           ctx.font = '600 10.5px "Inter", sans-serif';
           ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
@@ -478,9 +501,9 @@
       pieChart = new Chart(ctxPie, {
         type: 'doughnut',
         data: {
-          labels: ['Tiền giờ sân (80.1%)', 'Nước giải khát (11.5%)', 'Ống cầu lông (5.8%)', 'Thuê vợt & Căng cước (2.6%)'],
+          labels: pieLabels || ['Tiền giờ sân (80.0%)', 'Nước giải khát (11.5%)', 'Ống cầu lông (5.8%)', 'Thuê vợt & Căng cước (2.7%)'],
           datasets: [{
-            data: [54800000, 7850000, 3970000, 1830000],
+            data: pieData || [23600000, 3392500, 1711000, 796500],
             backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'],
             borderWidth: 0,
             hoverOffset: 6
@@ -509,20 +532,20 @@
     }
 
     let currentPeriodType = 'this_month';
-    let currentPeriodName = 'Tháng này';
+    let currentPeriodName = 'Tháng 10/2026 (Lũy kế đến 13/10)';
 
     function selectPeriod(type, btn) {
       currentPeriodType = type;
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+
       if (btn) {
         document.querySelectorAll('#periodBtnGroup button').forEach(b => {
           b.className = 'btn btn-outline';
         });
         btn.className = 'btn btn-primary';
-        currentPeriodName = btn.innerText;
       }
 
-      const now = new Date();
-      const pad = n => String(n).padStart(2, '0');
       const fromEl = document.getElementById('reportFromDate');
       const toEl = document.getElementById('reportToDate');
 
@@ -530,10 +553,12 @@
       let end = new Date(now);
 
       if (type === 'today') {
-        // start and end are today
+        start = new Date(now);
+        end = new Date(now);
       } else if (type === 'this_week') {
         const day = now.getDay() || 7;
         start.setDate(now.getDate() - day + 1);
+        end = new Date(start);
         end.setDate(start.getDate() + 6);
       } else if (type === 'this_month') {
         start = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -549,34 +574,141 @@
       if (fromEl) fromEl.value = fromStr;
       if (toEl) toEl.value = toStr;
 
-      updatePeriodLabels(currentPeriodName);
+      loadReportsFromApi();
     }
 
     function handleCustomDateChange() {
       const from = document.getElementById('reportFromDate')?.value;
       const to = document.getElementById('reportToDate')?.value;
-      currentPeriodName = `Tùy chọn (${from} đến ${to})`;
+      if (!from || !to) return;
+      currentPeriodType = 'custom';
       document.querySelectorAll('#periodBtnGroup button').forEach(b => {
         b.className = 'btn btn-outline';
       });
-      updatePeriodLabels(currentPeriodName);
+      loadReportsFromApi();
     }
 
-    function updatePeriodLabels(label) {
-      const kpiLabel = document.getElementById('kpiTotalRevenueLabel');
-      if (kpiLabel) kpiLabel.innerText = `Tổng doanh thu (${label})`;
-      const compLabel = document.getElementById('kpiComparisonLabel');
-      if (compLabel) compLabel.innerText = `So với kỳ trước`;
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    async function loadReportsFromApi() {
+      try {
+        let token = localStorage.getItem('jwt_token') || '';
+        if (!token && typeof document !== 'undefined' && document.cookie) {
+          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+          if (match) token = match[1];
+        }
+        const headers = { 'Accept': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const from = document.getElementById('reportFromDate')?.value || '';
+        const to = document.getElementById('reportToDate')?.value || '';
+        let url = `/api/manager/reports?branchCode=CN01&period=${encodeURIComponent(currentPeriodType)}`;
+        if (currentPeriodType === 'custom' && from && to) {
+          url += `&fromDate=${encodeURIComponent(from)}&toDate=${encodeURIComponent(to)}`;
+        }
+
+        const res = await fetch(url, { headers });
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.success) {
+            updateDashboardWithReportData(json);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('API error, using active database courts cache', err);
+      }
+    }
+
+    function updateDashboardWithReportData(data) {
+      if (!data) return;
+
+      // Cập nhật nhan đề bộ lọc đồng bộ
+      if (data.periodName) {
+        currentPeriodName = data.periodName;
+        const kpiLabel = document.getElementById('kpiTotalRevenueLabel');
+        if (kpiLabel) kpiLabel.innerText = `Tổng doanh thu (${data.periodName})`;
+      }
+      if (data.comparisonLabel) {
+        const compLabel = document.getElementById('kpiComparisonLabel');
+        if (compLabel) compLabel.innerText = data.comparisonLabel;
+      }
+      if (data.chartTitle) {
+        const trendTitle = document.getElementById('trendChartTitle');
+        if (trendTitle) trendTitle.innerText = data.chartTitle;
+      }
+      if (data.chartSubtitle) {
+        const trendSub = document.getElementById('trendChartSubtitle');
+        if (trendSub) trendSub.innerText = data.chartSubtitle;
+      }
+
+      // Update KPI cards
+      if (data.kpis) {
+        const elTotal = document.getElementById('kpiTotalRevenueVal');
+        if (elTotal && data.kpis.totalRevenue != null) {
+          elTotal.innerText = Number(data.kpis.totalRevenue).toLocaleString('vi-VN') + ' đ';
+        }
+        const elCourt = document.getElementById('kpiCourtRevenueVal');
+        if (elCourt && data.kpis.courtRevenue != null) {
+          elCourt.innerText = Number(data.kpis.courtRevenue).toLocaleString('vi-VN') + ' đ';
+        }
+        const elServ = document.getElementById('kpiServiceRevenueVal');
+        if (elServ && data.kpis.serviceRevenue != null) {
+          elServ.innerText = Number(data.kpis.serviceRevenue).toLocaleString('vi-VN') + ' đ';
+        }
+        const elOcc = document.getElementById('kpiAvgOccupancyVal');
+        if (elOcc && data.kpis.avgOccupancy != null) {
+          elOcc.innerText = data.kpis.avgOccupancy + '%';
+        }
+      }
+
+      // Update Trend Chart
+      if (data.weeklyTrend && trendChart) {
+        trendChart.data.labels = data.weeklyTrend.labels;
+        trendChart.data.datasets[0].data = data.weeklyTrend.courtRevenues;
+        trendChart.data.datasets[1].data = data.weeklyTrend.serviceRevenues;
+        trendChart.update();
+      }
+
+      // Update Pie Chart
+      if (data.revenueStructure && pieChart) {
+        pieChart.data.labels = data.revenueStructure.labels;
+        pieChart.data.datasets[0].data = data.revenueStructure.data;
+        centerTotalFormatted = data.revenueStructure.totalFormatted || '';
+        pieChart.update();
+      }
+
+      // Update Court Performance Table with uniform primary color for CL01-CL08 (including CL06)
+      if (data.courtPerformance && data.courtPerformance.length > 0) {
+        const tbody = document.getElementById('courtReportTbody');
+        if (tbody) {
+          tbody.innerHTML = data.courtPerformance.map(c => `
+            <tr>
+              <td style="text-align: center;">${c.stt}</td>
+              <td><strong>${escapeHtml(c.courtCode)}</strong></td>
+              <td>${escapeHtml(c.courtName)}</td>
+              <td>${escapeHtml(c.courtType)}</td>
+              <td style="text-align: center; font-weight: 700;">${escapeHtml(c.totalHours)}</td>
+              <td style="text-align: center;">${typeof c.occupancyRate === 'number' ? c.occupancyRate.toFixed(1) : c.occupancyRate}%</td>
+              <td style="text-align: right; color: var(--primary); font-weight: 800;">${Number(c.revenue).toLocaleString('vi-VN')} đ</td>
+              <td><span class="badge ${c.badgeClass || 'badge-blue'}">${escapeHtml(c.efficiency || 'Ổn định')}</span></td>
+            </tr>
+          `).join('');
+        }
+      }
     }
 
     function exportReportsToExcel() {
-      const from = document.getElementById('reportFromDate')?.value || '2026-09-01';
-      const to = document.getElementById('reportToDate')?.value || '2026-09-30';
+      const from = document.getElementById('reportFromDate')?.value || '2026-10-01';
+      const to = document.getElementById('reportToDate')?.value || '2026-10-31';
       const table = document.querySelector('.table-container table');
       if (!table) return;
 
       let csv = "\uFEFF";
-      csv += "BAO CAO HIEU SUAT & DOANH THU SAN - UTE SPORT ARENA\n";
+      csv += "BAO CAO HIEU SUAT & DOANH THU SAN - UTE SPORT CHI NHANH THU DUC\n";
       csv += `Ky bao cao: ${currentPeriodName} (Tu ${from} Den ${to})\n`;
       csv += `Ngay xuat: ${new Date().toLocaleDateString('vi-VN')} ${new Date().toLocaleTimeString('vi-VN')}\n\n`;
 
@@ -595,7 +727,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Bao_Cao_Doanh_Thu_San_${from}_den_${to}.csv`;
+      a.download = `Bao_Cao_Doanh_Thu_ThuDuc_${from}_den_${to}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -610,8 +742,8 @@
       const monthTitle = `Tháng ${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
       const btnMonth = document.getElementById('btnCurrentMonth');
       if (btnMonth) btnMonth.innerText = monthTitle;
-      selectPeriod('this_month', btnMonth);
       initCharts();
+      selectPeriod('this_month', btnMonth);
     });
   </script>
 </body>

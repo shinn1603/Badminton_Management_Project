@@ -103,6 +103,13 @@ public class BookingService {
     }
 
     public synchronized Booking createBooking(Booking booking) {
+        if (booking.getBookingCode() != null && !booking.getBookingCode().trim().isEmpty()) {
+            Optional<Booking> opt = bookingRepository.findByBookingCode(booking.getBookingCode().trim());
+            if (opt.isPresent()) {
+                return updateBooking(booking.getBookingCode().trim(), booking);
+            }
+        }
+
         if (booking.getCourtCode() == null || booking.getCourtCode().trim().isEmpty() ||
             booking.getTimeSlot() == null || booking.getTimeSlot().trim().isEmpty()) {
             throw new IllegalArgumentException("Thông tin sân và khung giờ không được để trống!");
@@ -169,6 +176,68 @@ public class BookingService {
                 .depositAmount(saved.getDepositAmount())
                 .status(saved.getStatus())
                 .message("Đơn đặt sân mới [" + saved.getBookingCode() + "] - Sân " + saved.getCourtCode() + " (" + saved.getTimeSlot() + ")")
+                .timestamp(LocalDateTime.now())
+                .build());
+
+        return saved;
+    }
+
+    public synchronized Booking updateBooking(String bookingCode, Booking booking) {
+        Booking existing = bookingRepository.findByBookingCode(bookingCode)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn đặt sân: " + bookingCode));
+
+        String courtCode = booking.getCourtCode() != null && !booking.getCourtCode().trim().isEmpty()
+                ? booking.getCourtCode().trim() : existing.getCourtCode();
+        String timeSlot = booking.getTimeSlot() != null && !booking.getTimeSlot().trim().isEmpty()
+                ? booking.getTimeSlot().trim() : existing.getTimeSlot();
+        LocalDate date = booking.getBookingDate() != null ? booking.getBookingDate() : existing.getBookingDate();
+
+        // Conflict check excluding current booking
+        List<Booking> sameCourtBookings = bookingRepository.findByCourtCodeAndBookingDate(courtCode, date);
+        boolean conflict = sameCourtBookings.stream().anyMatch(b ->
+                !b.getBookingCode().equalsIgnoreCase(existing.getBookingCode())
+                && b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus())
+                && isSlotOverlapping(timeSlot, b.getTimeSlot())
+        );
+        if (conflict) {
+            throw new IllegalStateException("Khung giờ " + timeSlot + " của sân " + courtCode + " đã có người đặt trước!");
+        }
+
+        if (booking.getCustomerName() != null && !booking.getCustomerName().trim().isEmpty()) {
+            existing.setCustomerName(booking.getCustomerName().trim());
+        }
+        if (booking.getCustomerPhone() != null && !booking.getCustomerPhone().trim().isEmpty()) {
+            existing.setCustomerPhone(booking.getCustomerPhone().trim());
+        }
+        if (booking.getBranchCode() != null && !booking.getBranchCode().trim().isEmpty()) {
+            existing.setBranchCode(booking.getBranchCode().trim());
+        }
+        existing.setCourtCode(courtCode);
+        existing.setTimeSlot(timeSlot);
+        existing.setBookingDate(date);
+        if (booking.getHourlyPrice() != null) existing.setHourlyPrice(booking.getHourlyPrice());
+        if (booking.getTotalPrice() != null) existing.setTotalPrice(booking.getTotalPrice());
+        if (booking.getDepositAmount() != null) existing.setDepositAmount(booking.getDepositAmount());
+        if (booking.getPaymentMethod() != null) existing.setPaymentMethod(booking.getPaymentMethod());
+        if (booking.getStatus() != null && !booking.getStatus().trim().isEmpty()) {
+            existing.setStatus(booking.getStatus().trim());
+        }
+        if (booking.getNotes() != null) existing.setNotes(booking.getNotes());
+
+        Booking saved = bookingRepository.save(existing);
+
+        broadcastBookingEvent(BookingNotificationDto.builder()
+                .eventType("UPDATE_BOOKING")
+                .bookingCode(saved.getBookingCode())
+                .courtCode(saved.getCourtCode())
+                .branchCode(saved.getBranchCode())
+                .customerName(saved.getCustomerName())
+                .customerPhone(saved.getCustomerPhone())
+                .timeSlot(saved.getTimeSlot())
+                .totalPrice(saved.getTotalPrice())
+                .depositAmount(saved.getDepositAmount())
+                .status(saved.getStatus())
+                .message("Cập nhật đơn đặt sân [" + saved.getBookingCode() + "] - Sân " + saved.getCourtCode() + " (" + saved.getTimeSlot() + ")")
                 .timestamp(LocalDateTime.now())
                 .build());
 

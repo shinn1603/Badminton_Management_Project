@@ -293,7 +293,7 @@
 
               <button type="button" class="btn btn-outline" style="font-size: 12.5px; margin-top: 8px;" onclick="addReceiptRow()">
                 <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>+ Thêm dòng sản phẩm</span>
+                <span>Thêm dòng sản phẩm</span>
               </button>
 
               <!-- TOTALS BOX -->
@@ -352,23 +352,55 @@
 
   <script src="/js/global-hub.js"></script>
   <script>
+    function getActiveBranchCode() {
+      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser())
+        || (function() {
+          try { return JSON.parse(localStorage.getItem('utesport_user')); } catch(e) { return null; }
+        })()
+        || {};
+      let b = user.branchCode || 'CN01';
+      if (b === 'ALL') b = 'CN01';
+      return b;
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('appSidebar');
+      if (sidebar) sidebar.classList.toggle('collapsed');
+    }
+
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'light';
+      const nxt = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', nxt);
+      localStorage.setItem('utesport_theme', nxt);
+      if (typeof showToast === 'function') {
+        showToast(`Đã chuyển sang giao diện ${nxt === 'dark' ? 'Tối' : 'Sáng'}`, 'info');
+      }
+    }
+
     let availableProducts = [
-      { productCode: 'P01', productName: 'Nước Revive Chanh Muối 500ml', costPrice: 8000 },
-      { productCode: 'P02', productName: 'Nước Pocari Sweat 500ml', costPrice: 11000 },
-      { productCode: 'P03', productName: 'Nước suối Aquafina 500ml', costPrice: 5000 },
-      { productCode: 'P04', productName: 'Nước tăng lực Bò Húc Red Bull', costPrice: 12000 },
-      { productCode: 'P05', productName: 'Ống Cầu Hải Yến Đỏ (12 quả)', costPrice: 145000 },
-      { productCode: 'P06', productName: 'Ống Cầu Thành Công 77', costPrice: 175000 },
-      { productCode: 'P07', productName: 'Quấn cán vợt VS', costPrice: 7000 },
-      { productCode: 'P08', productName: 'Khăn lau mồ hôi Yonex', costPrice: 25000 }
+      { productCode: 'P01', productName: 'Nước bù khoáng Revive Chanh muối 500ml', costPrice: 8000 },
+      { productCode: 'P02', productName: 'Nước điện giải Pocari Sweat 500ml', costPrice: 11000 },
+      { productCode: 'P03', productName: 'Nước suối tinh khiết Aquafina 500ml', costPrice: 5000 },
+      { productCode: 'P04', productName: 'Nước tăng lực Bò Húc Red Bull Thái', costPrice: 12000 },
+      { productCode: 'P05', productName: 'Ống Cầu Lông Hải Yến Đỏ (12 quả)', costPrice: 145000 },
+      { productCode: 'P06', productName: 'Ống Cầu Lông Thành Công 77 (12 quả)', costPrice: 175000 },
+      { productCode: 'P07', productName: 'Quấn cán vợt cầu lông VS chống trượt', costPrice: 7000 },
+      { productCode: 'P08', productName: 'Khăn lau mồ hôi thể thao Yonex', costPrice: 25000 }
     ];
 
     async function loadProducts() {
+      const branch = getActiveBranchCode();
+      const token = localStorage.getItem('jwt_token') || '';
+      const headers = {};
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+
       try {
-        const res = await fetch('/api/products');
+        const res = await fetch(`/api/products?branchCode=${encodeURIComponent(branch)}`, { headers });
         if (res.ok) {
           const data = await res.json();
-          if (data && data.length > 0) {
+          if (Array.isArray(data) && data.length > 0) {
             availableProducts = data;
           }
         }
@@ -391,7 +423,7 @@
       const row = selectEl.closest('.receipt-item-row');
       const costInput = row.querySelectorAll('input')[1];
       if (prod && costInput) {
-        costInput.value = prod.costPrice || 0;
+        costInput.value = Math.round(Number(prod.costPrice || 0));
       }
       calcTotals();
     }
@@ -413,11 +445,11 @@
         totalQty += qty;
         totalSum += sub;
 
-        subtotalEl.innerText = sub.toLocaleString('vi-VN') + ' đ';
+        subtotalEl.innerText = Math.round(sub).toLocaleString('vi-VN') + ' đ';
       });
 
       document.getElementById('totalItemsCount').innerText = totalQty + ' món';
-      document.getElementById('grandTotal').innerText = totalSum.toLocaleString('vi-VN') + ' đ';
+      document.getElementById('grandTotal').innerText = Math.round(totalSum).toLocaleString('vi-VN') + ' đ';
     }
 
     function addReceiptRow(defaultCode = 'P01', defaultQty = 10) {
@@ -430,7 +462,7 @@
           ${renderProductSelectOptions(defaultCode)}
         </select>
         <input type="number" class="form-control" placeholder="SL" value="${defaultQty}" min="1" oninput="calcTotals()">
-        <input type="number" class="form-control" placeholder="Giá nhập" value="${prod.costPrice || 8000}" step="1000" oninput="calcTotals()">
+        <input type="number" class="form-control" placeholder="Giá nhập" value="${Math.round(Number(prod.costPrice || 8000))}" step="1000" oninput="calcTotals()">
         <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); text-align: right;" class="item-subtotal">0 đ</div>
         <button type="button" class="btn-icon" style="color: #ef4444;" onclick="this.parentElement.remove(); calcTotals();">✕</button>
       `;
@@ -440,27 +472,33 @@
 
     async function loadReceiptHistory() {
       const tbody = document.getElementById('receiptsTableBody');
+      const branch = getActiveBranchCode();
+      const token = localStorage.getItem('jwt_token') || '';
+      const headers = {};
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+
       try {
-        const res = await fetch('/api/inventory/receipts?branchCode=CN01');
+        const res = await fetch(`/api/inventory/receipts?branchCode=${encodeURIComponent(branch)}`, { headers });
         if (res.ok) {
           const receipts = await res.json();
           if (!receipts || receipts.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 16px;">Chưa có phiếu nhập kho nào</td></tr>';
             return;
           }
+
           tbody.innerHTML = receipts.map(r => `
             <tr>
               <td><strong>${r.receiptCode}</strong></td>
               <td>${r.receiptDate ? (r.receiptDate.split('T')[0] || r.receiptDate) : 'Hôm nay'}</td>
               <td>${r.supplierName || 'Nhà cung cấp'}</td>
-              <td style="text-align: right; font-weight: 800; color: var(--primary);">${(Number(r.totalAmount) || 0).toLocaleString('vi-VN')} đ</td>
+              <td style="text-align: right; font-weight: 800; color: var(--primary);">${Math.round(Number(r.totalAmount) || 0).toLocaleString('vi-VN')} đ</td>
               <td><span class="badge badge-green">Đã nhập kho</span></td>
             </tr>
           `).join('');
         }
       } catch (e) {
         console.warn('Lỗi tải lịch sử phiếu nhập:', e);
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 16px;">Không thể tải lịch sử</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 16px;">Không thể tải lịch sử phiếu nhập</td></tr>';
       }
     }
 
@@ -494,12 +532,11 @@
       const supplierName = document.getElementById('supplierSelect').value;
       const receiptDate = document.getElementById('receiptDate').value;
 
-      // Dynamic manager branch & staff resolution
-      const curUser = (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser()) || (function() {
-        try { return JSON.parse(localStorage.getItem('utesport_user')); } catch(e) { return null; }
-      })();
-      const branchCode = (curUser && curUser.branchCode && curUser.branchCode !== 'ALL') ? curUser.branchCode : 'CN01';
-      const staffCode = (curUser && curUser.staffCode) ? curUser.staffCode : 'NS02';
+      const branchCode = getActiveBranchCode();
+      const curUser = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser())
+        || {};
+      const staffCode = curUser.staffCode || 'NS02';
 
       const payload = {
         supplierName: supplierName,
@@ -510,11 +547,7 @@
       };
 
       try {
-        let token = localStorage.getItem('jwt_token');
-        if (!token && typeof document !== 'undefined' && document.cookie) {
-          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
-          if (match) token = match[1];
-        }
+        let token = localStorage.getItem('jwt_token') || '';
         const headers = { 'Content-Type': 'application/json' };
         if (token) headers['Authorization'] = 'Bearer ' + token;
 
@@ -531,10 +564,19 @@
           data = {};
         }
 
-        if (res.ok && data.success) {
+        if (res.ok && (data.success !== false)) {
           const code = (data.receipt && data.receipt.receiptCode) ? data.receipt.receiptCode : 'mới';
-          showToast(`Nhập kho thành công phiếu [${code}]! Tồn kho đã được cập nhật.`, 'success');
+          showToast(`Nhập kho thành công phiếu [${code}]! Tồn kho Chi nhánh Thủ Đức đã được cập nhật vào CSDL.`, 'success');
           await loadReceiptHistory();
+          await loadProducts();
+
+          // Phát tín hiệu đồng bộ tức thì cho trang Kho vật tư (Inventory)
+          window.dispatchEvent(new CustomEvent('badminton:stock-receipt-event', { detail: data.receipt }));
+          window.dispatchEvent(new CustomEvent('badminton:inventory-event', { detail: data.receipt }));
+          if (window.GlobalHub && window.GlobalHub.publish) {
+            window.GlobalHub.publish('STOCK_RECEIPT_CREATED', data.receipt);
+          }
+
           // Reset danh sách nhập kho
           const container = document.getElementById('receiptItemsContainer');
           container.innerHTML = '';
@@ -549,6 +591,8 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
+      const savedTheme = localStorage.getItem('utesport_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
       document.getElementById('receiptDate').value = new Date().toISOString().split('T')[0];
       await loadProducts();
       const container = document.getElementById('receiptItemsContainer');

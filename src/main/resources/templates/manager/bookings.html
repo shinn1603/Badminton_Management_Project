@@ -154,6 +154,18 @@
       position: sticky;
       top: 90px;
     }
+
+    .kanban-empty {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12px;
+      padding: 24px 8px;
+      font-style: italic;
+      background: var(--surface-subtle);
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--border-subtle);
+      margin: 4px 0;
+    }
   </style>
 </head>
 <body>
@@ -337,7 +349,7 @@
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            <span>+ Tạo đặt sân</span>
+            <span>Tạo đặt sân</span>
           </button>
         </div>
 
@@ -546,17 +558,20 @@
               <div class="form-group">
                 <label class="form-label">Sân</label>
                 <select id="fCourtName" class="form-control" onchange="calculateFormPrice()">
-                  <option value="Sân cầu lông 1">Sân cầu lông 1 (90.000đ/h)</option>
-                  <option value="Sân cầu lông 2" selected>Sân cầu lông 2 (90.000đ/h)</option>
-                  <option value="Sân cầu lông 3">Sân cầu lông 3 (90.000đ/h)</option>
-                  <option value="Sân cầu lông 4 (VIP)">Sân cầu lông 4 (VIP 120.000đ/h)</option>
-                  <option value="Sân cầu lông 5 (VIP)">Sân cầu lông 5 (VIP 120.000đ/h)</option>
+                  <option value="CL01" data-rate="90000">CL01 - Sân 1 (Thảm tiêu chuẩn • 90.000đ/h)</option>
+                  <option value="CL02" data-rate="90000" selected>CL02 - Sân 2 (Thảm tiêu chuẩn • 90.000đ/h)</option>
+                  <option value="CL03" data-rate="90000">CL03 - Sân 3 (Thảm cao su • 90.000đ/h)</option>
+                  <option value="CL04" data-rate="90000">CL04 - Sân 4 (Thảm Silicon • 90.000đ/h)</option>
+                  <option value="CL05" data-rate="120000">CL05 - Sân 5 (VIP Yonex Quốc Tế • 120.000đ/h)</option>
+                  <option value="CL06" data-rate="90000">CL06 - Sân 6 (Thảm tiêu chuẩn • 90.000đ/h)</option>
+                  <option value="CL07" data-rate="90000">CL07 - Sân 7 (Thảm tiêu chuẩn • 90.000đ/h)</option>
+                  <option value="CL08" data-rate="120000">CL08 - Sân 8 (VIP Yonex Quốc Tế • 120.000đ/h)</option>
                 </select>
               </div>
 
               <div class="form-group">
                 <label class="form-label">Ngày đặt</label>
-                <input type="date" id="fBookingDate" class="form-control" value="2026-09-25" required>
+                <input type="date" id="fBookingDate" class="form-control" value="2026-10-12" required>
               </div>
 
               <div class="form-group">
@@ -565,8 +580,10 @@
                   <option value="08:00 - 10:00" data-hours="2" selected>08:00 - 10:00 (2 tiếng)</option>
                   <option value="09:00 - 10:00" data-hours="1">09:00 - 10:00 (1 tiếng)</option>
                   <option value="14:00 - 16:00" data-hours="2">14:00 - 16:00 (2 tiếng)</option>
+                  <option value="15:00 - 16:00" data-hours="1">15:00 - 16:00 (1 tiếng)</option>
                   <option value="17:00 - 18:00" data-hours="1">17:00 - 18:00 (1 tiếng)</option>
                   <option value="18:00 - 20:00" data-hours="2">18:00 - 20:00 (2 tiếng)</option>
+                  <option value="19:00 - 20:00" data-hours="1">19:00 - 20:00 (1 tiếng)</option>
                   <option value="20:00 - 22:00" data-hours="2">20:00 - 22:00 (2 tiếng)</option>
                 </select>
               </div>
@@ -663,48 +680,75 @@
     }
 
     function renderAll() {
-      renderTable();
-      renderKanban();
       updateStats();
+      applyFilters();
     }
 
     function updateStats() {
       const total = bookings.length;
       const pending = bookings.filter(b => b.status === 'Chờ xác nhận').length;
       const confirmed = bookings.filter(b => b.status === 'Đã xác nhận' || b.status === 'Đã cọc 30%').length;
-      const rev = bookings.filter(b => b.status !== 'Đã hủy').reduce((acc, cur) => acc + cur.price, 0);
+      const rev = bookings.filter(b => b.status !== 'Đã hủy').reduce((acc, cur) => acc + (cur.price || 0), 0);
 
-      document.getElementById('statTotalCount').textContent = total;
-      document.getElementById('statPendingCount').textContent = pending;
-      document.getElementById('statConfirmedCount').textContent = confirmed;
-      document.getElementById('statTotalRevenue').textContent = rev.toLocaleString('vi-VN') + 'đ';
+      const elTotal = document.getElementById('statTotalCount');
+      const elPending = document.getElementById('statPendingCount');
+      const elConfirmed = document.getElementById('statConfirmedCount');
+      const elRevenue = document.getElementById('statTotalRevenue');
+
+      if (elTotal) elTotal.textContent = total;
+      if (elPending) elPending.textContent = pending;
+      if (elConfirmed) elConfirmed.textContent = confirmed;
+      if (elRevenue) elRevenue.textContent = rev.toLocaleString('vi-VN') + 'đ';
+    }
+
+    function applyFilters() {
+      renderTable();
+      renderKanban();
+    }
+
+    function getFilteredBookings() {
+      const kw = (document.getElementById('filterKeyword')?.value || '').toLowerCase().trim();
+      const st = document.getElementById('filterStatus')?.value || 'ALL';
+
+      return bookings.filter(b => {
+        const matchKw = !kw
+          || (b.code && b.code.toLowerCase().includes(kw))
+          || (b.name && b.name.toLowerCase().includes(kw))
+          || (b.phone && b.phone.includes(kw))
+          || (b.court && b.court.toLowerCase().includes(kw));
+
+        const matchSt = st === 'ALL' || b.status === st;
+        return matchKw && matchSt;
+      });
     }
 
     function renderTable() {
       const tbody = document.getElementById('bookingsTableBody');
-      const kw = document.getElementById('filterKeyword').value.toLowerCase();
-      const st = document.getElementById('filterStatus').value;
+      if (!tbody) return;
 
-      const filtered = bookings.filter(b => {
-        const matchKw = b.code.toLowerCase().includes(kw) || b.name.toLowerCase().includes(kw) || b.phone.includes(kw);
-        const matchSt = st === 'ALL' || b.status === st;
-        return matchKw && matchSt;
-      });
-
-      document.getElementById('recordsCountText').textContent = `${filtered.length} / ${bookings.length} bản ghi`;
+      const filtered = getFilteredBookings();
+      const recordsCountEl = document.getElementById('recordsCountText');
+      if (recordsCountEl) {
+        recordsCountEl.textContent = `${filtered.length} / ${bookings.length} bản ghi`;
+      }
 
       tbody.innerHTML = '';
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px;">Không tìm thấy đơn đặt sân nào phù hợp với bộ lọc</td></tr>`;
+        return;
+      }
+
       filtered.forEach(b => {
         const tr = document.createElement('tr');
         tr.style.cursor = 'pointer';
         tr.onclick = () => selectBookingToEdit(b.code);
         tr.innerHTML = `
           <td><strong>${b.code}</strong></td>
-          <td>${b.name} <br><span style="font-size: 11px; color: var(--text-muted);">${b.phone}</span></td>
-          <td>${b.court}</td>
-          <td>${b.date}</td>
-          <td>${b.time}</td>
-          <td><strong>${b.price.toLocaleString('vi-VN')}</strong></td>
+          <td>${b.name || 'Khách vãng lai'} <br><span style="font-size: 11px; color: var(--text-muted);">${b.phone || '---'}</span></td>
+          <td><span style="font-weight: 600; color: var(--text-dark);">${b.court || '---'}</span></td>
+          <td>${b.date || '---'}</td>
+          <td>${b.time || '---'}</td>
+          <td><strong>${(b.price || 0).toLocaleString('vi-VN')}</strong></td>
           <td><span class="badge ${getBadgeClass(b.status)}">${b.status}</span></td>
         `;
         tbody.appendChild(tr);
@@ -717,25 +761,33 @@
       const uList = document.getElementById('kListInUse');
       const dList = document.getElementById('kListCompleted');
 
+      if (!pList || !cList || !uList || !dList) return;
+
       pList.innerHTML = '';
       cList.innerHTML = '';
       uList.innerHTML = '';
       dList.innerHTML = '';
 
+      const filtered = getFilteredBookings();
+      const recordsCountEl = document.getElementById('recordsCountText');
+      if (recordsCountEl) {
+        recordsCountEl.textContent = `${filtered.length} / ${bookings.length} bản ghi`;
+      }
+
       let pC = 0, cC = 0, uC = 0, dC = 0;
 
-      bookings.forEach(b => {
+      filtered.forEach(b => {
         const card = document.createElement('div');
         card.className = 'kanban-card';
         card.onclick = () => selectBookingToEdit(b.code);
         card.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <strong>${b.code}</strong>
-            <span class="badge ${getBadgeClass(b.status)}" style="font-size: 10px;">${b.status}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <strong style="color: var(--text-dark); font-size: 13px;">${b.code}</strong>
+            <span class="badge ${getBadgeClass(b.status)}" style="font-size: 10px; padding: 2px 6px;">${b.status}</span>
           </div>
-          <div style="font-weight: 600; font-size: 13px;">${b.name}</div>
-          <div style="font-size: 11.5px; color: var(--text-muted);">${b.court} • ${b.time}</div>
-          <div style="font-size: 12.5px; font-weight: 700; color: var(--primary); margin-top: 4px;">${b.price.toLocaleString('vi-VN')}đ</div>
+          <div style="font-weight: 600; font-size: 13px; color: var(--text-dark);">${b.name || 'Khách vãng lai'}</div>
+          <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">${b.court || '---'} • ${b.time || '---'}</div>
+          <div style="font-size: 12.5px; font-weight: 700; color: var(--primary); margin-top: 6px;">${(b.price || 0).toLocaleString('vi-VN')}đ</div>
         `;
 
         if (b.status === 'Chờ xác nhận') {
@@ -753,10 +805,20 @@
         }
       });
 
-      document.getElementById('kCountPending').textContent = pC;
-      document.getElementById('kCountConfirmed').textContent = cC;
-      document.getElementById('kCountInUse').textContent = uC;
-      document.getElementById('kCountCompleted').textContent = dC;
+      if (pC === 0) pList.innerHTML = '<div class="kanban-empty">Không có đơn</div>';
+      if (cC === 0) cList.innerHTML = '<div class="kanban-empty">Không có đơn</div>';
+      if (uC === 0) uList.innerHTML = '<div class="kanban-empty">Không có đơn</div>';
+      if (dC === 0) dList.innerHTML = '<div class="kanban-empty">Không có đơn</div>';
+
+      const elP = document.getElementById('kCountPending');
+      const elC = document.getElementById('kCountConfirmed');
+      const elU = document.getElementById('kCountInUse');
+      const elD = document.getElementById('kCountCompleted');
+
+      if (elP) elP.textContent = pC;
+      if (elC) elC.textContent = cC;
+      if (elU) elU.textContent = uC;
+      if (elD) elD.textContent = dC;
     }
 
     function switchView(view) {
@@ -766,40 +828,77 @@
       const kanbanWrap = document.getElementById('kanbanViewWrap');
 
       if (view === 'table') {
-        btnTable.classList.add('active');
-        btnKanban.classList.remove('active');
-        tableWrap.style.display = 'block';
-        kanbanWrap.style.display = 'none';
+        btnTable?.classList.add('active');
+        btnKanban?.classList.remove('active');
+        if (tableWrap) tableWrap.style.display = 'block';
+        if (kanbanWrap) kanbanWrap.style.display = 'none';
       } else {
-        btnKanban.classList.add('active');
-        btnTable.classList.remove('active');
-        tableWrap.style.display = 'none';
-        kanbanWrap.style.display = 'grid';
+        btnKanban?.classList.add('active');
+        btnTable?.classList.remove('active');
+        if (tableWrap) tableWrap.style.display = 'none';
+        if (kanbanWrap) kanbanWrap.style.display = 'grid';
       }
-    }
-
-    function applyFilters() {
-      renderTable();
+      applyFilters();
     }
 
     function selectBookingToEdit(code) {
       const item = bookings.find(b => b.code === code);
       if (!item) return;
 
-      document.getElementById('fBookingCode').value = item.code;
-      document.getElementById('fCustomerName').value = item.name;
-      document.getElementById('fCustomerPhone').value = item.phone;
-      document.getElementById('fCourtName').value = item.court;
-      document.getElementById('fBookingDate').value = item.date;
-      document.getElementById('fTimeSlot').value = item.time;
-      document.getElementById('fTotalPrice').value = item.price.toLocaleString('vi-VN');
-      document.getElementById('fBookingStatus').value = item.status;
+      const fCode = document.getElementById('fBookingCode');
+      const fName = document.getElementById('fCustomerName');
+      const fPhone = document.getElementById('fCustomerPhone');
+      const fDate = document.getElementById('fBookingDate');
+      const fPrice = document.getElementById('fTotalPrice');
+      const fStatus = document.getElementById('fBookingStatus');
+      const courtSelect = document.getElementById('fCourtName');
+      const timeSelect = document.getElementById('fTimeSlot');
 
-      showToast(`Đã chọn đơn ${item.code} của ${item.name}`, 'info');
+      if (fCode) fCode.value = item.code;
+      if (fName) fName.value = item.name || '';
+      if (fPhone) fPhone.value = item.phone || '';
+      if (fDate) fDate.value = item.date || new Date().toISOString().split('T')[0];
+      if (fPrice) fPrice.value = (item.price || 0).toLocaleString('vi-VN');
+      if (fStatus) fStatus.value = item.status;
+
+      // Match or add court in dropdown
+      if (courtSelect && item.court) {
+        let foundCourt = false;
+        for (let i = 0; i < courtSelect.options.length; i++) {
+          if (courtSelect.options[i].value === item.court || courtSelect.options[i].text.startsWith(item.court)) {
+            courtSelect.selectedIndex = i;
+            foundCourt = true;
+            break;
+          }
+        }
+        if (!foundCourt) {
+          const opt = new Option(`${item.court} - Sân tùy chọn`, item.court, true, true);
+          courtSelect.add(opt);
+        }
+      }
+
+      // Match or add time slot in dropdown
+      if (timeSelect && item.time) {
+        let foundTime = false;
+        for (let i = 0; i < timeSelect.options.length; i++) {
+          if (timeSelect.options[i].value === item.time) {
+            timeSelect.selectedIndex = i;
+            foundTime = true;
+            break;
+          }
+        }
+        if (!foundTime) {
+          const opt = new Option(item.time, item.time, true, true);
+          timeSelect.add(opt);
+        }
+      }
+
+      showToast(`Đã chọn đơn [${item.code}] của khách ${item.name || 'vãng lai'}`, 'info');
     }
 
     function resetFormForNew() {
-      const nextCode = 'DS0' + (101 + bookings.length);
+      const nextNum = 100 + bookings.length + 1;
+      const nextCode = 'DS0' + nextNum;
       document.getElementById('fBookingCode').value = nextCode;
       document.getElementById('fCustomerName').value = '';
       document.getElementById('fCustomerPhone').value = '';
@@ -811,15 +910,27 @@
     }
 
     function calculateFormPrice() {
-      const court = document.getElementById('fCourtName').value;
+      const courtEl = document.getElementById('fCourtName');
       const slotEl = document.getElementById('fTimeSlot');
-      const hours = parseInt(slotEl.options[slotEl.selectedIndex].getAttribute('data-hours') || '1', 10);
-      const rate = court.includes('VIP') ? 120000 : 90000;
+      let hours = 1;
+      if (slotEl && slotEl.selectedIndex >= 0) {
+        hours = parseInt(slotEl.options[slotEl.selectedIndex].getAttribute('data-hours') || '1', 10);
+      }
+      let rate = 90000;
+      if (courtEl && courtEl.selectedIndex >= 0) {
+        const rateAttr = courtEl.options[courtEl.selectedIndex].getAttribute('data-rate');
+        if (rateAttr) {
+          rate = parseInt(rateAttr, 10);
+        } else if (courtEl.value.includes('VIP') || courtEl.value === 'CL05' || courtEl.value === 'CL08') {
+          rate = 120000;
+        }
+      }
       const total = rate * hours;
-      document.getElementById('fTotalPrice').value = total.toLocaleString('vi-VN');
+      const fPrice = document.getElementById('fTotalPrice');
+      if (fPrice) fPrice.value = total.toLocaleString('vi-VN');
     }
 
-    function saveBookingForm(e) {
+    async function saveBookingForm(e) {
       e.preventDefault();
       const code = document.getElementById('fBookingCode').value;
       const name = document.getElementById('fCustomerName').value;
@@ -827,51 +938,63 @@
       const court = document.getElementById('fCourtName').value;
       const date = document.getElementById('fBookingDate').value;
       const time = document.getElementById('fTimeSlot').value;
-      const price = parseInt(document.getElementById('fTotalPrice').value.replace(/\./g, ''), 10);
+      const price = parseInt(document.getElementById('fTotalPrice').value.replace(/\./g, ''), 10) || 90000;
       const status = document.getElementById('fBookingStatus').value;
-
-      const idx = bookings.findIndex(b => b.code === code);
-      const newBooking = { code, name, phone, court, date, time, price, status };
-      if (idx >= 0) {
-        bookings[idx] = newBooking;
-        showToast(`Đã cập nhật đơn đặt sân ${code}!`, 'success');
-      } else {
-        bookings.unshift(newBooking);
-        showToast(`Đã thêm mới đơn đặt sân ${code}!`, 'success');
-      }
 
       const userBranch = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser().branchCode)
         || (window.RBAC && window.RBAC.getCurrentUser() && window.RBAC.getCurrentUser().branchCode)
         || 'CN01';
 
-      // Sync to SQL Server database
-      fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          bookingCode: code,
-          customerName: name,
-          customerPhone: phone,
-          courtCode: court,
-          branchCode: userBranch,
-          bookingDate: date,
-          timeSlot: time,
-          hourlyPrice: 90000,
-          totalPrice: price,
-          status: status
-        })
-      }).catch(e => console.warn('SQL save error:', e));
+      const token = localStorage.getItem('jwt_token') || '';
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
 
-      saveToStorage();
-      renderAll();
+      const payload = {
+        bookingCode: code,
+        customerName: name,
+        customerPhone: phone,
+        courtCode: court,
+        branchCode: userBranch,
+        bookingDate: date,
+        timeSlot: time,
+        hourlyPrice: price >= 180000 ? 90000 : price,
+        totalPrice: price,
+        status: status
+      };
+
+      try {
+        const res = await fetch('/api/bookings', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || 'Lỗi lưu thông tin đặt sân vào CSDL');
+        }
+
+        showToast(`Đã đồng bộ đơn đặt sân [${code}] vào CSDL SQL Server!`, 'success');
+      } catch (err) {
+        console.warn('Lỗi lưu CSDL:', err);
+        showToast(err.message || 'Không thể kết nối CSDL, lưu tạm bộ nhớ', 'warning');
+      }
+
+      await loadFromSqlServer();
     }
 
     async function loadFromSqlServer() {
       try {
-        const res = await fetch('/api/bookings');
+        const userBranch = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser().branchCode)
+          || (window.RBAC && window.RBAC.getCurrentUser() && window.RBAC.getCurrentUser().branchCode)
+          || 'CN01';
+        const token = localStorage.getItem('jwt_token') || '';
+        const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+        const url = userBranch && userBranch !== 'ALL' ? `/api/bookings?branchCode=${encodeURIComponent(userBranch)}` : '/api/bookings';
+        const res = await fetch(url, { headers });
         if (res.ok) {
           const data = await res.json();
-          if (data && data.length > 0) {
+          if (Array.isArray(data)) {
             bookings = data.map(b => ({
               code: b.bookingCode,
               name: b.customerName,
@@ -879,41 +1002,84 @@
               court: b.courtCode,
               date: b.bookingDate,
               time: b.timeSlot,
-              price: Number(b.totalPrice),
+              price: Number(b.totalPrice || 0),
               status: b.status
             }));
             saveToStorage();
             renderAll();
+            return;
           }
         }
       } catch (err) {
-        console.warn('SQL API load fallback to local:', err);
+        console.warn('SQL API load fallback to local storage:', err);
+      }
+      renderAll();
+    }
+
+    async function loadCourts() {
+      try {
+        const userBranch = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser().branchCode)
+          || (window.RBAC && window.RBAC.getCurrentUser() && window.RBAC.getCurrentUser().branchCode)
+          || 'CN01';
+        const url = userBranch && userBranch !== 'ALL' ? `/api/courts?branchCode=${encodeURIComponent(userBranch)}` : '/api/courts';
+        const res = await fetch(url);
+        if (res.ok) {
+          const list = await res.json();
+          const courtSelect = document.getElementById('fCourtName');
+          if (courtSelect && Array.isArray(list) && list.length > 0) {
+            courtSelect.innerHTML = '';
+            list.forEach(c => {
+              const opt = document.createElement('option');
+              opt.value = c.courtCode;
+              const rate = Number(c.hourlyRate || 90000);
+              opt.setAttribute('data-rate', rate);
+              opt.textContent = `${c.courtCode} - ${c.courtName} (${rate.toLocaleString('vi-VN')}đ/h)`;
+              courtSelect.appendChild(opt);
+            });
+            const urlParams = new URLSearchParams(window.location.search);
+            const courtParam = urlParams.get('court');
+            if (courtParam) {
+              courtSelect.value = courtParam;
+            }
+            calculateFormPrice();
+          }
+        }
+      } catch (e) {
+        console.warn('Lỗi tải danh mục sân:', e);
       }
     }
 
     async function deleteCurrentBooking() {
       const code = document.getElementById('fBookingCode').value;
-      if (!confirm(`Bạn có chắc chắn muốn xóa đơn ${code}?`)) return;
+      if (!code) return;
+      if (!confirm(`Bạn có chắc chắn muốn hủy / xóa đơn [${code}]?`)) return;
+
+      const token = localStorage.getItem('jwt_token') || '';
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
 
       try {
-        await fetch(`/api/bookings/${encodeURIComponent(code)}/cancel`, {
+        const res = await fetch(`/api/bookings/?branchCode=CN01${encodeURIComponent(code)}/cancel`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: headers,
           body: JSON.stringify({ reason: 'Quản lý chi nhánh hủy đơn' })
         });
+        if (res.ok) {
+          showToast(`Đã cập nhật trạng thái hủy cho đơn [${code}] trong CSDL!`, 'success');
+        } else {
+          showToast(`Không thể cập nhật trạng thái hủy cho đơn [${code}]`, 'error');
+        }
       } catch (e) {
-        console.warn('SQL cancel error:', e);
+        console.warn('Lỗi hủy đơn:', e);
       }
 
-      bookings = bookings.filter(b => b.code !== code);
-      saveToStorage();
-      renderAll();
+      await loadFromSqlServer();
       resetFormForNew();
-      showToast(`Đã xóa đơn ${code}`, 'error');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       init();
+      loadCourts();
       loadFromSqlServer();
     });
 

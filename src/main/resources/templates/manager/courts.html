@@ -255,6 +255,7 @@
         </div>
 
         <!-- KPI METRICS ROW -->
+        <!-- KPI METRICS ROW -->
         <div class="kpi-grid">
           <div class="kpi-card-unified">
             <div class="kpi-header">
@@ -263,8 +264,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
               </div>
             </div>
-            <div class="kpi-val" id="totalCourtsCount">6 sân</div>
-            <div class="kpi-trend positive">Chi nhánh Thủ Đức (6 Sân Cầu Lông Tiêu Chuẩn & VIP)</div>
+            <div class="kpi-val" id="kpiTotalCourts">-- sân</div>
+            <div class="kpi-trend positive" id="kpiTotalCourtsDesc">Chi nhánh Thủ Đức (Sân Tiêu Chuẩn & VIP)</div>
           </div>
 
           <div class="kpi-card-unified">
@@ -274,8 +275,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #3b82f6;">4 sân</div>
-            <div class="kpi-trend positive">Đang trống, sẵn sàng nhận khách</div>
+            <div class="kpi-val" id="kpiAvailableCourts" style="color: #3b82f6;">-- sân</div>
+            <div class="kpi-trend positive" id="kpiAvailableCourtsDesc">Đang trống, sẵn sàng nhận khách</div>
           </div>
 
           <div class="kpi-card-unified">
@@ -285,8 +286,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #f59e0b;">1 sân</div>
-            <div class="kpi-trend">Sân CL02 đang trong ca 08:00 - 10:00</div>
+            <div class="kpi-val" id="kpiInUseCourts" style="color: #f59e0b;">-- sân</div>
+            <div class="kpi-trend" id="kpiInUseCourtsDesc">Đang trong ca thi đấu</div>
           </div>
 
           <div class="kpi-card-unified">
@@ -296,8 +297,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #ef4444;">1 sân</div>
-            <div class="kpi-trend">Sân Cầu Lông CL06 bảo trì hệ thống đèn LED</div>
+            <div class="kpi-val" id="kpiMaintenanceCourts" style="color: #ef4444;">-- sân</div>
+            <div class="kpi-trend" id="kpiMaintenanceCourtsDesc">Bảo trì kỹ thuật thiết bị</div>
           </div>
         </div>
 
@@ -305,147 +306,11 @@
         <div class="section-card" style="margin-bottom: 24px;">
           <div class="section-title-wrap" style="margin-bottom: 16px;">
             <h3>Sơ đồ trực quan danh mục sân chi nhánh</h3>
-            <p>Hệ thống 6 sân thảm thi đấu chuẩn BWF tại chi nhánh Thủ Đức</p>
+            <p id="courtsVisualSubtitle">Hệ thống sân thảm thi đấu chuẩn BWF tại chi nhánh Thủ Đức</p>
           </div>
 
           <div class="courts-grid-wrap" id="courtsVisualGrid">
-            <!-- Card 1 -->
-            <div class="court-card-luxury">
-              <img src="/images/badminton-court.jpg" class="court-card-thumb" alt="Sân 1">
-              <div class="court-card-body">
-                <div class="court-card-header">
-                  <h4 class="court-name">Sân cầu lông 1 (VIP)</h4>
-                  <span class="badge badge-green">Trống</span>
-                </div>
-                <div class="court-meta-row">
-                  <span>Mã sân: <b>CL01</b></span>
-                  <span>Thảm: PVC Yonex Quốc Tế</span>
-                </div>
-                <div class="court-meta-row">
-                  <span>Loại sân: Cầu lông VIP</span>
-                  <span class="court-price-tag">120.000 đ/h</span>
-                </div>
-                <div style="margin-top: 12px; display: flex; gap: 6px;">
-                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL01', 'Sân cầu lông 1 (VIP)', 'Cầu lông VIP', 120000, 'Trống')">Chỉnh sửa</button>
-                  <a href="/manager/bookings" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card 2 -->
-            <div class="court-card-luxury">
-              <img src="/images/badminton-court.jpg" class="court-card-thumb" alt="Sân 2">
-              <div class="court-card-body">
-                <div class="court-card-header">
-                  <h4 class="court-name">Sân cầu lông 2</h4>
-                  <span class="badge badge-amber">Đang sử dụng</span>
-                </div>
-                <div class="court-meta-row">
-                  <span>Mã sân: <b>CL02</b></span>
-                  <span>Thảm: PVC Enlio 4.5mm</span>
-                </div>
-                <div class="court-meta-row">
-                  <span>Loại sân: Cầu lông tiêu chuẩn</span>
-                  <span class="court-price-tag">90.000 đ/h</span>
-                </div>
-                <div style="margin-top: 12px; display: flex; gap: 6px;">
-                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL02', 'Sân cầu lông 2', 'Cầu lông tiêu chuẩn', 90000, 'Đang sử dụng')">Chỉnh sửa</button>
-                  <a href="/manager/bookings" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card 3 -->
-            <div class="court-card-luxury">
-              <img src="/images/badminton-court.jpg" class="court-card-thumb" alt="Sân 3">
-              <div class="court-card-body">
-                <div class="court-card-header">
-                  <h4 class="court-name">Sân cầu lông 3</h4>
-                  <span class="badge badge-green">Trống</span>
-                </div>
-                <div class="court-meta-row">
-                  <span>Mã sân: <b>CL03</b></span>
-                  <span>Thảm: PVC Enlio 4.5mm</span>
-                </div>
-                <div class="court-meta-row">
-                  <span>Loại sân: Cầu lông tiêu chuẩn</span>
-                  <span class="court-price-tag">90.000 đ/h</span>
-                </div>
-                <div style="margin-top: 12px; display: flex; gap: 6px;">
-                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL03', 'Sân cầu lông 3', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Chỉnh sửa</button>
-                  <a href="/manager/bookings" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card 4 -->
-            <div class="court-card-luxury">
-              <img src="/images/badminton-court.jpg" class="court-card-thumb" alt="Sân 4">
-              <div class="court-card-body">
-                <div class="court-card-header">
-                  <h4 class="court-name">Sân cầu lông 4</h4>
-                  <span class="badge badge-green">Trống</span>
-                </div>
-                <div class="court-meta-row">
-                  <span>Mã sân: <b>CL04</b></span>
-                  <span>Thảm: PVC Enlio 4.5mm</span>
-                </div>
-                <div class="court-meta-row">
-                  <span>Loại sân: Cầu lông tiêu chuẩn</span>
-                  <span class="court-price-tag">90.000 đ/h</span>
-                </div>
-                <div style="margin-top: 12px; display: flex; gap: 6px;">
-                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL04', 'Sân cầu lông 4', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Chỉnh sửa</button>
-                  <a href="/manager/bookings" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card 5 -->
-            <div class="court-card-luxury">
-              <img src="/images/badminton-court.jpg" class="court-card-thumb" alt="Sân cầu lông 5">
-              <div class="court-card-body">
-                <div class="court-card-header">
-                  <h4 class="court-name">Sân cầu lông 5</h4>
-                  <span class="badge badge-green">Trống</span>
-                </div>
-                <div class="court-meta-row">
-                  <span>Mã sân: <b>CL05</b></span>
-                  <span>Thảm: PVC Enlio 4.5mm</span>
-                </div>
-                <div class="court-meta-row">
-                  <span>Loại sân: Tiêu chuẩn</span>
-                  <span class="court-price-tag">90.000 đ/h</span>
-                </div>
-                <div style="margin-top: 12px; display: flex; gap: 6px;">
-                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL05', 'Sân cầu lông 5', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Chỉnh sửa</button>
-                  <a href="/manager/bookings" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card 6 -->
-            <div class="court-card-luxury">
-              <img src="/images/badminton-court.jpg" class="court-card-thumb" alt="Sân cầu lông 6">
-              <div class="court-card-body">
-                <div class="court-card-header">
-                  <h4 class="court-name">Sân cầu lông 6 (VIP)</h4>
-                  <span class="badge badge-red">Bảo trì</span>
-                </div>
-                <div class="court-meta-row">
-                  <span>Mã sân: <b>CL06</b></span>
-                  <span>Thảm: Yonex BWF VIP</span>
-                </div>
-                <div class="court-meta-row">
-                  <span>Loại sân: Cầu lông VIP</span>
-                  <span class="court-price-tag">120.000 đ/h</span>
-                </div>
-                <div style="margin-top: 12px; display: flex; gap: 6px;">
-                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL06', 'Sân cầu lông 6', 'Cầu lông VIP', 120000, 'Bảo trì')">Chỉnh sửa</button>
-                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="showToast('Sân CL06 đang bảo trì hệ thống chiếu sáng chuẩn BWF', 'info')">Xem bảo trì</button>
-                </div>
-              </div>
-            </div>
+            <!-- Populated dynamically by JavaScript from SQL Server database -->
           </div>
         </div>
 
@@ -539,13 +404,37 @@
                 <tr>
                   <td style="text-align: center;">6</td>
                   <td><strong>CL06</strong></td>
-                  <td>Sân cầu lông 6</td>
+                  <td>Sân cầu lông 6 (VIP)</td>
                   <td>Cầu lông VIP</td>
                   <td>Thủ Đức (CN01)</td>
                   <td><b style="color: var(--primary);">120.000 đ/h</b></td>
                   <td><span class="badge badge-red">Bảo trì</span></td>
                   <td style="text-align: right;">
-                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL06', 'Sân cầu lông 6', 'Cầu lông VIP', 120000, 'Bảo trì')">Sửa</button>
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL06', 'Sân cầu lông 6 (VIP)', 'Cầu lông VIP', 120000, 'Bảo trì')">Sửa</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">7</td>
+                  <td><strong>CL07</strong></td>
+                  <td>Sân cầu lông 7</td>
+                  <td>Cầu lông tiêu chuẩn</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">90.000 đ/h</b></td>
+                  <td><span class="badge badge-green">Trống</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL07', 'Sân cầu lông 7', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Sửa</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">8</td>
+                  <td><strong>CL08</strong></td>
+                  <td>Sân cầu lông 8</td>
+                  <td>Cầu lông tiêu chuẩn</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">90.000 đ/h</b></td>
+                  <td><span class="badge badge-green">Trống</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL08', 'Sân cầu lông 8', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Sửa</button>
                   </td>
                 </tr>
               </tbody>
@@ -602,19 +491,267 @@
 
   <script src="/js/global-hub.js"></script>
   <script>
+    let allLoadedCourts = [];
+
+    function getActiveBranchCode() {
+      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser())
+        || {};
+      let b = user.branchCode || 'CN01';
+      if (b === 'ALL') b = 'CN01';
+      return b;
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('appSidebar');
+      if (sidebar) sidebar.classList.toggle('collapsed');
+    }
+
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'light';
+      const nxt = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', nxt);
+      localStorage.setItem('utesport_theme', nxt);
+      if (typeof showToast === 'function') {
+        showToast(`Đã chuyển sang giao diện ${nxt === 'dark' ? 'Tối' : 'Sáng'}`, 'info');
+      }
+    }
+
+    const fallbackCourts = [
+      { courtCode: 'CL01', branchCode: 'CN01', courtName: 'Sân cầu lông 1 (VIP Yonex)', courtType: 'Cầu lông VIP', hourlyRate: 120000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL02', branchCode: 'CN01', courtName: 'Sân cầu lông 2', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Đang sử dụng', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL03', branchCode: 'CN01', courtName: 'Sân cầu lông 3', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL04', branchCode: 'CN01', courtName: 'Sân cầu lông 4', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL05', branchCode: 'CN01', courtName: 'Sân cầu lông 5', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Đang sử dụng', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL06', branchCode: 'CN01', courtName: 'Sân cầu lông 6 (VIP Yonex)', courtType: 'Cầu lông VIP', hourlyRate: 120000, status: 'Bảo trì', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL07', branchCode: 'CN01', courtName: 'Sân cầu lông 7', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL08', branchCode: 'CN01', courtName: 'Sân cầu lông 8', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' }
+    ];
+
+    function renderKPIs(courts) {
+      const total = courts.length;
+      const available = courts.filter(c => c.status === 'Trống' || c.status === 'Sẵn sàng').length;
+      const inUse = courts.filter(c => c.status === 'Đang sử dụng').length;
+      const maint = courts.filter(c => c.status === 'Bảo trì').length;
+      const vipCount = courts.filter(c => (c.courtType || '').toLowerCase().includes('vip')).length;
+      const stdCount = total - vipCount;
+
+      const kpiTotal = document.getElementById('kpiTotalCourts');
+      const kpiTotalDesc = document.getElementById('kpiTotalCourtsDesc');
+      const kpiAvailable = document.getElementById('kpiAvailableCourts');
+      const kpiAvailableDesc = document.getElementById('kpiAvailableCourtsDesc');
+      const kpiInUse = document.getElementById('kpiInUseCourts');
+      const kpiInUseDesc = document.getElementById('kpiInUseCourtsDesc');
+      const kpiMaint = document.getElementById('kpiMaintenanceCourts');
+      const kpiMaintDesc = document.getElementById('kpiMaintenanceCourtsDesc');
+
+      if (kpiTotal) kpiTotal.textContent = `${total} sân`;
+      if (kpiTotalDesc) kpiTotalDesc.textContent = `Chi nhánh Thủ Đức (${vipCount} sân VIP, ${stdCount} sân thường)`;
+
+      if (kpiAvailable) kpiAvailable.textContent = `${available} sân`;
+      if (kpiAvailableDesc) {
+        const pct = total > 0 ? Math.round((available / total) * 100) : 0;
+        kpiAvailableDesc.textContent = `Đang trống, ${pct}% công suất khả dụng`;
+      }
+
+      if (kpiInUse) kpiInUse.textContent = `${inUse} sân`;
+      if (kpiInUseDesc) {
+        kpiInUseDesc.textContent = inUse > 0 ? `Đang trong ca thi đấu (${inUse} sân)` : 'Hiện không có ca thi đấu';
+      }
+
+      if (kpiMaint) kpiMaint.textContent = `${maint} sân`;
+      if (kpiMaintDesc) {
+        kpiMaintDesc.textContent = maint > 0 ? `Bảo trì định kỳ (${maint} sân)` : 'Tất cả sân hoạt động tốt';
+      }
+    }
+
+    function renderVisualGrid(courts) {
+      const grid = document.getElementById('courtsVisualGrid');
+      if (!grid) return;
+
+      if (!courts || courts.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 36px; color: var(--text-muted); background: var(--surface); border-radius: 12px; border: 1px dashed var(--border-subtle);">Không tìm thấy sân thi đấu nào</div>`;
+        return;
+      }
+
+      grid.innerHTML = courts.map(c => {
+        let badgeClass = 'badge-green';
+        let badgeLabel = c.status || 'Trống';
+        if (c.status === 'Đang sử dụng') badgeClass = 'badge-amber';
+        else if (c.status === 'Bảo trì') badgeClass = 'badge-red';
+        else if (c.status === 'Đang giữ chỗ') badgeClass = 'badge-purple';
+
+        const isVip = (c.courtType || '').toLowerCase().includes('vip');
+        const matType = isVip ? 'PVC Yonex Quốc Tế' : 'PVC Enlio 4.5mm';
+        const rateFormatted = Number(c.hourlyRate || 90000).toLocaleString('vi-VN') + ' đ/h';
+        const imgSrc = c.imageUrl || '/images/badminton-court.jpg';
+        const safeName = (c.courtName || ('Sân ' + c.courtCode)).replace(/'/g, "\\'");
+        const safeType = (c.courtType || 'Cầu lông tiêu chuẩn').replace(/'/g, "\\'");
+
+        // Phân quyền & trạng thái nút theo yêu cầu:
+        // 1. "Đang sử dụng": CHỈ HIỂN THỊ DUY NHẤT TRẠNG THÁI "Đang sử dụng" (ẩn hoàn toàn nút Chỉnh sửa và Đặt sân).
+        // 2. "Trống": Hiển thị nút "Chỉnh sửa" và nút "Đặt sân" (chuyển sang /manager/bookings?court=...)
+        // 3. "Bảo trì": Hiển thị nút "Chỉnh sửa" và nút "Hoàn tất bảo trì" (chuyển nhanh về Trống và lưu CSDL)
+        let actionButtonsHtml = '';
+        if (c.status === 'Đang sử dụng') {
+          actionButtonsHtml = `
+            <div style="margin-top: 12px; padding: 7px 10px; border-radius: 8px; background: rgba(245, 158, 11, 0.12); border: 1px dashed rgba(245, 158, 11, 0.4); color: #d97706; font-size: 12px; font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <span style="display: inline-block; width: 7px; height: 7px; background: #f59e0b; border-radius: 50%; box-shadow: 0 0 6px #f59e0b;"></span>
+              Đang có khách thi đấu
+            </div>
+          `;
+        } else if (c.status === 'Bảo trì') {
+          actionButtonsHtml = `
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
+              <button type="button" class="btn btn-outline" style="flex: 1; padding: 6px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${safeName}', '${safeType}', ${c.hourlyRate}, '${c.status}')">Chỉnh sửa</button>
+              <button type="button" class="btn btn-success" style="flex: 1; padding: 6px 8px; font-size: 11.5px; background: #10b981; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;" onclick="quickUpdateStatus('${c.courtCode}', 'Trống')">Hoàn tất bảo trì</button>
+            </div>
+          `;
+        } else if (c.status === 'Đang giữ chỗ') {
+          actionButtonsHtml = `
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
+              <button type="button" class="btn btn-outline" style="flex: 1; padding: 6px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${safeName}', '${safeType}', ${c.hourlyRate}, '${c.status}')">Chỉnh sửa</button>
+              <button type="button" class="btn btn-outline" style="flex: 1; padding: 6px 8px; font-size: 11.5px; border-color: #f59e0b; color: #d97706;" onclick="quickUpdateStatus('${c.courtCode}', 'Trống')">Hủy giữ chỗ</button>
+            </div>
+          `;
+        } else {
+          actionButtonsHtml = `
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
+              <button type="button" class="btn btn-outline" style="flex: 1; padding: 6px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${safeName}', '${safeType}', ${c.hourlyRate}, '${c.status}')">Chỉnh sửa</button>
+              <a href="/manager/bookings?court=${c.courtCode}" class="btn btn-primary" style="flex: 1; padding: 6px 8px; font-size: 11.5px; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Đặt sân</a>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="court-card-luxury" data-court-code="${c.courtCode}">
+            <img src="${imgSrc}" class="court-card-thumb" alt="${c.courtName}" onerror="this.src='/images/badminton-court.jpg'">
+            <div class="court-card-body">
+              <div class="court-card-header">
+                <h4 class="court-name">${c.courtName}</h4>
+                <span class="badge ${badgeClass}">${badgeLabel}</span>
+              </div>
+              <div class="court-meta-row">
+                <span>Mã sân: <b>${c.courtCode}</b></span>
+                <span>Thảm: ${matType}</span>
+              </div>
+              <div class="court-meta-row">
+                <span>Loại sân: ${c.courtType}</span>
+                <span class="court-price-tag">${rateFormatted}</span>
+              </div>
+              ${actionButtonsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderTable(courts) {
+      const tbody = document.getElementById('courtTableBody');
+      if (!tbody) return;
+
+      if (!courts || courts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Không tìm thấy sân thi đấu nào phù hợp</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = courts.map((c, idx) => {
+        let badgeClass = 'badge-green';
+        if (c.status === 'Đang sử dụng') badgeClass = 'badge-amber';
+        else if (c.status === 'Bảo trì') badgeClass = 'badge-red';
+        else if (c.status === 'Đang giữ chỗ') badgeClass = 'badge-purple';
+
+        const branchDisplay = c.branchCode === 'CN01' ? 'Thủ Đức (CN01)' :
+          (c.branchCode === 'CN02' ? 'Bình Thạnh (CN02)' :
+          (c.branchCode === 'CN03' ? 'Quận 9 (CN03)' :
+          (c.branchCode === 'CN04' ? 'Gò Vấp (CN04)' : (c.branchCode || 'CN01'))));
+
+        const rateFormatted = Number(c.hourlyRate || 90000).toLocaleString('vi-VN') + ' đ/h';
+        const safeName = (c.courtName || ('Sân ' + c.courtCode)).replace(/'/g, "\\'");
+        const safeType = (c.courtType || 'Cầu lông tiêu chuẩn').replace(/'/g, "\\'");
+
+        return `
+          <tr>
+            <td style="text-align: center;">${idx + 1}</td>
+            <td><strong>${c.courtCode}</strong></td>
+            <td>${c.courtName}</td>
+            <td>${c.courtType}</td>
+            <td>${branchDisplay}</td>
+            <td><b style="color: var(--primary);">${rateFormatted}</b></td>
+            <td><span class="badge ${badgeClass}">${c.status}</span></td>
+            <td style="text-align: right;">
+              <div style="display: inline-flex; gap: 6px; justify-content: flex-end;">
+                <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${safeName}', '${safeType}', ${c.hourlyRate}, '${c.status}')">Sửa</button>
+                ${c.status === 'Bảo trì' ? `<button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; border-color: #10b981; color: #10b981;" onclick="quickUpdateStatus('${c.courtCode}', 'Trống')" title="Chuyển về trạng thái Trống">Hoàn tất</button>` : ''}
+                ${c.status === 'Trống' ? `<a href="/manager/bookings?court=${c.courtCode}" class="btn btn-primary" style="padding: 4px 8px; font-size: 11.5px; text-decoration: none;">Đặt sân</a>` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterCourts() {
+      const kw = (document.getElementById('courtSearchInput')?.value || '').toLowerCase().trim();
+      if (!kw) {
+        renderKPIs(allLoadedCourts);
+        renderVisualGrid(allLoadedCourts);
+        renderTable(allLoadedCourts);
+        return;
+      }
+
+      const filtered = allLoadedCourts.filter(c =>
+        (c.courtCode && c.courtCode.toLowerCase().includes(kw)) ||
+        (c.courtName && c.courtName.toLowerCase().includes(kw)) ||
+        (c.courtType && c.courtType.toLowerCase().includes(kw)) ||
+        (c.status && c.status.toLowerCase().includes(kw))
+      );
+
+      renderKPIs(filtered);
+      renderVisualGrid(filtered);
+      renderTable(filtered);
+    }
+
+    async function quickUpdateStatus(courtCode, newStatus) {
+      const token = localStorage.getItem('jwt_token') || '';
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+
+      try {
+        const res = await fetch('/api/courts/status', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ courtCode, status: newStatus })
+        });
+        const data = await res.json();
+        if (res.ok && (data.success !== false)) {
+          showToast(`Đã chuyển trạng thái sân ${courtCode} thành "${newStatus}"!`, 'success');
+          await loadCourtsFromApi();
+        } else {
+          showToast(data.message || 'Không thể cập nhật trạng thái sân', 'error');
+        }
+      } catch (err) {
+        showToast(`Lỗi kết nối máy chủ: ${err.message}`, 'error');
+      }
+    }
+
     function openCourtModal(code, name, type, rate, status) {
       const modal = document.getElementById('courtModal');
       if (code) {
         document.getElementById('modalTitle').innerText = 'Cập nhật thông tin sân ' + code;
         document.getElementById('inpCourtCode').value = code;
+        document.getElementById('inpCourtCode').disabled = true;
         document.getElementById('inpCourtName').value = name || ('Sân ' + code);
         document.getElementById('inpCourtType').value = type || 'Cầu lông tiêu chuẩn';
         document.getElementById('inpHourlyRate').value = rate || 90000;
         document.getElementById('inpStatus').value = status || 'Trống';
       } else {
         document.getElementById('modalTitle').innerText = 'Thêm sân mới vào chi nhánh';
-        document.getElementById('inpCourtCode').value = 'CL0' + (document.querySelectorAll('#courtTableBody tr').length + 1);
+        const nextNum = allLoadedCourts.length + 1;
+        document.getElementById('inpCourtCode').value = 'CL0' + (nextNum < 10 ? nextNum : nextNum);
+        document.getElementById('inpCourtCode').disabled = false;
         document.getElementById('inpCourtName').value = '';
+        document.getElementById('inpCourtType').value = 'Cầu lông tiêu chuẩn';
         document.getElementById('inpHourlyRate').value = 90000;
         document.getElementById('inpStatus').value = 'Trống';
       }
@@ -631,23 +768,28 @@
       const type = document.getElementById('inpCourtType').value;
       const rate = document.getElementById('inpHourlyRate').value;
       const status = document.getElementById('inpStatus').value;
+      const branch = getActiveBranchCode();
 
       if (!code) {
         showToast('Vui lòng nhập mã sân!', 'warning');
         return;
       }
 
+      const token = localStorage.getItem('jwt_token') || '';
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+
       try {
         const res = await fetch('/api/courts', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: headers,
           body: JSON.stringify({
             courtCode: code,
             courtName: name,
             courtType: type,
             hourlyRate: Number(rate),
             status: status,
-            branchCode: 'CN01'
+            branchCode: branch
           })
         });
         const data = await res.json();
@@ -664,41 +806,40 @@
     }
 
     async function loadCourtsFromApi() {
+      const branch = getActiveBranchCode();
+      const token = localStorage.getItem('jwt_token') || '';
+      const headers = {};
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+
       try {
-        const res = await fetch('/api/courts');
+        const res = await fetch(`/api/courts?branchCode=${encodeURIComponent(branch)}`, { headers });
         if (res.ok) {
           const courts = await res.json();
-          if (courts && courts.length > 0) {
-            const tbody = document.getElementById('courtTableBody');
-            tbody.innerHTML = courts.map((c, idx) => {
-              let badge = 'badge-green';
-              if (c.status === 'Đang sử dụng') badge = 'badge-amber';
-              else if (c.status === 'Bảo trì') badge = 'badge-red';
-
-              return `
-                <tr>
-                  <td style="text-align: center;">${idx + 1}</td>
-                  <td><strong>${c.courtCode}</strong></td>
-                  <td>${c.courtName}</td>
-                  <td>${c.courtType}</td>
-                  <td>Thủ Đức (CN01)</td>
-                  <td><b style="color: var(--primary);">${Number(c.hourlyRate).toLocaleString('vi-VN')} đ/h</b></td>
-                  <td><span class="badge ${badge}">${c.status}</span></td>
-                  <td style="text-align: right;">
-                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${c.courtName}', '${c.courtType}', ${c.hourlyRate}, '${c.status}')">Sửa</button>
-                  </td>
-                </tr>
-              `;
-            }).join('');
-            showToast(`Đã đồng bộ ${courts.length} sân thi đấu từ cơ sở dữ liệu`, 'success');
+          if (Array.isArray(courts) && courts.length > 0) {
+            allLoadedCourts = courts;
+          } else {
+            allLoadedCourts = fallbackCourts;
           }
+        } else {
+          allLoadedCourts = fallbackCourts;
         }
       } catch (err) {
-        console.warn('API error, using cached seed data');
+        console.warn('API error, using cached fallback data', err);
+        allLoadedCourts = fallbackCourts;
       }
+
+      renderKPIs(allLoadedCourts);
+      renderVisualGrid(allLoadedCourts);
+      renderTable(allLoadedCourts);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('utesport_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      loadCourtsFromApi();
+    });
+
+    window.addEventListener('badminton:court-event', () => {
       loadCourtsFromApi();
     });
   </script>
