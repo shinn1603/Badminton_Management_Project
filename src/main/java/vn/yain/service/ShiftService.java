@@ -105,7 +105,7 @@ public class ShiftService {
             Staff.builder().staffCode("NV-06").branchCode("CN01").fullName("Trịnh Gia Vinh").position("Kỹ thuật & Bảo dưỡng sân").phone("0977222333").email("vinh.tg@utesport.vn").status("Đang làm việc").build()
         );
         for (Staff s : defaults) {
-            if (!staffRepository.existsByStaffCode(s.getStaffCode())) {
+            if (!staffRepository.existsByStaffCode(s.getStaffCode()) && (s.getEmail() == null || staffRepository.findByEmail(s.getEmail()).isEmpty())) {
                 staffRepository.save(s);
             }
         }

@@ -17,6 +17,19 @@ let currentSessionKey = null;
 let currentSessionSlots = [];
 let currentDisplayTimeRange = '';
 
+function getPosAuthHeaders(extraHeaders = {}) {
+  const headers = { ...extraHeaders };
+  let token = localStorage.getItem('jwt_token');
+  if (!token && typeof document !== 'undefined' && document.cookie) {
+    const m = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+    if (m) token = m[1];
+  }
+  if (token) {
+    headers['Authorization'] = 'Bearer ' + token;
+  }
+  return headers;
+}
+
 function getSessionKey(courtCode, code, customer, phone) {
   if (code && code.trim() !== '') return `code_${code.trim()}`;
   return `cust_${currentBranch}_${currentDateStr}_${courtCode}_${customer || 'unknown'}_${phone || ''}`;
@@ -196,7 +209,9 @@ async function renderGridForDate(dateStr) {
 
   let bookings = [];
   try {
-    const res = await fetch(`/api/bookings?branchCode=${encodeURIComponent(currentBranch)}&date=${encodeURIComponent(dateStr)}`);
+    const res = await fetch(`/api/bookings?branchCode=${encodeURIComponent(currentBranch)}&date=${encodeURIComponent(dateStr)}`, {
+      headers: getPosAuthHeaders({ 'Accept': 'application/json' })
+    });
     if (res.ok) {
       bookings = await res.json() || [];
     }
@@ -683,7 +698,7 @@ async function submitBookingForm() {
   try {
     const res = await fetch('/api/bookings', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getPosAuthHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({
         bookingCode: genCode,
         courtCode: courtCode,
@@ -745,7 +760,10 @@ async function checkInBooking() {
     if (bCode) {
       window.lastActionBookingCode = bCode;
       try {
-        const res = await fetch(`/api/bookings/${bCode}/checkin`, { method: 'POST' });
+        const res = await fetch(`/api/bookings/${bCode}/checkin`, {
+          method: 'POST',
+          headers: getPosAuthHeaders({ 'Accept': 'application/json' })
+        });
         const data = await res.json();
         if (data.success || res.ok) {
           if (typeof showToast === 'function') showToast(`Khách đã nhận sân [${activeSlotCell.dataset.court}]!`, 'success');
@@ -772,7 +790,7 @@ async function cancelBookingFromModal() {
   try {
     const res = await fetch(`/api/bookings/${bCode}/cancel`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getPosAuthHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ reason: 'Nhân viên hủy tại quầy POS' })
     });
     const data = await res.json();
@@ -1147,7 +1165,7 @@ function quickAddProduct(codeOrName, name, price, stock) {
     if (bCode) {
       fetch(`/api/bookings/${bCode}/order-service`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getPosAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ productCode: itemCode, quantity: 1 })
       }).then(r => r.json()).then(data => {
         if (data.success && window.showToast) {
@@ -1330,7 +1348,7 @@ async function submitCheckout() {
     try {
       const res = await fetch(`/api/bookings/${bCode}/checkout`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getPosAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           productFee: serviceSubtotal,
           paymentMethod: payMode,
@@ -1365,7 +1383,7 @@ async function submitCheckout() {
     try {
       await fetch('/api/invoices/retail', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getPosAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           productFee: serviceSubtotal,
           paymentMethod: payMode,

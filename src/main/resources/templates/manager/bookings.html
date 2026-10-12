@@ -337,7 +337,7 @@
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            <span>+ Tạo đặt sân</span>
+            <span>Tạo đặt sân</span>
           </button>
         </div>
 
@@ -686,7 +686,7 @@
       const st = document.getElementById('filterStatus').value;
 
       const filtered = bookings.filter(b => {
-        const matchKw = b.code.toLowerCase().includes(kw) || b.name.toLowerCase().includes(kw) || b.phone.includes(kw);
+        const matchKw = b.code.toLowerCase().includes(kw) || b.name.toLowerCase().includes(kw) || b.phone.includes(kw) || (b.court && b.court.toLowerCase().includes(kw));
         const matchSt = st === 'ALL' || b.status === st;
         return matchKw && matchSt;
       });
@@ -868,7 +868,11 @@
 
     async function loadFromSqlServer() {
       try {
-        const res = await fetch('/api/bookings');
+        const urlParams = new URLSearchParams(window.location.search);
+        const courtParam = urlParams.get('court');
+        const branchCode = urlParams.get('branchCode') || 'CN01';
+
+        const res = await fetch(`/api/bookings?branchCode=${encodeURIComponent(branchCode)}`);
         if (res.ok) {
           const data = await res.json();
           if (data && data.length > 0) {
@@ -882,6 +886,16 @@
               price: Number(b.totalPrice),
               status: b.status
             }));
+
+            // Filter automatically if a specific court is clicked from the courts catalog
+            if (courtParam) {
+              const kwInput = document.getElementById('filterKeyword');
+              if (kwInput) {
+                kwInput.value = courtParam;
+              }
+              showToast(`Đang lọc lịch đặt riêng cho sân ${courtParam}`, 'info');
+            }
+
             saveToStorage();
             renderAll();
           }

@@ -747,23 +747,15 @@
             const dutyText = item.duty || 'Trực';
 
             const nightClass = shift.isNight ? 'shift-night' : '';
-            const todayStyle = (isToday && !shift.isNight && idx === 0) ? 'border: 2px solid var(--primary);' : (isToday && shift.isNight && idx === 0) ? 'border: 2px solid #2563eb;' : '';
-
-            let todayTag = '';
-            if (isToday && idx === 0) {
-              todayTag = shift.isNight 
-                ? `<span class="badge badge-blue" style="font-size: 9px; padding: 2px 4px; margin-right: 4px;">CA TỐI</span>` 
-                : `<span class="badge badge-green" style="font-size: 9px; padding: 2px 4px; margin-right: 4px;">HÔM NAY</span>`;
-            }
+            const todayStyle = isToday ? (shift.isNight ? 'box-shadow: 0 0 0 1.5px #2563eb;' : 'box-shadow: 0 0 0 1.5px var(--primary);') : '';
 
             html += `
-              <div class="staff-badge-shift ${nightClass}" style="${todayStyle}" title="${staff ? staff.name : ''}">
-                <div style="display: flex; align-items: center; gap: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                  <span>${displayName}</span>
-                  <span style="font-size: 10px; opacity: 0.85; font-weight: 600;">[${dutyText}]</span>
+              <div class="staff-badge-shift ${nightClass}" style="${todayStyle}" title="${staff ? staff.name : ''} - ${dutyText}">
+                <div style="display: flex; flex-direction: column; overflow: hidden; min-width: 0;">
+                  <span style="font-weight: 700; font-size: 11.5px; line-height: 1.2;">${displayName}</span>
+                  <span style="font-size: 10px; opacity: 0.8; font-weight: 600;">${dutyText}</span>
                 </div>
-                <div style="display: flex; align-items: center;">
-                  ${todayTag}
+                <div style="display: flex; align-items: center; gap: 4px;">
                   <button type="button" class="btn-del-shift" onclick="removeStaffFromShift('${dayKey}', '${shift.key}', '${item.staffId}')" title="Xóa nhân viên khỏi ca này">✕</button>
                 </div>
               </div>
@@ -812,9 +804,16 @@
       let html = '';
       filtered.forEach((staff, idx) => {
         let roleBadge = 'badge-blue';
-        if (staff.role.includes('Quản lý')) roleBadge = 'badge-purple';
-        else if (staff.role.includes('Lễ tân')) roleBadge = 'badge-amber';
-        else if (staff.role.includes('Kỹ thuật')) roleBadge = 'badge-purple';
+        const r = (staff.role || '').toLowerCase();
+        if (r.includes('quản lý') || r.includes('giám đốc')) {
+          roleBadge = 'badge-purple';
+        } else if (r.includes('thu ngân') || r.includes('pos')) {
+          roleBadge = 'badge-blue';
+        } else if (r.includes('lễ tân')) {
+          roleBadge = 'badge-amber';
+        } else if (r.includes('kỹ thuật') || r.includes('bảo dưỡng')) {
+          roleBadge = 'badge-green';
+        }
 
         html += `
           <tr>

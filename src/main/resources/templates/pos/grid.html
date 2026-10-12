@@ -911,9 +911,17 @@
       const newTimeSlot = document.getElementById('transferNewTimeSlot').value;
 
       try {
+        let token = localStorage.getItem('jwt_token');
+        if (!token && document.cookie) {
+          const m = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+          if (m) token = m[1];
+        }
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
         const res = await fetch(`/api/bookings/${currentTransferBookingCode}/transfer`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: headers,
           body: JSON.stringify({
             targetCourtCode: targetCourtCode,
             newTimeSlot: newTimeSlot

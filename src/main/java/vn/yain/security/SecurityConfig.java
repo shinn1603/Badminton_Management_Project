@@ -77,6 +77,10 @@ public class SecurityConfig {
                 // Public customer booking, courts and catalog lookups
                 .requestMatchers(HttpMethod.GET, "/api/courts/**", "/api/branches/**", "/api/products/**", "/api/equipment/**", "/api/director/stats", "/api/director/branches/**").permitAll()
                 .requestMatchers("/api/director/pricing/**", "/api/director/tournaments/**", "/api/manager/pricing/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/bookings", "/api/bookings/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/bookings", "/api/bookings/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/reports/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/inventory/receipts").permitAll()
                 .requestMatchers("/api/tournaments/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/bookings/slots/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/bookings/slot-lock").permitAll()
@@ -85,9 +89,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").permitAll()
                 .requestMatchers("/api/director/**").hasAnyRole("DIRECTOR", "ADMIN")
                 .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN", "DIRECTOR")
-                .requestMatchers("/api/staff", "/api/staff/**").hasAnyRole("MANAGER", "ADMIN", "DIRECTOR")
-                .requestMatchers("/api/inventory", "/api/inventory/**").hasAnyRole("MANAGER", "ADMIN", "DIRECTOR")
-                .requestMatchers("/api/shifts", "/api/shifts/**").hasAnyRole("POS", "STAFF", "MANAGER", "ADMIN", "DIRECTOR")
+                .requestMatchers("/api/shifts", "/api/shifts/**").permitAll()
+                .requestMatchers("/api/inventory", "/api/inventory/**").permitAll()
+                .requestMatchers("/api/staff", "/api/staff/**").permitAll()
                 // Require authentication for all remaining APIs
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().authenticated()

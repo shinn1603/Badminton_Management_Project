@@ -268,7 +268,7 @@
                   </svg>
                 </div>
               </div>
-              <div class="stat-value">248</div>
+              <div class="stat-value" id="kpiDashBookings">29</div>
               <div class="stat-trend stat-trend-up">
                 <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
                   <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
@@ -289,7 +289,7 @@
                   </svg>
                 </div>
               </div>
-              <div class="stat-value">12.450.000đ</div>
+              <div class="stat-value" id="kpiDashRevenue">2.850.000đ</div>
               <div class="stat-trend stat-trend-up">
                 <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
                   <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
@@ -310,7 +310,7 @@
                   </svg>
                 </div>
               </div>
-              <div class="stat-value">78%</div>
+              <div class="stat-value" id="kpiDashOccupancy">75%</div>
               <div class="stat-trend stat-trend-up">
                 <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
                   <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
@@ -333,7 +333,7 @@
                   </svg>
                 </div>
               </div>
-              <div class="stat-value">36</div>
+              <div class="stat-value" id="kpiDashCustomers">29</div>
               <div class="stat-trend stat-trend-up">
                 <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;">
                   <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
@@ -350,7 +350,7 @@
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
-                <span>+ Tạo đặt sân</span>
+                <span>Tạo đặt sân</span>
               </button>
               <div style="display: flex; gap: 8px;">
                 <button type="button" class="btn btn-outline" style="flex: 1; padding: 7px 10px; font-size: 11.5px;" onclick="showToast('Mở form thêm khách hàng mới', 'info')">
@@ -437,54 +437,8 @@
                 <a href="/manager/courts" style="font-size: 12.5px; font-weight: 600; color: var(--primary);">Xem tất cả →</a>
               </div>
               <div class="card-body">
-                <div class="courts-thumbs-grid">
-                  <!-- Court 1 -->
-                  <div class="court-thumb-card" onclick="window.location.href='/manager/courts'">
-                    <div class="court-thumb-img-wrap">
-                      <img src="/images/badminton-court.jpg" alt="Sân Cầu Lông 1">
-                      <span class="badge badge-available court-thumb-badge">● Trống</span>
-                    </div>
-                    <div class="court-thumb-body">
-                      <div class="court-thumb-title">Sân cầu lông 1</div>
-                      <div class="court-thumb-meta">Thảm Taraflex cao cấp • 05:00 - 23:00</div>
-                    </div>
-                  </div>
-
-                  <!-- Court 2 -->
-                  <div class="court-thumb-card" onclick="window.location.href='/manager/courts'">
-                    <div class="court-thumb-img-wrap">
-                      <img src="/images/badminton-court.jpg" alt="Sân Cầu Lông 2">
-                      <span class="badge badge-in-use court-thumb-badge">● Đang sử dụng</span>
-                    </div>
-                    <div class="court-thumb-body">
-                      <div class="court-thumb-title">Sân cầu lông 2</div>
-                      <div class="court-thumb-meta">Sân tiêu chuẩn thi đấu • 05:00 - 23:00</div>
-                    </div>
-                  </div>
-
-                  <!-- Court 3 -->
-                  <div class="court-thumb-card" onclick="window.location.href='/manager/courts'">
-                    <div class="court-thumb-img-wrap">
-                      <img src="/images/badminton-court.jpg" alt="Sân Cầu Lông 3">
-                      <span class="badge badge-available court-thumb-badge">● Trống</span>
-                    </div>
-                    <div class="court-thumb-body">
-                      <div class="court-thumb-title">Sân Cầu Lông 3</div>
-                      <div class="court-thumb-meta">Thảm Enlio tiêu chuẩn • 06:00 - 22:00</div>
-                    </div>
-                  </div>
-
-                  <!-- Court 4 -->
-                  <div class="court-thumb-card" onclick="window.location.href='/manager/courts'">
-                    <div class="court-thumb-img-wrap">
-                      <img src="/images/badminton-court.jpg" alt="Sân Cầu Lông 4 (VIP)">
-                      <span class="badge badge-maintenance court-thumb-badge">● Bảo trì đèn</span>
-                    </div>
-                    <div class="court-thumb-body">
-                      <div class="court-thumb-title">Sân Cầu Lông 4 (VIP)</div>
-                      <div class="court-thumb-meta">Thảm Yonex BWF • Hoàn thành 14:00</div>
-                    </div>
-                  </div>
+                <div class="courts-thumbs-grid" id="dashboardCourtThumbsGrid">
+                  <!-- Rendered dynamically -->
                 </div>
               </div>
             </div>
@@ -585,56 +539,13 @@
                 <!-- Date bar -->
                 <div class="timeline-date-bar">
                   <button type="button" class="btn-icon" style="width: 26px; height: 26px;" onclick="changeTimelineDate(-1)">‹</button>
-                  <span id="timelineDateLabel">Hôm nay, 30/09/2026</span>
+                  <span id="timelineDateLabel">Hôm nay</span>
                   <button type="button" class="btn-icon" style="width: 26px; height: 26px;" onclick="changeTimelineDate(1)">›</button>
                 </div>
 
                 <!-- Slots List -->
-                <div class="timeline-slots-list">
-                  <div class="timeline-slot-item">
-                    <span class="timeline-hour">07:00</span>
-                    <div class="timeline-court-info">
-                      <div class="timeline-court-name">Sân cầu lông 1</div>
-                      <div class="timeline-court-sub">Khung giờ sáng sớm</div>
-                    </div>
-                    <span class="badge badge-available">Trống</span>
-                  </div>
-
-                  <div class="timeline-slot-item" style="border-left: 3px solid #2563eb;">
-                    <span class="timeline-hour">08:00</span>
-                    <div class="timeline-court-info">
-                      <div class="timeline-court-name">Sân cầu lông 2</div>
-                      <div class="timeline-court-sub">Nguyễn Hoàng Nam • Khách quen</div>
-                    </div>
-                    <span class="badge badge-in-use">Đang chơi</span>
-                  </div>
-
-                  <div class="timeline-slot-item" style="border-left: 3px solid #f59e0b;">
-                    <span class="timeline-hour">09:00</span>
-                    <div class="timeline-court-info">
-                      <div class="timeline-court-name">Sân Cầu Lông 2</div>
-                      <div class="timeline-court-sub">Lê Minh Đức • Đã cọc 30%</div>
-                    </div>
-                    <span class="badge badge-pending">Đã cọc</span>
-                  </div>
-
-                  <div class="timeline-slot-item">
-                    <span class="timeline-hour">10:00</span>
-                    <div class="timeline-court-info">
-                      <div class="timeline-court-name">Sân cầu lông 3</div>
-                      <div class="timeline-court-sub">Sân tiêu chuẩn</div>
-                    </div>
-                    <span class="badge badge-available">Trống</span>
-                  </div>
-
-                  <div class="timeline-slot-item" style="border-left: 3px solid #2563eb;">
-                    <span class="timeline-hour">11:00</span>
-                    <div class="timeline-court-info">
-                      <div class="timeline-court-name">Sân cầu lông 1</div>
-                      <div class="timeline-court-sub">Khách vãng lai check-in quầy</div>
-                    </div>
-                    <span class="badge badge-in-use">Đang chơi</span>
-                  </div>
+                <div class="timeline-slots-list" id="timelineSlotsList">
+                  <!-- Rendered dynamically -->
                 </div>
               </div>
             </div>
@@ -926,17 +837,96 @@
       showToast(`Đang tải dữ liệu báo cáo trong ${days} ngày qua...`, 'info');
     }
 
-    function changeTimelineDate(delta) {
-      showToast(`Chuyển lịch xem ngày ${delta > 0 ? 'tiếp theo' : 'trước đó'}`, 'info');
+    let currentTimelineDate = new Date();
+
+    function formatVnDate(d) {
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      const today = new Date();
+      const isToday = d.toDateString() === today.toDateString();
+      return `${isToday ? 'Hôm nay, ' : ''}${dd}/${mm}/${yyyy}`;
+    }
+
+    function toIsoDate(d) {
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      return `${d.getFullYear()}-${mm}-${dd}`;
+    }
+
+    async function changeTimelineDate(delta) {
+      currentTimelineDate.setDate(currentTimelineDate.getDate() + delta);
+      document.getElementById('timelineDateLabel').innerText = formatVnDate(currentTimelineDate);
+      await loadTimelineSlotsForDate(currentTimelineDate);
+    }
+
+    async function loadTimelineSlotsForDate(dateObj) {
+      const container = document.getElementById('timelineSlotsList');
+      if (!container) return;
+      const iso = toIsoDate(dateObj);
+
+      try {
+        const res = await fetch(`/api/bookings?branchCode=CN01&date=${iso}`);
+        if (res.ok) {
+          const bookings = await res.json();
+          if (bookings && bookings.length > 0) {
+            container.innerHTML = bookings.slice(0, 6).map(b => {
+              const [startTime] = (b.timeSlot || '08:00 - 09:00').split(' - ');
+              const isUsed = b.status === 'Đang sử dụng';
+              const isDeposit = b.status === 'Đã cọc 30%' || b.status === 'Chờ xác nhận';
+              const border = isUsed ? 'border-left: 3px solid #2563eb;' : (isDeposit ? 'border-left: 3px solid #f59e0b;' : 'border-left: 3px solid #10b981;');
+              const badgeClass = isUsed ? 'badge-in-use' : (isDeposit ? 'badge-pending' : 'badge-available');
+              return `
+                <div class="timeline-slot-item" style="${border}">
+                  <span class="timeline-hour">${startTime}</span>
+                  <div class="timeline-court-info">
+                    <div class="timeline-court-name">${b.courtCode} - ${b.customerName}</div>
+                    <div class="timeline-court-sub">${b.timeSlot} • ${b.notes || 'Khách đặt sân'}</div>
+                  </div>
+                  <span class="badge ${badgeClass}">${b.status}</span>
+                </div>
+              `;
+            }).join('');
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('Lỗi tải timeline:', e);
+      }
+
+      // Fallback empty view for that date
+      container.innerHTML = `
+        <div style="text-align: center; padding: 20px 10px; color: var(--text-muted); font-size: 13px;">
+          Không có lịch đặt nào trong ngày ${formatVnDate(dateObj)}. Tất cả sân đang trống!
+        </div>
+      `;
     }
 
     // REAL SQL SERVER DATA FETCH
     async function loadRealSqlData() {
       try {
-        const res = await fetch('/api/bookings');
+        const res = await fetch('/api/bookings?branchCode=CN01');
         if (res.ok) {
           const data = await res.json();
           if (data && data.length > 0) {
+            // Update dashboard KPIs dynamically from real data
+            const totalBookings = data.length;
+            const totalRev = data.filter(b => b.status !== 'Đã hủy').reduce((sum, b) => sum + (Number(b.totalPrice) || 0), 0);
+            const inUseCount = data.filter(b => b.status === 'Đang sử dụng').length;
+            const uniquePhones = new Set(data.map(b => b.customerPhone)).size;
+
+            const elBookings = document.getElementById('kpiDashBookings');
+            if (elBookings) elBookings.innerText = totalBookings;
+
+            const elRev = document.getElementById('kpiDashRevenue');
+            if (elRev) elRev.innerText = totalRev.toLocaleString('vi-VN') + 'đ';
+
+            const elOccupancy = document.getElementById('kpiDashOccupancy');
+            if (elOccupancy) elOccupancy.innerText = Math.min(100, Math.round((totalBookings / 32) * 100)) + '%';
+
+            const elCust = document.getElementById('kpiDashCustomers');
+            if (elCust) elCust.innerText = uniquePhones || totalBookings;
+
             const tbody = document.getElementById('recentBookingsTbody');
             if (tbody) {
               tbody.innerHTML = '';
@@ -948,7 +938,7 @@
                   <td>${b.courtCode}</td>
                   <td>${b.bookingDate} • ${b.timeSlot}</td>
                   <td><strong>${Number(b.totalPrice).toLocaleString('vi-VN')}đ</strong></td>
-                  <td><span class="badge ${b.status === 'Đang sử dụng' ? 'badge-in-use' : b.status === 'Hoàn thành' ? 'badge-completed' : 'badge-pending'}">${b.status}</span></td>
+                  <td><span class="badge ${b.status === 'Đang sử dụng' ? 'badge-in-use' : b.status === 'Hoàn thành' || b.status === 'Đã thanh toán' ? 'badge-completed' : 'badge-pending'}">${b.status}</span></td>
                   <td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="window.location.href='/manager/bookings'">Chi tiết</button></td>
                 `;
                 tbody.appendChild(tr);
@@ -961,15 +951,53 @@
       }
     }
 
+    async function loadRealCourtThumbs() {
+      try {
+        const res = await fetch('/api/courts?branchCode=CN01');
+        if (res.ok) {
+          const courts = await res.json();
+          const grid = document.getElementById('dashboardCourtThumbsGrid');
+          if (grid && courts && courts.length > 0) {
+            grid.innerHTML = courts.slice(0, 4).map(c => {
+              const isUsed = c.status === 'Đang sử dụng';
+              const isMaint = c.status === 'Bảo trì';
+              const badgeClass = isUsed ? 'badge-in-use' : (isMaint ? 'badge-maintenance' : 'badge-available');
+              const statusText = isUsed ? '● Đang sử dụng' : (isMaint ? '● Bảo trì' : '● Trống');
+              const img = c.imageUrl || '/images/badminton-court.jpg';
+
+              return `
+                <div class="court-thumb-card" onclick="window.location.href='/manager/courts'">
+                  <div class="court-thumb-img-wrap">
+                    <img src="${img}" alt="${c.courtName}" onerror="this.src='/images/badminton-court.jpg'">
+                    <span class="badge ${badgeClass} court-thumb-badge">${statusText}</span>
+                  </div>
+                  <div class="court-thumb-body">
+                    <div class="court-thumb-title">${c.courtName}</div>
+                    <div class="court-thumb-meta">${c.courtType} • 05:00 - 23:00</div>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }
+        }
+      } catch (e) {
+        console.warn('Lỗi tải thẻ trạng thái sân:', e);
+      }
+    }
+
     // Run charts and real SQL load
     window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('timelineDateLabel').innerText = formatVnDate(currentTimelineDate);
       renderCharts();
       loadRealSqlData();
+      loadTimelineSlotsForDate(currentTimelineDate);
+      loadRealCourtThumbs();
     });
 
     // Realtime reactive reload on WebSocket booking events
     window.addEventListener('badminton:booking-event', () => {
       loadRealSqlData();
+      loadTimelineSlotsForDate(currentTimelineDate);
     });
   </script>
   <script src="/js/global-hub.js"></script>

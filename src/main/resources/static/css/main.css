@@ -1741,10 +1741,22 @@ textarea {
   border: 1px solid var(--danger-border);
 }
 
+.badge-purple {
+  background: rgba(139, 92, 246, 0.12);
+  color: #7c3aed;
+  border: 1px solid rgba(139, 92, 246, 0.28);
+}
+
 .badge-gray {
   background: var(--surface-subtle);
   color: var(--text-muted);
   border: 1px solid var(--border-subtle);
+}
+
+[data-theme="dark"] .badge-purple {
+  background: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+  border-color: rgba(139, 92, 246, 0.4);
 }
 
 [data-theme="dark"] .badge-green {

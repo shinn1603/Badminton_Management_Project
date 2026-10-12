@@ -8,10 +8,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.yain.dto.CourtEventDto;
+import vn.yain.entity.Booking;
 import vn.yain.entity.Court;
+import vn.yain.repository.BookingRepository;
 import vn.yain.repository.CourtRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +36,36 @@ public class CourtService {
     // Track held courts and their expiration times (600 seconds = 10 minutes)
     private final Map<String, LocalDateTime> heldCourtTimestamps = new ConcurrentHashMap<>();
 
+    @Autowired
+    private BookingRepository bookingRepository;
+
     public List<Court> getCourts(String branchCode) {
+        List<Court> courts;
         if (branchCode != null && !branchCode.isEmpty()) {
-            return courtRepository.findByBranchCode(branchCode);
+            courts = courtRepository.findByBranchCode(branchCode);
+        } else {
+            courts = courtRepository.findAll();
         }
-        return courtRepository.findAll();
+
+        // Dynamically compute realtime court status based on today's active bookings
+        LocalDate today = LocalDate.now();
+        List<Booking> todayBookings = bookingRepository.findAll().stream()
+                .filter(b -> today.equals(b.getBookingDate()))
+                .toList();
+
+        return courts.stream().map(c -> {
+            // Check if any booking on this court is currently active/in-use
+            boolean isCurrentlyInUse = todayBookings.stream().anyMatch(b ->
+                    c.getCourtCode().equalsIgnoreCase(b.getCourtCode()) &&
+                    "Đang sử dụng".equalsIgnoreCase(b.getStatus()));
+
+            if (isCurrentlyInUse) {
+                Court copy = new Court(c.getId(), c.getCourtCode(), c.getCourtName(), c.getCourtType(),
+                        c.getBranchCode(), c.getHourlyRate(), "Đang sử dụng", c.getImageUrl());
+                return copy;
+            }
+            return c;
+        }).toList();
     }
 
     public Optional<Court> getCourtByCode(String courtCode) {

@@ -236,7 +236,7 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: var(--primary);">68.450.000 đ</div>
+            <div class="kpi-val" id="valTotalRevenue" style="color: var(--primary);">68.450.000 đ</div>
             <div class="kpi-trend positive" id="kpiComparisonLabel">+14.2% so với kỳ trước</div>
           </div>
 
@@ -247,8 +247,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #3b82f6;">54.800.000 đ</div>
-            <div class="kpi-trend positive">Chiếm 80.1% tổng doanh thu</div>
+            <div class="kpi-val" id="valCourtRevenue" style="color: #3b82f6;">54.800.000 đ</div>
+            <div class="kpi-trend positive" id="trendCourtRevenue">Chiếm 80.1% tổng doanh thu</div>
           </div>
 
           <div class="kpi-card-unified">
@@ -258,8 +258,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #f59e0b;">13.650.000 đ</div>
-            <div class="kpi-trend positive">Chiếm 19.9% (Tăng trưởng tốt)</div>
+            <div class="kpi-val" id="valProductRevenue" style="color: #f59e0b;">13.650.000 đ</div>
+            <div class="kpi-trend positive" id="trendProductRevenue">Chiếm 19.9% (Tăng trưởng tốt)</div>
           </div>
 
           <div class="kpi-card-unified">
@@ -269,7 +269,7 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
               </div>
             </div>
-            <div class="kpi-val" style="color: #8b5cf6;">78.5%</div>
+            <div class="kpi-val" id="valOccupancy" style="color: #8b5cf6;">78.5%</div>
             <div class="kpi-trend positive">Giờ vàng tối đạt 96.2%</div>
           </div>
         </div>
@@ -278,7 +278,7 @@
         <div class="grid-charts-layout">
           <div class="section-card">
             <div class="section-title-wrap" style="margin-bottom: 16px;">
-              <h3>Diễn biến doanh thu theo tuần (Tháng 09/2026)</h3>
+              <h3 id="trendChartTitle">Diễn biến doanh thu theo tuần</h3>
               <p>So sánh giữa doanh thu giờ sân và doanh thu dịch vụ bán quầy</p>
             </div>
             <div style="height: 280px; position: relative;">
@@ -378,7 +378,7 @@
                   <td>Cầu lông VIP</td>
                   <td style="text-align: center; font-weight: 700;">14 giờ</td>
                   <td style="text-align: center;">15.0%</td>
-                  <td style="text-align: right; color: var(--text-muted); font-weight: 800;">1.680.000 đ</td>
+                  <td style="text-align: right; color: var(--primary); font-weight: 800;">1.680.000 đ</td>
                   <td><span class="badge badge-amber">Bảo trì</span></td>
                 </tr>
               </tbody>
@@ -466,7 +466,8 @@
           
           ctx.font = '800 20px "Plus Jakarta Sans", sans-serif';
           ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
-          ctx.fillText('68.4M', x, y - 8);
+          const centerText = chart.config.data.centerText || '68.4M';
+          ctx.fillText(centerText, x, y - 8);
           
           ctx.font = '600 10.5px "Inter", sans-serif';
           ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
@@ -478,10 +479,11 @@
       pieChart = new Chart(ctxPie, {
         type: 'doughnut',
         data: {
-          labels: ['Tiền giờ sân (80.1%)', 'Nước giải khát (11.5%)', 'Ống cầu lông (5.8%)', 'Thuê vợt & Căng cước (2.6%)'],
+          centerText: '68.4M',
+          labels: ['Tiền giờ sân', 'Dịch vụ & Dụng cụ'],
           datasets: [{
-            data: [54800000, 7850000, 3970000, 1830000],
-            backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'],
+            data: [54800000, 13600000],
+            backgroundColor: ['#10b981', '#3b82f6'],
             borderWidth: 0,
             hoverOffset: 6
           }]
@@ -550,6 +552,7 @@
       if (toEl) toEl.value = toStr;
 
       updatePeriodLabels(currentPeriodName);
+      loadReportData(fromStr, toStr);
     }
 
     function handleCustomDateChange() {
@@ -560,6 +563,9 @@
         b.className = 'btn btn-outline';
       });
       updatePeriodLabels(currentPeriodName);
+      if (from && to) {
+        loadReportData(from, to);
+      }
     }
 
     function updatePeriodLabels(label) {
@@ -567,6 +573,82 @@
       if (kpiLabel) kpiLabel.innerText = `Tổng doanh thu (${label})`;
       const compLabel = document.getElementById('kpiComparisonLabel');
       if (compLabel) compLabel.innerText = `So với kỳ trước`;
+      const trendTitle = document.getElementById('trendChartTitle');
+      if (trendTitle) trendTitle.innerText = `Diễn biến doanh thu (${label})`;
+    }
+
+    async function loadReportData(from, to) {
+      try {
+        const res = await fetch(`/api/reports/metrics?branchCode=CN01&fromDate=${from}&toDate=${to}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.success) {
+            // Update KPIs
+            const totalRev = Number(data.totalRevenue || 0);
+            const courtRev = Number(data.courtRevenue || 0);
+            const prodRev = Number(data.productRevenue || 0);
+
+            document.getElementById('valTotalRevenue').innerText = totalRev.toLocaleString('vi-VN') + ' đ';
+            document.getElementById('valCourtRevenue').innerText = courtRev.toLocaleString('vi-VN') + ' đ';
+            document.getElementById('valProductRevenue').innerText = prodRev.toLocaleString('vi-VN') + ' đ';
+
+            const courtPct = totalRev > 0 ? ((courtRev / totalRev) * 100).toFixed(1) : '80.0';
+            const prodPct = totalRev > 0 ? ((prodRev / totalRev) * 100).toFixed(1) : '20.0';
+            document.getElementById('trendCourtRevenue').innerText = `Chiếm ${courtPct}% tổng doanh thu`;
+            document.getElementById('trendProductRevenue').innerText = `Chiếm ${prodPct}% (Tăng trưởng tốt)`;
+
+            // Update Table
+            if (data.courtStats && data.courtStats.length > 0) {
+              const tbody = document.querySelector('.table-container table tbody');
+              if (tbody) {
+                tbody.innerHTML = data.courtStats.map((c, idx) => {
+                  const rev = Number(c.revenue || 0);
+                  const isMaintenance = c.status === 'Bảo trì';
+                  const badgeLabel = c.efficiency || (isMaintenance ? 'Bảo trì' : (c.occupancyRate >= 60 ? 'Cao điểm' : 'Ổn định'));
+                  const badgeClass = isMaintenance ? 'badge-amber' : (badgeLabel === 'Cao điểm' ? 'badge-green' : (badgeLabel === 'Tốt' ? 'badge-green' : 'badge-blue'));
+
+                  return `
+                    <tr>
+                      <td style="text-align: center;">${idx + 1}</td>
+                      <td><strong>${c.courtCode}</strong></td>
+                      <td>${c.courtName}</td>
+                      <td>${c.courtType}</td>
+                      <td style="text-align: center; font-weight: 700;">${c.hours} giờ</td>
+                      <td style="text-align: center;">${c.occupancyRate}%</td>
+                      <td style="text-align: right; color: var(--primary); font-weight: 800;">${rev.toLocaleString('vi-VN')} đ</td>
+                      <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
+                    </tr>
+                  `;
+                }).join('');
+              }
+            }
+
+            // Update Bar Trend Chart
+            if (trendChart && data.trendLabels && data.trendLabels.length > 0) {
+              trendChart.data.labels = data.trendLabels;
+              trendChart.data.datasets[0].data = data.trendCourtData;
+              trendChart.data.datasets[1].data = data.trendProductData;
+              trendChart.update();
+            }
+
+            // Update Doughnut Chart & Center Text
+            if (pieChart) {
+              let displayM = '0đ';
+              if (totalRev >= 1000000) {
+                displayM = (totalRev / 1000000).toFixed(1) + 'M';
+              } else if (totalRev > 0) {
+                displayM = (totalRev / 1000).toFixed(0) + 'K';
+              }
+              pieChart.data.centerText = displayM;
+              pieChart.data.labels = [`Tiền giờ sân (${courtPct}%)`, `Dịch vụ & Dụng cụ (${prodPct}%)`];
+              pieChart.data.datasets[0].data = totalRev > 0 ? [courtRev, prodRev] : [1, 0];
+              pieChart.update();
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Lỗi đồng bộ báo cáo từ cơ sở dữ liệu:', e);
+      }
     }
 
     function exportReportsToExcel() {
@@ -610,8 +692,8 @@
       const monthTitle = `Tháng ${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
       const btnMonth = document.getElementById('btnCurrentMonth');
       if (btnMonth) btnMonth.innerText = monthTitle;
-      selectPeriod('this_month', btnMonth);
       initCharts();
+      selectPeriod('this_month', btnMonth);
     });
   </script>
 </body>

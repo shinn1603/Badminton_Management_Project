@@ -327,7 +327,7 @@
                 </div>
                 <div style="margin-top: 12px; display: flex; gap: 6px;">
                   <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL01', 'Sân cầu lông 1 (VIP)', 'Cầu lông VIP', 120000, 'Trống')">Chỉnh sửa</button>
-                  <a href="/manager/bookings" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
+                  <a href="/manager/bookings?court=CL01" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
                 </div>
               </div>
             </div>
@@ -350,7 +350,7 @@
                 </div>
                 <div style="margin-top: 12px; display: flex; gap: 6px;">
                   <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL02', 'Sân cầu lông 2', 'Cầu lông tiêu chuẩn', 90000, 'Đang sử dụng')">Chỉnh sửa</button>
-                  <a href="/manager/bookings" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
+                  <a href="/manager/bookings?court=CL02" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
                 </div>
               </div>
             </div>
@@ -373,7 +373,7 @@
                 </div>
                 <div style="margin-top: 12px; display: flex; gap: 6px;">
                   <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL03', 'Sân cầu lông 3', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Chỉnh sửa</button>
-                  <a href="/manager/bookings" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
+                  <a href="/manager/bookings?court=CL03" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
                 </div>
               </div>
             </div>
@@ -396,7 +396,7 @@
                 </div>
                 <div style="margin-top: 12px; display: flex; gap: 6px;">
                   <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL04', 'Sân cầu lông 4', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Chỉnh sửa</button>
-                  <a href="/manager/bookings" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
+                  <a href="/manager/bookings?court=CL04" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
                 </div>
               </div>
             </div>
@@ -419,7 +419,7 @@
                 </div>
                 <div style="margin-top: 12px; display: flex; gap: 6px;">
                   <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL05', 'Sân cầu lông 5', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Chỉnh sửa</button>
-                  <a href="/manager/bookings" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
+                  <a href="/manager/bookings?court=CL05" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
                 </div>
               </div>
             </div>
@@ -442,7 +442,7 @@
                 </div>
                 <div style="margin-top: 12px; display: flex; gap: 6px;">
                   <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('CL06', 'Sân cầu lông 6', 'Cầu lông VIP', 120000, 'Bảo trì')">Chỉnh sửa</button>
-                  <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="showToast('Sân CL06 đang bảo trì hệ thống chiếu sáng chuẩn BWF', 'info')">Xem bảo trì</button>
+                  <a href="/manager/bookings?court=CL06" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
                 </div>
               </div>
             </div>
@@ -663,33 +663,88 @@
       }
     }
 
+    const BRANCH_NAMES = {
+      'CN01': 'Thủ Đức (CN01)',
+      'CN02': 'Bình Thạnh (CN02)',
+      'CN03': 'Quận 9 (CN03)',
+      'CN04': 'Gò Vấp (CN04)'
+    };
+
     async function loadCourtsFromApi() {
       try {
         const res = await fetch('/api/courts');
         if (res.ok) {
           const courts = await res.json();
           if (courts && courts.length > 0) {
+            // Update table
             const tbody = document.getElementById('courtTableBody');
-            tbody.innerHTML = courts.map((c, idx) => {
-              let badge = 'badge-green';
-              if (c.status === 'Đang sử dụng') badge = 'badge-amber';
-              else if (c.status === 'Bảo trì') badge = 'badge-red';
+            if (tbody) {
+              tbody.innerHTML = courts.map((c, idx) => {
+                let badge = 'badge-green';
+                if (c.status === 'Đang sử dụng') badge = 'badge-amber';
+                else if (c.status === 'Bảo trì') badge = 'badge-red';
 
-              return `
-                <tr>
-                  <td style="text-align: center;">${idx + 1}</td>
-                  <td><strong>${c.courtCode}</strong></td>
-                  <td>${c.courtName}</td>
-                  <td>${c.courtType}</td>
-                  <td>Thủ Đức (CN01)</td>
-                  <td><b style="color: var(--primary);">${Number(c.hourlyRate).toLocaleString('vi-VN')} đ/h</b></td>
-                  <td><span class="badge ${badge}">${c.status}</span></td>
-                  <td style="text-align: right;">
-                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${c.courtName}', '${c.courtType}', ${c.hourlyRate}, '${c.status}')">Sửa</button>
-                  </td>
-                </tr>
-              `;
-            }).join('');
+                const branchDisplay = BRANCH_NAMES[c.branchCode] || `${c.branchCode || 'CN01'}`;
+
+                return `
+                  <tr>
+                    <td style="text-align: center;">${idx + 1}</td>
+                    <td><strong>${c.courtCode}</strong></td>
+                    <td>${c.courtName}</td>
+                    <td>${c.courtType}</td>
+                    <td>${branchDisplay}</td>
+                    <td><b style="color: var(--primary);">${Number(c.hourlyRate).toLocaleString('vi-VN')} đ/h</b></td>
+                    <td><span class="badge ${badge}">${c.status}</span></td>
+                    <td style="text-align: right;">
+                      <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${c.courtName}', '${c.courtType}', ${c.hourlyRate}, '${c.status}')">Sửa</button>
+                    </td>
+                  </tr>
+                `;
+              }).join('');
+            }
+
+            // Update visual grid cards for active branch
+            const visualGrid = document.getElementById('courtsVisualGrid');
+            if (visualGrid) {
+              const currentBranchCourts = courts.filter(c => !c.branchCode || c.branchCode === 'CN01');
+              visualGrid.innerHTML = currentBranchCourts.map(c => {
+                let badge = 'badge-green';
+                if (c.status === 'Đang sử dụng') badge = 'badge-amber';
+                else if (c.status === 'Bảo trì') badge = 'badge-red';
+
+                const img = c.imageUrl || '/images/badminton-court.jpg';
+                const carpet = c.courtType.includes('VIP') ? 'Yonex BWF Quốc Tế' : 'PVC Enlio Tiêu Chuẩn';
+
+                return `
+                  <div class="court-card-luxury">
+                    <img src="${img}" class="court-card-thumb" alt="${c.courtName}" onerror="this.src='/images/badminton-court.jpg'">
+                    <div class="court-card-body">
+                      <div class="court-card-header">
+                        <h4 class="court-name">${c.courtName}</h4>
+                        <span class="badge ${badge}">${c.status}</span>
+                      </div>
+                      <div class="court-meta-row">
+                        <span>Mã sân: <b>${c.courtCode}</b></span>
+                        <span>Thảm: ${carpet}</span>
+                      </div>
+                      <div class="court-meta-row">
+                        <span>Loại sân: ${c.courtType}</span>
+                        <span class="court-price-tag">${Number(c.hourlyRate).toLocaleString('vi-VN')} đ/h</span>
+                      </div>
+                      <div style="margin-top: 12px; display: flex; gap: 6px;">
+                        <button class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${c.courtName}', '${c.courtType}', ${c.hourlyRate}, '${c.status}')">Chỉnh sửa</button>
+                        <a href="/manager/bookings?court=${encodeURIComponent(c.courtCode)}" class="btn btn-primary" style="flex: 1; padding: 6px; font-size: 11.5px; text-align: center;">Xem lịch đặt</a>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('');
+            }
+
+            // Update KPI counters
+            const totalEl = document.getElementById('totalCourtsCount');
+            if (totalEl) totalEl.innerText = `${courts.filter(c => c.branchCode === 'CN01').length} sân`;
+
             showToast(`Đã đồng bộ ${courts.length} sân thi đấu từ cơ sở dữ liệu`, 'success');
           }
         }
