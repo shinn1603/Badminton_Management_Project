@@ -1741,6 +1741,18 @@ textarea {
   border: 1px solid var(--danger-border);
 }
 
+.badge-purple {
+  background: rgba(139, 92, 246, 0.12);
+  color: #7c3aed;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.badge-teal {
+  background: rgba(13, 148, 136, 0.12);
+  color: #0f766e;
+  border: 1px solid rgba(13, 148, 136, 0.3);
+}
+
 .badge-gray {
   background: var(--surface-subtle);
   color: var(--text-muted);
@@ -1763,6 +1775,18 @@ textarea {
   background: rgba(245, 158, 11, 0.18);
   color: #fbbf24;
   border-color: rgba(245, 158, 11, 0.35);
+}
+
+[data-theme="dark"] .badge-purple {
+  background: rgba(167, 139, 250, 0.18);
+  color: #c4b5fd;
+  border-color: rgba(167, 139, 250, 0.35);
+}
+
+[data-theme="dark"] .badge-teal {
+  background: rgba(45, 212, 191, 0.18);
+  color: #5eead4;
+  border-color: rgba(45, 212, 191, 0.35);
 }
 
 [data-theme="dark"] .badge-red {

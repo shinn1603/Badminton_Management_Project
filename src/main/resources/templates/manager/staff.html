@@ -176,6 +176,77 @@
       background: #ef4444;
       color: #ffffff;
     }
+
+    /* Đồng bộ đóng khung chức vụ nổi bật (Pill Badges) */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.15px;
+      line-height: 1.4;
+      white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      transition: all 0.15s ease;
+    }
+
+    .badge-purple {
+      background: rgba(139, 92, 246, 0.12);
+      color: #7c3aed;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    [data-theme="dark"] .badge-purple {
+      background: rgba(167, 139, 250, 0.18);
+      color: #c4b5fd;
+      border-color: rgba(167, 139, 250, 0.35);
+    }
+
+    .badge-teal {
+      background: rgba(13, 148, 136, 0.12);
+      color: #0f766e;
+      border: 1px solid rgba(13, 148, 136, 0.3);
+    }
+    [data-theme="dark"] .badge-teal {
+      background: rgba(45, 212, 191, 0.18);
+      color: #5eead4;
+      border-color: rgba(45, 212, 191, 0.35);
+    }
+
+    .badge-blue {
+      background: rgba(59, 130, 246, 0.12);
+      color: #2563eb;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    [data-theme="dark"] .badge-blue {
+      background: rgba(59, 130, 246, 0.18);
+      color: #60a5fa;
+      border-color: rgba(59, 130, 246, 0.35);
+    }
+
+    .badge-amber {
+      background: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    [data-theme="dark"] .badge-amber {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    [data-theme="dark"] .badge-green {
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.35);
+    }
   </style>
 </head>
 <body>
@@ -892,9 +963,16 @@
       let html = '';
       filtered.forEach((staff, idx) => {
         let roleBadge = 'badge-blue';
-        if (staff.role.includes('Quản lý')) roleBadge = 'badge-purple';
-        else if (staff.role.includes('Lễ tân')) roleBadge = 'badge-amber';
-        else if (staff.role.includes('Kỹ thuật')) roleBadge = 'badge-purple';
+        const roleLower = (staff.role || '').toLowerCase();
+        if (roleLower.includes('quản lý')) {
+          roleBadge = 'badge-purple';
+        } else if (roleLower.includes('lễ tân')) {
+          roleBadge = 'badge-amber';
+        } else if (roleLower.includes('kỹ thuật') || roleLower.includes('bảo dưỡng')) {
+          roleBadge = 'badge-teal';
+        } else {
+          roleBadge = 'badge-blue';
+        }
 
         html += `
           <tr>
