@@ -30,6 +30,9 @@ public class Booking {
     @Column(name = "customer_phone", nullable = false, length = 20)
     private String customerPhone;
 
+    @Column(name = "customer_email", length = 100)
+    private String customerEmail;
+
     @Column(name = "court_code", nullable = false, length = 20)
     private String courtCode;
 

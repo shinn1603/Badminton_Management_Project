@@ -28,6 +28,9 @@ public class TournamentRegistration {
     @Column(length = 20)
     private String phone;
 
+    @Column(length = 100)
+    private String email;
+
     @Column(name = "registration_date")
     private LocalDateTime registrationDate = LocalDateTime.now();
 

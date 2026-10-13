@@ -613,7 +613,10 @@
           </div>
         </div>
 
-        <button type="button" class="btn btn-outline" onclick="closeModals()" style="width: 100%; height: 36px; font-size: 12.5px;">
+        <button type="button" class="btn btn-primary" onclick="resendTicketEmail()" id="btnResendEmail" style="width: 100%; height: 38px; font-size: 13px; font-weight: 700; margin-bottom: 8px; border-radius: 8px;">
+          📩 Gửi Phiếu & Vé Về Email
+        </button>
+        <button type="button" class="btn btn-outline" onclick="closeModals()" style="width: 100%; height: 36px; font-size: 12.5px; border-radius: 8px;">
           Đóng Vé Điện Tử
         </button>
       </div>
@@ -847,6 +850,34 @@
     function closeModals() {
       document.getElementById('qrModal').classList.remove('open');
       document.getElementById('reviewModal').classList.remove('open');
+    }
+
+    async function resendTicketEmail() {
+      const code = document.getElementById('tktCode').innerText.trim();
+      const btn = document.getElementById('btnResendEmail');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Đang gửi email...';
+      }
+      try {
+        const res = await fetch(`/api/bookings/${code}/send-ticket-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+        } else {
+          showToast(data.message || 'Không thể gửi vé về email!', 'error');
+        }
+      } catch (e) {
+        showToast('Lỗi mạng khi gửi email vé!', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = '📩 Gửi Phiếu & Vé Về Email';
+        }
+      }
     }
 
     async function handleCancelRequest(code, hoursBeforeMatch, depositAmount) {

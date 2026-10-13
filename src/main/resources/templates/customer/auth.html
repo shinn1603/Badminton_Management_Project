@@ -545,6 +545,15 @@
               Zalo Pay
             </button>
           </div>
+
+          <!-- Dòng điều hướng đăng nhập nội bộ cho nhân viên -->
+          <div class="auth-staff-redirect" style="margin-top: 22px; padding-top: 16px; border-top: 1px dashed var(--cust-border); text-align: center; font-size: 13px; color: var(--cust-text-muted);">
+            <span>Bạn là nhân viên? </span>
+            <a href="/login" style="color: var(--cust-primary); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: color 0.2s ease;">
+              Đăng nhập nội bộ
+              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; stroke-width: 2.2;"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </a>
+          </div>
         </div>
 
         <!-- Form Register -->
@@ -616,8 +625,15 @@
         Vui lòng nhập số điện thoại hoặc email đăng ký và mật khẩu mới để thiết lập lại mật khẩu.
       </p>
       <div class="form-group" style="margin-bottom: 12px;">
-        <label class="form-label">Số điện thoại hoặc Email</label>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <label class="form-label" style="margin: 0;">Số điện thoại hoặc Email</label>
+          <a href="javascript:void(0)" id="btnCustSendOtp" onclick="sendCustomerForgotOtp()" style="font-size: 11.5px; color: var(--cust-teal); text-decoration: none; font-weight: 700;">📩 Gửi OTP về Email</a>
+        </div>
         <input type="text" id="cfIdentifier" class="form-control" placeholder="0901234567 hoặc email" style="width: 100%; box-sizing: border-box;">
+      </div>
+      <div id="custOtpContainer" class="form-group" style="margin-bottom: 12px; display: none;">
+        <label class="form-label" style="color: var(--cust-teal);">Mã OTP (6 chữ số từ email)</label>
+        <input type="text" id="cfOtp" class="form-control" placeholder="Nhập mã 6 chữ số nhận từ email" style="width: 100%; box-sizing: border-box; letter-spacing: 2px; font-weight: 700; color: #047857;">
       </div>
       <div class="form-group" style="margin-bottom: 12px;">
         <label class="form-label">Mật khẩu mới (tối thiểu 6 ký tự)</label>
@@ -887,6 +903,8 @@
         return;
       }
 
+      const otp = document.getElementById('cfOtp') ? document.getElementById('cfOtp').value.trim() : '';
+
       btn.disabled = true;
       btn.innerText = 'Đang xử lý...';
 
@@ -894,7 +912,7 @@
         const res = await fetch('/api/auth/reset-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ identifier, newPassword: newPass })
+          body: JSON.stringify({ identifier, newPassword: newPass, otp })
         });
         const data = await res.json();
         if (data.success) {
@@ -911,6 +929,38 @@
       } finally {
         btn.disabled = false;
         btn.innerText = 'Xác Nhận Đổi';
+      }
+    }
+
+    async function sendCustomerForgotOtp() {
+      const identifier = document.getElementById('cfIdentifier').value.trim();
+      if (!identifier) {
+        showToast('Vui lòng nhập số điện thoại hoặc email trước khi gửi mã OTP!', 'warning');
+        document.getElementById('cfIdentifier').focus();
+        return;
+      }
+      const btn = document.getElementById('btnCustSendOtp');
+      btn.innerText = 'Đang gửi...';
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          const otpContainer = document.getElementById('custOtpContainer');
+          if (otpContainer) otpContainer.style.display = 'block';
+          btn.innerText = 'Gửi lại OTP';
+          document.getElementById('cfOtp').focus();
+        } else {
+          showToast(data.message || 'Không thể gửi mã OTP!', 'error');
+          btn.innerText = '📩 Gửi OTP về Email';
+        }
+      } catch (e) {
+        showToast('Lỗi kết nối khi gửi email OTP!', 'error');
+        btn.innerText = '📩 Gửi OTP về Email';
       }
     }
   </script>

@@ -62,6 +62,7 @@ Hệ thống hỗ trợ song song 2 cơ chế truy vấn:
 | 23 | `audit_logs` | `NhatKyHoatDong` | Nhật ký truy vết bảo mật (Đổi giá, check-in, phân quyền, login) |
 | 24 | `tournament_matches` | `TranDau` | Lịch thi đấu và kết quả các trận đấu trong giải |
 | 25 | `system_settings` | `CauHinhHeThong` | Cấu hình quy định: % cọc (30%), giữ chỗ (10p), hủy hoàn cọc |
+| 26 | `pricing_proposals` | `DeXuatGia` | Quản lý đề xuất điều chỉnh giá sân từ Quản lý chi nhánh gửi Giám đốc phê duyệt |
 
 ---
 

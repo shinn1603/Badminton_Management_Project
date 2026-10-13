@@ -157,6 +157,11 @@ public class ApiController {
     @Autowired
     private SystemSettingRepository systemSettingRepository;
 
+    @Autowired(required = false)
+    private vn.yain.service.EmailService emailService;
+
+    private static final Map<String, Map<String, Object>> forgotPasswordOtpMap = new java.util.concurrent.ConcurrentHashMap<>();
+
     // ==========================================
     // 1. AUTHENTICATION & JWT ENDPOINTS
     // ==========================================
@@ -200,6 +205,80 @@ public class ApiController {
         }
     }
 
+    @PostMapping("/auth/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> payload) {
+        try {
+            String identifier = payload.get("identifier");
+            if (identifier == null || identifier.trim().isEmpty()) identifier = payload.get("username");
+            if (identifier == null || identifier.trim().isEmpty()) identifier = payload.get("phone");
+            if (identifier == null || identifier.trim().isEmpty()) identifier = payload.get("email");
+
+            if (identifier == null || identifier.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Vui lòng nhập tên tài khoản, số điện thoại hoặc email!"));
+            }
+
+            String cleanId = identifier.trim();
+            User user = userRepository.findByUsername(cleanId)
+                    .or(() -> userRepository.findByPhone(cleanId))
+                    .or(() -> cleanId.contains("@") ? userRepository.findByEmail(cleanId) : Optional.empty())
+                    .orElse(null);
+
+            String email = null;
+            String fullName = null;
+            if (user != null) {
+                email = user.getEmail();
+                fullName = user.getFullName();
+            } else {
+                Customer cust = customerRepository.findByPhone(cleanId)
+                        .or(() -> cleanId.contains("@") ? customerRepository.findByEmail(cleanId) : Optional.empty())
+                        .orElse(null);
+                if (cust != null) {
+                    email = cust.getEmail();
+                    fullName = cust.getFullName();
+                }
+            }
+
+            if (email == null || email.isBlank() || !email.contains("@")) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "success", false,
+                        "message", "Tài khoản [" + cleanId + "] chưa cập nhật địa chỉ email hợp lệ để nhận mã khôi phục! Vui lòng liên hệ hotline 0903.123.456 để được hỗ trợ trực tiếp."
+                ));
+            }
+
+            // Tạo mã xác nhận OTP 6 chữ số ngẫu nhiên
+            String otp = String.format("%06d", new java.util.Random().nextInt(1000000));
+            Map<String, Object> otpInfo = new HashMap<>();
+            otpInfo.put("otp", otp);
+            otpInfo.put("email", email);
+            otpInfo.put("identifier", cleanId);
+            otpInfo.put("expiry", System.currentTimeMillis() + 10 * 60 * 1000); // 10 phút hiệu lực
+            forgotPasswordOtpMap.put(cleanId.toLowerCase(), otpInfo);
+
+            if (emailService != null) {
+                emailService.sendPasswordResetOtp(email, fullName, otp);
+            }
+
+            String masked = maskEmail(email);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Mã xác nhận OTP đã được gửi thành công đến email " + masked + ". Vui lòng kiểm tra hộp thư!",
+                    "email", masked,
+                    "identifier", cleanId
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
+        }
+    }
+
+    private String maskEmail(String email) {
+        if (email == null || !email.contains("@")) return email;
+        int atIndex = email.indexOf('@');
+        if (atIndex <= 2) return email;
+        String name = email.substring(0, atIndex);
+        String domain = email.substring(atIndex);
+        return name.charAt(0) + "***" + name.charAt(name.length() - 1) + domain;
+    }
+
     @PostMapping("/auth/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> payload) {
         try {
@@ -219,10 +298,56 @@ public class ApiController {
                 newPassword = payload.get("password");
             }
 
-            userService.resetPassword(identifier, newPassword);
+            if (identifier == null || identifier.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Vui lòng nhập định danh tài khoản!"));
+            }
+
+            String cleanId = identifier.trim();
+
+            // Nếu người dùng nhập mã OTP, kiểm tra tính hợp lệ
+            String otp = payload.get("otp");
+            if (otp != null && !otp.isBlank()) {
+                Map<String, Object> otpInfo = forgotPasswordOtpMap.get(cleanId.toLowerCase());
+                if (otpInfo == null) {
+                    return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã xác nhận OTP không tồn tại hoặc đã hết hạn!"));
+                }
+                long expiry = (long) otpInfo.get("expiry");
+                if (System.currentTimeMillis() > expiry) {
+                    forgotPasswordOtpMap.remove(cleanId.toLowerCase());
+                    return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã xác nhận OTP đã hết hạn (quá 10 phút)! Vui lòng yêu cầu mã mới."));
+                }
+                String expectedOtp = (String) otpInfo.get("otp");
+                if (!expectedOtp.equals(otp.trim())) {
+                    return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã xác nhận OTP không chính xác. Vui lòng kiểm tra lại email!"));
+                }
+                forgotPasswordOtpMap.remove(cleanId.toLowerCase());
+            }
+
+            userService.resetPassword(cleanId, newPassword);
+
+            // Gửi email thông báo thay đổi mật khẩu thành công
+            User u = userRepository.findByUsername(cleanId)
+                    .or(() -> userRepository.findByPhone(cleanId))
+                    .or(() -> cleanId.contains("@") ? userRepository.findByEmail(cleanId) : Optional.empty())
+                    .orElse(null);
+            String userEmail = (u != null && u.getEmail() != null) ? u.getEmail() : null;
+            String fullName = (u != null && u.getFullName() != null) ? u.getFullName() : cleanId;
+
+            if (userEmail == null || userEmail.isBlank()) {
+                Customer c = customerRepository.findByPhone(cleanId).orElse(null);
+                if (c != null && c.getEmail() != null) {
+                    userEmail = c.getEmail();
+                    fullName = c.getFullName();
+                }
+            }
+
+            if (userEmail != null && userEmail.contains("@") && emailService != null) {
+                emailService.sendPasswordChangedNotification(userEmail, fullName, newPassword);
+            }
+
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "message", "Đặt lại mật khẩu thành công! Quý khách vui lòng đăng nhập với mật khẩu mới."
+                    "message", "Đặt lại mật khẩu thành công! Thông báo đã được gửi về email của quý khách."
             ));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
@@ -782,6 +907,31 @@ public class ApiController {
                         .body(Map.of("success", false, "message", "Không tìm thấy đơn đặt sân: " + code)));
     }
 
+    @PostMapping("/bookings/{code}/send-ticket-email")
+    public ResponseEntity<?> sendTicketEmail(@PathVariable String code, @RequestBody(required = false) Map<String, String> payload) {
+        Booking b = bookingRepository.findByBookingCode(code).orElse(null);
+        if (b == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Không tìm thấy đơn đặt sân: " + code));
+        }
+        String targetEmail = (payload != null && payload.get("email") != null && !payload.get("email").isBlank())
+                ? payload.get("email").trim()
+                : b.getCustomerEmail();
+
+        if (targetEmail != null && !targetEmail.isBlank()) {
+            b.setCustomerEmail(targetEmail);
+            bookingRepository.save(b);
+        }
+
+        if (emailService != null) {
+            emailService.sendBookingConfirmation(b);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Đã gửi phiếu xác nhận đặt sân & Vé điện tử E-Ticket tới: " + (targetEmail != null ? targetEmail : "email khách hàng")
+            ));
+        }
+        return ResponseEntity.ok(Map.of("success", true, "message", "Hệ thống đã ghi nhận yêu cầu gửi vé."));
+    }
+
     @PostMapping("/bookings")
     public ResponseEntity<?> createBooking(@RequestBody Booking booking) {
         Booking saved = bookingService.createBooking(booking);
@@ -1265,10 +1415,21 @@ public class ApiController {
             customerCode = phone.isBlank() ? "GUEST" : phone.trim();
         }
 
+        String email = (String) payload.get("email");
+        if ((email == null || email.isBlank()) && !phone.isBlank()) {
+            Customer c = customerRepository.findByPhone(phone.trim()).orElse(null);
+            if (c != null && c.getEmail() != null) email = c.getEmail();
+            if (email == null || email.isBlank()) {
+                User u = userRepository.findByPhone(phone.trim()).orElse(null);
+                if (u != null && u.getEmail() != null) email = u.getEmail();
+            }
+        }
+
         TournamentRegistration reg = new TournamentRegistration();
         reg.setTournamentCode(t.getTournamentCode());
         reg.setTeamName(teamName + (player1Name.isBlank() ? "" : " - " + player1Name) + (category.isBlank() ? "" : " (" + category + ")"));
         reg.setPhone(phone);
+        reg.setEmail(email != null && !email.isBlank() ? email.trim() : null);
         reg.setCustomerCode(customerCode);
         reg.setRegistrationDate(LocalDateTime.now());
         reg.setStatus("Đã xác nhận");
@@ -1281,10 +1442,16 @@ public class ApiController {
         }
         tournamentRepository.save(t);
 
+        if (emailService != null) {
+            try {
+                emailService.sendTournamentRegistration(t, reg, email);
+            } catch (Exception ignored) {}
+        }
+
         int remaining = max - current;
         return ResponseEntity.ok(Map.of(
                 "success", true,
-                "message", "Đăng ký tham gia giải đấu thành công! Hồ sơ đã được lưu vào hệ thống cơ sở dữ liệu.",
+                "message", "Đăng ký tham gia giải đấu thành công! Phiếu xác nhận đã được gửi về email của bạn.",
                 "tournamentCode", t.getTournamentCode(),
                 "tournamentName", t.getTournamentName(),
                 "currentParticipants", current,

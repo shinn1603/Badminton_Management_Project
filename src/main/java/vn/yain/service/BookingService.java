@@ -52,6 +52,9 @@ public class BookingService {
     @Autowired(required = false)
     private vn.yain.repository.CustomerRepository customerRepository;
 
+    @Autowired(required = false)
+    private EmailService emailService;
+
     @Value("${vietqr.bank.bin:970422}")
     private String bankBin;
 
@@ -284,9 +287,22 @@ public class BookingService {
         booking.setNotes(noteBuilder.toString());
 
         // Liên kết mã khách hàng từ cơ sở dữ liệu nếu tồn tại
+        String customerEmail = (String) payload.get("customerEmail");
+        if (customerEmail == null || customerEmail.isBlank()) {
+            customerEmail = (String) payload.get("email");
+        }
+        if (customerEmail != null && !customerEmail.isBlank()) {
+            booking.setCustomerEmail(customerEmail.trim());
+        }
+
         if (customerRepository != null && customerPhone != null && !customerPhone.isBlank()) {
             customerRepository.findByPhone(customerPhone.trim())
-                    .ifPresent(c -> booking.setCustomerCode(c.getCustomerCode()));
+                    .ifPresent(c -> {
+                        booking.setCustomerCode(c.getCustomerCode());
+                        if (booking.getCustomerEmail() == null || booking.getCustomerEmail().isBlank()) {
+                            booking.setCustomerEmail(c.getEmail());
+                        }
+                    });
         }
 
         Booking saved = bookingRepository.save(booking);
@@ -389,6 +405,14 @@ public class BookingService {
                 .message("Đã nhận tiền cọc cho đơn [" + updated.getBookingCode() + "] - Sân " + updated.getCourtCode())
                 .timestamp(LocalDateTime.now())
                 .build());
+
+        if (emailService != null) {
+            try {
+                emailService.sendBookingConfirmation(updated);
+            } catch (Exception e) {
+                // Log only, do not rollback transaction
+            }
+        }
 
         return updated;
     }

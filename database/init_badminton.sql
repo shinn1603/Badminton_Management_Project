@@ -76,6 +76,7 @@ IF OBJECT_ID('invoices', 'U') IS NOT NULL DROP TABLE invoices;
 IF OBJECT_ID('payments', 'U') IS NOT NULL DROP TABLE payments;
 IF OBJECT_ID('booking_services', 'U') IS NOT NULL DROP TABLE booking_services;
 IF OBJECT_ID('bookings', 'U') IS NOT NULL DROP TABLE bookings;
+IF OBJECT_ID('pricing_proposals', 'U') IS NOT NULL DROP TABLE pricing_proposals;
 IF OBJECT_ID('pricing_rules', 'U') IS NOT NULL DROP TABLE pricing_rules;
 IF OBJECT_ID('time_slots', 'U') IS NOT NULL DROP TABLE time_slots;
 IF OBJECT_ID('courts', 'U') IS NOT NULL DROP TABLE courts;
@@ -95,7 +96,7 @@ IF OBJECT_ID('branches', 'U') IS NOT NULL DROP TABLE branches;
 GO
 
 -- =====================================================================
--- 3. ĐỊNH NGHĨA 24 BẢNG DỮ LIỆU CỐT LÕI (CORE TABLES)
+-- 3. ĐỊNH NGHĨA 25 BẢNG DỮ LIỆU CỐT LÕI (CORE TABLES)
 -- =====================================================================
 
 -- BẢNG 1: CHI NHÁNH TOÀN CHUỖI (branches / ChiNhanh)
@@ -169,6 +170,7 @@ CREATE TABLE bookings (
     customer_code VARCHAR(20) NULL REFERENCES customers(customer_code),
     customer_name NVARCHAR(100) NOT NULL,
     customer_phone VARCHAR(20) NOT NULL,
+    customer_email VARCHAR(100) NULL,
     court_code VARCHAR(20) NOT NULL REFERENCES courts(court_code),
     branch_code VARCHAR(20) NOT NULL REFERENCES branches(branch_code),
     booking_date DATE NOT NULL,
@@ -318,6 +320,7 @@ CREATE TABLE tournament_registrations (
     customer_code VARCHAR(20) NOT NULL REFERENCES customers(customer_code),
     team_name NVARCHAR(100) NOT NULL,
     phone VARCHAR(20) NOT NULL,
+    email VARCHAR(100) NULL,
     registration_date DATETIME DEFAULT GETDATE(),
     status NVARCHAR(30) DEFAULT N'Đã xác nhận' -- Chờ xác nhận, Đã xác nhận, Đã hủy
 );
@@ -340,13 +343,17 @@ GO
 -- BẢNG 17: PHÂN CA LÀM VIỆC NHÂN VIÊN (work_shifts / PhanCa)
 CREATE TABLE work_shifts (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    shift_code VARCHAR(20) NOT NULL UNIQUE,
+    shift_code VARCHAR(50) NOT NULL UNIQUE,
     staff_code VARCHAR(20) NOT NULL REFERENCES staff(staff_code),
+    branch_code VARCHAR(20) DEFAULT 'CN01' REFERENCES branches(branch_code),
+    day_of_week VARCHAR(10) NULL,
+    shift_type NVARCHAR(30) NOT NULL, -- morning, night, Ca Sáng, Ca Chiều, Ca Tối
+    duty NVARCHAR(100) NULL, -- POS, Thu ngân, Lễ tân, Kỹ thuật, Quản lý
+    icon VARCHAR(30) DEFAULT 'POS',
     shift_date DATE NOT NULL,
     start_time VARCHAR(10) NOT NULL,
     end_time VARCHAR(10) NOT NULL,
-    shift_type NVARCHAR(30) NOT NULL, -- Ca Sáng (06:00-14:00), Ca Chiều (14:00-22:00), Ca Tối (17:00-23:00)
-    status NVARCHAR(30) DEFAULT N'Đã phân ca' -- Đã phân ca, Đang trực, Đã hoàn thành
+    status NVARCHAR(50) DEFAULT N'Đã phân ca' -- Đã phân ca, Đang trực, Đã hoàn thành
 );
 GO
 
@@ -437,6 +444,24 @@ CREATE TABLE system_settings (
 );
 GO
 
+-- BẢNG 25: ĐỀ XUẤT ĐIỀU CHỈNH GIÁ SÂN (pricing_proposals / DeXuatGia)
+CREATE TABLE pricing_proposals (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    proposal_code VARCHAR(20) NOT NULL UNIQUE,
+    branch_code VARCHAR(20) NOT NULL REFERENCES branches(branch_code),
+    proposer_name NVARCHAR(100) NOT NULL,
+    court_type NVARCHAR(100) NOT NULL,
+    slot_info NVARCHAR(100) NOT NULL,
+    current_price DECIMAL(18,2) NOT NULL,
+    proposed_price DECIMAL(18,2) NOT NULL,
+    reason NVARCHAR(255) NULL,
+    status NVARCHAR(30) DEFAULT N'Chờ phê duyệt', -- Chờ phê duyệt, Đã phê duyệt, Từ chối
+    created_at DATETIME2 DEFAULT GETDATE(),
+    approved_at DATETIME2 NULL,
+    note NVARCHAR(255) NULL
+);
+GO
+
 -- =====================================================================
 -- 4. TẠO CÁC VIEW ÁNH XẠ TIẾNG VIỆT THEO CHUẨN ĐẶC TẢ CHƯƠNG 5 FILE WORD
 -- =====================================================================
@@ -489,9 +514,11 @@ CREATE VIEW TranDau AS SELECT match_code AS MaTran, tournament_code AS MaGiaiDau
 GO
 CREATE VIEW CauHinhHeThong AS SELECT setting_code AS MaCauHinh, setting_name AS TenCauHinh, setting_value AS GiaTri, description AS MoTa, updated_at AS NgayCapNhat FROM system_settings;
 GO
+CREATE VIEW DeXuatGia AS SELECT proposal_code AS MaDeXuat, branch_code AS MaCN, proposer_name AS NguoiDeXuat, court_type AS LoaiSan, slot_info AS KhungGio, current_price AS GiaHienTai, proposed_price AS GiaDeXuat, reason AS LyDo, status AS TrangThai, created_at AS NgayDeXuat, approved_at AS NgayPheDuyet, note AS GhiChuPheDuyet FROM pricing_proposals;
+GO
 
 -- =====================================================================
--- 5. CHÈN DỮ LIỆU MẪU ĐẦY ĐỦ CHO TẤT CẢ 24 BẢNG (SEED DATA)
+-- 5. CHÈN DỮ LIỆU MẪU ĐẦY ĐỦ CHO TẤT CẢ 25 BẢNG (SEED DATA)
 -- =====================================================================
 
 -- 5.1 DỮ LIỆU CHI NHÁNH TOÀN CHUỖI (branches)
@@ -740,7 +767,7 @@ IF NOT EXISTS (SELECT name FROM sys.indexes WHERE name = N'idx_invoices_booking_
     CREATE INDEX idx_invoices_booking_date ON invoices(booking_code, invoice_date);
 GO
 
-PRINT N'>>> ĐÃ KHỞI TẠO TOÀN DIỆN 24 BẢNG DỮ LIỆU, 24 VIEW TIẾNG VIỆT VÀ CHÈN SEED DATA HOÀN TẤT THÀNH CÔNG!';
+PRINT N'>>> ĐÃ KHỞI TẠO TOÀN DIỆN 25 BẢNG DỮ LIỆU, 25 VIEW TIẾNG VIỆT VÀ CHÈN SEED DATA HOÀN TẤT THÀNH CÔNG!';
 GO
 
 -- =====================================================================
@@ -1508,7 +1535,7 @@ END;
 GO
 
 PRINT N'=====================================================================';
-PRINT N'>>> ĐÃ KHỞI TẠO TOÀN DIỆN 24 BẢNG DỮ LIỆU, 24 VIEW TIẾNG VIỆT,';
+PRINT N'>>> ĐÃ KHỞI TẠO TOÀN DIỆN 25 BẢNG DỮ LIỆU, 25 VIEW TIẾNG VIỆT,';
 PRINT N'>>> 5 FUNCTIONS, 7 STORED PROCEDURES VÀ 6 TRIGGERS HOÀN TẤT THÀNH CÔNG!';
 PRINT N'=====================================================================';
 GO

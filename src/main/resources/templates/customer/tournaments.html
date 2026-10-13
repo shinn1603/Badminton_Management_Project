@@ -540,15 +540,12 @@
 
           <div class="form-row" style="margin-top: 10px;">
             <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label">Số CCCD / Mã Số Sinh Viên *</label>
-              <input type="text" class="form-control" id="tourPlayer1Cccd" placeholder="079xxxxxxxx hoặc 24110xxx" required value="24110234">
+              <label class="form-label">Email Nhận Phiếu Xác Nhận *</label>
+              <input type="email" class="form-control" id="tourPlayer1Email" placeholder="vd: athlete@utesport.vn" required value="athlete@utesport.vn">
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label">Trình Độ</label>
-              <select class="form-control">
-                <option>Trung bình khá (Phong trào 1-2 năm)</option>
-                <option selected>Khá (Chơi thường xuyên > 3 năm)</option>
-              </select>
+              <label class="form-label">Số CCCD / Mã Số Sinh Viên *</label>
+              <input type="text" class="form-control" id="tourPlayer1Cccd" placeholder="079xxxxxxxx hoặc 24110xxx" required value="24110234">
             </div>
           </div>
 
@@ -857,6 +854,8 @@
         headers['Authorization'] = 'Bearer ' + token;
       }
 
+      const email1 = document.getElementById('tourPlayer1Email') ? document.getElementById('tourPlayer1Email').value.trim() : '';
+
       try {
         const res = await fetch('/api/tournaments/register', {
           method: 'POST',
@@ -868,13 +867,14 @@
             category: category,
             player1Name: player1,
             phone: phone1,
+            email: email1,
             customerCode: currentCustomer ? currentCustomer.customerCode : ''
           })
         });
 
         const data = await res.json();
         if (res.ok && data.success) {
-          showToast(`Đăng ký thành công giải đấu ${code}! Đã lưu vào cơ sở dữ liệu. Ban tổ chức sẽ liên hệ SĐT ${phone1}.`, 'success');
+          showToast(`Đăng ký thành công! Phiếu xác nhận & vé giải đấu đã được gửi tới email ${email1 || phone1}.`, 'success');
           closeTourModal();
           await loadTournaments();
         } else {
