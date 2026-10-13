@@ -1054,6 +1054,7 @@ textarea {
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.1px;
+  white-space: nowrap;
 }
 
 .badge-available {
@@ -1713,6 +1714,10 @@ textarea {
   font-weight: 700;
   letter-spacing: 0.2px;
   line-height: 1.2;
+  white-space: nowrap;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dark);
 }
 
 .badge-green {
@@ -1725,6 +1730,18 @@ textarea {
   background: var(--secondary-light);
   color: #2563eb;
   border: 1px solid var(--secondary-border);
+}
+
+.badge-purple {
+  background: rgba(147, 51, 234, 0.1);
+  color: #9333ea;
+  border: 1px solid rgba(147, 51, 234, 0.25);
+}
+
+.badge-teal {
+  background: rgba(13, 148, 136, 0.1);
+  color: #0d9488;
+  border: 1px solid rgba(13, 148, 136, 0.25);
 }
 
 .badge-amber,
@@ -1757,6 +1774,18 @@ textarea {
   background: rgba(59, 130, 246, 0.18);
   color: #60a5fa;
   border-color: rgba(59, 130, 246, 0.35);
+}
+
+[data-theme="dark"] .badge-purple {
+  background: rgba(168, 85, 247, 0.18);
+  color: #c084fc;
+  border-color: rgba(168, 85, 247, 0.35);
+}
+
+[data-theme="dark"] .badge-teal {
+  background: rgba(45, 212, 191, 0.18);
+  color: #2dd4bf;
+  border-color: rgba(45, 212, 191, 0.35);
 }
 
 [data-theme="dark"] .badge-amber {
@@ -2316,5 +2345,39 @@ textarea {
   .cust-nav-menu {
     display: none;
   }
+}
+
+/* Unified Data Summary Strip (replaces bulky top KPI cards) */
+.data-summary-strip {
+  margin-top: 14px;
+  padding: 10px 16px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.data-summary-strip strong {
+  font-weight: 700;
+}
+
+.data-summary-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.data-summary-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 

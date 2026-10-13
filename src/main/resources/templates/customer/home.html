@@ -1746,8 +1746,13 @@
     }
 
     function onDashBranchChanged(branchCode) {
+      if (!branchCode) return;
       const heroSelect = document.getElementById('heroBranchSelect');
-      if (heroSelect) heroSelect.value = branchCode;
+      if (heroSelect && heroSelect.value !== branchCode) heroSelect.value = branchCode;
+      const dashSelect = document.getElementById('dashBranchPicker');
+      if (dashSelect && dashSelect.value !== branchCode) dashSelect.value = branchCode;
+      try { localStorage.setItem('customer_selected_branch', branchCode); } catch (e) {}
+
       loadBranchCourts(branchCode);
       const matrixTab = document.getElementById('tab-matrix');
       if (matrixTab && matrixTab.style.display === 'block') {
@@ -1897,14 +1902,16 @@
           return;
         }
 
+        const availableCourts = courts.filter(c => c.status !== 'Bảo trì');
         const kpiEl = document.getElementById('kpiAvailableCourts');
         if (kpiEl) {
-          kpiEl.innerText = `${courts.length} / ${courts.length} Sân Sẵn Sàng`;
+          kpiEl.innerText = `${availableCourts.length} / ${courts.length} Sân Sẵn Sàng`;
         }
 
         let html = '';
         courts.forEach(c => {
           const isVip = (c.courtType && c.courtType.toLowerCase().includes('vip')) || (c.hourlyRate >= 110000);
+          const isMaintenance = (c.status === 'Bảo trì');
           const rateFormatted = (c.hourlyRate || 90000).toLocaleString('vi-VN');
           const depositFormatted = Math.round((c.hourlyRate || 90000) * 0.3).toLocaleString('vi-VN');
           const courtBookings = booked.filter(b => b.courtCode === c.courtCode);
@@ -1913,19 +1920,21 @@
           const availableCount = TIME_SLOTS.filter(slot => !courtBookings.some(b => isSlotOverlapping(slot, b.timeSlot))).length;
 
           html += `
-            <div class="court-display-card" data-branch="${c.branchCode}" data-code="${c.courtCode}">
+            <div class="court-display-card" data-branch="${c.branchCode}" data-code="${c.courtCode}" style="${isMaintenance ? 'opacity: 0.88; border-color: rgba(245, 158, 11, 0.4);' : ''}">
               <div class="court-card-thumb-wrap">
                 <img src="${c.imageUrl || '/images/badminton-court.jpg'}" alt="${c.courtName}">
                 <span class="court-thumb-badge ${isVip ? 'badge-vip' : 'badge-standard'}">
                   ${isVip ? 'Sân VIP Yonex' : 'Sân Chuẩn Enlio'}
                 </span>
                 <div class="court-status-indicator">
-                  <span class="hero-pulse-dot"></span> ${availableCount} slot trống hôm nay
+                  ${isMaintenance 
+                    ? '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; margin-right: 5px;"></span> <span style="color: #d97706; font-weight: 700;">Đang bảo trì kỹ thuật</span>'
+                    : `<span class="hero-pulse-dot"></span> ${availableCount} slot trống hôm nay`}
                 </div>
               </div>
               <div class="court-info-body">
                 <div class="court-name-row">
-                  <div class="court-item-title">${c.courtName}</div>
+                  <div class="court-item-title">${c.courtName} ${isMaintenance ? '<span class="badge badge-amber" style="font-size: 11px; margin-left: 6px;">Bảo trì</span>' : ''}</div>
                   <div class="court-mat-type">Mã: ${c.courtCode}</div>
                 </div>
                 <div class="court-amenities-tags">
@@ -1938,14 +1947,22 @@
                   <span class="price-note">/ giờ (Cọc trước 30%: ${depositFormatted}đ)</span>
                 </div>
                 <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
-                  Bấm để mở lưới chọn giờ. Khi đặt chỉ khóa đúng giờ được chọn, các giờ khác vẫn mở.
+                  ${isMaintenance 
+                    ? '<span style="color: #d97706; font-weight: 600;">Sân đang trong giai đoạn bảo dưỡng định kỳ, tạm dừng nhận đặt lịch mới.</span>'
+                    : 'Bấm để mở lưới chọn giờ. Khi đặt chỉ khóa đúng giờ được chọn, các giờ khác vẫn mở.'}
                 </div>
               </div>
               <div class="court-card-action">
-                <button type="button" class="btn-book-instant" onclick="openCourtTimeGridModal('${c.courtCode}', '${c.courtName}', ${c.hourlyRate || 90000}, '${c.branchCode}')">
-                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                  <span>Xem Lưới Giờ & Khóa Sân</span>
-                </button>
+                ${isMaintenance ? `
+                  <button type="button" class="btn btn-outline" disabled style="width: 100%; border-color: var(--border-subtle); color: var(--text-muted); opacity: 0.7; cursor: not-allowed; background: var(--surface-subtle); font-weight: 700;">
+                    <span>Sân Đang Bảo Trì - Tạm Dừng Đặt</span>
+                  </button>
+                ` : `
+                  <button type="button" class="btn-book-instant" onclick="openCourtTimeGridModal('${c.courtCode}', '${c.courtName}', ${c.hourlyRate || 90000}, '${c.branchCode}')">
+                    <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span>Xem Lưới Giờ & Khóa Sân</span>
+                  </button>
+                `}
               </div>
             </div>
           `;
@@ -1981,15 +1998,22 @@
 
         let html = '';
         courts.forEach(c => {
+          const isMaintenance = (c.status === 'Bảo trì');
           html += `<tr>`;
-          html += `<td class="cust-matrix-court-col"><strong>${c.courtName}</strong><div style="font-size: 11px; color: var(--text-muted);">${(c.hourlyRate || 90000).toLocaleString()} đ/h</div></td>`;
+          html += `<td class="cust-matrix-court-col">
+            <strong>${c.courtName}</strong>
+            ${isMaintenance ? '<span class="badge badge-amber" style="font-size: 10px; margin-left: 4px;">Bảo trì</span>' : ''}
+            <div style="font-size: 11px; color: var(--text-muted);">${(c.hourlyRate || 90000).toLocaleString()} đ/h</div>
+          </td>`;
 
           TIME_SLOTS.forEach(slot => {
             const isBooked = bookings.some(b => b.courtCode === c.courtCode && isSlotOverlapping(slot, b.timeSlot));
-            if (isBooked) {
+            if (isMaintenance) {
+              html += `<td><span class="matrix-cell-maintenance" style="display: block; padding: 6px 2px; border-radius: 4px; font-size: 11px; background: rgba(245, 158, 11, 0.12); color: #d97706; font-weight: 700; cursor: not-allowed;" title="Sân đang bảo trì kỹ thuật, tạm dừng nhận đặt">Bảo trì</span></td>`;
+            } else if (isBooked) {
               html += `<td><span class="matrix-cell-booked" title="Khung giờ đã có người đặt trước">Đã đặt</span></td>`;
             } else {
-              html += `<td><span class="matrix-cell-free" onclick="openCourtTimeGridModal('${c.courtCode}', '${c.courtName}', ${c.hourlyRate || 90000}, '${c.branchCode}', '${slot}', '${date}')" title="Bấm để chọn và khóa slot này">Trống</span></td>`;
+              html += `<td><span class="matrix-cell-free" onclick="openCourtTimeGridModal('${c.courtCode}', '${c.courtName}', ${c.hourlyRate || 90000}, '${c.branchCode}', '${slot}', '${date}', '${c.status || ''}')" title="Bấm để chọn và khóa slot này">Trống</span></td>`;
             }
           });
 
@@ -2012,7 +2036,11 @@
     }
 
     // Modal Control: Open Court Time Grid
-    function openCourtTimeGridModal(courtCode, courtName, rate, branchCode, preselectedSlot = null, preselectedDate = null) {
+    function openCourtTimeGridModal(courtCode, courtName, rate, branchCode, preselectedSlot = null, preselectedDate = null, courtStatus = '') {
+      if (courtStatus === 'Bảo trì') {
+        alert(`Sân ${courtName} (${courtCode}) đang trong trạng thái Bảo trì kỹ thuật. Hệ thống tạm dừng nhận đặt lịch!`);
+        return;
+      }
       currentModalCourt = {
         courtCode,
         courtName,
@@ -2368,8 +2396,22 @@
 
       // Initial branch & court load from database
       const firstBranch = await loadHomeBranchesFromDb();
-      loadBranchCourts(firstBranch || 'CN01');
-      loadBranchPricing(firstBranch || 'CN01');
+      let activeBranch = firstBranch || 'CN01';
+      try {
+        const saved = localStorage.getItem('customer_selected_branch');
+        const dashSelect = document.getElementById('dashBranchPicker');
+        if (saved && dashSelect && Array.from(dashSelect.options).some(o => o.value === saved)) {
+          activeBranch = saved;
+        }
+      } catch (e) {}
+
+      const heroSelect = document.getElementById('heroBranchSelect');
+      const dashSelect = document.getElementById('dashBranchPicker');
+      if (heroSelect) heroSelect.value = activeBranch;
+      if (dashSelect) dashSelect.value = activeBranch;
+
+      loadBranchCourts(activeBranch);
+      loadBranchPricing(activeBranch);
     });
 
     function handleQuickSearch(e) {

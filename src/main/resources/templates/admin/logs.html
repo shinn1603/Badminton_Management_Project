@@ -164,24 +164,8 @@
               </thead>
               <tbody id="backupListTable">
                 <tr>
-                  <td style="font-family: monospace; font-weight: 600; color: var(--text-dark);">backup_ute_sport_20261012_0200.sql.gz</td>
-                  <td>28.4 MB</td>
-                  <td>12/10/2026 02:00:01</td>
-                  <td><span class="badge" style="background: #eff6ff; color: #1d4ed8;">Tự động (Cron)</span></td>
-                  <td style="text-align: right;">
-                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="downloadBackup('backup_ute_sport_20261012_0200.sql.gz')">Tải file</button>
-                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444;" onclick="restoreBackup('backup_ute_sport_20261012_0200.sql.gz')">Phục hồi</button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="font-family: monospace; font-weight: 600; color: var(--text-dark);">backup_ute_sport_20261011_0200.sql.gz</td>
-                  <td>27.9 MB</td>
-                  <td>11/10/2026 02:00:00</td>
-                  <td><span class="badge" style="background: #eff6ff; color: #1d4ed8;">Tự động (Cron)</span></td>
-                  <td style="text-align: right;">
-                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="downloadBackup('backup_ute_sport_20261011_0200.sql.gz')">Tải file</button>
-                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444;" onclick="restoreBackup('backup_ute_sport_20261011_0200.sql.gz')">Phục hồi</button>
+                  <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                    Đang nạp danh sách bản sao lưu từ SQL Server...
                   </td>
                 </tr>
               </tbody>
@@ -267,10 +251,73 @@
       });
     }
 
+    async function loadBackupLogs() {
+      const tbody = document.getElementById('backupListTable');
+      if (!tbody) return;
+      try {
+        let token = localStorage.getItem('jwt_token');
+        if (!token && typeof document !== 'undefined' && document.cookie) {
+          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+          if (match) token = match[1];
+        }
+        const headers = {};
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/admin/logs/backups', { headers });
+        if (res.ok) {
+          const data = await res.json();
+          const backups = data.backups || [];
+          if (backups.length === 0) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                  Chưa có bản sao lưu nào được thực hiện. Nhấn nút "Sao lưu CSDL ngay" để tạo bản sao lưu mới.
+                </td>
+              </tr>
+            `;
+            return;
+          }
+          tbody.innerHTML = '';
+          backups.forEach(b => {
+            const timeStr = b.actionTime ? new Date(b.actionTime).toLocaleString('vi-VN') : '--';
+            const details = b.details || '';
+            const match = details.match(/backup_[^\s]+\.sql\.gz/);
+            const filename = match ? match[0] : ('backup_db_' + (b.id || 'system') + '.sql.gz');
+            const isCron = (b.actionType || '').toLowerCase().includes('tự động') || (b.username || '').toLowerCase() === 'system';
+            const methodBadge = isCron 
+              ? '<span class="badge" style="background: #eff6ff; color: #1d4ed8;">Tự động (Cron)</span>'
+              : '<span class="badge" style="background: #f0fdfa; color: #0f766e;">Thủ công</span>';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td style="font-family: monospace; font-weight: 600; color: var(--text-dark);">${escapeHtml(filename)}</td>
+              <td>28.5 MB</td>
+              <td>${escapeHtml(timeStr)}</td>
+              <td>${methodBadge}</td>
+              <td style="text-align: right;">
+                <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="downloadBackup('${escapeHtml(filename)}')">Tải file</button>
+                <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444;" onclick="restoreBackup('${escapeHtml(filename)}')">Phục hồi</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+          return;
+        }
+      } catch (err) {
+        console.warn('Lỗi tải lịch sử sao lưu:', err);
+      }
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
+            Chưa có bản sao lưu nào được ghi nhận trong CSDL.
+          </td>
+        </tr>
+      `;
+    }
+
     async function backupDatabaseNow() {
       const now = new Date();
       const filename = 'backup_ute_sport_manual_' + now.toISOString().replace(/[-:T.]/g, '').slice(0, 14) + '.sql.gz';
-      const timeStr = now.toLocaleDateString('vi-VN') + ' ' + now.toLocaleTimeString('vi-VN');
 
       try {
         let token = localStorage.getItem('jwt_token');
@@ -288,26 +335,10 @@
         });
         const data = await res.json();
         if (res.ok && data.success) {
-          await loadAuditLogs();
+          await Promise.all([loadBackupLogs(), loadAuditLogs()]);
         }
       } catch (err) {
         console.warn('Lỗi ghi nhật ký sao lưu:', err);
-      }
-
-      const tbody = document.getElementById('backupListTable');
-      if (tbody) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td style="font-family: monospace; font-weight: 600; color: var(--text-dark);">${filename}</td>
-          <td>28.5 MB</td>
-          <td>${timeStr}</td>
-          <td><span class="badge" style="background: #f0fdfa; color: #0f766e;">Thủ công</span></td>
-          <td style="text-align: right;">
-            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="downloadBackup('${filename}')">Tải file</button>
-            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444;" onclick="restoreBackup('${filename}')">Phục hồi</button>
-          </td>
-        `;
-        tbody.insertBefore(tr, tbody.firstChild);
       }
 
       if (window.showToast) { showToast('Đã sao lưu CSDL thành công: ' + filename, 'success'); }
@@ -332,7 +363,10 @@
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
-    document.addEventListener('DOMContentLoaded', loadAuditLogs);
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAuditLogs();
+      loadBackupLogs();
+    });
   </script>
   <script src="/js/global-hub.js"></script>
 </body>

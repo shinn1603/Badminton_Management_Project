@@ -57,7 +57,7 @@
         </div>
         <div class="brand-text">
           <h2>UTE SPORT</h2>
-          <span>CHI NHÁNH THỦ ĐỨC</span>
+          <span id="sidebarBranchName">CHI NHÁNH THỦ ĐỨC</span>
         </div>
       </div>
 
@@ -235,52 +235,6 @@
           </div>
         </div>
 
-        <!-- KPI METRICS GRID -->
-        <div class="kpi-grid" style="margin-bottom: 24px;">
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Tổng số phiếu nhập kho</span>
-              <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: var(--primary);">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: var(--primary);" id="kpiTotalReceipts">0 phiếu</div>
-            <div class="kpi-trend positive">Từ bảng stock_receipts CSDL</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Tổng giá trị vốn nhập</span>
-              <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #3b82f6;" id="kpiTotalAmount">0 đ</div>
-            <div class="kpi-trend positive">Tổng chi phí nhập hàng</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Mặt hàng trong kho chi nhánh</span>
-              <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #f59e0b;" id="kpiAvailableProducts">0 mặt hàng</div>
-            <div class="kpi-trend">Đang kinh doanh tại kho</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Nhà cung cấp đối tác</span>
-              <div class="kpi-icon-wrap" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #8b5cf6;" id="kpiSuppliersCount">0 NCC</div>
-            <div class="kpi-trend">Nguồn cung ứng uy tín</div>
-          </div>
-        </div>
 
         <div class="split-layout">
           <!-- BÊN TRÁI: FORM LẬP PHIẾU NHẬP -->
@@ -340,7 +294,7 @@
 
               <button type="button" class="btn btn-outline" style="font-size: 12.5px; margin-top: 8px;" onclick="addReceiptRow()">
                 <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>+ Thêm dòng sản phẩm</span>
+                <span>Thêm dòng sản phẩm</span>
               </button>
 
               <!-- TOTALS BOX -->
@@ -393,6 +347,20 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- DÒNG THÔNG TIN TỔNG QUAN CHUNG DƯỚI BẢNG DỮ LIỆU -->
+            <div class="data-summary-strip">
+              <div class="data-summary-group">
+                <span class="data-summary-item">Tổng nhập kho: <strong id="kpiTotalReceipts" style="color: var(--primary);">0 phiếu</strong></span>
+                <span style="opacity: 0.4;">•</span>
+                <span class="data-summary-item">Tổng vốn nhập: <strong id="kpiTotalAmount" style="color: #3b82f6;">0 đ</strong></span>
+              </div>
+              <div class="data-summary-group" style="font-size: 12.5px;">
+                <span class="data-summary-item">Mặt hàng kinh doanh: <strong id="kpiAvailableProducts" style="color: #f59e0b;">0 mặt hàng</strong></span>
+                <span style="opacity: 0.4;">•</span>
+                <span class="data-summary-item">Đối tác cung ứng: <strong id="kpiSuppliersCount" style="color: #8b5cf6;">0 NCC</strong></span>
+              </div>
+            </div>
           </div>
         </div>
       </main>
@@ -424,8 +392,10 @@
       const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
         || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
       const select = document.getElementById('branchFilterSelect');
+      const sideName = document.getElementById('sidebarBranchName');
       if (!select) return;
       if (user && (user.role === 'DIRECTOR' || user.role === 'ADMIN')) {
+        if (sideName) sideName.textContent = 'HỆ THỐNG TOÀN QUỐC';
         select.innerHTML = `
           <option value="CN01" selected>CN01 - Thủ Đức (UTE Sport)</option>
           <option value="CN02">CN02 - Bình Thạnh</option>
@@ -437,7 +407,9 @@
         select.style.cursor = 'pointer';
       } else {
         const br = (user && user.branchCode) ? user.branchCode : 'CN01';
-        select.innerHTML = `<option value="${br}" selected>${br} - Thủ Đức (Chi nhánh quản lý)</option>`;
+        const brName = branchNamesMap[br] || (user && user.branchName) || 'Chi nhánh Thủ Đức';
+        if (sideName) sideName.textContent = brName.toUpperCase();
+        select.innerHTML = `<option value="${br}" selected>${br} - ${brName} (Chi nhánh quản lý)</option>`;
         select.value = br;
         select.disabled = true;
         select.style.cursor = 'not-allowed';

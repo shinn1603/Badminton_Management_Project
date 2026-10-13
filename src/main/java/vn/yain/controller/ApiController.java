@@ -49,7 +49,7 @@ public class ApiController {
 
     /**
      * Resolves effective branch code strictly based on user's role and assigned branch.
-     * - ROLE_DIRECTOR and ROLE_ADMIN: Can view/query any branchCode or ALL.
+     * - ROLE_DIRECTOR, ROLE_ADMIN, and ROLE_CUSTOMER (or anonymous): Can view/query any branchCode or ALL.
      * - ROLE_MANAGER, ROLE_POS, or any branch staff: Strictly locked to their assigned branchCode (e.g., CN01 for Bảo).
      *   Any request to query other branches or ALL is overridden to their assigned branchCode.
      */
@@ -58,11 +58,20 @@ public class ApiController {
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
             boolean isDirectorOrAdmin = auth.getAuthorities().stream().anyMatch(a ->
                     a.getAuthority().equals("ROLE_DIRECTOR") || a.getAuthority().equals("ROLE_ADMIN"));
-            if (!isDirectorOrAdmin) {
+            boolean isCustomer = auth.getAuthorities().stream().anyMatch(a ->
+                    a.getAuthority().equals("ROLE_CUSTOMER") || a.getAuthority().equals("CUSTOMER"));
+
+            if (!isDirectorOrAdmin && !isCustomer) {
                 String username = auth.getName();
                 Optional<User> userOpt = userRepository.findByUsername(username);
-                if (userOpt.isPresent() && userOpt.get().getBranchCode() != null && !userOpt.get().getBranchCode().isBlank()) {
-                    return userOpt.get().getBranchCode().trim();
+                if (userOpt.isPresent()) {
+                    String role = userOpt.get().getRole();
+                    if ("CUSTOMER".equalsIgnoreCase(role) || "ROLE_CUSTOMER".equalsIgnoreCase(role)) {
+                        return (requestedBranchCode != null && !requestedBranchCode.isBlank()) ? requestedBranchCode.trim() : "CN01";
+                    }
+                    if (userOpt.get().getBranchCode() != null && !userOpt.get().getBranchCode().isBlank()) {
+                        return userOpt.get().getBranchCode().trim();
+                    }
                 }
                 return "CN01"; // Default branch for manager Bảo
             }
@@ -639,6 +648,20 @@ public class ApiController {
         try {
             List<AuditLog> logs = auditLogRepository.findTop100ByOrderByActionTimeDesc();
             return ResponseEntity.ok(Map.of("success", true, "logs", logs));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/admin/logs/backups")
+    public ResponseEntity<?> getAdminBackupLogs() {
+        try {
+            List<AuditLog> allLogs = auditLogRepository.findTop100ByOrderByActionTimeDesc();
+            List<AuditLog> backupLogs = allLogs.stream()
+                    .filter(l -> "Hệ thống sao lưu".equalsIgnoreCase(l.getModule())
+                            || (l.getActionType() != null && l.getActionType().toLowerCase().contains("sao lưu")))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(Map.of("success", true, "backups", backupLogs));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
@@ -1706,6 +1729,8 @@ public class ApiController {
         } catch (Exception e) {
             return 1.0;
         }
+    }
+
     // ==========================================
     // 9.1 MANAGER DASHBOARD METRICS & STATS - TRUY VẤN DỮ LIỆU THẬT TỪ SQL SERVER
     // ==========================================
@@ -2585,9 +2610,44 @@ public class ApiController {
                         pricingRuleRepository.save(r);
                     }
                 }
+
+                // Đồng bộ và cập nhật giá mới vào bảng courts để khách đặt sân và thu ngân POS lập tức nhận giá mới
+                if (p.getProposedPrice() != null) {
+                    List<Court> bCourts = courtRepository.findByBranchCode(bCode);
+                    String cType = p.getCourtType();
+                    for (Court c : bCourts) {
+                        boolean match = false;
+                        if (cType == null || cType.isBlank() || cType.contains("Tất cả")) {
+                            match = true;
+                        } else if (cType.toLowerCase().contains("vip") && c.getCourtType() != null && c.getCourtType().toLowerCase().contains("vip")) {
+                            match = true;
+                        } else if ((cType.toLowerCase().contains("tiêu chuẩn") || cType.toLowerCase().contains("thường")) &&
+                                   (c.getCourtType() == null || !c.getCourtType().toLowerCase().contains("vip"))) {
+                            match = true;
+                        } else if (c.getCourtType() != null && c.getCourtType().equalsIgnoreCase(cType)) {
+                            match = true;
+                        }
+                        if (match) {
+                            c.setHourlyRate(p.getProposedPrice());
+                            courtRepository.save(c);
+                        }
+                    }
+                }
             }
 
-            return ResponseEntity.ok(Map.of("success", true, "message", "Đã phê duyệt đề xuất giá " + p.getProposalCode() + " thành công!", "proposal", p));
+            // Ghi nhật ký kiểm toán hệ thống (Audit Log)
+            try {
+                AuditLog logEntry = new AuditLog();
+                logEntry.setActionType("PHÊ DUYỆT GIÁ SÂN");
+                logEntry.setUsername("director");
+                logEntry.setModule("Bảng giá");
+                logEntry.setStatus("Thành công");
+                logEntry.setActionTime(LocalDateTime.now());
+                logEntry.setDetails("Giám đốc phê duyệt đề xuất giá " + p.getProposalCode() + " cho chi nhánh " + bCode + " (" + (p.getCourtType() != null ? p.getCourtType() : "Sân") + "): " + p.getProposedPrice() + " đ");
+                auditLogRepository.save(logEntry);
+            } catch (Exception ignored) {}
+
+            return ResponseEntity.ok(Map.of("success", true, "message", "Đã phê duyệt đề xuất giá " + p.getProposalCode() + " thành công và đồng bộ biểu giá vào hệ thống!", "proposal", p));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi: " + e.getMessage()));
         }
@@ -2607,6 +2667,19 @@ public class ApiController {
                 p.setNote(body.get("note"));
             }
             pricingProposalRepository.save(p);
+
+            // Ghi nhật ký kiểm toán hệ thống (Audit Log)
+            try {
+                AuditLog logEntry = new AuditLog();
+                logEntry.setActionType("TỪ CHỐI GIÁ SÂN");
+                logEntry.setUsername("director");
+                logEntry.setModule("Bảng giá");
+                logEntry.setStatus("Thành công");
+                logEntry.setActionTime(LocalDateTime.now());
+                logEntry.setDetails("Giám đốc từ chối đề xuất giá " + p.getProposalCode() + ". Lý do: " + (p.getNote() != null ? p.getNote() : "Không ghi rõ"));
+                auditLogRepository.save(logEntry);
+            } catch (Exception ignored) {}
+
             return ResponseEntity.ok(Map.of("success", true, "message", "Đã từ chối đề xuất giá " + p.getProposalCode() + "!", "proposal", p));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi: " + e.getMessage()));
@@ -2796,6 +2869,76 @@ public class ApiController {
             }
             promotionRepository.delete(opt.get());
             return ResponseEntity.ok(Map.of("success", true, "message", "Đã xóa chương trình khuyến mãi thành công khỏi Database!"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/director/pricing/promotions/{id}/approve")
+    public ResponseEntity<?> approvePromotion(@PathVariable String id) {
+        try {
+            Optional<Promotion> opt = Optional.empty();
+            try {
+                Long numId = Long.parseLong(id);
+                opt = promotionRepository.findById(numId);
+            } catch (NumberFormatException ignored) {}
+            if (opt.isEmpty()) {
+                opt = promotionRepository.findByPromoCode(id);
+            }
+            if (opt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "Không tìm thấy chương trình khuyến mãi: " + id));
+            }
+            Promotion p = opt.get();
+            p.setStatus("Đang áp dụng");
+            promotionRepository.save(p);
+
+            try {
+                AuditLog logEntry = new AuditLog();
+                logEntry.setActionType("KÍCH HOẠT KHUYẾN MÃI");
+                logEntry.setUsername("director");
+                logEntry.setModule("Khuyến mãi");
+                logEntry.setStatus("Thành công");
+                logEntry.setActionTime(LocalDateTime.now());
+                logEntry.setDetails("Giám đốc phê duyệt và kích hoạt chiến dịch khuyến mãi: " + p.getPromoCode() + " (" + p.getPromoName() + ")");
+                auditLogRepository.save(logEntry);
+            } catch (Exception ignored) {}
+
+            return ResponseEntity.ok(Map.of("success", true, "message", "Đã phê duyệt và kích hoạt chiến dịch khuyến mãi '" + p.getPromoName() + "' thành công!", "promotion", p));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/director/pricing/promotions/{id}/reject")
+    public ResponseEntity<?> rejectPromotion(@PathVariable String id) {
+        try {
+            Optional<Promotion> opt = Optional.empty();
+            try {
+                Long numId = Long.parseLong(id);
+                opt = promotionRepository.findById(numId);
+            } catch (NumberFormatException ignored) {}
+            if (opt.isEmpty()) {
+                opt = promotionRepository.findByPromoCode(id);
+            }
+            if (opt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "Không tìm thấy chương trình khuyến mãi: " + id));
+            }
+            Promotion p = opt.get();
+            p.setStatus("Từ chối");
+            promotionRepository.save(p);
+
+            try {
+                AuditLog logEntry = new AuditLog();
+                logEntry.setActionType("BÁC BỎ KHUYẾN MÃI");
+                logEntry.setUsername("director");
+                logEntry.setModule("Khuyến mãi");
+                logEntry.setStatus("Thành công");
+                logEntry.setActionTime(LocalDateTime.now());
+                logEntry.setDetails("Giám đốc bác bỏ chiến dịch khuyến mãi: " + p.getPromoCode() + " (" + p.getPromoName() + ")");
+                auditLogRepository.save(logEntry);
+            } catch (Exception ignored) {}
+
+            return ResponseEntity.ok(Map.of("success", true, "message", "Đã bác bỏ chương trình khuyến mãi '" + p.getPromoName() + "'!", "promotion", p));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi: " + e.getMessage()));
         }

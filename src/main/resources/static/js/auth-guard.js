@@ -52,8 +52,8 @@
     CUSTOMER: {
       roleTitle: 'Hội viên trực tuyến',
       defaultName: 'Lê Bá Đạt',
-      branchCode: 'CN01',
-      branchName: 'CN Thủ Đức',
+      branchCode: 'ALL',
+      branchName: 'Toàn hệ thống',
       allowedPrefixes: ['/customer/', '/', '/login'],
       prohibitedPrefixes: ['/pos/', '/manager/', '/director/', '/admin/'],
       homeUrl: '/customer/home',
@@ -138,8 +138,8 @@
       user.role = 'CUSTOMER';
       user.fullName = 'Lê Bá Đạt';
       user.roleTitle = 'Hội viên trực tuyến';
-      user.branchCode = 'CN01';
-      user.branchName = 'CN Thủ Đức';
+      user.branchCode = 'ALL';
+      user.branchName = 'Toàn hệ thống';
     }
 
     // CRITICAL: NEVER mutate an authenticated user's account or role based on current URL!
@@ -253,6 +253,14 @@
         el.textContent = titleLabel;
       });
 
+      // Update POS branch brand indicators if present
+      document.querySelectorAll('#posSidebarBranchText').forEach(el => {
+        el.textContent = (currentUser.branchName || ('Chi nhánh ' + branchLabel)).toUpperCase();
+      });
+      document.querySelectorAll('#posHeaderBranchText').forEach(el => {
+        el.textContent = `Sơ đồ & Lưới đặt sân thời gian thực - ${currentUser.branchName || branchLabel}`;
+      });
+
       // Strict role isolation in UI navigation
       if (currentUser.role === 'DIRECTOR') {
         document.querySelectorAll('a[href^="/admin/"], a[href^="/manager/"], a[href^="/pos/"]').forEach(el => {
@@ -273,9 +281,9 @@
       }
 
       // Strict branch-level isolation:
-      // If user is MANAGER or has a specific branch assigned and is not DIRECTOR or ADMIN,
-      // lock down all branch selection dropdowns across the application to their assigned branch.
-      if (currentUser.role === 'MANAGER' || (currentUser.branchCode && currentUser.branchCode !== 'ALL' && currentUser.role !== 'DIRECTOR' && currentUser.role !== 'ADMIN')) {
+      // ONLY apply to branch staff (MANAGER, POS, STAFF). CUSTOMER, DIRECTOR, and ADMIN are never restricted.
+      const isInternalBranchStaff = currentUser && currentUser.role !== 'CUSTOMER' && currentUser.role !== 'DIRECTOR' && currentUser.role !== 'ADMIN' && (currentUser.role === 'MANAGER' || currentUser.role === 'POS' || currentUser.role === 'STAFF');
+      if (isInternalBranchStaff) {
         const assignedBranch = currentUser.branchCode || 'CN01';
         const assignedBranchName = currentUser.branchName || 'CN Thủ Đức';
         localStorage.setItem('manager_active_branch', assignedBranch);
@@ -541,9 +549,10 @@
       }
     }
 
-    // Strict branch isolation for MANAGER or branch-scoped roles:
-    // If user is MANAGER and requests API with branchCode, sanitize to their assigned branchCode.
-    if (currentUser && (currentUser.role === 'MANAGER' || (currentUser.branchCode && currentUser.branchCode !== 'ALL' && currentUser.role !== 'DIRECTOR' && currentUser.role !== 'ADMIN'))) {
+    // Strict branch isolation ONLY for branch staff (MANAGER, POS, STAFF):
+    // CUSTOMER, DIRECTOR, and ADMIN can freely query any branch across the chain.
+    const isInternalBranchStaff = currentUser && currentUser.role !== 'CUSTOMER' && currentUser.role !== 'DIRECTOR' && currentUser.role !== 'ADMIN' && (currentUser.role === 'MANAGER' || currentUser.role === 'POS' || currentUser.role === 'STAFF');
+    if (isInternalBranchStaff) {
       const assignedBranch = currentUser.branchCode || 'CN01';
       if (typeof url === 'string' && url.includes('branchCode=')) {
         url = url.replace(/branchCode=[^&]*/g, 'branchCode=' + encodeURIComponent(assignedBranch));

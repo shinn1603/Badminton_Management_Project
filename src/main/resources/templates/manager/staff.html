@@ -369,52 +369,6 @@
           </div>
         </div>
 
-        <!-- KPI METRICS -->
-        <div class="kpi-grid">
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Tổng nhân sự chi nhánh</span>
-              <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: var(--primary);">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-              </div>
-            </div>
-            <div class="kpi-val" id="kpiTotalStaff" style="color: var(--primary);">-- nhân sự</div>
-            <div class="kpi-trend positive" id="kpiStaffBreakdown">Đang tải dữ liệu từ CSDL...</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Đang trong ca sáng hôm nay</span>
-              <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              </div>
-            </div>
-            <div class="kpi-val" id="kpiTodayMorning" style="color: #3b82f6;">-- nhân sự</div>
-            <div class="kpi-trend positive" id="kpiTodayMorningTrend">Ca sáng (05:00 - 13:30)</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Ca chiều tối hôm nay (13:30 - 22:30)</span>
-              <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-              </div>
-            </div>
-            <div class="kpi-val" id="kpiTodayNight" style="color: #f59e0b;">-- nhân sự</div>
-            <div class="kpi-trend" id="kpiTodayNightTrend">Tăng cường ca tối phục vụ giờ cao điểm</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Tỷ lệ phủ ca tuần</span>
-              <div class="kpi-icon-wrap" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              </div>
-            </div>
-            <div class="kpi-val" id="kpiCoverageRate" style="color: #8b5cf6;">--%</div>
-            <div class="kpi-trend positive" id="kpiCoverageTrend">14 ca trực trong tuần</div>
-          </div>
-        </div>
 
         <!-- MA TRẬN PHÂN CA TUẦN -->
         <div class="section-card" style="margin-bottom: 24px;">
@@ -497,6 +451,24 @@
                 <!-- RENDERED DYNAMICALLY VIA JAVASCRIPT -->
               </tbody>
             </table>
+          </div>
+
+          <!-- DÒNG THÔNG TIN TỔNG QUAN CHUNG DƯỚI BẢNG DỮ LIỆU -->
+          <div class="data-summary-strip">
+            <div class="data-summary-group">
+              <span class="data-summary-item">Tổng nhân sự: <strong id="kpiTotalStaff" style="color: var(--text-dark);">-- nhân sự</strong></span>
+              <span style="opacity: 0.4;">•</span>
+              <span id="kpiStaffBreakdown" style="font-size: 12px; color: var(--text-muted);">Đang tải dữ liệu...</span>
+            </div>
+            <div class="data-summary-group" style="font-size: 12.5px;">
+              <span class="data-summary-item">Ca sáng: <strong id="kpiTodayMorning" style="color: #3b82f6;">--</strong></span>
+              <span style="opacity: 0.4;">•</span>
+              <span class="data-summary-item">Ca tối: <strong id="kpiTodayNight" style="color: #f59e0b;">--</strong></span>
+              <span style="opacity: 0.4;">•</span>
+              <span class="data-summary-item">Độ phủ ca tuần: <strong id="kpiCoverageRate" style="color: #8b5cf6;">--%</strong> (<span id="kpiCoverageTrend">14/14 ca</span>)</span>
+            </div>
+            <span id="kpiTodayMorningTrend" style="display: none;"></span>
+            <span id="kpiTodayNightTrend" style="display: none;"></span>
           </div>
         </div>
       </main>
@@ -728,8 +700,16 @@
       const weekInfo = getCurrentWeekDays();
       let html = `<th style="width: 125px;">Ca Trực</th>`;
       weekInfo.forEach(w => {
-        const todayBadge = w.isToday ? ` <span class="badge badge-green" style="font-size: 9.5px; padding: 2px 4px; margin-left: 4px;">HÔM NAY</span>` : '';
-        html += `<th>${w.dayName} (${w.formattedDate})${todayBadge}</th>`;
+        const todayThBg = w.isToday ? 'background: rgba(16, 185, 129, 0.08);' : '';
+        html += `
+          <th style="${todayThBg}">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+              <span style="font-weight: 700; font-size: 12.5px;">${w.dayName}</span>
+              <span style="font-size: 11px; color: var(--text-muted); font-weight: 500;">${w.formattedDate}</span>
+              ${w.isToday ? `<span class="badge badge-green" style="font-size: 9.5px; padding: 1px 6px; border-radius: 9999px; margin-top: 2px;">HÔM NAY</span>` : ''}
+            </div>
+          </th>
+        `;
       });
       theadTr.innerHTML = html;
     }
@@ -810,6 +790,33 @@
     // ==========================================
     // RENDER SHIFT SCHEDULE MATRIX
     // ==========================================
+    function getCleanDuty(rawDuty, staff) {
+      if (staff && staff.role) {
+        if (staff.role.includes('Quản lý')) return 'Quản lý';
+        if (staff.role.includes('Lễ tân')) return 'Lễ tân';
+        if (staff.role.includes('Kỹ thuật')) return 'Kỹ thuật';
+        if (staff.role.includes('POS') && (rawDuty === 'POS' || (rawDuty && rawDuty.includes('POS')))) return 'POS';
+        if (staff.role.includes('Thu ngân')) return 'Thu ngân';
+      }
+      if (staff && staff.id) {
+        if (staff.id === 'NV-01') return 'Quản lý';
+        if (staff.id === 'NV-02') return 'POS';
+        if (staff.id === 'NV-03') return 'Lễ tân';
+        if (staff.id === 'NV-04') return 'Thu ngân';
+        if (staff.id === 'NV-05' || staff.id === 'NV-06') return 'Kỹ thuật';
+      }
+      let d = (rawDuty || '').trim();
+      if (!d || d.includes('?')) {
+        const dLower = d.toLowerCase();
+        if (dLower.includes('thu') || d.includes('K') || d.includes('k')) return 'Kỹ thuật';
+        if (dLower.includes('tân') || d.includes('L') || d.includes('l')) return 'Lễ tân';
+        if (dLower.includes('lý') || d.includes('Qu') || d.includes('qu')) return 'Quản lý';
+        if (dLower.includes('ngân') || d.includes('Thu') || d.includes('thu')) return 'Thu ngân';
+        return 'Trực ca';
+      }
+      return d;
+    }
+
     function renderShiftMatrix() {
       const tbody = document.getElementById('shiftMatrixTbody');
       if (!tbody) return;
@@ -835,34 +842,23 @@
           const dayKey = w.key;
           const isToday = w.isToday;
           const dayShifts = (shiftSchedule[dayKey] && shiftSchedule[dayKey][shift.key]) || [];
+          const todayColBg = isToday ? 'background: rgba(16, 185, 129, 0.03);' : '';
 
-          html += `<td><div class="schedule-cell">`;
+          html += `<td style="${todayColBg}"><div class="schedule-cell">`;
 
           dayShifts.forEach((item, idx) => {
             const staff = getStaffById(item.staffId);
             const displayName = staff ? staff.shortName : item.staffId;
-            const dutyText = item.duty || 'Trực';
-
+            const dutyText = getCleanDuty(item.duty, staff);
             const nightClass = shift.isNight ? 'shift-night' : '';
-            const todayStyle = (isToday && !shift.isNight && idx === 0) ? 'border: 2px solid var(--primary);' : (isToday && shift.isNight && idx === 0) ? 'border: 2px solid #2563eb;' : '';
-
-            let todayTag = '';
-            if (isToday && idx === 0) {
-              todayTag = shift.isNight 
-                ? `<span class="badge badge-blue" style="font-size: 9px; padding: 2px 4px; margin-right: 4px;">CA TỐI</span>` 
-                : `<span class="badge badge-green" style="font-size: 9px; padding: 2px 4px; margin-right: 4px;">HÔM NAY</span>`;
-            }
 
             html += `
-              <div class="staff-badge-shift ${nightClass}" style="${todayStyle}" title="${staff ? staff.name : ''}">
-                <div style="display: flex; align-items: center; gap: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                  <span>${displayName}</span>
-                  <span style="font-size: 10px; opacity: 0.85; font-weight: 600;">[${dutyText}]</span>
+              <div class="staff-badge-shift ${nightClass}" title="${staff ? (staff.name + ' - ' + (staff.role || dutyText)) : ''}">
+                <div style="display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                  <span style="font-weight: 700;">${displayName}</span>
+                  <span style="font-size: 10.5px; opacity: 0.85; font-weight: 600;">[${dutyText}]</span>
                 </div>
-                <div style="display: flex; align-items: center;">
-                  ${todayTag}
-                  <button type="button" class="btn-del-shift" onclick="removeStaffFromShift('${dayKey}', '${shift.key}', '${item.staffId}')" title="Xóa nhân viên khỏi ca này">✕</button>
-                </div>
+                <button type="button" class="btn-del-shift" onclick="removeStaffFromShift('${dayKey}', '${shift.key}', '${item.staffId}')" title="Xóa nhân viên khỏi ca này">✕</button>
               </div>
             `;
           });
@@ -883,6 +879,7 @@
       updateKPIs();
     }
 
+
     // ==========================================
     // RENDER STAFF TABLE
     // ==========================================
@@ -897,7 +894,7 @@
           s.id.toLowerCase().includes(keyword) || 
           s.phone.includes(keyword) || 
           (s.email && s.email.toLowerCase().includes(keyword));
-        const matchesRole = !filterRole || s.role === filterRole;
+        const matchesRole = !filterRole || s.role === filterRole || s.role.includes(filterRole) || (filterRole.includes('Kỹ thuật') && s.role.includes('Kỹ thuật'));
         return matchesKeyword && matchesRole;
       });
 
@@ -909,16 +906,25 @@
       let html = '';
       filtered.forEach((staff, idx) => {
         let roleBadge = 'badge-blue';
-        if (staff.role.includes('Quản lý')) roleBadge = 'badge-purple';
+        if (staff.role.includes('Quản lý') || staff.role.includes('Giám đốc')) roleBadge = 'badge-purple';
         else if (staff.role.includes('Lễ tân')) roleBadge = 'badge-amber';
-        else if (staff.role.includes('Kỹ thuật')) roleBadge = 'badge-purple';
+        else if (staff.role.includes('Kỹ thuật')) roleBadge = 'badge-teal';
+        else if (staff.role.includes('Thu ngân') || staff.role.includes('POS')) roleBadge = 'badge-blue';
+
+        // Đồng bộ chuẩn hóa tên hiển thị chức danh trên bảng
+        let displayRole = staff.role;
+        if (displayRole.includes('Giám đốc')) displayRole = 'Giám đốc điều hành';
+        else if (displayRole.includes('Quản lý')) displayRole = 'Quản lý chi nhánh';
+        else if (displayRole.includes('Thu ngân') || displayRole.includes('POS')) displayRole = 'Thu ngân quầy POS';
+        else if (displayRole.includes('Lễ tân')) displayRole = 'Lễ tân & Dịch vụ';
+        else if (displayRole.includes('Kỹ thuật')) displayRole = 'Kỹ thuật & Bảo dưỡng sân';
 
         html += `
           <tr>
             <td style="text-align: center;">${idx + 1}</td>
             <td><strong>${staff.id}</strong></td>
             <td><strong>${staff.name}</strong></td>
-            <td><span class="badge ${roleBadge}">${staff.role}</span></td>
+            <td><span class="badge ${roleBadge}">${displayRole}</span></td>
             <td>${staff.phone}</td>
             <td>${staff.email || '-'}</td>
             <td><span class="badge ${staff.status === 'Đang làm việc' ? 'badge-green' : 'badge-amber'}">${staff.status}</span></td>

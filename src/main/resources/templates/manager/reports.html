@@ -239,52 +239,6 @@
           </div>
         </div>
 
-        <!-- KPI METRICS -->
-        <div class="kpi-grid">
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label" id="kpiTotalRevenueLabel">Tổng doanh thu kỳ báo cáo</span>
-              <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: var(--primary);">
-                <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: var(--primary);" id="kpiTotalRevenue">0 đ</div>
-            <div class="kpi-trend positive" id="kpiComparisonLabel">Tính từ CSDL SQL Server</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Doanh thu tiền giờ sân</span>
-              <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #3b82f6;" id="kpiCourtRevenue">0 đ</div>
-            <div class="kpi-trend positive" id="kpiCourtRevenuePercent">Chiếm 0% tổng thu</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Dịch vụ nước & Dụng cụ</span>
-              <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #f59e0b;" id="kpiServiceRevenue">0 đ</div>
-            <div class="kpi-trend positive" id="kpiServiceRevenuePercent">Chiếm 0% tổng thu</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Tỷ lệ lấp đầy bình quân</span>
-              <div class="kpi-icon-wrap" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #8b5cf6;" id="kpiOccupancyRate">0%</div>
-            <div class="kpi-trend positive" id="kpiTotalHoursLabel">0 giờ thi đấu</div>
-          </div>
-        </div>
 
         <!-- CHARTS SECTION -->
         <div class="grid-charts-layout">
@@ -339,6 +293,21 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- DÒNG THÔNG TIN TỔNG QUAN CHUNG DƯỚI BẢNG DỮ LIỆU -->
+          <div class="data-summary-strip">
+            <div class="data-summary-group">
+              <span class="data-summary-item"><span id="kpiTotalRevenueLabel">Tổng doanh thu kỳ</span>: <strong id="kpiTotalRevenue" style="color: var(--primary);">0 đ</strong></span>
+              <span id="kpiComparisonLabel" style="display: none;"></span>
+            </div>
+            <div class="data-summary-group" style="font-size: 12.5px;">
+              <span class="data-summary-item">Tiền giờ sân: <strong id="kpiCourtRevenue" style="color: #3b82f6;">0 đ</strong> (<span id="kpiCourtRevenuePercent">0%</span>)</span>
+              <span style="opacity: 0.4;">•</span>
+              <span class="data-summary-item">Dịch vụ quầy: <strong id="kpiServiceRevenue" style="color: #f59e0b;">0 đ</strong> (<span id="kpiServiceRevenuePercent">0%</span>)</span>
+              <span style="opacity: 0.4;">•</span>
+              <span class="data-summary-item">Tỷ lệ lấp đầy: <strong id="kpiOccupancyRate" style="color: #8b5cf6;">0%</strong> (<span id="kpiTotalHoursLabel">0 giờ</span>)</span>
+            </div>
           </div>
         </div>
       </main>

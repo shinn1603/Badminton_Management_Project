@@ -336,52 +336,7 @@
           </div>
         </div>
 
-        <!-- KPI METRICS ROW (CONNECTED TO SQL SERVER) -->
-        <div class="kpi-grid">
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Tổng số sân thi đấu</span>
-              <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: var(--primary);">
-                <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
-              </div>
-            </div>
-            <div class="kpi-val" id="totalCourtsCount">0 sân</div>
-            <div class="kpi-trend positive" id="totalCourtsTrend">Dữ liệu từ CSDL SQL Server</div>
-          </div>
 
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Sẵn sàng phục vụ (Trống)</span>
-              <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #10b981;" id="availableCourtsCount">0 sân</div>
-            <div class="kpi-trend positive">Đang trống, sẵn sàng nhận khách</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Đang có khách thi đấu</span>
-              <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #f59e0b;" id="inUseCourtsCount">0 sân</div>
-            <div class="kpi-trend" id="inUseCourtsTrend">Đang trong thời gian chơi</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Đang bảo trì định kỳ</span>
-              <div class="kpi-icon-wrap" style="background: rgba(239, 68, 68, 0.12); color: #ef4444;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #ef4444;" id="maintenanceCourtsCount">0 sân</div>
-            <div class="kpi-trend">Bảo trì mặt thảm, lưới hoặc hệ thống đèn</div>
-          </div>
-        </div>
 
         <!-- VISUAL COURTS GRID (DYNAMICALLY RENDERED FROM SQL SERVER) -->
         <div class="section-card" style="margin-bottom: 24px;">
@@ -599,19 +554,8 @@
 
     function updateKpiMetrics() {
       const total = allCourts.length;
-      const available = allCourts.filter(c => c.status === 'Trống').length;
-      const inUse = allCourts.filter(c => c.status === 'Đang sử dụng' || c.status === 'Đang giữ chỗ').length;
-      const maintenance = allCourts.filter(c => c.status === 'Bảo trì').length;
-
-      document.getElementById('totalCourtsCount').textContent = `${total} sân`;
-      document.getElementById('availableCourtsCount').textContent = `${available} sân`;
-      document.getElementById('inUseCourtsCount').textContent = `${inUse} sân`;
-      document.getElementById('maintenanceCourtsCount').textContent = `${maintenance} sân`;
-
-      const branch = getActiveBranch();
-      const branchText = branch === 'ALL' ? 'Toàn hệ thống' : `Chi nhánh ${branch}`;
-      document.getElementById('totalCourtsTrend').textContent = `${branchText} (${total} sân chuẩn BWF)`;
-      document.getElementById('sidebarCourtsTag').textContent = `${total} sân`;
+      const sidebarTag = document.getElementById('sidebarCourtsTag');
+      if (sidebarTag) sidebarTag.textContent = `${total} sân`;
     }
 
     function applyFilters() {

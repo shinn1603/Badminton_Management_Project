@@ -24,10 +24,10 @@ public class Staff {
     @Column(name = "branch_code", nullable = false, length = 20)
     private String branchCode;
 
-    @Column(name = "full_name", nullable = false, length = 100)
+    @Column(name = "full_name", nullable = false, columnDefinition = "NVARCHAR(100)")
     private String fullName;
 
-    @Column(name = "position", nullable = false, length = 50)
+    @Column(name = "position", nullable = false, columnDefinition = "NVARCHAR(50)")
     private String position;
 
     @Column(name = "phone", nullable = false, length = 20)
@@ -36,10 +36,10 @@ public class Staff {
     @Column(name = "email", length = 100, unique = true)
     private String email;
 
-    @Column(name = "address", length = 255)
+    @Column(name = "address", columnDefinition = "NVARCHAR(255)")
     private String address;
 
     @Builder.Default
-    @Column(name = "status", length = 30)
+    @Column(name = "status", columnDefinition = "NVARCHAR(30)")
     private String status = "Đang làm việc";
 }

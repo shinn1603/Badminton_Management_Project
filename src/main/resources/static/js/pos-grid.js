@@ -77,12 +77,14 @@ const timeSlots = [
 ];
 
 const fallbackCourts = [
-  { courtCode: 'CL01', courtName: 'San 01 (VIP Yonex)', courtType: 'VIP Yonex', hourlyRate: 120000, branchCode: 'CN01' },
-  { courtCode: 'CL02', courtName: 'San 02 (VIP Yonex)', courtType: 'VIP Yonex', hourlyRate: 120000, branchCode: 'CN01' },
-  { courtCode: 'CL03', courtName: 'San 03 (Tham Enlio)', courtType: 'Tieu chuan', hourlyRate: 90000, branchCode: 'CN01' },
-  { courtCode: 'CL04', courtName: 'San 04 (Tham Enlio)', courtType: 'Tieu chuan', hourlyRate: 90000, branchCode: 'CN01' },
-  { courtCode: 'CL05', courtName: 'San 05 (Tieu chuan)', courtType: 'Tieu chuan', hourlyRate: 90000, branchCode: 'CN01' },
-  { courtCode: 'CL06', courtName: 'San 06 (Tieu chuan)', courtType: 'Tieu chuan', hourlyRate: 90000, branchCode: 'CN01' }
+  { courtCode: 'CL01', courtName: 'Sân 01 (VIP Yonex)', courtType: 'VIP Yonex', hourlyRate: 120000, branchCode: 'CN01' },
+  { courtCode: 'CL02', courtName: 'Sân 02 (VIP Yonex)', courtType: 'VIP Yonex', hourlyRate: 120000, branchCode: 'CN01' },
+  { courtCode: 'CL03', courtName: 'Sân 03 (Thảm Enlio)', courtType: 'Tiêu chuẩn', hourlyRate: 90000, branchCode: 'CN01' },
+  { courtCode: 'CL04', courtName: 'Sân 04 (Thảm Enlio)', courtType: 'Tiêu chuẩn', hourlyRate: 90000, branchCode: 'CN01' },
+  { courtCode: 'CL05', courtName: 'Sân 05 (Tiêu chuẩn)', courtType: 'Tiêu chuẩn', hourlyRate: 90000, branchCode: 'CN01' },
+  { courtCode: 'CL06', courtName: 'Sân 06 (Tiêu chuẩn)', courtType: 'Tiêu chuẩn', hourlyRate: 90000, branchCode: 'CN01' },
+  { courtCode: 'CL07', courtName: 'Sân 07 (Tiêu chuẩn)', courtType: 'Tiêu chuẩn', hourlyRate: 90000, branchCode: 'CN01' },
+  { courtCode: 'CL08', courtName: 'Sân 08 (Tiêu chuẩn)', courtType: 'Tiêu chuẩn', hourlyRate: 90000, branchCode: 'CN01' }
 ];
 
 function formatDate(dateObj) {
@@ -111,9 +113,10 @@ function updateCourtSelectDropdowns() {
     const curVal = bSelect.value;
     bSelect.innerHTML = realCourts.map(c => {
       const rate = Number(c.hourlyRate) || 90000;
-      return `<option value="${c.courtCode}" data-price="${rate}">${c.courtName} - ${rate.toLocaleString('vi-VN')} đ/h</option>`;
+      const isMaint = (c.status === 'Bảo trì');
+      return `<option value="${c.courtCode}" data-price="${rate}" ${isMaint ? 'disabled style="color: #d97706;"' : ''}>${c.courtName} ${isMaint ? '[BẢO TRÌ - KHÔNG NHẬN ĐẶT]' : `- ${rate.toLocaleString('vi-VN')} đ/h`}</option>`;
     }).join('');
-    if (curVal && realCourts.some(c => c.courtCode === curVal)) {
+    if (curVal && realCourts.some(c => c.courtCode === curVal && c.status !== 'Bảo trì')) {
       bSelect.value = curVal;
     }
   }
@@ -123,9 +126,10 @@ function updateCourtSelectDropdowns() {
     const curVal = tSelect.value;
     tSelect.innerHTML = realCourts.map(c => {
       const rate = Number(c.hourlyRate) || 90000;
-      return `<option value="${c.courtCode}" data-price="${rate}">${c.courtName} - ${rate.toLocaleString('vi-VN')} đ/h</option>`;
+      const isMaint = (c.status === 'Bảo trì');
+      return `<option value="${c.courtCode}" data-price="${rate}" ${isMaint ? 'disabled style="color: #d97706;"' : ''}>${c.courtName} ${isMaint ? '[BẢO TRÌ - KHÔNG CHUYỂN ĐẾN]' : `- ${rate.toLocaleString('vi-VN')} đ/h`}</option>`;
     }).join('');
-    if (curVal && realCourts.some(c => c.courtCode === curVal)) {
+    if (curVal && realCourts.some(c => c.courtCode === curVal && c.status !== 'Bảo trì')) {
       tSelect.value = curVal;
     }
   }
@@ -219,12 +223,14 @@ async function renderGridForDate(dateStr) {
       appData[currentBranch][dateStr][court.courtCode] = {};
     }
 
+    const isCourtMaintenance = (court.status === 'Bảo trì');
+
     let rowHtml = `
       <tr>
         <td class="matrix-td-court">
           <div class="court-info">
-            <span class="court-name">${court.courtName}</span>
-            <span class="court-type">${isVip ? 'VIP • Thảm Yonex BWF' : (isEnlio ? 'Tiêu chuẩn • Thảm Enlio' : 'Tiêu chuẩn • Thảm Taraflex')}</span>
+            <span class="court-name">${court.courtName} ${isCourtMaintenance ? '<span class="badge badge-amber" style="font-size: 10px; margin-left: 4px;">Bảo trì</span>' : ''}</span>
+            <span class="court-type" style="${isCourtMaintenance ? 'color: #d97706; font-weight: 600;' : ''}">${isCourtMaintenance ? 'Đang bảo trì kỹ thuật' : (isVip ? 'VIP • Thảm Yonex BWF' : (isEnlio ? 'Tiêu chuẩn • Thảm Enlio' : 'Tiêu chuẩn • Thảm Taraflex'))}</span>
           </div>
         </td>`;
 
@@ -242,7 +248,18 @@ async function renderGridForDate(dateStr) {
       });
 
       let cellData;
-      if (matchedBooking) {
+      if (isCourtMaintenance) {
+        cellData = {
+          state: 'maintenance',
+          code: '',
+          customer: '',
+          phone: '',
+          price: defaultPrice,
+          deposit: 0,
+          rawStatus: 'Bảo trì',
+          posItems: []
+        };
+      } else if (matchedBooking) {
         let state = 'booked';
         const st = (matchedBooking.status || '').toLowerCase();
         if (st.includes('đang sử dụng') || st.includes('đang chơi') || st === 'in-use') {
@@ -288,7 +305,13 @@ async function renderGridForDate(dateStr) {
       appData[currentBranch][dateStr][court.courtCode][timeSlot] = cellData;
 
       rowHtml += `<td class="matrix-slot-cell">`;
-      if (cellData.state === 'available') {
+      if (cellData.state === 'maintenance') {
+        rowHtml += `
+          <div class="slot-inner state-maintenance" style="background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.4); color: #d97706; cursor: not-allowed; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 48px; border-radius: 6px; padding: 4px;" onclick="alert('Sân ${court.courtName} đang trong quá trình bảo trì kỹ thuật, tạm dừng nhận đặt!')">
+            <span class="slot-title" style="font-weight: 700; font-size: 11px; color: #d97706;">Bảo trì</span>
+            <span style="font-size: 10px; color: #b45309; opacity: 0.85;">Tạm khóa</span>
+          </div>`;
+      } else if (cellData.state === 'available') {
         if (dateStr < todayStr) {
           rowHtml += `
             <div class="slot-inner" style="background-color: var(--surface-subtle); border: 1px dashed var(--border-subtle); color: var(--text-muted); cursor: not-allowed;" onclick="alert('Không thể đặt sân cho các ngày trong quá khứ!')">

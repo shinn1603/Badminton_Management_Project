@@ -35,7 +35,7 @@ public class WorkShift {
     @Column(name = "shift_type", length = 30)
     private String shiftType; // morning, night
 
-    @Column(name = "duty", length = 50)
+    @Column(name = "duty", columnDefinition = "NVARCHAR(100)")
     private String duty; // POS, Thu ngan, Le tan, Ky thuat, Quan ly
 
     @Builder.Default
@@ -55,6 +55,6 @@ public class WorkShift {
     private String endTime = "14:00";
 
     @Builder.Default
-    @Column(name = "status", length = 30)
+    @Column(name = "status", columnDefinition = "NVARCHAR(50)")
     private String status = "Đã phân ca";
 }

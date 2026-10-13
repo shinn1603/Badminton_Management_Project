@@ -23,7 +23,7 @@
         </div>
         <div class="brand-text">
           <h2>UTE SPORT</h2>
-          <span>CHI NHÁNH THỦ ĐỨC</span>
+          <span id="sidebarBranchName">CHI NHÁNH THỦ ĐỨC</span>
         </div>
       </div>
 
@@ -192,52 +192,6 @@
           </div>
         </div>
 
-        <!-- KPI METRICS -->
-        <div class="kpi-grid">
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Tổng số mặt hàng kinh doanh</span>
-              <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: var(--primary);">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: var(--primary);" id="kpiTotalItems">0 mặt hàng</div>
-            <div class="kpi-trend positive">F&B và phụ kiện thể thao</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Tổng tồn kho thực tế</span>
-              <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"></path><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #3b82f6;" id="kpiTotalStock">0 món</div>
-            <div class="kpi-trend positive">Đảm bảo phục vụ liên tục</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Cảnh báo sắp hết hàng</span>
-              <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #f59e0b;" id="kpiLowStock">0 mặt hàng</div>
-            <div class="kpi-trend">Dưới định mức tối thiểu</div>
-          </div>
-
-          <div class="kpi-card-unified">
-            <div class="kpi-header">
-              <span class="kpi-label">Giá trị vốn tồn kho</span>
-              <div class="kpi-icon-wrap" style="background: rgba(139, 92, 246, 0.12); color: #8b5cf6;">
-                <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-              </div>
-            </div>
-            <div class="kpi-val" style="color: #8b5cf6;" id="kpiTotalValue">0 đ</div>
-            <div class="kpi-trend">Theo giá vốn nhập kho</div>
-          </div>
-        </div>
 
         <!-- TABLE SECTION -->
         <div class="section-card">
@@ -300,6 +254,20 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- DÒNG THÔNG TIN TỔNG QUAN CHUNG DƯỚI BẢNG DỮ LIỆU -->
+          <div class="data-summary-strip">
+            <div class="data-summary-group">
+              <span class="data-summary-item">Tổng danh mục hàng hóa: <strong id="kpiTotalItems" style="color: var(--primary);">0 mặt hàng</strong></span>
+              <span style="opacity: 0.4;">•</span>
+              <span class="data-summary-item">Tổng tồn kho thực tế: <strong id="kpiTotalStock" style="color: #3b82f6;">0 món</strong></span>
+            </div>
+            <div class="data-summary-group" style="font-size: 12.5px;">
+              <span class="data-summary-item">Cảnh báo sắp hết: <strong id="kpiLowStock" style="color: #f59e0b;">0 mặt hàng</strong></span>
+              <span style="opacity: 0.4;">•</span>
+              <span class="data-summary-item">Giá trị vốn tồn kho: <strong id="kpiTotalValue" style="color: #8b5cf6;">0 đ</strong></span>
+            </div>
           </div>
         </div>
       </main>
@@ -408,8 +376,10 @@
       const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
         || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
       const select = document.getElementById('branchFilterSelect');
+      const sideName = document.getElementById('sidebarBranchName');
       if (!select) return;
       if (user && (user.role === 'DIRECTOR' || user.role === 'ADMIN')) {
+        if (sideName) sideName.textContent = 'HỆ THỐNG TOÀN QUỐC';
         select.innerHTML = `
           <option value="CN01" selected>CN01 - Thủ Đức (UTE Sport)</option>
           <option value="CN02">CN02 - Bình Thạnh</option>
@@ -421,7 +391,10 @@
         select.style.cursor = 'pointer';
       } else {
         const br = (user && user.branchCode) ? user.branchCode : 'CN01';
-        select.innerHTML = `<option value="${br}" selected>${br} - Thủ Đức (Chi nhánh quản lý)</option>`;
+        const branchNames = { 'CN01': 'Thủ Đức', 'CN02': 'Bình Thạnh', 'CN03': 'Quận 9', 'CN04': 'Gò Vấp' };
+        const brName = branchNames[br] || (user && user.branchName) || 'Thủ Đức';
+        if (sideName) sideName.textContent = ('CHI NHÁNH ' + brName).toUpperCase();
+        select.innerHTML = `<option value="${br}" selected>${br} - ${brName} (Chi nhánh quản lý)</option>`;
         select.value = br;
         select.disabled = true;
         select.style.cursor = 'not-allowed';

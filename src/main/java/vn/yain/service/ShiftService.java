@@ -147,7 +147,7 @@ public class ShiftService {
 
             Map<String, Object> item = new HashMap<>();
             item.put("staffId", ws.getStaffCode());
-            item.put("duty", ws.getDuty() != null ? ws.getDuty() : "Trực");
+            item.put("duty", recoverDuty(ws.getDuty(), ws.getStaffCode()));
             item.put("icon", ws.getIcon() != null ? ws.getIcon() : "POS");
             schedule.get(day).get(type).add(item);
         }
@@ -159,13 +159,31 @@ public class ShiftService {
         return response;
     }
 
+    public static String recoverDuty(String duty, String staffCode) {
+        if (duty == null || duty.trim().isEmpty() || duty.contains("?")) {
+            if (duty != null) {
+                String dLower = duty.toLowerCase();
+                if (dLower.contains("thu") || duty.contains("K?")) return "Kỹ thuật";
+                if (dLower.contains("tân") || duty.contains("L?")) return "Lễ tân";
+                if (dLower.contains("lý") || duty.contains("Qu?")) return "Quản lý";
+                if (dLower.contains("ngân") || duty.contains("Thu")) return "Thu ngân";
+            }
+            if ("NV-01".equals(staffCode)) return "Quản lý";
+            if ("NV-02".equals(staffCode) || "NV-04".equals(staffCode)) return "Thu ngân";
+            if ("NV-03".equals(staffCode)) return "Lễ tân";
+            if ("NV-05".equals(staffCode) || "NV-06".equals(staffCode)) return "Kỹ thuật";
+            return "Trực ca";
+        }
+        return duty.trim();
+    }
+
     public void assignShift(String day, String shift, String staffCode, String duty, String icon, String branchCode) {
         if (day == null || shift == null || staffCode == null) return;
         String d = day.trim().toLowerCase();
         String s = shift.trim().toLowerCase();
         String st = staffCode.trim();
         String br = (branchCode != null && !branchCode.trim().isEmpty()) ? branchCode.trim() : "CN01";
-        String dt = (duty != null && !duty.trim().isEmpty()) ? duty.trim() : "Trực";
+        String dt = recoverDuty(duty, st);
         String ic = (icon != null && !icon.trim().isEmpty()) ? icon.trim() : "POS";
 
         // Ensure staff exists in DB to prevent foreign key violation
@@ -227,7 +245,7 @@ public class ShiftService {
                             if (itemObj instanceof Map) {
                                 Map<String, Object> item = (Map<String, Object>) itemObj;
                                 String staffId = (String) item.get("staffId");
-                                String duty = (String) item.getOrDefault("duty", "Trực");
+                                String duty = recoverDuty((String) item.getOrDefault("duty", "Trực"), staffId);
                                 String icon = (String) item.getOrDefault("icon", "POS");
                                 if (staffId != null && !staffId.trim().isEmpty()) {
                                     String shiftCode = "WS-" + br + "-" + day.toUpperCase() + "-" + (seq++);
@@ -337,7 +355,7 @@ public class ShiftService {
                 .branchCode(branchCode)
                 .dayOfWeek(day)
                 .shiftType(type)
-                .duty(duty)
+                .duty(recoverDuty(duty, staffCode))
                 .icon(icon)
                 .shiftDate(LocalDate.now())
                 .startTime(startTime)

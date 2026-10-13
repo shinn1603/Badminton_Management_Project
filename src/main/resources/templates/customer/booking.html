@@ -994,19 +994,31 @@
         let html = '';
         branchCourts.forEach((c, idx) => {
           const isVip = (c.courtType && c.courtType.toLowerCase().includes('vip')) || (c.hourlyRate >= 110000);
+          const isMaint = (c.status === 'Bảo trì');
           const rateFormatted = (c.hourlyRate || 90000).toLocaleString('vi-VN');
-          html += `
-            <div class="court-chip-btn" id="chipCourt_${c.courtCode}" onclick="onSelectCourt('${c.courtCode}', '${c.courtName}', ${c.hourlyRate || 90000}, '${isVip ? 'VIP Yonex' : 'Tiêu Chuẩn'}')">
-              <div class="chip-name">${c.courtName}</div>
-              <div class="chip-desc">${isVip ? 'Thảm Yonex BWF' : 'Thảm Enlio BWF'}</div>
-              <div class="chip-rate">${rateFormatted} đ/h</div>
-            </div>
-          `;
+          if (isMaint) {
+            html += `
+              <div class="court-chip-btn court-chip-maintenance" id="chipCourt_${c.courtCode}" style="opacity: 0.6; cursor: not-allowed; border: 1px dashed #f59e0b; background: rgba(245, 158, 11, 0.05);" title="Sân đang bảo dưỡng kỹ thuật, tạm dừng nhận đặt">
+                <div class="chip-name">${c.courtName} <span style="font-size: 11px; color: #d97706; font-weight: 700;">[Bảo trì]</span></div>
+                <div class="chip-desc" style="color: #d97706;">Đang bảo dưỡng</div>
+                <div class="chip-rate" style="color: var(--text-muted); font-size: 12px;">Tạm ngưng đặt</div>
+              </div>
+            `;
+          } else {
+            html += `
+              <div class="court-chip-btn" id="chipCourt_${c.courtCode}" onclick="onSelectCourt('${c.courtCode}', '${c.courtName}', ${c.hourlyRate || 90000}, '${isVip ? 'VIP Yonex' : 'Tiêu Chuẩn'}')">
+                <div class="chip-name">${c.courtName}</div>
+                <div class="chip-desc">${isVip ? 'Thảm Yonex BWF' : 'Thảm Enlio BWF'}</div>
+                <div class="chip-rate">${rateFormatted} đ/h</div>
+              </div>
+            `;
+          }
         });
         container.innerHTML = html;
 
-        // Auto select target court or first court
-        const initialCourt = (targetCourtCode && branchCourts.find(c => c.courtCode === targetCourtCode)) || branchCourts[0];
+        // Auto select target court or first available court (excluding maintenance)
+        const availableCourts = branchCourts.filter(c => c.status !== 'Bảo trì');
+        const initialCourt = (targetCourtCode && branchCourts.find(c => c.courtCode === targetCourtCode && c.status !== 'Bảo trì')) || availableCourts[0];
         if (initialCourt) {
           const isVip = (initialCourt.courtType && initialCourt.courtType.toLowerCase().includes('vip')) || (initialCourt.hourlyRate >= 110000);
           onSelectCourt(initialCourt.courtCode, initialCourt.courtName, initialCourt.hourlyRate || 90000, isVip ? 'VIP Yonex' : 'Tiêu Chuẩn');
