@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import vn.yain.repository.BranchRepository;
-import vn.yain.repository.UserRepository;
 import vn.yain.service.UserService;
 
 @Controller
@@ -16,9 +15,6 @@ public class DashboardController {
 
     @Autowired(required = false)
     private BranchRepository branchRepository;
-
-    @Autowired(required = false)
-    private UserRepository userRepository;
 
     @GetMapping("/login")
     public String login() {
