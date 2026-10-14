@@ -2,16 +2,15 @@ package vn.yain.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "courts")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Court {
+    public Court() {
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

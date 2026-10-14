@@ -103,7 +103,7 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" placeholder="Tìm tên hoặc tài khoản..." id="userSearchInput" onkeyup="filterUserTable()">
+            <input type="text" placeholder="Tìm tên hoặc tài khoản..." id="userSearchInput" onkeyup="syncAndFilterUsers('header')">
           </div>
 
           <button class="btn-action btn-primary-action" onclick="openUserModal()">
@@ -135,24 +135,35 @@
         </div>
 
         <div class="filter-strip">
-          <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-            <div class="pill-group" id="rolePillGroup">
-              <button class="pill-btn active" onclick="filterByRole(this, 'ALL')">Tất cả</button>
-              <button class="pill-btn" onclick="filterByRole(this, 'ADMIN')">Quản trị viên</button>
-              <button class="pill-btn" onclick="filterByRole(this, 'DIRECTOR')">Giám đốc</button>
-              <button class="pill-btn" onclick="filterByRole(this, 'MANAGER')">Quản lý chi nhánh</button>
-              <button class="pill-btn" onclick="filterByRole(this, 'POS')">Thu ngân POS</button>
-              <button class="pill-btn" onclick="filterByRole(this, 'CUSTOMER')">Khách hàng</button>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+              <div class="pill-group" id="rolePillGroup">
+                <button class="pill-btn active" onclick="filterByRole(this, 'ALL')">Tất cả</button>
+                <button class="pill-btn" onclick="filterByRole(this, 'ADMIN')">Quản trị viên</button>
+                <button class="pill-btn" onclick="filterByRole(this, 'DIRECTOR')">Giám đốc</button>
+                <button class="pill-btn" onclick="filterByRole(this, 'MANAGER')">Quản lý chi nhánh</button>
+                <button class="pill-btn" onclick="filterByRole(this, 'POS')">Thu ngân POS</button>
+                <button class="pill-btn" onclick="filterByRole(this, 'CUSTOMER')">Khách hàng</button>
+              </div>
+
+              <select class="branch-select" id="branchFilterSelect" onchange="filterTableByBranch(this.value)">
+                <option value="ALL">Tất cả chi nhánh</option>
+                <option value="ALL_CHAIN">Toàn chuỗi (Không giới hạn)</option>
+                <option value="CN01">Chi nhánh Thủ Đức (CN01)</option>
+                <option value="CN02">Chi nhánh Bình Thạnh (CN02)</option>
+                <option value="CN03">Chi nhánh Quận 9 (CN03)</option>
+                <option value="CN04">Chi nhánh Gò Vấp (CN04)</option>
+              </select>
             </div>
 
-            <select class="branch-select" id="branchFilterSelect" onchange="filterTableByBranch(this.value)">
-              <option value="ALL">Tất cả chi nhánh</option>
-              <option value="ALL_CHAIN">Toàn chuỗi (Không giới hạn)</option>
-              <option value="CN01">Chi nhánh Thủ Đức (CN01)</option>
-              <option value="CN02">Chi nhánh Bình Thạnh (CN02)</option>
-              <option value="CN03">Chi nhánh Quận 9 (CN03)</option>
-              <option value="CN04">Chi nhánh Gò Vấp (CN04)</option>
-            </select>
+            <!-- ỐNG TÌM KIẾM TÀI KHOẢN TRONG TAB PHẠM VI DỮ LIỆU CHI NHÁNH -->
+            <div class="search-box" style="margin: 0; min-width: 280px;">
+              <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--text-muted); width: 14px; height: 14px;">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" placeholder="Tìm tài khoản, họ tên, email..." id="userSearchInputTab" onkeyup="syncAndFilterUsers('tab')">
+            </div>
           </div>
         </div>
 
@@ -270,24 +281,10 @@
       CN04: 'CN Gò Vấp (CN04)'
     };
 
-    // Standard database accounts seed fallback
-    const DEFAULT_SYSTEM_USERS = [
-      { id: 1, username: 'director', fullName: 'Nguyễn Phước Thọ', role: 'DIRECTOR', branchCode: 'ALL', status: 'Hoạt động', phone: '0901111222', email: 'director@utesport.vn' },
-      { id: 2, username: 'admin', fullName: 'Trần Biểu Hương', role: 'ADMIN', branchCode: 'ALL', status: 'Hoạt động', phone: '0908888999', email: 'admin@utesport.vn' },
-      { id: 3, username: 'manager', fullName: 'Trần Phúc Bảo', role: 'MANAGER', branchCode: 'CN01', status: 'Hoạt động', phone: '0903123456', email: 'manager@utesport.vn' },
-      { id: 4, username: 'pos', fullName: 'Nguyễn Thanh Tâm', role: 'POS', branchCode: 'CN01', status: 'Hoạt động', phone: '0904555666', email: 'pos@utesport.vn' },
-      { id: 5, username: 'nam.vh', fullName: 'Võ Hoàng Nam', role: 'DIRECTOR', branchCode: 'ALL', status: 'Hoạt động', phone: '0901111222', email: 'nam.vh@utesport.vn' },
-      { id: 6, username: 'quan.nv', fullName: 'Nguyễn Văn Quản', role: 'MANAGER', branchCode: 'CN02', status: 'Hoạt động', phone: '0903333444', email: 'quan.nv@utesport.vn' },
-      { id: 7, username: 'nam.th', fullName: 'Trần Hữu Nam', role: 'MANAGER', branchCode: 'CN03', status: 'Hoạt động', phone: '0903789012', email: 'nam.th@utesport.vn' },
-      { id: 8, username: 'khang.lh', fullName: 'Lê Hoàng Khang', role: 'MANAGER', branchCode: 'CN04', status: 'Hoạt động', phone: '0903555777', email: 'khang.lh@utesport.vn' },
-      { id: 9, username: 'mai.lt', fullName: 'Lê Thị Mai', role: 'POS', branchCode: 'CN01', status: 'Hoạt động', phone: '0904777888', email: 'mai.lt@utesport.vn' },
-      { id: 10, username: 'customer', fullName: 'Lê Bá Đạt', role: 'CUSTOMER', branchCode: 'CN01', status: 'Hoạt động', phone: '0912345678', email: 'khachhang@gmail.com' }
-    ];
-
+    // Danh sách tài khoản được đồng bộ 100% trực tiếp từ CSDL SQL Server (Bảng users) qua API /api/admin/users
     let cachedUsers = [];
 
     async function loadUsers() {
-      // 1. Fetch live data from /api/admin/users
       try {
         const token = localStorage.getItem('jwt_token');
         const headers = { 'Accept': 'application/json' };
@@ -295,42 +292,14 @@
         const res = await fetch('/api/admin/users', { headers });
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
+          if (Array.isArray(data)) {
             cachedUsers = data;
           }
+        } else {
+          console.error('Lỗi khi gọi API /api/admin/users:', res.status);
         }
       } catch (e) {
-        console.warn('API error fetching /api/admin/users:', e);
-      }
-
-      // 3. Ensure any customer registered in current browser session is merged if not yet in list
-      try {
-        const localUserRaw = localStorage.getItem('utesport_user');
-        if (localUserRaw) {
-          const localUser = JSON.parse(localUserRaw);
-          if (localUser && localUser.fullName && (localUser.role === 'CUSTOMER' || localUser.username)) {
-            const exists = cachedUsers.some(u =>
-              (u.username && localUser.username && u.username.toLowerCase() === localUser.username.toLowerCase()) ||
-              (u.phone && localUser.phone && u.phone === localUser.phone)
-            );
-            if (!exists) {
-              cachedUsers.push({
-                id: localUser.userId || Date.now(),
-                username: localUser.username || localUser.phone,
-                fullName: localUser.fullName,
-                role: (localUser.role || 'CUSTOMER').toUpperCase(),
-                branchCode: localUser.branchCode || 'CN01',
-                status: 'Hoạt động',
-                phone: localUser.phone || '',
-                email: localUser.email || ''
-              });
-            }
-          }
-        }
-      } catch (e) {}
-
-      if (!cachedUsers || cachedUsers.length === 0) {
-        cachedUsers = DEFAULT_SYSTEM_USERS;
+        console.error('Lỗi kết nối cơ sở dữ liệu SQL Server:', e);
       }
 
       renderUserTable(cachedUsers);
@@ -340,6 +309,19 @@
       const tbody = document.getElementById('userTableBody');
       if (!tbody) return;
       tbody.innerHTML = '';
+
+      if (!users || users.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 36px; color: var(--text-muted);">
+              Không tìm thấy tài khoản người dùng trong cơ sở dữ liệu SQL Server.
+            </td>
+          </tr>
+        `;
+        const countEl = document.getElementById('userTableCountLabel');
+        if (countEl) countEl.innerText = '0 tài khoản trong cơ sở dữ liệu';
+        return;
+      }
 
       users.forEach((u, idx) => {
         const roleInfo = ROLE_LABELS[u.role] || { label: u.role, badge: 'badge-blue' };
@@ -527,44 +509,66 @@
       }
     }
 
+    let currentRoleFilter = 'ALL';
+    let currentBranchFilter = 'ALL';
+
     function filterByRole(btn, role) {
       document.querySelectorAll('#rolePillGroup .pill-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
-      const rows = document.querySelectorAll('#userTableBody tr');
-      rows.forEach(r => {
-        const rowRole = r.getAttribute('data-role');
-        if (role === 'ALL' || rowRole === role) {
-          r.style.display = '';
-        } else {
-          r.style.display = 'none';
-        }
-      });
+      currentRoleFilter = role;
+      applyUserFilters();
     }
 
     function filterTableByBranch(branch) {
+      currentBranchFilter = branch;
+      applyUserFilters();
+    }
+
+    function syncAndFilterUsers(source) {
+      const qTab = document.getElementById('userSearchInputTab');
+      const qHeader = document.getElementById('userSearchInput');
+      if (source === 'tab' && qTab && qHeader) {
+        qHeader.value = qTab.value;
+      } else if (source === 'header' && qTab && qHeader) {
+        qTab.value = qHeader.value;
+      }
+      applyUserFilters();
+    }
+
+    function filterUserTable() {
+      syncAndFilterUsers('header');
+    }
+
+    function applyUserFilters() {
+      const qTab = document.getElementById('userSearchInputTab');
+      const qHeader = document.getElementById('userSearchInput');
+      const q = ((qTab ? qTab.value : (qHeader ? qHeader.value : '')) || '').toLowerCase().trim();
       const rows = document.querySelectorAll('#userTableBody tr');
+
+      let visible = 0;
       rows.forEach(r => {
-        const rowBranch = r.getAttribute('data-branch');
-        if (branch === 'ALL') {
+        const rowRole = r.getAttribute('data-role') || '';
+        const rowBranch = r.getAttribute('data-branch') || '';
+        const text = r.innerText.toLowerCase();
+
+        const matchRole = (currentRoleFilter === 'ALL' || rowRole === currentRoleFilter);
+        const matchBranch = (currentBranchFilter === 'ALL') ||
+                            (currentBranchFilter === 'ALL_CHAIN' && rowBranch === 'ALL') ||
+                            (rowBranch === currentBranchFilter);
+        const matchQ = !q || text.includes(q);
+
+        if (matchRole && matchBranch && matchQ) {
           r.style.display = '';
-        } else if (branch === 'ALL_CHAIN' && rowBranch === 'ALL') {
-          r.style.display = '';
-        } else if (rowBranch === branch) {
-          r.style.display = '';
+          visible++;
         } else {
           r.style.display = 'none';
         }
       });
-    }
 
-    function filterUserTable() {
-      const q = document.getElementById('userSearchInput').value.toLowerCase();
-      const rows = document.querySelectorAll('#userTableBody tr');
-      rows.forEach(r => {
-        const text = r.innerText.toLowerCase();
-        r.style.display = text.includes(q) ? '' : 'none';
-      });
+      const countLabel = document.getElementById('userTableCountLabel');
+      if (countLabel) {
+        countLabel.textContent = `Hiển thị ${visible} tài khoản (Đồng bộ trực tiếp từ SQL Server)`;
+      }
     }
 
     function toggleSidebar() {

@@ -2,17 +2,16 @@ package vn.yain.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tournaments")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Tournament {
+    public Tournament() {
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,6 +34,17 @@ public class Tournament {
     @Lob
     @Column(name = "rules", columnDefinition = "NVARCHAR(MAX)")
     private String rules;
+
+    @Column(name = "category", length = 50)
+    private String category = "Đôi nam nữ";
+
+    public String getCategory() {
+        return category != null ? category : "Đôi nam nữ";
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
     @Column(name = "max_participants")
     private Integer maxParticipants = 32;

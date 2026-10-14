@@ -3,16 +3,14 @@ package vn.yain.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class User {
+    public User() {
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,6 +34,9 @@ public class User {
     @Column(nullable = false, length = 30)
     private String role; // DIRECTOR, MANAGER, POS, CUSTOMER, ADMIN
 
+    @Column(name = "staff_code", length = 20)
+    private String staffCode;
+
     @Column(name = "branch_code", length = 20)
     private String branchCode;
 
@@ -44,4 +45,7 @@ public class User {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public String getStaffCode() { return staffCode; }
+    public void setStaffCode(String staffCode) { this.staffCode = staffCode; }
 }

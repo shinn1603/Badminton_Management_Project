@@ -459,14 +459,27 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Tổng giải thưởng dự kiến (VNĐ) <span style="color: var(--danger);">*</span></label>
-          <input type="number" class="form-control" id="inpTourPrize" value="15000000" step="1000000">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Thể thức / Nội dung thi đấu <span style="color: var(--danger);">*</span></label>
+            <select class="form-control" id="inpTourCategory">
+              <option value="Đôi nam nữ" selected>Đôi nam nữ</option>
+              <option value="Đơn nam">Đơn nam</option>
+              <option value="Đôi nam">Đôi nam</option>
+              <option value="Đôi nữ">Đôi nữ</option>
+              <option value="Đơn nữ">Đơn nữ</option>
+              <option value="Tổng hợp nhiều nội dung">Tổng hợp nhiều nội dung</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tổng giải thưởng dự kiến (VNĐ) <span style="color: var(--danger);">*</span></label>
+            <input type="number" class="form-control" id="inpTourPrize" value="15000000" step="1000000">
+          </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Thể thức thi đấu & Quy định khóa sân</label>
-          <textarea class="form-control" id="inpTourRules" rows="3" placeholder="Ví dụ: Thi đấu đôi nam nữ 3 hiệp 21 điểm theo luật BWF. Khóa từ Sân 01 đến Sân 04 trong khung 07:30 - 18:00..."></textarea>
+          <label class="form-label">Mô tả thể thức & Quy định khóa sân</label>
+          <textarea class="form-control" id="inpTourRules" rows="3" placeholder="Ví dụ: Thi đấu 3 hiệp 21 điểm theo luật BWF. Khóa từ Sân 01 đến Sân 04 trong khung 07:30 - 18:00..."></textarea>
         </div>
       </div>
 
@@ -479,7 +492,7 @@
 
   <!-- MODAL XEM DANH SÁCH ĐỘI ĐĂNG KÝ -->
   <div class="modal-overlay" id="registrationsModal">
-    <div class="modal-card" style="max-width: 640px;">
+    <div class="modal-card" style="max-width: 740px;">
       <div class="modal-header">
         <div>
           <h3 id="regModalTitle">Danh sách đội đăng ký giải đấu</h3>
@@ -495,6 +508,7 @@
               <tr>
                 <th style="width: 45px;">STT</th>
                 <th>Tên cặp đấu / CLB</th>
+                <th style="text-align: center;">Nội dung thi đấu</th>
                 <th>Mã HV</th>
                 <th>Số điện thoại</th>
                 <th>Thời gian ĐK</th>
@@ -503,7 +517,7 @@
             </thead>
             <tbody id="regTableBody">
               <tr>
-                <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Không có đội đăng ký nào</td>
+                <td colspan="7" style="text-align: center; padding: 24px; color: var(--text-muted);">Không có đội đăng ký nào</td>
               </tr>
             </tbody>
           </table>
@@ -641,7 +655,10 @@
           <tr id="tourRow-${t.id}">
             <td style="font-weight: 700; color: var(--primary); font-size: 13.5px;">${t.tournamentCode}</td>
             <td>
-              <div style="font-weight: 600; color: var(--text-dark);">${t.tournamentName}</div>
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span style="font-weight: 600; color: var(--text-dark);">${t.tournamentName}</span>
+                <span class="badge" style="background: rgba(13, 148, 136, 0.12); color: #0d9488; font-size: 11px; padding: 2px 7px; border-radius: 4px; font-weight: 600; border: 1px solid rgba(13, 148, 136, 0.25);">${t.category || 'Đôi nam nữ'}</span>
+              </div>
               <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px; max-width: 280px; line-height: 1.35;">${t.rules || 'Quy chuẩn BWF'}</div>
             </td>
             <td>
@@ -845,6 +862,7 @@
       const maxP = document.getElementById('inpTourMax').value;
       const fee = document.getElementById('inpTourFee').value;
       const prize = document.getElementById('inpTourPrize').value;
+      const category = document.getElementById('inpTourCategory')?.value || 'Đôi nam nữ';
       const rules = document.getElementById('inpTourRules').value.trim();
 
       if (!name) {
@@ -856,6 +874,7 @@
         tournamentCode: code,
         tournamentName: name,
         branchCode: branchCode,
+        category: category,
         startDate: start,
         endDate: end,
         maxParticipants: maxP,
@@ -906,15 +925,29 @@
 
       const tbody = document.getElementById('regTableBody');
       if (!regs || regs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Chưa có cặp đấu / đội nào đăng ký giải đấu này</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 24px; color: var(--text-muted);">Chưa có cặp đấu / đội nào đăng ký giải đấu này</td></tr>';
       } else {
         let html = '';
         regs.forEach((r, idx) => {
           let regTime = r.registrationDate ? r.registrationDate.replace('T', ' ').substring(0, 16) : '';
+          let cat = r.category || 'Đôi nam nữ';
+          let catBadgeStyle = 'background: rgba(13, 148, 136, 0.12); color: #0d9488; border: 1px solid rgba(13, 148, 136, 0.25);';
+          if (cat === 'Đơn nam') {
+            catBadgeStyle = 'background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.25);';
+          } else if (cat === 'Đôi nam') {
+            catBadgeStyle = 'background: rgba(99, 102, 241, 0.12); color: #4f46e5; border: 1px solid rgba(99, 102, 241, 0.25);';
+          } else if (cat === 'Đôi nữ') {
+            catBadgeStyle = 'background: rgba(244, 63, 94, 0.12); color: #e11d48; border: 1px solid rgba(244, 63, 94, 0.25);';
+          } else if (cat === 'Đơn nữ') {
+            catBadgeStyle = 'background: rgba(245, 158, 11, 0.12); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.25);';
+          }
           html += `
             <tr>
               <td style="text-align: center; font-weight: 700;">${idx + 1}</td>
               <td style="font-weight: 600; color: var(--text-dark);">${r.teamName}</td>
+              <td style="text-align: center;">
+                <span class="badge" style="${catBadgeStyle}; font-weight: 600; font-size: 11.5px; padding: 3px 8px; border-radius: 6px;">${cat}</span>
+              </td>
               <td><span style="font-family: monospace; color: var(--primary);">${r.customerCode || 'N/A'}</span></td>
               <td>${r.phone || 'N/A'}</td>
               <td style="font-size: 11.5px; color: var(--text-muted);">${regTime}</td>

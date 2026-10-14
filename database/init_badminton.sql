@@ -305,6 +305,7 @@ CREATE TABLE tournaments (
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
     rules NVARCHAR(MAX),
+    category NVARCHAR(50) DEFAULT N'Đôi nam nữ', -- Đơn nam, Đơn nữ, Đôi nam, Đôi nữ, Đôi nam nữ, Tổng hợp nhiều nội dung
     max_participants INT DEFAULT 32,
     current_participants INT DEFAULT 24,
     entry_fee DECIMAL(18,2) DEFAULT 0,
@@ -319,6 +320,7 @@ CREATE TABLE tournament_registrations (
     tournament_code VARCHAR(20) NOT NULL REFERENCES tournaments(tournament_code),
     customer_code VARCHAR(20) NOT NULL REFERENCES customers(customer_code),
     team_name NVARCHAR(100) NOT NULL,
+    category NVARCHAR(50) DEFAULT N'Đôi nam nữ', -- Đơn nam, Đơn nữ, Đôi nam, Đôi nữ, Đôi nam nữ
     phone VARCHAR(20) NOT NULL,
     email VARCHAR(100) NULL,
     registration_date DATETIME DEFAULT GETDATE(),
@@ -681,17 +683,18 @@ INSERT INTO users (username, password, full_name, email, phone, role, staff_code
 ('mai.lt', '123456', N'Lê Thị Mai', 'mai.lt@utesport.vn', '0904777888', 'POS', 'NS04', 'CN01');
 
 -- 5.14 DỮ LIỆU GIẢI ĐẤU VÀ SỰ KIỆN (tournaments)
-INSERT INTO tournaments (tournament_code, branch_code, tournament_name, start_date, end_date, rules, max_participants, current_participants, entry_fee, total_prize, status) VALUES
-('GD01', 'CN01', N'Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026', '2026-10-10 08:00:00', '2026-10-12 18:00:00', N'Thi đấu theo thể thức loại trực tiếp 3 hiệp 21 điểm theo luật BWF. Mỗi VĐV chỉ được đăng ký 1 nội dung.', 32, 24, 300000, 20000000, N'Đang mở đăng ký'),
-('GD02', 'CN01', N'Giải Cầu Lông Doanh Nghiệp & Sinh Viên Cúp Thủ Đức 2026', '2026-10-25 08:00:00', '2026-10-26 17:00:00', N'Giải đấu phong trào kết nối các doanh nghiệp và cựu sinh viên đam mê cầu lông.', 24, 0, 250000, 15000000, N'Sắp mở đăng ký'),
-('GD03', 'CN02', N'Giải Đơn Nam Bình Thạnh Mở Rộng 2026', '2026-11-05 08:00:00', '2026-11-06 18:00:00', N'Giải đơn nam các CLB phong trào khu vực Bình Thạnh - Phú Nhuận.', 16, 0, 200000, 10000000, N'Sắp mở đăng ký');
+INSERT INTO tournaments (tournament_code, branch_code, tournament_name, category, start_date, end_date, rules, max_participants, current_participants, entry_fee, total_prize, status) VALUES
+('GD01', 'CN01', N'Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026', N'Đôi nam nữ', '2026-10-10 08:00:00', '2026-10-12 18:00:00', N'Thi đấu theo thể thức loại trực tiếp 3 hiệp 21 điểm theo luật BWF. Mỗi VĐV chỉ được đăng ký 1 nội dung.', 32, 24, 300000, 20000000, N'Đang mở đăng ký'),
+('GD02', 'CN01', N'Giải Cầu Lông Doanh Nghiệp & Sinh Viên Cúp Thủ Đức 2026', N'Tổng hợp nhiều nội dung', '2026-10-25 08:00:00', '2026-10-26 17:00:00', N'Giải đấu phong trào kết nối các doanh nghiệp và cựu sinh viên đam mê cầu lông.', 24, 0, 250000, 15000000, N'Sắp mở đăng ký'),
+('GD03', 'CN02', N'Giải Đơn Nam Bình Thạnh Mở Rộng 2026', N'Đơn nam', '2026-11-05 08:00:00', '2026-11-06 18:00:00', N'Giải đơn nam các CLB phong trào khu vực Bình Thạnh - Phú Nhuận.', 16, 0, 200000, 10000000, N'Sắp mở đăng ký');
 
 -- 5.15 DỮ LIỆU ĐĂNG KÝ THAM GIA GIẢI ĐẤU (tournament_registrations)
-INSERT INTO tournament_registrations (tournament_code, customer_code, team_name, phone, status) VALUES
-('GD01', 'KH001', N'Cặp Đôi Đạt & Trang (CLB Thủ Đức)', '0912345678', N'Đã xác nhận'),
-('GD01', 'KH002', N'Cặp Đôi Nam & Tuấn (ĐH Sư Phạm Kỹ Thuật)', '0903123456', N'Đã xác nhận'),
-('GD01', 'KH003', N'Cặp Đôi Huy & Hằng (Công ty TMA)', '0988777666', N'Đã xác nhận'),
-('GD01', 'KH004', N'Cặp Đôi Mai Anh & Đức (CLB Yonex)', '0977555444', N'Đã xác nhận');
+INSERT INTO tournament_registrations (tournament_code, customer_code, team_name, category, phone, status) VALUES
+('GD01', 'KH001', N'Cặp Đôi Đạt & Trang (CLB Thủ Đức)', N'Đôi nam nữ', '0912345678', N'Đã xác nhận'),
+('GD01', 'KH002', N'Cặp Đôi Nam & Thảo (ĐH Sư Phạm Kỹ Thuật)', N'Đôi nam nữ', '0903123456', N'Đã xác nhận'),
+('GD01', 'KH003', N'Cặp Đôi Huy & Hằng (Công ty TMA)', N'Đôi nam nữ', '0988777666', N'Đã xác nhận'),
+('GD01', 'KH004', N'Cặp Đôi Mai Anh & Đức (CLB Yonex)', N'Đôi nam nữ', '0977555444', N'Đã xác nhận'),
+('GD01', 'KH005', N'Cặp Đôi Tuấn & Lan (CLB Bình Thạnh)', N'Đôi nam nữ', '0933221100', N'Đã xác nhận');
 
 -- 5.16 DỮ LIỆU GIAO DỊCH THANH TOÁN (payments)
 INSERT INTO payments (payment_code, booking_code, amount, method, transaction_type, transaction_ref, status) VALUES

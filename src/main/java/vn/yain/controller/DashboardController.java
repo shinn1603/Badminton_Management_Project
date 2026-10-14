@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import vn.yain.repository.BranchRepository;
+import vn.yain.repository.UserRepository;
 import vn.yain.service.UserService;
 
 @Controller
@@ -11,6 +13,12 @@ public class DashboardController {
 
     @Autowired(required = false)
     private UserService userService;
+
+    @Autowired(required = false)
+    private BranchRepository branchRepository;
+
+    @Autowired(required = false)
+    private UserRepository userRepository;
 
     @GetMapping("/login")
     public String login() {
@@ -79,12 +87,21 @@ public class DashboardController {
     }
 
     @GetMapping("/admin/users")
-    public String adminUsers() {
+    public String adminUsers(Model model) {
+        if (userService != null) {
+            model.addAttribute("users", userService.getAllUsers());
+        }
         return "admin/users";
     }
 
     @GetMapping("/admin/permissions")
-    public String adminPermissions() {
+    public String adminPermissions(Model model) {
+        if (userService != null) {
+            model.addAttribute("users", userService.getAllUsers());
+        }
+        if (branchRepository != null) {
+            model.addAttribute("branches", branchRepository.findAll());
+        }
         return "admin/permissions";
     }
 

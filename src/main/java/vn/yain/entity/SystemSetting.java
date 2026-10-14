@@ -2,16 +2,14 @@ package vn.yain.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "system_settings")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class SystemSetting {
+    public SystemSetting() {
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

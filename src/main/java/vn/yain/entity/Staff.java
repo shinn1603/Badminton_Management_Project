@@ -1,18 +1,14 @@
 package vn.yain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "staff")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Staff {
+    public Staff() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +35,46 @@ public class Staff {
     @Column(name = "address", columnDefinition = "NVARCHAR(255)")
     private String address;
 
-    @Builder.Default
     @Column(name = "status", columnDefinition = "NVARCHAR(30)")
     private String status = "Đang làm việc";
+
+    public static StaffBuilder builder() {
+        return new StaffBuilder();
+    }
+
+    public static class StaffBuilder {
+        private Long id;
+        private String staffCode;
+        private String branchCode = "CN01";
+        private String fullName;
+        private String position;
+        private String phone;
+        private String email;
+        private String address;
+        private String status = "Đang làm việc";
+
+        public StaffBuilder id(Long id) { this.id = id; return this; }
+        public StaffBuilder staffCode(String staffCode) { this.staffCode = staffCode; return this; }
+        public StaffBuilder branchCode(String branchCode) { this.branchCode = branchCode; return this; }
+        public StaffBuilder fullName(String fullName) { this.fullName = fullName; return this; }
+        public StaffBuilder position(String position) { this.position = position; return this; }
+        public StaffBuilder phone(String phone) { this.phone = phone; return this; }
+        public StaffBuilder email(String email) { this.email = email; return this; }
+        public StaffBuilder address(String address) { this.address = address; return this; }
+        public StaffBuilder status(String status) { this.status = status; return this; }
+
+        public Staff build() {
+            Staff s = new Staff();
+            s.id = this.id;
+            s.staffCode = this.staffCode;
+            s.branchCode = this.branchCode;
+            s.fullName = this.fullName;
+            s.position = this.position;
+            s.phone = this.phone;
+            s.email = this.email;
+            s.address = this.address;
+            s.status = this.status;
+            return s;
+        }
+    }
 }

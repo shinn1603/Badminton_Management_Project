@@ -2,16 +2,15 @@ package vn.yain.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tournament_registrations")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class TournamentRegistration {
+    public TournamentRegistration() {
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,6 +27,9 @@ public class TournamentRegistration {
     @Column(length = 20)
     private String phone;
 
+    @Column(name = "category", length = 50)
+    private String category = "Đôi nam nữ";
+
     @Column(length = 100)
     private String email;
 
@@ -36,4 +38,12 @@ public class TournamentRegistration {
 
     @Column(length = 50)
     private String status = "Đã xác nhận";
+
+    public String getCategory() {
+        return category != null ? category : "Đôi nam nữ";
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
 }

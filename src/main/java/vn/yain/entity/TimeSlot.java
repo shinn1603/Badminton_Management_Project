@@ -2,15 +2,13 @@ package vn.yain.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-
 @Entity
 @Table(name = "time_slots")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class TimeSlot {
+    public TimeSlot() {
+    }
+
     @Id
     @Column(name = "slot_code", nullable = false, length = 20)
     private String slotCode;

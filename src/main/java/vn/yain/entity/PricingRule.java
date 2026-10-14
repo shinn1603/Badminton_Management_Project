@@ -2,17 +2,16 @@ package vn.yain.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "pricing_rules")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class PricingRule {
+    public PricingRule() {
+    }
+
     @Id
     @Column(name = "pricing_code", nullable = false, length = 20)
     private String pricingCode;

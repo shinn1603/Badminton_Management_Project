@@ -639,18 +639,26 @@ public class ApiController {
                 }
             }
 
-            AuditLog auditLog = new AuditLog();
-            auditLog.setUsername("admin");
-            auditLog.setActionType("Cập nhật ma trận phân quyền chi nhánh");
-            auditLog.setDetails(desc.length() > 250 ? desc.substring(0, 247) + "..." : desc.toString());
-            auditLog.setModule("Phân hệ Quản trị");
-            auditLog.setStatus("Thành công");
-            auditLog.setActionTime(LocalDateTime.now());
-            auditLogRepository.save(auditLog);
+            if (auditLogRepository != null) {
+                try {
+                    AuditLog auditLog = new AuditLog();
+                    auditLog.setUsername("admin");
+                    auditLog.setActionType("Cập nhật ma trận phân quyền chi nhánh");
+                    auditLog.setDetails(desc.length() > 250 ? desc.substring(0, 247) + "..." : desc.toString());
+                    auditLog.setModule("Phân hệ Quản trị");
+                    auditLog.setStatus("Thành công");
+                    auditLog.setActionTime(LocalDateTime.now());
+                    auditLogRepository.save(auditLog);
+                } catch (Exception ex) {
+                    log.warn("Không thể ghi audit log: {}", ex.getMessage());
+                }
+            }
 
             return ResponseEntity.ok(Map.of("success", true, "updatedCount", count));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+            log.error("Lỗi cập nhật phân quyền:", e);
+            String msg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", msg));
         }
     }
 
@@ -1344,6 +1352,7 @@ public class ApiController {
             map.put("currentParticipants", current);
             map.put("entryFee", t.getEntryFee() != null ? t.getEntryFee() : BigDecimal.ZERO);
             map.put("totalPrize", t.getTotalPrize() != null ? t.getTotalPrize() : BigDecimal.ZERO);
+            map.put("category", t.getCategory() != null ? t.getCategory() : "Đôi nam nữ");
             map.put("status", t.getStatus() != null ? t.getStatus() : "Đang mở đăng ký");
             result.add(map);
         }
@@ -1427,7 +1436,8 @@ public class ApiController {
 
         TournamentRegistration reg = new TournamentRegistration();
         reg.setTournamentCode(t.getTournamentCode());
-        reg.setTeamName(teamName + (player1Name.isBlank() ? "" : " - " + player1Name) + (category.isBlank() ? "" : " (" + category + ")"));
+        reg.setTeamName(teamName + (player1Name.isBlank() ? "" : " - " + player1Name));
+        reg.setCategory(category != null && !category.isBlank() ? category : "Đôi nam nữ");
         reg.setPhone(phone);
         reg.setEmail(email != null && !email.isBlank() ? email.trim() : null);
         reg.setCustomerCode(customerCode);
@@ -2886,38 +2896,6 @@ public class ApiController {
         }
     }
 
-    @PutMapping("/director/pricing/promotions/{id}/approve")
-    public ResponseEntity<?> approvePromotionById(@PathVariable Long id) {
-        try {
-            Optional<Promotion> opt = promotionRepository.findById(id);
-            if (opt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "Không tìm thấy khuyến mãi: " + id));
-            }
-            Promotion p = opt.get();
-            p.setStatus("Đang áp dụng");
-            promotionRepository.save(p);
-            return ResponseEntity.ok(Map.of("success", true, "message", "Đã phê duyệt và kích hoạt chiến dịch khuyến mãi " + p.getPromoCode() + "!", "promotion", p));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi: " + e.getMessage()));
-        }
-    }
-
-    @PutMapping("/director/pricing/promotions/{id}/reject")
-    public ResponseEntity<?> rejectPromotionById(@PathVariable Long id) {
-        try {
-            Optional<Promotion> opt = promotionRepository.findById(id);
-            if (opt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "Không tìm thấy khuyến mãi: " + id));
-            }
-            Promotion p = opt.get();
-            p.setStatus("Bác bỏ");
-            promotionRepository.save(p);
-            return ResponseEntity.ok(Map.of("success", true, "message", "Đã bác bỏ chương trình khuyến mãi " + p.getPromoCode() + "!", "promotion", p));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi: " + e.getMessage()));
-        }
-    }
-
     @PostMapping("/director/pricing/rules")
     public ResponseEntity<?> saveOrUpdatePricingRule(@RequestBody Map<String, Object> payload) {
         try {
@@ -3144,6 +3122,7 @@ public class ApiController {
                 item.put("startDate", t.getStartDate() != null ? t.getStartDate().toString() : "");
                 item.put("endDate", t.getEndDate() != null ? t.getEndDate().toString() : "");
                 item.put("rules", t.getRules() != null ? t.getRules() : "");
+                item.put("category", t.getCategory() != null ? t.getCategory() : "Đôi nam nữ");
                 item.put("maxParticipants", t.getMaxParticipants() != null ? t.getMaxParticipants() : 32);
 
                 List<TournamentRegistration> regs = regMap.getOrDefault(t.getTournamentCode(), Collections.emptyList());
@@ -3304,6 +3283,7 @@ public class ApiController {
             t.setEntryFee(new BigDecimal(payload.getOrDefault("entryFee", "200000").toString()));
             t.setTotalPrize(new BigDecimal(payload.getOrDefault("totalPrize", "10000000").toString()));
             t.setRules((String) payload.getOrDefault("rules", "Thể thức thi đấu loại trực tiếp"));
+            t.setCategory((String) payload.getOrDefault("category", "Đôi nam nữ"));
             t.setStatus((String) payload.getOrDefault("status", "Chờ phê duyệt"));
 
             String startStr = (String) payload.get("startDate");

@@ -512,9 +512,11 @@
             <div class="form-group" style="margin-bottom: 0;">
               <label class="form-label">Nội Dung Thi Đấu *</label>
               <select class="form-control" id="tourCategory" required>
-                <option value="Đôi Nam">Đôi Nam Phong Trào</option>
-                <option value="Đôi Nam Nữ" selected>Đôi Nam Nữ Phối Hợp</option>
-                <option value="Đôi Nữ">Đôi Nữ</option>
+                <option value="Đơn nam">Đơn nam</option>
+                <option value="Đôi nam">Đôi nam</option>
+                <option value="Đôi nam nữ" selected>Đôi nam nữ</option>
+                <option value="Đôi nữ">Đôi nữ</option>
+                <option value="Đơn nữ">Đơn nữ</option>
               </select>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
@@ -622,7 +624,7 @@
       }
     }
 
-    function openRegisterModal(code, name, fee) {
+    function openRegisterModal(code, name, fee, catParam) {
       document.getElementById('modalTourCode').value = code || 'GD01';
       document.getElementById('modalTourName').value = name || 'Giải Cầu Lông UTE Open';
       const feeNum = Number(fee || 0);
@@ -640,6 +642,39 @@
         if (p1 && currentCustomer.fullName) p1.value = currentCustomer.fullName;
         if (ph1 && currentCustomer.phone) ph1.value = currentCustomer.phone;
       }
+
+      // Khóa đúng nội dung thi đấu theo thể thức của giải đấu
+      const catSelect = document.getElementById('tourCategory');
+      if (catSelect) {
+        const t = (typeof allTournaments !== 'undefined') ? allTournaments.find(item => item.tournamentCode === code) : null;
+        const category = catParam || (t && t.category ? t.category : '');
+        const lowerName = (name || '').toLowerCase();
+        const rules = ((t && t.rules) ? t.rules : '').toLowerCase();
+
+        catSelect.innerHTML = '';
+        if (category && category !== 'Tổng hợp nhiều nội dung') {
+          catSelect.innerHTML = `<option value="${category}" selected>${category} (Nội dung chính thức)</option>`;
+        } else if (lowerName.includes('đôi nam nữ') || rules.includes('đôi nam nữ') && !lowerName.includes('doanh nghiệp')) {
+          catSelect.innerHTML = `<option value="Đôi nam nữ" selected>Đôi nam nữ (Nội dung chính thức)</option>`;
+        } else if (lowerName.includes('đơn nam') || rules.includes('đơn nam')) {
+          catSelect.innerHTML = `<option value="Đơn nam" selected>Đơn nam (Nội dung chính thức)</option>`;
+        } else if (lowerName.includes('đơn nữ') || rules.includes('đơn nữ')) {
+          catSelect.innerHTML = `<option value="Đơn nữ" selected>Đơn nữ (Nội dung chính thức)</option>`;
+        } else if (lowerName.includes('đôi nữ')) {
+          catSelect.innerHTML = `<option value="Đôi nữ" selected>Đôi nữ (Nội dung chính thức)</option>`;
+        } else if (lowerName.includes('đôi nam') && !lowerName.includes('đôi nam nữ')) {
+          catSelect.innerHTML = `<option value="Đôi nam" selected>Đôi nam (Nội dung chính thức)</option>`;
+        } else {
+          catSelect.innerHTML = `
+            <option value="Đôi nam">Đôi nam</option>
+            <option value="Đôi nam nữ" selected>Đôi nam nữ</option>
+            <option value="Đôi nữ">Đôi nữ</option>
+            <option value="Đơn nam">Đơn nam</option>
+            <option value="Đơn nữ">Đơn nữ</option>
+          `;
+        }
+      }
+
       document.getElementById('regModal').classList.add('open');
     }
 
@@ -773,7 +808,7 @@
                     <strong>Địa điểm:</strong> ${branchName}
                   </div>
                   <div class="tour-meta-item">
-                    <strong>Nội dung:</strong> Đôi nam, Đôi nam nữ
+                    <strong>Nội dung:</strong> <span style="font-weight: 600; color: var(--cust-primary);">${t.category || 'Đôi nam nữ'}</span>
                   </div>
                   <div class="tour-meta-item">
                     <strong>Lệ phí tham gia:</strong> ${feeDisplay}
@@ -796,7 +831,7 @@
 
               <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--cust-border);">
                 <span style="font-size: 11.5px; color: var(--cust-text-muted);">Mã giải: <strong style="color: var(--cust-primary);">${code}</strong> &bull; Áp dụng luật BWF</span>
-                <button type="button" class="${btnClass}" id="tourBtn-${code}" ${btnDisabled ? 'disabled style="padding: 0 18px; border-radius: 6px; cursor: not-allowed; opacity: 0.6; height: 36px; font-size: 12.5px;"' : `onclick="openRegisterModal('${code}', '${safeName}', ${fee})" style="padding: 0 20px; font-weight: 600; border-radius: 6px; height: 36px; font-size: 12.5px;"`}>
+                <button type="button" class="${btnClass}" id="tourBtn-${code}" ${btnDisabled ? 'disabled style="padding: 0 18px; border-radius: 6px; cursor: not-allowed; opacity: 0.6; height: 36px; font-size: 12.5px;"' : `onclick="openRegisterModal('${code}', '${safeName}', ${fee}, '${t.category || ''}')" style="padding: 0 20px; font-weight: 600; border-radius: 6px; height: 36px; font-size: 12.5px;"`}>
                   ${btnText}
                 </button>
               </div>
