@@ -404,4 +404,47 @@ public class UserService {
         log.info("Cập nhật trạng thái người dùng {} thành {}", saved.getUsername(), saved.getStatus());
         return saved;
     }
+
+    public Customer createCustomer(String fullName, String phone, String email, String membershipTier) {
+        if (fullName == null || fullName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Họ và tên khách hàng không được để trống!");
+        }
+        if (phone == null || !phone.trim().matches("0\\d{9}")) {
+            throw new IllegalArgumentException("Số điện thoại không hợp lệ (yêu cầu 10 chữ số, bắt đầu bằng 0)!");
+        }
+        String cleanPhone = phone.trim();
+        if (customerRepository.findByPhone(cleanPhone).isPresent()) {
+            throw new IllegalArgumentException("Số điện thoại " + cleanPhone + " đã tồn tại trong hệ thống!");
+        }
+
+        Customer c = new Customer();
+        long count = customerRepository.count();
+        c.setCustomerCode("KH" + String.format("%04d", count + 1));
+        c.setFullName(fullName.trim());
+        c.setPhone(cleanPhone);
+        c.setEmail(email != null && !email.trim().isEmpty() ? email.trim() : (cleanPhone + "@utesport.vn"));
+        c.setPassword(passwordEncoder.encode("123456"));
+        c.setMembershipTier(membershipTier != null && !membershipTier.trim().isEmpty() ? membershipTier : "Đồng");
+        c.setStatus("Hoạt động");
+        c.setCreatedAt(LocalDateTime.now());
+        Customer saved = customerRepository.save(c);
+
+        // Sync to User table
+        if (!userRepository.findByUsername(cleanPhone).isPresent()) {
+            User u = new User();
+            u.setUsername(cleanPhone);
+            u.setFullName(saved.getFullName());
+            u.setPhone(cleanPhone);
+            u.setEmail(saved.getEmail());
+            u.setPassword(saved.getPassword());
+            u.setRole("CUSTOMER");
+            u.setBranchCode("CN01");
+            u.setStatus("Hoạt động");
+            u.setCreatedAt(LocalDateTime.now());
+            userRepository.save(u);
+        }
+
+        log.info("Đã tạo mới khách hàng thành công: {} ({})", saved.getFullName(), saved.getCustomerCode());
+        return saved;
+    }
 }

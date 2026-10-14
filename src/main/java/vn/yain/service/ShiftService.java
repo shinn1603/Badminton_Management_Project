@@ -45,6 +45,10 @@ public class ShiftService {
     public List<Staff> getAllStaff(String branchCode) {
         ensureDefaultStaffSeeded();
         if (branchCode != null && !branchCode.trim().isEmpty() && !"ALL".equalsIgnoreCase(branchCode.trim())) {
+            List<Staff> list = staffRepository.findByBranchCodeOrderByStaffCodeAsc(branchCode.trim());
+            if (list != null && !list.isEmpty()) {
+                return list;
+            }
             return staffRepository.findByBranchCode(branchCode.trim());
         }
         return staffRepository.findAll();
@@ -53,7 +57,7 @@ public class ShiftService {
     public Staff saveStaff(Staff staff) {
         if (staff.getStaffCode() == null || staff.getStaffCode().trim().isEmpty()) {
             long count = staffRepository.count() + 1;
-            staff.setStaffCode("NV-0" + count);
+            staff.setStaffCode("NS" + (count < 10 ? "0" + count : String.valueOf(count)));
         }
         if (staff.getBranchCode() == null || staff.getBranchCode().trim().isEmpty()) {
             staff.setBranchCode("CN01");
@@ -94,12 +98,13 @@ public class ShiftService {
     private void ensureDefaultStaffSeeded() {
         if (staffSeeded) return;
         List<Staff> defaults = List.of(
-            Staff.builder().staffCode("NV-01").branchCode("CN01").fullName("Trần Phúc Bảo").position("Quản lý chi nhánh").phone("0903123456").email("manager@utesport.vn").status("Đang làm việc").build(),
-            Staff.builder().staffCode("NV-02").branchCode("CN01").fullName("Nguyễn Thanh Tâm").position("Thu ngân POS quầy").phone("0904555666").email("pos@utesport.vn").status("Đang làm việc").build(),
-            Staff.builder().staffCode("NV-03").branchCode("CN01").fullName("Bùi Khánh Linh").position("Lễ tân & Dịch vụ").phone("0909111222").email("linh.bk@utesport.vn").status("Đang làm việc").build(),
-            Staff.builder().staffCode("NV-04").branchCode("CN01").fullName("Nguyễn Hoàng Nam").position("Thu ngân POS quầy").phone("0903888777").email("nam.nh@utesport.vn").status("Đang làm việc").build(),
-            Staff.builder().staffCode("NV-05").branchCode("CN01").fullName("Phạm Gia Huy").position("Kỹ thuật & Bảo dưỡng sân").phone("0988777666").email("huy.pg@utesport.vn").status("Đang làm việc").build(),
-            Staff.builder().staffCode("NV-06").branchCode("CN01").fullName("Trịnh Gia Vinh").position("Kỹ thuật & Bảo dưỡng sân").phone("0977222333").email("vinh.tg@utesport.vn").status("Đang làm việc").build()
+            Staff.builder().staffCode("NS02").branchCode("CN01").fullName("Trần Phúc Bảo").position("Quản lý chi nhánh Thủ Đức").phone("0903123456").email("bao.tran@utesport.vn").status("Đang làm việc").build(),
+            Staff.builder().staffCode("NS03").branchCode("CN01").fullName("Nguyễn Thanh Tâm").position("Thu ngân quầy POS").phone("0904555666").email("tam.nguyen@utesport.vn").status("Đang làm việc").build(),
+            Staff.builder().staffCode("NS04").branchCode("CN01").fullName("Lê Thị Mai").position("Thu ngân quầy POS").phone("0904777888").email("mai.lt@utesport.vn").status("Đang làm việc").build(),
+            Staff.builder().staffCode("NS09").branchCode("CN01").fullName("Bùi Khánh Linh").position("Lễ tân & Dịch vụ").phone("0909111222").email("linh.bk@utesport.vn").status("Đang làm việc").build(),
+            Staff.builder().staffCode("NS10").branchCode("CN01").fullName("Nguyễn Hoàng Nam").position("Thu ngân POS quầy").phone("0903888777").email("nam.nh@utesport.vn").status("Đang làm việc").build(),
+            Staff.builder().staffCode("NS11").branchCode("CN01").fullName("Phạm Gia Huy").position("Kỹ thuật & Bảo dưỡng sân").phone("0988777666").email("huy.pg@utesport.vn").status("Đang làm việc").build(),
+            Staff.builder().staffCode("NS12").branchCode("CN01").fullName("Trịnh Gia Vinh").position("Kỹ thuật & Bảo dưỡng sân").phone("0977222333").email("vinh.tg@utesport.vn").status("Đang làm việc").build()
         );
         for (Staff s : defaults) {
             if (!staffRepository.existsByStaffCode(s.getStaffCode())) {
@@ -295,53 +300,53 @@ public class ShiftService {
         int seq = 100;
 
         // Monday
-        list.add(createShift(branchCode, "mon", "morning", "NV-02", "POS", "POS", seq++));
-        list.add(createShift(branchCode, "mon", "morning", "NV-05", "Kỹ thuật", "TECH", seq++));
-        list.add(createShift(branchCode, "mon", "night", "NV-03", "Lễ tân", "REC", seq++));
-        list.add(createShift(branchCode, "mon", "night", "NV-01", "Quản lý", "MGR", seq++));
-        list.add(createShift(branchCode, "mon", "night", "NV-06", "Kỹ thuật", "TECH", seq++));
+        list.add(createShift(branchCode, "mon", "morning", "NS03", "POS", "POS", seq++));
+        list.add(createShift(branchCode, "mon", "morning", "NS11", "Kỹ thuật", "TECH", seq++));
+        list.add(createShift(branchCode, "mon", "night", "NS09", "Lễ tân", "REC", seq++));
+        list.add(createShift(branchCode, "mon", "night", "NS02", "Quản lý", "MGR", seq++));
+        list.add(createShift(branchCode, "mon", "night", "NS12", "Kỹ thuật", "TECH", seq++));
 
         // Tuesday
-        list.add(createShift(branchCode, "tue", "morning", "NV-02", "POS", "POS", seq++));
-        list.add(createShift(branchCode, "tue", "morning", "NV-04", "Thu ngân", "CASH", seq++));
-        list.add(createShift(branchCode, "tue", "night", "NV-03", "Lễ tân", "REC", seq++));
-        list.add(createShift(branchCode, "tue", "night", "NV-05", "Kỹ thuật", "TECH", seq++));
+        list.add(createShift(branchCode, "tue", "morning", "NS03", "POS", "POS", seq++));
+        list.add(createShift(branchCode, "tue", "morning", "NS04", "Thu ngân", "CASH", seq++));
+        list.add(createShift(branchCode, "tue", "night", "NS09", "Lễ tân", "REC", seq++));
+        list.add(createShift(branchCode, "tue", "night", "NS11", "Kỹ thuật", "TECH", seq++));
 
         // Wednesday
-        list.add(createShift(branchCode, "wed", "morning", "NV-02", "POS", "POS", seq++));
-        list.add(createShift(branchCode, "wed", "morning", "NV-05", "Kỹ thuật", "TECH", seq++));
-        list.add(createShift(branchCode, "wed", "night", "NV-03", "Lễ tân", "REC", seq++));
-        list.add(createShift(branchCode, "wed", "night", "NV-01", "Quản lý", "MGR", seq++));
-        list.add(createShift(branchCode, "wed", "night", "NV-06", "Kỹ thuật", "TECH", seq++));
+        list.add(createShift(branchCode, "wed", "morning", "NS03", "POS", "POS", seq++));
+        list.add(createShift(branchCode, "wed", "morning", "NS11", "Kỹ thuật", "TECH", seq++));
+        list.add(createShift(branchCode, "wed", "night", "NS04", "Thu ngân", "CASH", seq++));
+        list.add(createShift(branchCode, "wed", "night", "NS02", "Quản lý", "MGR", seq++));
+        list.add(createShift(branchCode, "wed", "night", "NS12", "Kỹ thuật", "TECH", seq++));
 
         // Thursday
-        list.add(createShift(branchCode, "thu", "morning", "NV-04", "Thu ngân", "CASH", seq++));
-        list.add(createShift(branchCode, "thu", "morning", "NV-06", "Kỹ thuật", "TECH", seq++));
-        list.add(createShift(branchCode, "thu", "night", "NV-02", "POS", "POS", seq++));
-        list.add(createShift(branchCode, "thu", "night", "NV-05", "Kỹ thuật", "TECH", seq++));
+        list.add(createShift(branchCode, "thu", "morning", "NS10", "Thu ngân", "CASH", seq++));
+        list.add(createShift(branchCode, "thu", "morning", "NS12", "Kỹ thuật", "TECH", seq++));
+        list.add(createShift(branchCode, "thu", "night", "NS03", "POS", "POS", seq++));
+        list.add(createShift(branchCode, "thu", "night", "NS11", "Kỹ thuật", "TECH", seq++));
 
         // Friday
-        list.add(createShift(branchCode, "fri", "morning", "NV-02", "POS", "POS", seq++));
-        list.add(createShift(branchCode, "fri", "morning", "NV-04", "Thu ngân", "CASH", seq++));
-        list.add(createShift(branchCode, "fri", "night", "NV-03", "Lễ tân", "REC", seq++));
-        list.add(createShift(branchCode, "fri", "night", "NV-01", "Quản lý", "MGR", seq++));
-        list.add(createShift(branchCode, "fri", "night", "NV-06", "Kỹ thuật", "TECH", seq++));
+        list.add(createShift(branchCode, "fri", "morning", "NS03", "POS", "POS", seq++));
+        list.add(createShift(branchCode, "fri", "morning", "NS10", "Thu ngân", "CASH", seq++));
+        list.add(createShift(branchCode, "fri", "night", "NS09", "Lễ tân", "REC", seq++));
+        list.add(createShift(branchCode, "fri", "night", "NS02", "Quản lý", "MGR", seq++));
+        list.add(createShift(branchCode, "fri", "night", "NS12", "Kỹ thuật", "TECH", seq++));
 
         // Saturday
-        list.add(createShift(branchCode, "sat", "morning", "NV-02", "POS", "POS", seq++));
-        list.add(createShift(branchCode, "sat", "morning", "NV-05", "Kỹ thuật", "TECH", seq++));
-        list.add(createShift(branchCode, "sat", "morning", "NV-03", "Lễ tân", "REC", seq++));
-        list.add(createShift(branchCode, "sat", "night", "NV-04", "Thu ngân", "CASH", seq++));
-        list.add(createShift(branchCode, "sat", "night", "NV-01", "Quản lý", "MGR", seq++));
-        list.add(createShift(branchCode, "sat", "night", "NV-06", "Kỹ thuật", "TECH", seq++));
+        list.add(createShift(branchCode, "sat", "morning", "NS03", "POS", "POS", seq++));
+        list.add(createShift(branchCode, "sat", "morning", "NS11", "Kỹ thuật", "TECH", seq++));
+        list.add(createShift(branchCode, "sat", "morning", "NS09", "Lễ tân", "REC", seq++));
+        list.add(createShift(branchCode, "sat", "night", "NS04", "Thu ngân", "CASH", seq++));
+        list.add(createShift(branchCode, "sat", "night", "NS02", "Quản lý", "MGR", seq++));
+        list.add(createShift(branchCode, "sat", "night", "NS12", "Kỹ thuật", "TECH", seq++));
 
         // Sunday
-        list.add(createShift(branchCode, "sun", "morning", "NV-04", "Thu ngân", "CASH", seq++));
-        list.add(createShift(branchCode, "sun", "morning", "NV-06", "Kỹ thuật", "TECH", seq++));
-        list.add(createShift(branchCode, "sun", "morning", "NV-03", "Lễ tân", "REC", seq++));
-        list.add(createShift(branchCode, "sun", "night", "NV-02", "POS", "POS", seq++));
-        list.add(createShift(branchCode, "sun", "night", "NV-01", "Quản lý", "MGR", seq++));
-        list.add(createShift(branchCode, "sun", "night", "NV-05", "Kỹ thuật", "TECH", seq++));
+        list.add(createShift(branchCode, "sun", "morning", "NS10", "Thu ngân", "CASH", seq++));
+        list.add(createShift(branchCode, "sun", "morning", "NS12", "Kỹ thuật", "TECH", seq++));
+        list.add(createShift(branchCode, "sun", "morning", "NS09", "Lễ tân", "REC", seq++));
+        list.add(createShift(branchCode, "sun", "night", "NS03", "POS", "POS", seq++));
+        list.add(createShift(branchCode, "sun", "night", "NS02", "Quản lý", "MGR", seq++));
+        list.add(createShift(branchCode, "sun", "night", "NS11", "Kỹ thuật", "TECH", seq++));
 
         workShiftRepository.saveAll(list);
     }

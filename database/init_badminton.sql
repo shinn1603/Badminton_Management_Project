@@ -528,7 +528,8 @@ INSERT INTO branches (branch_code, branch_name, address, phone, operating_hours,
 ('CN01', N'Chi nhánh 1 - Sân Cầu Lông Thủ Đức', N'Số 01 Võ Văn Ngân, Phường Linh Chiểu, TP. Thủ Đức', '0903123456', N'06:00 - 23:00 hàng ngày', N'Trần Phúc Bảo', 8, N'Hoạt động'),
 ('CN02', N'Chi nhánh 2 - Sân Cầu Lông Bình Thạnh', N'Số 234 Điện Biên Phủ, Phường 25, Bình Thạnh', '0903333444', N'06:00 - 23:00 hàng ngày', N'Nguyễn Văn Quản', 6, N'Hoạt động'),
 ('CN03', N'Chi nhánh 3 - Sân Cầu Lông Quận 9', N'Số 70 Đỗ Xuân Hợp, Phước Long B, TP. Thủ Đức', '0903789012', N'06:00 - 23:00 hàng ngày', N'Trần Hữu Nam', 6, N'Hoạt động'),
-('CN04', N'Chi nhánh 4 - Sân Cầu Lông Gò Vấp', N'Số 18 Quang Trung, Phường 10, Gò Vấp', '0903555777', N'06:00 - 23:00 hàng ngày', N'Lê Hoàng Khang', 6, N'Hoạt động');
+('CN04', N'Chi nhánh 4 - Sân Cầu Lông Gò Vấp', N'Số 18 Quang Trung, Phường 10, Gò Vấp', '0903555777', N'06:00 - 23:00 hàng ngày', N'Lê Hoàng Khang', 6, N'Hoạt động'),
+('ALL', N'Hội Sở / Ban Giám Đốc', N'Số 01 Võ Văn Ngân, Phường Linh Chiểu, TP. Thủ Đức', '0901111222', N'08:00 - 17:00 hàng ngày', N'Võ Hoàng Nam', 0, N'Hoạt động');
 
 -- 5.2 DỮ LIỆU SÂN CẦU LÔNG (courts)
 INSERT INTO courts (court_code, branch_code, court_name, court_type, hourly_rate, status, image_url) VALUES
@@ -602,6 +603,40 @@ INSERT INTO bookings (booking_code, customer_code, customer_name, customer_phone
 ('DS0105', 'KH005', N'Trần Thanh Hằng', '0933444555', 'CL01', 'CN01', DATEADD(DAY, 1, CAST(GETDATE() AS DATE)), '17:00 - 18:00', 'KG03', 120000, 120000, 36000, N'Chuyển khoản VietQR', N'Đã cọc 30%', N'Chuyển khoản VietQR giữ chỗ 10p'),
 ('DS0106', 'KH006', N'Bùi Khánh Linh', '0909111222', 'CL04', 'CN01', DATEADD(DAY, 1, CAST(GETDATE() AS DATE)), '20:00 - 22:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Đã xác nhận', N'Giao lưu công ty FPT'),
 ('DS0107', 'KH002', N'Đỗ Quang Vinh', '0944333222', 'CL02', 'CN01', DATEADD(DAY, -1, CAST(GETDATE() AS DATE)), '15:00 - 16:00', 'KG02', 90000, 90000, 0, N'Tiền mặt', N'Đã hủy', N'Bận công tác đột xuất'),
+('DS01_1001_1', 'KH001', N'Lê Bá Đạt', '0912345678', 'CL01', 'CN01', '2026-10-01', '08:00 - 10:00', 'KG01', 120000, 240000, 72000, N'Tiền mặt', N'Hoàn thành', N'Khách quen tập sáng'),
+('DS01_1001_2', 'KH003', N'Phạm Gia Huy', '0988777666', 'CL03', 'CN01', '2026-10-01', '17:00 - 19:00', 'KG03', 90000, 180000, 54000, N'VietQR Pro', N'Hoàn thành', N'Đặt sân sau giờ làm'),
+('DS01_1001_3', 'KH004', N'Vũ Thị Mai Anh', '0977555444', 'CL07', 'CN01', '2026-10-01', '19:00 - 21:00', 'KG03', 90000, 180000, 54000, N'Chuyển khoản VietQR', N'Hoàn thành', N'Đánh đôi nữ'),
+('DS01_1002_1', 'KH002', N'Nguyễn Hoàng Nam', '0903123456', 'CL02', 'CN01', '2026-10-02', '09:00 - 11:00', 'KG02', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Tập thể lực'),
+('DS01_1002_2', 'KH005', N'Trần Thanh Hằng', '0933444555', 'CL04', 'CN01', '2026-10-02', '18:00 - 20:00', 'KG03', 90000, 180000, 54000, N'VietQR Pro', N'Hoàn thành', N'CLB Thủ Đức'),
+('DS01_1002_3', 'KH006', N'Bùi Khánh Linh', '0909111222', 'CL08', 'CN01', '2026-10-02', '20:00 - 22:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Giao lưu'),
+('DS01_1003_1', 'KH001', N'Lê Bá Đạt', '0912345678', 'CL01', 'CN01', '2026-10-03', '15:00 - 17:00', 'KG02', 120000, 240000, 72000, N'Chuyển khoản VietQR', N'Hoàn thành', N'Tập đôi nam'),
+('DS01_1003_2', 'KH003', N'Phạm Gia Huy', '0988777666', 'CL05', 'CN01', '2026-10-03', '17:00 - 19:00', 'KG03', 90000, 180000, 54000, N'VietQR Pro', N'Hoàn thành', N'Khách vãng lai'),
+('DS01_1003_3', 'KH004', N'Vũ Thị Mai Anh', '0977555444', 'CL07', 'CN01', '2026-10-03', '19:00 - 21:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Đặt trực tiếp tại quầy'),
+('DS01_1004_1', 'KH002', N'Nguyễn Hoàng Nam', '0903123456', 'CL02', 'CN01', '2026-10-04', '08:00 - 10:00', 'KG01', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Khách cố định'),
+('DS01_1004_2', 'KH005', N'Trần Thanh Hằng', '0933444555', 'CL03', 'CN01', '2026-10-04', '10:00 - 12:00', 'KG02', 90000, 180000, 54000, N'VietQR Pro', N'Hoàn thành', N'Tập kỹ thuật'),
+('DS01_1004_3', 'KH006', N'Bùi Khánh Linh', '0909111222', 'CL08', 'CN01', '2026-10-04', '16:00 - 18:00', 'KG02', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Giao lưu cuối tuần'),
+('DS01_1005_3', 'KH004', N'Vũ Thị Mai Anh', '0977555444', 'CL06', 'CN01', '2026-10-05', '08:00 - 10:00', 'KG01', 120000, 240000, 72000, N'Tiền mặt', N'Hoàn thành', N'Trước khi sân bảo trì'),
+('DS01_1005_1', 'KH001', N'Lê Bá Đạt', '0912345678', 'CL01', 'CN01', '2026-10-05', '18:00 - 20:00', 'KG03', 120000, 240000, 72000, N'VietQR Pro', N'Hoàn thành', N'Tối thứ 2'),
+('DS01_1005_2', 'KH003', N'Phạm Gia Huy', '0988777666', 'CL04', 'CN01', '2026-10-05', '19:00 - 21:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Giao lưu nội bộ'),
+('DS01_1006_1', 'KH002', N'Nguyễn Hoàng Nam', '0903123456', 'CL02', 'CN01', '2026-10-06', '17:00 - 19:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Tập phát cầu'),
+('DS01_1006_2', 'KH005', N'Trần Thanh Hằng', '0933444555', 'CL05', 'CN01', '2026-10-06', '19:00 - 21:00', 'KG03', 90000, 180000, 54000, N'VietQR Pro', N'Hoàn thành', N'Khách hội viên'),
+('DS01_1006_3', 'KH006', N'Bùi Khánh Linh', '0909111222', 'CL07', 'CN01', '2026-10-06', '20:00 - 22:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Trận chung kết mini'),
+('DS01_1007_1', 'KH001', N'Lê Bá Đạt', '0912345678', 'CL01', 'CN01', '2026-10-07', '09:00 - 11:00', 'KG02', 120000, 240000, 72000, N'Chuyển khoản VietQR', N'Hoàn thành', N'Khách quen VIP'),
+('DS01_1007_2', 'KH003', N'Phạm Gia Huy', '0988777666', 'CL03', 'CN01', '2026-10-07', '18:00 - 20:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Thi đấu giao hữu'),
+('DS01_1007_3', 'KH004', N'Vũ Thị Mai Anh', '0977555444', 'CL08', 'CN01', '2026-10-07', '19:00 - 21:00', 'KG03', 90000, 180000, 54000, N'VietQR Pro', N'Hoàn thành', N'Đánh đôi nữ'),
+('DS01_1008_3', 'KH006', N'Bùi Khánh Linh', '0909111222', 'CL07', 'CN01', '2026-10-08', '17:00 - 19:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Khách vãng lai'),
+('DS01_1008_1', 'KH002', N'Nguyễn Hoàng Nam', '0903123456', 'CL02', 'CN01', '2026-10-08', '18:00 - 20:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Định kỳ thứ 5'),
+('DS01_1008_2', 'KH005', N'Trần Thanh Hằng', '0933444555', 'CL04', 'CN01', '2026-10-08', '20:00 - 22:00', 'KG03', 90000, 180000, 54000, N'VietQR Pro', N'Hoàn thành', N'CLB Ngân Hàng'),
+('DS01_1009_1', 'KH001', N'Lê Bá Đạt', '0912345678', 'CL01', 'CN01', '2026-10-09', '17:00 - 19:00', 'KG03', 120000, 240000, 72000, N'Chuyển khoản VietQR', N'Hoàn thành', N'VIP Thứ 6'),
+('DS01_1009_3', 'KH004', N'Vũ Thị Mai Anh', '0977555444', 'CL08', 'CN01', '2026-10-09', '18:00 - 20:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Khách nhóm'),
+('DS01_1009_2', 'KH003', N'Phạm Gia Huy', '0988777666', 'CL03', 'CN01', '2026-10-09', '19:00 - 21:00', 'KG03', 90000, 180000, 54000, N'VietQR Pro', N'Hoàn thành', N'Giao lưu cuối tuần'),
+('DS01_1012_1', 'KH002', N'Nguyễn Hoàng Nam', '0903123456', 'CL02', 'CN01', '2026-10-12', '18:00 - 20:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Tối thứ 2'),
+('DS01_1012_2', 'KH004', N'Vũ Thị Mai Anh', '0977555444', 'CL07', 'CN01', '2026-10-12', '19:00 - 21:00', 'KG03', 90000, 180000, 54000, N'VietQR Pro', N'Hoàn thành', N'Tập đánh đôi'),
+('DS01_1012_3', 'KH006', N'Bùi Khánh Linh', '0909111222', 'CL08', 'CN01', '2026-10-12', '20:00 - 22:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Hoàn thành', N'Giao lưu câu lạc bộ'),
+('DS01_1013_1', 'KH002', N'Nguyễn Hoàng Nam', '0903123456', 'CL02', 'CN01', '2026-10-13', '17:00 - 19:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Đang sử dụng', N'Hôm nay - Ca chiều'),
+('DS01_1013_3', 'KH005', N'Trần Thanh Hằng', '0933444555', 'CL04', 'CN01', '2026-10-13', '18:00 - 20:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Đã xác nhận', N'Hôm nay - CLB Nữ'),
+('DS01_1013_2', 'KH003', N'Phạm Gia Huy', '0988777666', 'CL03', 'CN01', '2026-10-13', '19:00 - 21:00', 'KG03', 90000, 180000, 54000, N'VietQR Pro', N'Đã xác nhận', N'Hôm nay - Ca tối'),
+('DS01_1013_4', 'KH004', N'Vũ Thị Mai Anh', '0977555444', 'CL07', 'CN01', '2026-10-13', '20:00 - 22:00', 'KG03', 90000, 180000, 54000, N'VietQR Pro', N'Đã xác nhận', N'Hôm nay - Đánh đôi'),
 ('DS0201', 'KH001', N'Lê Bá Đạt', '0912345678', 'BT01', 'CN02', CAST(GETDATE() AS DATE), '18:00 - 20:00', 'KG03', 120000, 240000, 72000, N'Chuyển khoản VietQR', N'Đang sử dụng', N'Sân VIP Bình Thạnh'),
 ('DS0202', 'KH003', N'Phạm Gia Huy', '0988777666', 'BT04', 'CN02', CAST(GETDATE() AS DATE), '19:00 - 21:00', 'KG03', 90000, 180000, 54000, N'Tiền mặt', N'Đang sử dụng', N'Tập luyện đôi nam'),
 ('DS0301', 'KH004', N'Vũ Thị Mai Anh', '0977555444', 'Q902', 'CN03', CAST(GETDATE() AS DATE), '17:00 - 19:00', 'KG03', 90000, 180000, 54000, N'VietQR Pro', N'Đang sử dụng', N'Nhóm bạn sinh viên'),
@@ -660,14 +695,18 @@ INSERT INTO booking_services (booking_code, product_name, quantity, unit_price, 
 
 -- 5.12 DỮ LIỆU NHÂN VIÊN CHI NHÁNH (staff)
 INSERT INTO staff (staff_code, branch_code, full_name, position, phone, email, address) VALUES
-('NS01', 'CN01', N'Võ Hoàng Nam', N'Giám đốc điều hành', '0901111222', 'nam.vh@utesport.vn', N'Quận 1, TP. Hồ Chí Minh'),
+('NS01', 'ALL', N'Võ Hoàng Nam', N'Giám đốc điều hành', '0901111222', 'nam.vh@utesport.vn', N'Quận 1, TP. Hồ Chí Minh'),
 ('NS02', 'CN01', N'Trần Phúc Bảo', N'Quản lý chi nhánh Thủ Đức', '0903123456', 'bao.tran@utesport.vn', N'TP. Thủ Đức, TP. Hồ Chí Minh'),
 ('NS03', 'CN01', N'Nguyễn Thanh Tâm', N'Thu ngân quầy POS', '0904555666', 'tam.nguyen@utesport.vn', N'TP. Thủ Đức, TP. Hồ Chí Minh'),
 ('NS04', 'CN01', N'Lê Thị Mai', N'Thu ngân quầy POS', '0904777888', 'mai.lt@utesport.vn', N'TP. Thủ Đức, TP. Hồ Chí Minh'),
 ('NS05', 'CN02', N'Nguyễn Văn Quản', N'Quản lý chi nhánh Bình Thạnh', '0903333444', 'quan.nv@utesport.vn', N'Bình Thạnh, TP. Hồ Chí Minh'),
 ('NS06', 'CN03', N'Trần Hữu Nam', N'Quản lý chi nhánh Quận 9', '0903789012', 'nam.th@utesport.vn', N'Quận 9, TP. Hồ Chí Minh'),
 ('NS07', 'CN04', N'Lê Hoàng Khang', N'Quản lý chi nhánh Gò Vấp', '0903555777', 'khang.lh@utesport.vn', N'Gò Vấp, TP. Hồ Chí Minh'),
-('NS08', 'CN04', N'Lê Văn Hùng', N'Nhân viên kỹ thuật sân', '0908111333', 'hung.lv@utesport.vn', N'Gò Vấp, TP. Hồ Chí Minh');
+('NS08', 'CN04', N'Lê Văn Hùng', N'Nhân viên kỹ thuật sân', '0908111333', 'hung.lv@utesport.vn', N'Gò Vấp, TP. Hồ Chí Minh'),
+('NS09', 'CN01', N'Bùi Khánh Linh', N'Lễ tân & Dịch vụ', '0909111222', 'linh.bk@utesport.vn', N'TP. Thủ Đức, TP. Hồ Chí Minh'),
+('NS10', 'CN01', N'Nguyễn Hoàng Nam', N'Thu ngân POS quầy', '0903888777', 'nam.nh@utesport.vn', N'TP. Thủ Đức, TP. Hồ Chí Minh'),
+('NS11', 'CN01', N'Phạm Gia Huy', N'Kỹ thuật & Bảo dưỡng sân', '0988777666', 'huy.pg@utesport.vn', N'TP. Thủ Đức, TP. Hồ Chí Minh'),
+('NS12', 'CN01', N'Trịnh Gia Vinh', N'Kỹ thuật & Bảo dưỡng sân', '0977222333', 'vinh.tg@utesport.vn', N'TP. Thủ Đức, TP. Hồ Chí Minh');
 
 -- 5.13 DỮ LIỆU TÀI KHOẢN ĐĂNG NHẬP HỆ THỐNG (users)
 INSERT INTO users (username, password, full_name, email, phone, role, staff_code, branch_code) VALUES

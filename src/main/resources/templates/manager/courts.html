@@ -23,8 +23,6 @@
       transition: all 0.25s ease;
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
       position: relative;
-      display: flex;
-      flex-direction: column;
     }
 
     .court-card-luxury:hover {
@@ -33,45 +31,15 @@
       border-color: var(--primary);
     }
 
-    .court-card-thumb-wrap {
-      height: 140px;
-      width: 100%;
-      position: relative;
-      overflow: hidden;
-      background: var(--surface-subtle);
-    }
-
     .court-card-thumb {
-      height: 100%;
+      height: 140px;
       width: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 0.3s ease;
-    }
-
-    .court-card-luxury:hover .court-card-thumb {
-      transform: scale(1.05);
-    }
-
-    .court-card-thumb-badge {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      padding: 4px 10px;
-      border-radius: 9999px;
-      font-size: 11px;
-      font-weight: 700;
-      backdrop-filter: blur(8px);
-      background: rgba(15, 23, 42, 0.75);
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .court-card-body {
       padding: 16px;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
     }
 
     .court-card-header {
@@ -82,7 +50,7 @@
     }
 
     .court-name {
-      font-size: 15.5px;
+      font-size: 16px;
       font-weight: 800;
       color: var(--text-dark);
       margin: 0;
@@ -97,34 +65,9 @@
     }
 
     .court-price-tag {
-      font-size: 14.5px;
+      font-size: 15px;
       font-weight: 800;
       color: var(--primary);
-    }
-
-    .court-actions-bar {
-      margin-top: auto;
-      padding-top: 12px;
-      display: flex;
-      gap: 6px;
-      border-top: 1px solid var(--border-subtle);
-    }
-
-    .filter-controls-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-
-    .status-select-pill {
-      font-size: 11.5px;
-      padding: 3px 8px;
-      border-radius: 6px;
-      border: 1px solid var(--border-subtle);
-      background: var(--surface);
-      cursor: pointer;
     }
   </style>
 </head>
@@ -143,7 +86,7 @@
         </div>
         <div class="brand-text">
           <h2>UTE SPORT</h2>
-          <span id="sidebarBranchName">CHI NHÁNH THỦ ĐỨC</span>
+          <span>CHI NHÁNH THỦ ĐỨC</span>
         </div>
       </div>
 
@@ -168,7 +111,10 @@
             <line x1="3" y1="10" x2="21" y2="10"></line>
           </svg>
           <span class="menu-text">Đặt sân</span>
+          <span class="menu-tag">7 mới</span>
         </a>
+
+
 
         <a href="/manager/courts" class="menu-item active">
           <svg class="svg-icon" viewBox="0 0 24 24">
@@ -177,7 +123,6 @@
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
           </svg>
           <span class="menu-text">Danh mục sân</span>
-          <span class="menu-tag" id="sidebarCourtsTag">8 sân</span>
         </a>
 
         <a href="/manager/pricing" class="menu-item">
@@ -224,10 +169,10 @@
       </div>
 
       <div class="sidebar-bottom">
-        <div class="user-avatar" id="sidebarUserAvatar">QL</div>
+        <div class="user-avatar">QL</div>
         <div class="user-meta">
-          <div class="user-name" id="sidebarUserName">Quản Lý Chi Nhánh</div>
-          <div class="user-title" id="sidebarUserRole">Quản lý cơ sở</div>
+          <div class="user-name">Trần Phúc Bảo</div>
+          <div class="user-title">Quản lý cơ sở Thủ Đức</div>
         </div>
         <a href="/login" style="margin-left: auto; color: #94a3b8;" title="Đăng xuất">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
@@ -256,7 +201,7 @@
             <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--primary);">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             </svg>
-            <span id="headerBranchTitle">Hệ Thống Sân Cầu Lông UTE Sport</span>
+            <span>Trung Tâm Thể Thao UTE Sport - Thủ Đức</span>
           </div>
 
           <div class="search-box-header">
@@ -264,7 +209,7 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" placeholder="Tìm kiếm theo mã sân, tên sân, loại sân..." id="courtSearchInput" oninput="applyFilters()">
+            <input type="text" placeholder="Tìm kiếm sân theo số hiệu, loại sân..." id="courtSearchInput" oninput="filterCourts()">
           </div>
         </div>
 
@@ -278,13 +223,10 @@
               <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
               <line x1="1" y1="12" x2="3" y2="12"></line>
               <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
           </button>
-
-          <a href="/manager/pricing" class="btn btn-outline" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; font-size: 13px;">
-            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-            <span>Đề Xuất Chỉnh Giá</span>
-          </a>
 
           <button type="button" class="btn btn-primary" onclick="openCourtModal()">
             <svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -305,76 +247,90 @@
           <div class="hero-banner-content">
             <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
               <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
-              Cơ Sở Vật Chất & Danh Mục Sân • SQL Server Realtime
+              Cơ Sở Vật Chất & Danh Mục Sân Chi Nhánh
             </div>
             <h1 class="hero-title" style="margin-bottom: 8px;">Danh Mục Sân & Trạng Thái Hoạt Động</h1>
-            <p class="hero-subtitle" style="margin-bottom: 0;">Quản lý hệ thống sân thi đấu tiêu chuẩn BWF, cập nhật trạng thái vận hành thời gian thực kết nối SQL Server (Đơn giá do Ban Giám Đốc phê duyệt).</p>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Quản lý hệ thống sân thi đấu tiêu chuẩn BWF, phân loại sân VIP, cập nhật bảng giá và lịch bảo trì thiết bị</p>
           </div>
         </div>
 
-        <!-- FILTER CONTROLS BAR -->
-        <div class="filter-controls-row">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <label style="font-size: 13px; font-weight: 700; color: var(--text-dark);">Chi nhánh:</label>
-            <select id="branchFilterSelect" class="form-control" onchange="onBranchChange()" style="width: auto; font-weight: 700; color: var(--primary);">
-              <option value="CN01" selected>CN01 - Thủ Đức (Chi nhánh quản lý)</option>
-            </select>
+        <!-- KPI METRICS ROW -->
+        <!-- KPI METRICS ROW -->
+        <div class="kpi-grid">
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Tổng số sân thi đấu</span>
+              <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: var(--primary);">
+                <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+              </div>
+            </div>
+            <div class="kpi-val" id="kpiTotalCourts">-- sân</div>
+            <div class="kpi-trend positive" id="kpiTotalCourtsDesc">Chi nhánh Thủ Đức (Sân Tiêu Chuẩn & VIP)</div>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <label style="font-size: 13px; font-weight: 700; color: var(--text-dark);">Trạng thái:</label>
-            <select id="statusFilterSelect" class="form-control" onchange="applyFilters()" style="width: auto;">
-              <option value="ALL">Tất cả trạng thái</option>
-              <option value="Trống">Trống (Sẵn sàng)</option>
-              <option value="Đang sử dụng">Đang sử dụng</option>
-              <option value="Bảo trì">Đang bảo trì</option>
-            </select>
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Sẵn sàng phục vụ</span>
+              <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+            </div>
+            <div class="kpi-val" id="kpiAvailableCourts" style="color: #3b82f6;">-- sân</div>
+            <div class="kpi-trend positive" id="kpiAvailableCourtsDesc">Đang trống, sẵn sàng nhận khách</div>
           </div>
 
-          <div style="margin-left: auto; font-size: 13px; color: var(--text-muted); font-weight: 600;">
-            Hiển thị: <span id="filteredCourtsCountText" style="color: var(--primary); font-weight: 700;">0 sân</span>
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Đang có khách thi đấu</span>
+              <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </div>
+            </div>
+            <div class="kpi-val" id="kpiInUseCourts" style="color: #f59e0b;">-- sân</div>
+            <div class="kpi-trend" id="kpiInUseCourtsDesc">Đang trong ca thi đấu</div>
+          </div>
+
+          <div class="kpi-card-unified">
+            <div class="kpi-header">
+              <span class="kpi-label">Đang bảo trì định kỳ</span>
+              <div class="kpi-icon-wrap" style="background: rgba(239, 68, 68, 0.12); color: #ef4444;">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+              </div>
+            </div>
+            <div class="kpi-val" id="kpiMaintenanceCourts" style="color: #ef4444;">-- sân</div>
+            <div class="kpi-trend" id="kpiMaintenanceCourtsDesc">Bảo trì kỹ thuật thiết bị</div>
           </div>
         </div>
 
-
-
-        <!-- VISUAL COURTS GRID (DYNAMICALLY RENDERED FROM SQL SERVER) -->
+        <!-- VISUAL COURTS GRID -->
         <div class="section-card" style="margin-bottom: 24px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-            <div class="section-title-wrap">
-              <h3>Sơ đồ trực quan danh mục sân chi nhánh</h3>
-              <p id="visualGridSubtitle">Hệ thống sân thảm thi đấu chuẩn BWF nạp trực tiếp từ CSDL</p>
-            </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-              <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;" id="visualCourtCountText">0 sân</span>
-            </div>
+          <div class="section-title-wrap" style="margin-bottom: 16px;">
+            <h3>Sơ đồ trực quan danh mục sân chi nhánh</h3>
+            <p id="courtsVisualSubtitle">Hệ thống sân thảm thi đấu chuẩn BWF tại chi nhánh Thủ Đức</p>
           </div>
 
           <div class="courts-grid-wrap" id="courtsVisualGrid">
-            <!-- Dynamically populated from SQL Server -->
+            <!-- Populated dynamically by JavaScript from SQL Server database -->
           </div>
         </div>
 
-        <!-- TABLE VIEW (DYNAMICALLY RENDERED FROM SQL SERVER) -->
+        <!-- TABLE VIEW -->
         <div class="section-card">
-          <div class="section-header-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div class="section-header-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
             <div class="section-title-wrap">
               <h3>Bảng chi tiết thông số kỹ thuật sân</h3>
             </div>
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;" id="tableCourtCountText">0 bản ghi</span>
-              <button class="btn btn-outline" onclick="loadCourtsFromApi()">
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                <span>Làm mới CSDL</span>
-              </button>
-            </div>
+            <button class="btn btn-outline" onclick="loadCourtsFromApi()">
+              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+              <span>Làm mới danh sách</span>
+            </button>
           </div>
 
           <div class="table-container">
             <table class="clean-table" id="courtTable">
               <thead>
                 <tr>
-                  <th style="width: 50px; text-align: center;">STT</th>
+                  <th style="width: 60px; text-align: center;">STT</th>
                   <th>Mã sân</th>
                   <th>Tên sân</th>
                   <th>Phân loại</th>
@@ -385,7 +341,102 @@
                 </tr>
               </thead>
               <tbody id="courtTableBody">
-                <!-- Dynamically populated from SQL Server -->
+                <tr>
+                  <td style="text-align: center;">1</td>
+                  <td><strong>CL01</strong></td>
+                  <td>Sân cầu lông 1 (VIP)</td>
+                  <td>Cầu lông VIP</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">120.000 đ/h</b></td>
+                  <td><span class="badge badge-green">Trống</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL01', 'Sân cầu lông 1 (VIP)', 'Cầu lông VIP', 120000, 'Trống')">Sửa</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">2</td>
+                  <td><strong>CL02</strong></td>
+                  <td>Sân cầu lông 2</td>
+                  <td>Cầu lông tiêu chuẩn</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">90.000 đ/h</b></td>
+                  <td><span class="badge badge-amber">Đang sử dụng</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL02', 'Sân cầu lông 2', 'Cầu lông tiêu chuẩn', 90000, 'Đang sử dụng')">Sửa</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">3</td>
+                  <td><strong>CL03</strong></td>
+                  <td>Sân cầu lông 3</td>
+                  <td>Cầu lông tiêu chuẩn</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">90.000 đ/h</b></td>
+                  <td><span class="badge badge-green">Trống</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL03', 'Sân cầu lông 3', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Sửa</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">4</td>
+                  <td><strong>CL04</strong></td>
+                  <td>Sân cầu lông 4</td>
+                  <td>Cầu lông tiêu chuẩn</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">90.000 đ/h</b></td>
+                  <td><span class="badge badge-green">Trống</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL04', 'Sân cầu lông 4', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Sửa</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">5</td>
+                  <td><strong>CL05</strong></td>
+                  <td>Sân cầu lông 5</td>
+                  <td>Cầu lông tiêu chuẩn</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">90.000 đ/h</b></td>
+                  <td><span class="badge badge-green">Trống</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL05', 'Sân cầu lông 5', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Sửa</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">6</td>
+                  <td><strong>CL06</strong></td>
+                  <td>Sân cầu lông 6 (VIP)</td>
+                  <td>Cầu lông VIP</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">120.000 đ/h</b></td>
+                  <td><span class="badge badge-red">Bảo trì</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL06', 'Sân cầu lông 6 (VIP)', 'Cầu lông VIP', 120000, 'Bảo trì')">Sửa</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">7</td>
+                  <td><strong>CL07</strong></td>
+                  <td>Sân cầu lông 7</td>
+                  <td>Cầu lông tiêu chuẩn</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">90.000 đ/h</b></td>
+                  <td><span class="badge badge-green">Trống</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL07', 'Sân cầu lông 7', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Sửa</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="text-align: center;">8</td>
+                  <td><strong>CL08</strong></td>
+                  <td>Sân cầu lông 8</td>
+                  <td>Cầu lông tiêu chuẩn</td>
+                  <td>Thủ Đức (CN01)</td>
+                  <td><b style="color: var(--primary);">90.000 đ/h</b></td>
+                  <td><span class="badge badge-green">Trống</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('CL08', 'Sân cầu lông 8', 'Cầu lông tiêu chuẩn', 90000, 'Trống')">Sửa</button>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -403,47 +454,24 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Chi nhánh quản lý *</label>
-          <select class="form-control" id="inpBranchCode">
-            <option value="CN01">CN01 - Chi nhánh Thủ Đức</option>
-            <option value="CN02">CN02 - Chi nhánh Bình Thạnh</option>
-            <option value="CN03">CN03 - Chi nhánh Quận 9</option>
-            <option value="CN04">CN04 - Chi nhánh Gò Vấp</option>
-          </select>
+          <label class="form-label">Mã số sân</label>
+          <input type="text" class="form-control" id="inpCourtCode" placeholder="Ví dụ: CL05">
         </div>
         <div class="form-group">
-          <label class="form-label">Mã số sân *</label>
-          <input type="text" class="form-control" id="inpCourtCode" placeholder="Ví dụ: CL09, BT07...">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Tên hiển thị của sân *</label>
-          <input type="text" class="form-control" id="inpCourtName" placeholder="Ví dụ: Sân cầu lông 9 (VIP Yonex)">
+          <label class="form-label">Tên hiển thị của sân</label>
+          <input type="text" class="form-control" id="inpCourtName" placeholder="Ví dụ: Sân cầu lông 5">
         </div>
         <div class="form-group">
           <label class="form-label">Phân loại sân</label>
-          <select class="form-control" id="inpCourtType" onchange="onCourtTypeChange()">
+          <select class="form-control" id="inpCourtType">
             <option value="Cầu lông tiêu chuẩn">Cầu lông tiêu chuẩn</option>
             <option value="Cầu lông VIP">Cầu lông VIP</option>
             <option value="Cầu lông Thi Đấu Quốc Tế">Cầu lông Thi Đấu Quốc Tế</option>
           </select>
         </div>
         <div class="form-group">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <label class="form-label" style="margin-bottom: 0;">Đơn giá thuê (VNĐ/giờ)</label>
-            <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #b45309; background: rgba(245, 158, 11, 0.12); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.25);">
-              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px; stroke: currentColor;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              Cố định theo Bảng giá do Giám đốc duyệt
-            </span>
-          </div>
-          <input type="number" class="form-control" id="inpHourlyRate" value="90000" readonly style="background: var(--surface-subtle, #f1f5f9); cursor: not-allowed; color: var(--text-dark); font-weight: 700;">
-          <div style="margin-top: 8px; padding: 10px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12px;">
-            <div style="color: var(--text-muted); line-height: 1.4;">
-              Quản lý chi nhánh không thể tự ý sửa giá trực tiếp. Muốn điều chỉnh giá sân, vui lòng gửi đề xuất lên Ban Giám Đốc.
-            </div>
-            <a href="/manager/pricing" class="btn btn-outline" style="font-size: 11.5px; padding: 5px 10px; white-space: nowrap; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
-              Gửi đề xuất giá &rarr;
-            </a>
-          </div>
+          <label class="form-label">Đơn giá thuê (VNĐ/giờ)</label>
+          <input type="number" class="form-control" id="inpHourlyRate" value="90000" step="10000">
         </div>
         <div class="form-group">
           <label class="form-label">Trạng thái vận hành</label>
@@ -453,62 +481,30 @@
             <option value="Bảo trì">Bảo trì kỹ thuật</option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Đường dẫn hình ảnh sân</label>
-          <input type="text" class="form-control" id="inpImageUrl" value="/images/badminton-court.jpg">
-        </div>
       </div>
-      <div class="modal-footer" style="display: flex; justify-content: space-between; gap: 10px;">
-        <button class="btn btn-outline" style="border-color: var(--danger-border); color: var(--danger); display: none;" id="btnDeleteCourtInModal" onclick="deleteCourtFromModal()">Xóa sân</button>
-        <div style="display: flex; gap: 8px; margin-left: auto;">
-          <button class="btn btn-outline" onclick="closeCourtModal()">Hủy bỏ</button>
-          <button class="btn btn-primary" onclick="saveCourt()">Lưu thông tin sân</button>
-        </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeCourtModal()">Hủy bỏ</button>
+        <button class="btn btn-primary" onclick="saveCourt()">Lưu thông tin sân</button>
       </div>
     </div>
   </div>
 
-  <div class="toast-container" id="toastContainer"></div>
-
   <script src="/js/global-hub.js"></script>
   <script>
-    let allCourts = [];
-    let isEditingMode = false;
+    let allLoadedCourts = [];
 
-    function getActiveBranch() {
+    function getActiveBranchCode() {
       const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
-        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
-      if (user && (user.role === 'MANAGER' || (user.branchCode && user.role !== 'DIRECTOR' && user.role !== 'ADMIN'))) {
-        return user.branchCode || 'CN01';
-      }
-      const select = document.getElementById('branchFilterSelect');
-      if (select && select.value) return select.value;
-      return (user && user.branchCode) ? user.branchCode : 'CN01';
+        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser())
+        || {};
+      let b = user.branchCode || 'CN01';
+      if (b === 'ALL') b = 'CN01';
+      return b;
     }
 
-    function initBranchSecurity() {
-      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
-        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
-      const select = document.getElementById('branchFilterSelect');
-      if (!select) return;
-      if (user && (user.role === 'DIRECTOR' || user.role === 'ADMIN')) {
-        select.innerHTML = `
-          <option value="CN01" selected>CN Thủ Đức (CN01)</option>
-          <option value="CN02">CN Bình Thạnh (CN02)</option>
-          <option value="CN03">CN Quận 9 (CN03)</option>
-          <option value="CN04">CN Gò Vấp (CN04)</option>
-          <option value="ALL">Toàn bộ chi nhánh</option>
-        `;
-        select.disabled = false;
-        select.style.cursor = 'pointer';
-      } else {
-        const br = (user && user.branchCode) ? user.branchCode : 'CN01';
-        select.innerHTML = `<option value="${br}" selected>${br} - Thủ Đức (Chi nhánh quản lý)</option>`;
-        select.value = br;
-        select.disabled = true;
-        select.style.cursor = 'not-allowed';
-        select.title = 'Phân quyền: Bạn chỉ có quyền quản lý cơ sở được phân công (' + br + ')';
-      }
+    function toggleSidebar() {
+      const sidebar = document.getElementById('appSidebar');
+      if (sidebar) sidebar.classList.toggle('collapsed');
     }
 
     function toggleTheme() {
@@ -516,203 +512,248 @@
       const nxt = cur === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', nxt);
       localStorage.setItem('utesport_theme', nxt);
-      showToast(`Chuyển sang giao diện ${nxt === 'dark' ? 'Tối' : 'Sáng'}`, 'info');
-    }
-
-    function toggleSidebar() {
-      document.getElementById('appSidebar').classList.toggle('collapsed');
-    }
-
-    function onBranchChange() {
-      const branch = getActiveBranch();
-      const sideName = document.getElementById('sidebarBranchName');
-      const headerTitle = document.getElementById('headerBranchTitle');
-      if (sideName) sideName.textContent = `CHI NHÁNH ${branch}`;
-      if (headerTitle) headerTitle.textContent = branch === 'ALL' ? 'Toàn bộ chi nhánh UTE Sport' : `Chi Nhánh ${branch} - UTE Sport`;
-      loadCourtsFromApi();
-    }
-
-    async function loadCourtsFromApi() {
-      const branch = getActiveBranch();
-      const url = (branch && branch !== 'ALL') ? `/api/courts?branchCode=${encodeURIComponent(branch)}` : '/api/courts';
-
-      try {
-        const res = await fetch(url);
-        if (res.ok) {
-          allCourts = await res.json() || [];
-          updateKpiMetrics();
-          applyFilters();
-          showToast(`Đã đồng bộ ${allCourts.length} sân thi đấu từ SQL Server!`, 'success');
-        } else {
-          showToast(`Lỗi khi nạp danh sách sân (HTTP ${res.status})`, 'error');
-        }
-      } catch (err) {
-        console.error('Lỗi API courts:', err);
-        showToast('Lỗi kết nối máy chủ SQL Server', 'error');
+      if (typeof showToast === 'function') {
+        showToast(`Đã chuyển sang giao diện ${nxt === 'dark' ? 'Tối' : 'Sáng'}`, 'info');
       }
     }
 
-    function updateKpiMetrics() {
-      const total = allCourts.length;
-      const sidebarTag = document.getElementById('sidebarCourtsTag');
-      if (sidebarTag) sidebarTag.textContent = `${total} sân`;
-    }
+    const fallbackCourts = [
+      { courtCode: 'CL01', branchCode: 'CN01', courtName: 'Sân cầu lông 1 (VIP Yonex)', courtType: 'Cầu lông VIP', hourlyRate: 120000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL02', branchCode: 'CN01', courtName: 'Sân cầu lông 2', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Đang sử dụng', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL03', branchCode: 'CN01', courtName: 'Sân cầu lông 3', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL04', branchCode: 'CN01', courtName: 'Sân cầu lông 4', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL05', branchCode: 'CN01', courtName: 'Sân cầu lông 5', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Đang sử dụng', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL06', branchCode: 'CN01', courtName: 'Sân cầu lông 6 (VIP Yonex)', courtType: 'Cầu lông VIP', hourlyRate: 120000, status: 'Bảo trì', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL07', branchCode: 'CN01', courtName: 'Sân cầu lông 7', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL08', branchCode: 'CN01', courtName: 'Sân cầu lông 8', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' }
+    ];
 
-    function applyFilters() {
-      const kw = (document.getElementById('courtSearchInput')?.value || '').toLowerCase().trim();
-      const st = document.getElementById('statusFilterSelect')?.value || 'ALL';
+    function renderKPIs(courts) {
+      const total = courts.length;
+      const available = courts.filter(c => c.status === 'Trống' || c.status === 'Sẵn sàng').length;
+      const inUse = courts.filter(c => c.status === 'Đang sử dụng').length;
+      const maint = courts.filter(c => c.status === 'Bảo trì').length;
+      const vipCount = courts.filter(c => (c.courtType || '').toLowerCase().includes('vip')).length;
+      const stdCount = total - vipCount;
 
-      const filtered = allCourts.filter(c => {
-        const matchKw = !kw || c.courtCode.toLowerCase().includes(kw)
-          || c.courtName.toLowerCase().includes(kw)
-          || (c.courtType && c.courtType.toLowerCase().includes(kw));
-        const matchSt = st === 'ALL' || c.status === st;
-        return matchKw && matchSt;
-      });
+      const kpiTotal = document.getElementById('kpiTotalCourts');
+      const kpiTotalDesc = document.getElementById('kpiTotalCourtsDesc');
+      const kpiAvailable = document.getElementById('kpiAvailableCourts');
+      const kpiAvailableDesc = document.getElementById('kpiAvailableCourtsDesc');
+      const kpiInUse = document.getElementById('kpiInUseCourts');
+      const kpiInUseDesc = document.getElementById('kpiInUseCourtsDesc');
+      const kpiMaint = document.getElementById('kpiMaintenanceCourts');
+      const kpiMaintDesc = document.getElementById('kpiMaintenanceCourtsDesc');
 
-      document.getElementById('filteredCourtsCountText').textContent = `${filtered.length} / ${allCourts.length} sân`;
-      document.getElementById('visualCourtCountText').textContent = `${filtered.length} sân`;
-      document.getElementById('tableCourtCountText').textContent = `${filtered.length} bản ghi`;
+      if (kpiTotal) kpiTotal.textContent = `${total} sân`;
+      if (kpiTotalDesc) kpiTotalDesc.textContent = `Chi nhánh Thủ Đức (${vipCount} sân VIP, ${stdCount} sân thường)`;
 
-      renderVisualGrid(filtered);
-      renderTable(filtered);
+      if (kpiAvailable) kpiAvailable.textContent = `${available} sân`;
+      if (kpiAvailableDesc) {
+        const pct = total > 0 ? Math.round((available / total) * 100) : 0;
+        kpiAvailableDesc.textContent = `Đang trống, ${pct}% công suất khả dụng`;
+      }
+
+      if (kpiInUse) kpiInUse.textContent = `${inUse} sân`;
+      if (kpiInUseDesc) {
+        kpiInUseDesc.textContent = inUse > 0 ? `Đang trong ca thi đấu (${inUse} sân)` : 'Hiện không có ca thi đấu';
+      }
+
+      if (kpiMaint) kpiMaint.textContent = `${maint} sân`;
+      if (kpiMaintDesc) {
+        kpiMaintDesc.textContent = maint > 0 ? `Bảo trì định kỳ (${maint} sân)` : 'Tất cả sân hoạt động tốt';
+      }
     }
 
     function renderVisualGrid(courts) {
       const grid = document.getElementById('courtsVisualGrid');
       if (!grid) return;
-      grid.innerHTML = '';
 
-      if (courts.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px; background: var(--surface); border-radius: 16px; border: 1px dashed var(--border-subtle);">Không tìm thấy sân thi đấu nào phù hợp với bộ lọc.</div>';
+      if (!courts || courts.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 36px; color: var(--text-muted); background: var(--surface); border-radius: 12px; border: 1px dashed var(--border-subtle);">Không tìm thấy sân thi đấu nào</div>`;
         return;
       }
 
-      courts.forEach(c => {
+      grid.innerHTML = courts.map(c => {
         let badgeClass = 'badge-green';
-        if (c.status === 'Đang sử dụng' || c.status === 'Đang giữ chỗ') badgeClass = 'badge-amber';
+        let badgeLabel = c.status || 'Trống';
+        if (c.status === 'Đang sử dụng') badgeClass = 'badge-amber';
         else if (c.status === 'Bảo trì') badgeClass = 'badge-red';
+        else if (c.status === 'Đang giữ chỗ') badgeClass = 'badge-purple';
 
-        const card = document.createElement('div');
-        card.className = 'court-card-luxury';
-        card.innerHTML = `
-          <div class="court-card-thumb-wrap">
-            <img src="${c.imageUrl || '/images/badminton-court.jpg'}" class="court-card-thumb" alt="${c.courtName}">
-            <span class="court-card-thumb-badge">${c.branchCode || 'CN01'}</span>
-          </div>
-          <div class="court-card-body">
-            <div class="court-card-header">
-              <h4 class="court-name">${c.courtName}</h4>
-              <span class="badge ${badgeClass}">${c.status}</span>
+        const isVip = (c.courtType || '').toLowerCase().includes('vip');
+        const matType = isVip ? 'PVC Yonex Quốc Tế' : 'PVC Enlio 4.5mm';
+        const rateFormatted = Number(c.hourlyRate || 90000).toLocaleString('vi-VN') + ' đ/h';
+        const imgSrc = c.imageUrl || '/images/badminton-court.jpg';
+        const safeName = (c.courtName || ('Sân ' + c.courtCode)).replace(/'/g, "\\'");
+        const safeType = (c.courtType || 'Cầu lông tiêu chuẩn').replace(/'/g, "\\'");
+
+        // Phân quyền & trạng thái nút theo yêu cầu:
+        // 1. "Đang sử dụng": CHỈ HIỂN THỊ DUY NHẤT TRẠNG THÁI "Đang sử dụng" (ẩn hoàn toàn nút Chỉnh sửa và Đặt sân).
+        // 2. "Trống": Hiển thị nút "Chỉnh sửa" và nút "Đặt sân" (chuyển sang /manager/bookings?court=...)
+        // 3. "Bảo trì": Hiển thị nút "Chỉnh sửa" và nút "Hoàn tất bảo trì" (chuyển nhanh về Trống và lưu CSDL)
+        let actionButtonsHtml = '';
+        if (c.status === 'Đang sử dụng') {
+          actionButtonsHtml = `
+            <div style="margin-top: 12px; padding: 7px 10px; border-radius: 8px; background: rgba(245, 158, 11, 0.12); border: 1px dashed rgba(245, 158, 11, 0.4); color: #d97706; font-size: 12px; font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <span style="display: inline-block; width: 7px; height: 7px; background: #f59e0b; border-radius: 50%; box-shadow: 0 0 6px #f59e0b;"></span>
+              Đang có khách thi đấu
             </div>
-            <div class="court-meta-row">
-              <span>Mã sân: <b>${c.courtCode}</b></span>
-              <span>Chi nhánh: <b>${c.branchCode}</b></span>
+          `;
+        } else if (c.status === 'Bảo trì') {
+          actionButtonsHtml = `
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
+              <button type="button" class="btn btn-outline" style="flex: 1; padding: 6px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${safeName}', '${safeType}', ${c.hourlyRate}, '${c.status}')">Chỉnh sửa</button>
+              <button type="button" class="btn btn-success" style="flex: 1; padding: 6px 8px; font-size: 11.5px; background: #10b981; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;" onclick="quickUpdateStatus('${c.courtCode}', 'Trống')">Hoàn tất bảo trì</button>
             </div>
-            <div class="court-meta-row">
-              <span>Loại: ${c.courtType}</span>
-              <span class="court-price-tag">${Number(c.hourlyRate || 90000).toLocaleString('vi-VN')} đ/h</span>
+          `;
+        } else if (c.status === 'Đang giữ chỗ') {
+          actionButtonsHtml = `
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
+              <button type="button" class="btn btn-outline" style="flex: 1; padding: 6px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${safeName}', '${safeType}', ${c.hourlyRate}, '${c.status}')">Chỉnh sửa</button>
+              <button type="button" class="btn btn-outline" style="flex: 1; padding: 6px 8px; font-size: 11.5px; border-color: #f59e0b; color: #d97706;" onclick="quickUpdateStatus('${c.courtCode}', 'Trống')">Hủy giữ chỗ</button>
             </div>
-            <div class="court-actions-bar">
-              <button type="button" class="btn btn-outline" style="flex: 1; padding: 6px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${c.courtName}', '${c.courtType}', ${c.hourlyRate}, '${c.status}', '${c.branchCode}', '${c.imageUrl || ''}')">Sửa</button>
-              <select class="status-select-pill" onchange="quickChangeStatus('${c.courtCode}', this.value)" title="Đổi trạng thái nhanh">
-                <option value="Trống" ${c.status === 'Trống' ? 'selected' : ''}>Trống</option>
-                <option value="Đang sử dụng" ${c.status === 'Đang sử dụng' ? 'selected' : ''}>Đang dùng</option>
-                <option value="Bảo trì" ${c.status === 'Bảo trì' ? 'selected' : ''}>Bảo trì</option>
-              </select>
-              <button type="button" class="btn btn-outline" style="padding: 6px 8px; font-size: 11.5px; border-color: var(--danger-border); color: var(--danger);" onclick="deleteCourt('${c.courtCode}')" title="Xóa sân">✕</button>
+          `;
+        } else {
+          actionButtonsHtml = `
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
+              <button type="button" class="btn btn-outline" style="flex: 1; padding: 6px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${safeName}', '${safeType}', ${c.hourlyRate}, '${c.status}')">Chỉnh sửa</button>
+              <a href="/manager/bookings?court=${c.courtCode}" class="btn btn-primary" style="flex: 1; padding: 6px 8px; font-size: 11.5px; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Đặt sân</a>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="court-card-luxury" data-court-code="${c.courtCode}">
+            <img src="${imgSrc}" class="court-card-thumb" alt="${c.courtName}" onerror="this.src='/images/badminton-court.jpg'">
+            <div class="court-card-body">
+              <div class="court-card-header">
+                <h4 class="court-name">${c.courtName}</h4>
+                <span class="badge ${badgeClass}">${badgeLabel}</span>
+              </div>
+              <div class="court-meta-row">
+                <span>Mã sân: <b>${c.courtCode}</b></span>
+                <span>Thảm: ${matType}</span>
+              </div>
+              <div class="court-meta-row">
+                <span>Loại sân: ${c.courtType}</span>
+                <span class="court-price-tag">${rateFormatted}</span>
+              </div>
+              ${actionButtonsHtml}
             </div>
           </div>
         `;
-        grid.appendChild(card);
-      });
+      }).join('');
     }
 
     function renderTable(courts) {
       const tbody = document.getElementById('courtTableBody');
       if (!tbody) return;
-      tbody.innerHTML = '';
 
-      if (courts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">Không có bản ghi sân thi đấu nào phù hợp.</td></tr>';
+      if (!courts || courts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Không tìm thấy sân thi đấu nào phù hợp</td></tr>`;
         return;
       }
 
-      courts.forEach((c, idx) => {
+      tbody.innerHTML = courts.map((c, idx) => {
         let badgeClass = 'badge-green';
-        if (c.status === 'Đang sử dụng' || c.status === 'Đang giữ chỗ') badgeClass = 'badge-amber';
+        if (c.status === 'Đang sử dụng') badgeClass = 'badge-amber';
         else if (c.status === 'Bảo trì') badgeClass = 'badge-red';
+        else if (c.status === 'Đang giữ chỗ') badgeClass = 'badge-purple';
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td style="text-align: center;">${idx + 1}</td>
-          <td><strong>${c.courtCode}</strong></td>
-          <td>${c.courtName}</td>
-          <td>${c.courtType}</td>
-          <td><b>${c.branchCode}</b></td>
-          <td><b style="color: var(--primary);">${Number(c.hourlyRate || 90000).toLocaleString('vi-VN')} đ/h</b></td>
-          <td><span class="badge ${badgeClass}">${c.status}</span></td>
-          <td style="text-align: right;">
-            <div style="display: inline-flex; gap: 4px;">
-              <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openCourtModal('${c.courtCode}', '${c.courtName}', '${c.courtType}', ${c.hourlyRate}, '${c.status}', '${c.branchCode}', '${c.imageUrl || ''}')">Sửa</button>
-              <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px; border-color: var(--danger-border); color: var(--danger);" onclick="deleteCourt('${c.courtCode}')">Xóa</button>
-            </div>
-          </td>
+        const branchDisplay = c.branchCode === 'CN01' ? 'Thủ Đức (CN01)' :
+          (c.branchCode === 'CN02' ? 'Bình Thạnh (CN02)' :
+          (c.branchCode === 'CN03' ? 'Quận 9 (CN03)' :
+          (c.branchCode === 'CN04' ? 'Gò Vấp (CN04)' : (c.branchCode || 'CN01'))));
+
+        const rateFormatted = Number(c.hourlyRate || 90000).toLocaleString('vi-VN') + ' đ/h';
+        const safeName = (c.courtName || ('Sân ' + c.courtCode)).replace(/'/g, "\\'");
+        const safeType = (c.courtType || 'Cầu lông tiêu chuẩn').replace(/'/g, "\\'");
+
+        return `
+          <tr>
+            <td style="text-align: center;">${idx + 1}</td>
+            <td><strong>${c.courtCode}</strong></td>
+            <td>${c.courtName}</td>
+            <td>${c.courtType}</td>
+            <td>${branchDisplay}</td>
+            <td><b style="color: var(--primary);">${rateFormatted}</b></td>
+            <td><span class="badge ${badgeClass}">${c.status}</span></td>
+            <td style="text-align: right;">
+              <div style="display: inline-flex; gap: 6px; justify-content: flex-end;">
+                <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${safeName}', '${safeType}', ${c.hourlyRate}, '${c.status}')">Sửa</button>
+                ${c.status === 'Bảo trì' ? `<button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; border-color: #10b981; color: #10b981;" onclick="quickUpdateStatus('${c.courtCode}', 'Trống')" title="Chuyển về trạng thái Trống">Hoàn tất</button>` : ''}
+                ${c.status === 'Trống' ? `<a href="/manager/bookings?court=${c.courtCode}" class="btn btn-primary" style="padding: 4px 8px; font-size: 11.5px; text-decoration: none;">Đặt sân</a>` : ''}
+              </div>
+            </td>
+          </tr>
         `;
-        tbody.appendChild(tr);
-      });
+      }).join('');
     }
 
-    function onCourtTypeChange() {
-      if (!isEditingMode) {
-        const type = document.getElementById('inpCourtType').value;
-        const defaultRates = {
-          'Cầu lông tiêu chuẩn': 90000,
-          'Cầu lông VIP': 120000,
-          'Cầu lông Thi Đấu Quốc Tế': 160000
-        };
-        document.getElementById('inpHourlyRate').value = defaultRates[type] || 90000;
+    function filterCourts() {
+      const kw = (document.getElementById('courtSearchInput')?.value || '').toLowerCase().trim();
+      if (!kw) {
+        renderKPIs(allLoadedCourts);
+        renderVisualGrid(allLoadedCourts);
+        renderTable(allLoadedCourts);
+        return;
+      }
+
+      const filtered = allLoadedCourts.filter(c =>
+        (c.courtCode && c.courtCode.toLowerCase().includes(kw)) ||
+        (c.courtName && c.courtName.toLowerCase().includes(kw)) ||
+        (c.courtType && c.courtType.toLowerCase().includes(kw)) ||
+        (c.status && c.status.toLowerCase().includes(kw))
+      );
+
+      renderKPIs(filtered);
+      renderVisualGrid(filtered);
+      renderTable(filtered);
+    }
+
+    async function quickUpdateStatus(courtCode, newStatus) {
+      const token = localStorage.getItem('jwt_token') || '';
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+
+      try {
+        const res = await fetch('/api/courts/status', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ courtCode, status: newStatus })
+        });
+        const data = await res.json();
+        if (res.ok && (data.success !== false)) {
+          showToast(`Đã chuyển trạng thái sân ${courtCode} thành "${newStatus}"!`, 'success');
+          await loadCourtsFromApi();
+        } else {
+          showToast(data.message || 'Không thể cập nhật trạng thái sân', 'error');
+        }
+      } catch (err) {
+        showToast(`Lỗi kết nối máy chủ: ${err.message}`, 'error');
       }
     }
 
-    function openCourtModal(code, name, type, rate, status, branch, image) {
+    function openCourtModal(code, name, type, rate, status) {
       const modal = document.getElementById('courtModal');
-      const btnDelete = document.getElementById('btnDeleteCourtInModal');
-      const activeBranch = getActiveBranch() === 'ALL' ? 'CN01' : getActiveBranch();
-
       if (code) {
-        isEditingMode = true;
         document.getElementById('modalTitle').innerText = 'Cập nhật thông tin sân ' + code;
         document.getElementById('inpCourtCode').value = code;
-        document.getElementById('inpCourtCode').readOnly = true;
+        document.getElementById('inpCourtCode').disabled = true;
         document.getElementById('inpCourtName').value = name || ('Sân ' + code);
         document.getElementById('inpCourtType').value = type || 'Cầu lông tiêu chuẩn';
         document.getElementById('inpHourlyRate').value = rate || 90000;
-        document.getElementById('inpHourlyRate').readOnly = true;
         document.getElementById('inpStatus').value = status || 'Trống';
-        document.getElementById('inpBranchCode').value = branch || activeBranch;
-        document.getElementById('inpImageUrl').value = image || '/images/badminton-court.jpg';
-        if (btnDelete) btnDelete.style.display = 'block';
       } else {
-        isEditingMode = false;
         document.getElementById('modalTitle').innerText = 'Thêm sân mới vào chi nhánh';
-        const nextIdx = allCourts.length + 1;
-        const prefix = activeBranch === 'CN02' ? 'BT' : (activeBranch === 'CN03' ? 'Q9' : (activeBranch === 'CN04' ? 'GV' : 'CL'));
-        document.getElementById('inpCourtCode').value = prefix + (nextIdx < 10 ? '0' + nextIdx : nextIdx);
-        document.getElementById('inpCourtCode').readOnly = false;
+        const nextNum = allLoadedCourts.length + 1;
+        document.getElementById('inpCourtCode').value = 'CL0' + (nextNum < 10 ? nextNum : nextNum);
+        document.getElementById('inpCourtCode').disabled = false;
         document.getElementById('inpCourtName').value = '';
         document.getElementById('inpCourtType').value = 'Cầu lông tiêu chuẩn';
-        const defaultRates = {
-          'Cầu lông tiêu chuẩn': 90000,
-          'Cầu lông VIP': 120000,
-          'Cầu lông Thi Đấu Quốc Tế': 160000
-        };
-        document.getElementById('inpHourlyRate').value = defaultRates['Cầu lông tiêu chuẩn'] || 90000;
-        document.getElementById('inpHourlyRate').readOnly = true;
+        document.getElementById('inpHourlyRate').value = 90000;
         document.getElementById('inpStatus').value = 'Trống';
-        document.getElementById('inpBranchCode').value = activeBranch;
-        document.getElementById('inpImageUrl').value = '/images/badminton-court.jpg';
-        if (btnDelete) btnDelete.style.display = 'none';
       }
       modal.classList.add('open');
     }
@@ -727,32 +768,33 @@
       const type = document.getElementById('inpCourtType').value;
       const rate = document.getElementById('inpHourlyRate').value;
       const status = document.getElementById('inpStatus').value;
-      const branch = document.getElementById('inpBranchCode').value;
-      const image = document.getElementById('inpImageUrl').value.trim() || '/images/badminton-court.jpg';
+      const branch = getActiveBranchCode();
 
       if (!code) {
         showToast('Vui lòng nhập mã sân!', 'warning');
         return;
       }
 
+      const token = localStorage.getItem('jwt_token') || '';
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+
       try {
         const res = await fetch('/api/courts', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: headers,
           body: JSON.stringify({
             courtCode: code,
             courtName: name,
             courtType: type,
             hourlyRate: Number(rate),
             status: status,
-            branchCode: branch,
-            imageUrl: image
+            branchCode: branch
           })
         });
-
         const data = await res.json();
-        if (res.ok && data.success) {
-          showToast(`Đã lưu sân ${code} (${name}) vào SQL Server thành công!`, 'success');
+        if (data.success || res.ok) {
+          showToast(`Đã lưu sân ${code} (${name}) - ${Number(rate).toLocaleString('vi-VN')} đ/h vào cơ sở dữ liệu!`, 'success');
           closeCourtModal();
           await loadCourtsFromApi();
         } else {
@@ -763,67 +805,38 @@
       }
     }
 
-    async function quickChangeStatus(courtCode, newStatus) {
-      try {
-        const res = await fetch('/api/courts/status', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ courtCode: courtCode, status: newStatus })
-        });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          showToast(`Đã đổi trạng thái sân ${courtCode} thành "${newStatus}"!`, 'success');
-          await loadCourtsFromApi();
-        } else {
-          showToast(data.message || 'Không thể đổi trạng thái', 'error');
-        }
-      } catch (e) {
-        showToast('Lỗi cập nhật: ' + e.message, 'error');
-      }
-    }
-
-    async function deleteCourt(courtCode) {
-      if (!confirm(`Bạn có chắc chắn muốn xóa sân ${courtCode} khỏi CSDL SQL Server?`)) return;
+    async function loadCourtsFromApi() {
+      const branch = getActiveBranchCode();
+      const token = localStorage.getItem('jwt_token') || '';
+      const headers = {};
+      if (token) headers['Authorization'] = 'Bearer ' + token;
 
       try {
-        const res = await fetch(`/api/courts/${encodeURIComponent(courtCode)}`, {
-          method: 'DELETE'
-        });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          showToast(`Đã xóa sân ${courtCode} thành công!`, 'success');
-          await loadCourtsFromApi();
+        const res = await fetch(`/api/courts?branchCode=${encodeURIComponent(branch)}`, { headers });
+        if (res.ok) {
+          const courts = await res.json();
+          if (Array.isArray(courts) && courts.length > 0) {
+            allLoadedCourts = courts;
+          } else {
+            allLoadedCourts = fallbackCourts;
+          }
         } else {
-          showToast(data.message || 'Lỗi khi xóa sân', 'error');
+          allLoadedCourts = fallbackCourts;
         }
-      } catch (e) {
-        showToast('Lỗi kết nối xóa sân: ' + e.message, 'error');
+      } catch (err) {
+        console.warn('API error, using cached fallback data', err);
+        allLoadedCourts = fallbackCourts;
       }
-    }
 
-    async function deleteCourtFromModal() {
-      const code = document.getElementById('inpCourtCode').value.trim();
-      if (!code) return;
-      closeCourtModal();
-      await deleteCourt(code);
+      renderKPIs(allLoadedCourts);
+      renderVisualGrid(allLoadedCourts);
+      renderTable(allLoadedCourts);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('utesport_theme') || 'light';
       document.documentElement.setAttribute('data-theme', savedTheme);
-
-      initBranchSecurity();
-
-      const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
-        || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser());
-      if (user) {
-        if (user.fullName) {
-          const nameEl = document.getElementById('sidebarUserName');
-          if (nameEl) nameEl.textContent = user.fullName;
-        }
-      }
-
-      onBranchChange();
+      loadCourtsFromApi();
     });
 
     window.addEventListener('badminton:court-event', () => {
