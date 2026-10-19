@@ -221,8 +221,14 @@
     }
 
     @media (max-width: 860px) {
-      .tour-card { grid-template-columns: 1fr; }
-      .tour-card-banner { border-right: none; border-bottom: 1px solid var(--cust-border); }
+      .tour-card { grid-template-columns: 1fr !important; }
+      .tour-card-banner {
+        border-right: none !important;
+        border-bottom: 1px solid var(--cust-border) !important;
+        height: auto !important;
+        min-height: unset !important;
+        padding: 20px 22px !important;
+      }
     }
   
     /* LUXURY TOP NAVBAR & FOOTER STYLES */
@@ -730,10 +736,11 @@
         const pct = max > 0 ? Math.min(100, Math.round((current / max) * 100)) : 0;
         const remaining = Math.max(0, max - current);
 
+        const isPast = t.endDate && (!isNaN(new Date(t.endDate).getTime())) && (new Date(t.endDate) < new Date());
         const isFull = current >= max || status === 'Hết chỗ';
         const isClosed = status === 'Đã đóng đăng ký';
         const isUpcoming = status === 'Sắp mở đăng ký';
-        const isCompleted = status === 'Đã hoàn thành';
+        const isCompleted = status === 'Đã hoàn thành' || status === 'Đã kết thúc' || isPast;
 
         let badgeClass = 'badge-success';
         let badgeText = 'ĐANG MỞ ĐĂNG KÝ';
@@ -745,7 +752,7 @@
 
         if (isCompleted) {
           badgeClass = 'badge';
-          badgeText = 'ĐÃ HOÀN THÀNH';
+          badgeText = 'ĐÃ KẾT THÚC';
           barColor = '#94a3b8';
           slotText = `Đã kết thúc (${current}/${max} Cặp)`;
           btnText = 'Giải Đấu Đã Kết Thúc';

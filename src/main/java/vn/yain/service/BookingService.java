@@ -297,11 +297,26 @@ public class BookingService {
             }
         }
 
-        int[] hours = parseSlotHours(timeSlot);
-        int startHour = hours[0];
-
-        BigDecimal hourlyRate = pricingService != null ? pricingService.calculateHourlyRate(court, startHour) : (court != null && court.getHourlyRate() != null ? court.getHourlyRate() : new BigDecimal("90000"));
-        BigDecimal courtTotal = pricingService != null ? pricingService.calculateTotalPrice(hourlyRate, duration) : hourlyRate.multiply(BigDecimal.valueOf(duration));
+        BigDecimal courtTotal = BigDecimal.ZERO;
+        if (payload.get("totalPrice") != null) {
+            try {
+                courtTotal = new BigDecimal(payload.get("totalPrice").toString());
+            } catch (Exception ignored) {}
+        }
+        if (courtTotal.compareTo(BigDecimal.ZERO) <= 0) {
+            if (timeSlot.contains(",")) {
+                String[] parts = timeSlot.split(",");
+                for (String part : parts) {
+                    int[] h = parseSlotHours(part.trim());
+                    BigDecimal rate = pricingService != null ? pricingService.calculateHourlyRate(court, h[0]) : (court != null && court.getHourlyRate() != null ? court.getHourlyRate() : new BigDecimal("90000"));
+                    courtTotal = courtTotal.add(rate);
+                }
+            } else {
+                int[] hours = parseSlotHours(timeSlot);
+                BigDecimal hourlyRate = pricingService != null ? pricingService.calculateHourlyRate(court, hours[0]) : (court != null && court.getHourlyRate() != null ? court.getHourlyRate() : new BigDecimal("90000"));
+                courtTotal = pricingService != null ? pricingService.calculateTotalPrice(hourlyRate, duration) : hourlyRate.multiply(BigDecimal.valueOf(duration));
+            }
+        }
 
         BigDecimal addonAmount = BigDecimal.ZERO;
         if (payload.get("addonAmount") != null) {
@@ -325,7 +340,17 @@ public class BookingService {
             }
         }
 
-        BigDecimal deposit = pricingService != null ? pricingService.calculateDepositAmount(totalPrice) : totalPrice.multiply(new BigDecimal("0.3")).setScale(0, java.math.RoundingMode.HALF_UP);
+        BigDecimal deposit = BigDecimal.ZERO;
+        if (payload.get("depositAmount") != null) {
+            try {
+                deposit = new BigDecimal(payload.get("depositAmount").toString());
+            } catch (Exception ignored) {}
+        }
+        if (deposit.compareTo(BigDecimal.ZERO) <= 0) {
+            deposit = pricingService != null ? pricingService.calculateDepositAmount(totalPrice) : totalPrice.multiply(new BigDecimal("0.3")).setScale(0, java.math.RoundingMode.HALF_UP);
+        }
+
+        BigDecimal avgHourlyRate = duration > 0 ? courtTotal.divide(BigDecimal.valueOf(duration), 0, java.math.RoundingMode.HALF_UP) : courtTotal;
 
         String bookingCode = generateUniqueBookingCode();
         Booking booking = new Booking();
@@ -336,7 +361,7 @@ public class BookingService {
         booking.setCustomerPhone(customerPhone != null ? customerPhone.trim() : "0903123456");
         booking.setBookingDate(bookingDate);
         booking.setTimeSlot(timeSlot.trim());
-        booking.setHourlyPrice(hourlyRate);
+        booking.setHourlyPrice(avgHourlyRate);
         booking.setTotalPrice(totalPrice);
         booking.setDepositAmount(deposit);
         booking.setPaymentMethod("Chuyển khoản VietQR");

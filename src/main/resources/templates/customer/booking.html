@@ -990,6 +990,21 @@
     function isSlotOverlapping(s1, s2) {
       if (!s1 || !s2) return false;
       if (s1.trim().toLowerCase() === s2.trim().toLowerCase()) return true;
+      if (s1.includes(',') || s2.includes(',')) {
+        const parts1 = s1.split(',');
+        const parts2 = s2.split(',');
+        for (const p1 of parts1) {
+          for (const p2 of parts2) {
+            if (isSingleSlotOverlapping(p1.trim(), p2.trim())) return true;
+          }
+        }
+        return false;
+      }
+      return isSingleSlotOverlapping(s1.trim(), s2.trim());
+    }
+
+    function isSingleSlotOverlapping(s1, s2) {
+      if (s1.toLowerCase() === s2.toLowerCase()) return true;
       const parseHours = (slot) => {
         const m = slot.match(/(\d{1,2}):\d{2}\s*-\s*(\d{1,2}):\d{2}/);
         return m ? [parseInt(m[1]), parseInt(m[2])] : [0, 0];
@@ -1575,7 +1590,8 @@
     async function loadBranchesFromDb(targetBranch = null) {
       try {
         const res = await fetch('/api/branches');
-        const branches = await res.json() || [];
+        let branches = await res.json() || [];
+        branches = branches.filter(b => b.branchCode && b.branchCode.toUpperCase() !== 'ALL');
         if (branches && branches.length > 0) {
           const sel = document.getElementById('selBranch');
           const currentVal = targetBranch || sel.value || branches[0].branchCode;

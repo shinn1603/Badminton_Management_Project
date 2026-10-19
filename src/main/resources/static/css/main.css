@@ -3380,7 +3380,9 @@ body.has-mobile-nav {
     grid-template-columns: 1fr !important;
   }
   .tour-card-banner {
-    height: 140px !important;
+    height: auto !important;
+    min-height: unset !important;
+    padding: 20px 22px !important;
   }
 
   /* 11. HARD ZERO-OVERFLOW LOCK FOR MOBILE VIEWPORT */

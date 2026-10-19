@@ -35,6 +35,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final PromotionRepository promotionRepository;
     private final SystemSettingRepository systemSettingRepository;
     private final StockReceiptRepository stockReceiptRepository;
+    private final AuditLogRepository auditLogRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -58,6 +59,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             seedPromotions();
             seedSystemSettings();
             seedStockReceipts();
+            seedAuditLogs();
             log.info(">>> HOÀN TẤT ĐỒNG BỘ TOÀN BỘ 25 PHÂN HỆ DỮ LIỆU MẪU CHUẨN ĐẶC TẢ! <<<");
         } catch (Exception e) {
             log.warn(">>> CẢNH BÁO DATABASE SEEDER: {} <<<", e.getMessage());
@@ -65,14 +67,21 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     private void seedBranches() {
-        if (branchRepository.count() < 5) {
-            branchRepository.saveAll(List.of(
+        // Xóa chi nhánh giả lập ALL nếu tồn tại trong cơ sở dữ liệu
+        branchRepository.findByBranchCode("ALL").ifPresent(branchRepository::delete);
+
+        if (branchRepository.count() < 4) {
+            List<Branch> branches = List.of(
                 createBranch("CN01", "Chi nhánh 1 - Sân Cầu Lông Thủ Đức", "Số 01 Võ Văn Ngân, Phường Linh Chiểu, TP. Thủ Đức", "0903123456", "Trần Phúc Bảo", 8, "Hoạt động"),
                 createBranch("CN02", "Chi nhánh 2 - Sân Cầu Lông Bình Thạnh", "Số 234 Điện Biên Phủ, Phường 25, Bình Thạnh", "0903333444", "Nguyễn Văn Quản", 6, "Hoạt động"),
                 createBranch("CN03", "Chi nhánh 3 - Sân Cầu Lông Quận 9", "Số 70 Đỗ Xuân Hợp, Phước Long B, TP. Thủ Đức", "0903789012", "Trần Hữu Nam", 6, "Hoạt động"),
-                createBranch("CN04", "Chi nhánh 4 - Sân Cầu Lông Gò Vấp", "Số 18 Quang Trung, Phường 10, Gò Vấp", "0903555777", "Lê Hoàng Khang", 6, "Hoạt động"),
-                createBranch("ALL", "Hội Sở / Ban Giám Đốc", "Số 01 Võ Văn Ngân, Phường Linh Chiểu, TP. Thủ Đức", "0901111222", "Võ Hoàng Nam", 0, "Hoạt động")
-            ));
+                createBranch("CN04", "Chi nhánh 4 - Sân Cầu Lông Gò Vấp", "Số 18 Quang Trung, Phường 10, Gò Vấp", "0903555777", "Lê Hoàng Khang", 6, "Hoạt động")
+            );
+            for (Branch b : branches) {
+                if (!branchRepository.existsByBranchCode(b.getBranchCode())) {
+                    branchRepository.save(b);
+                }
+            }
         }
     }
 
@@ -424,10 +433,18 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     private void seedTournaments() {
+        // Cập nhật trạng thái các giải đấu đã qua hạn sang 'Đã kết thúc'
+        tournamentRepository.findByTournamentCode("GD01").ifPresent(t -> {
+            if (t.getEndDate() != null && t.getEndDate().isBefore(LocalDateTime.now())) {
+                t.setStatus("Đã kết thúc");
+                tournamentRepository.save(t);
+            }
+        });
+
         if (tournamentRepository.count() < 3) {
             tournamentRepository.saveAll(List.of(
-                createTournament("GD01", "CN01", "Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026", "Đôi nam nữ", LocalDateTime.of(2026, 10, 10, 8, 0), LocalDateTime.of(2026, 10, 12, 18, 0), "Thi đấu theo thể thức loại trực tiếp 3 hiệp 21 điểm theo luật BWF. Mỗi VĐV chỉ được đăng ký 1 nội dung.", 32, 24, new BigDecimal("300000"), new BigDecimal("20000000"), "Đang mở đăng ký"),
-                createTournament("GD02", "CN01", "Giải Cầu Lông Doanh Nghiệp & Sinh Viên Cúp Thủ Đức 2026", "Tổng hợp nhiều nội dung", LocalDateTime.of(2026, 10, 25, 8, 0), LocalDateTime.of(2026, 10, 26, 17, 0), "Giải đấu phong trào kết nối các doanh nghiệp và cựu sinh viên đam mê cầu lông.", 24, 0, new BigDecimal("250000"), new BigDecimal("15000000"), "Sắp mở đăng ký"),
+                createTournament("GD01", "CN01", "Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026", "Đôi nam nữ", LocalDateTime.of(2026, 10, 10, 8, 0), LocalDateTime.of(2026, 10, 12, 18, 0), "Thi đấu theo thể thức loại trực tiếp 3 hiệp 21 điểm theo luật BWF. Mỗi VĐV chỉ được đăng ký 1 nội dung.", 32, 24, new BigDecimal("300000"), new BigDecimal("20000000"), "Đã kết thúc"),
+                createTournament("GD02", "CN01", "Giải Cầu Lông Doanh Nghiệp & Sinh Viên Cúp Thủ Đức 2026", "Tổng hợp nhiều nội dung", LocalDateTime.of(2026, 10, 25, 8, 0), LocalDateTime.of(2026, 10, 26, 17, 0), "Giải đấu phong trào kết nối các doanh nghiệp và cựu sinh viên đam mê cầu lông.", 24, 8, new BigDecimal("250000"), new BigDecimal("15000000"), "Đang mở đăng ký"),
                 createTournament("GD03", "CN02", "Giải Đơn Nam Bình Thạnh Mở Rộng 2026", "Đơn nam", LocalDateTime.of(2026, 11, 5, 8, 0), LocalDateTime.of(2026, 11, 6, 18, 0), "Giải đơn nam các CLB phong trào khu vực Bình Thạnh - Phú Nhuận.", 16, 0, new BigDecimal("200000"), new BigDecimal("10000000"), "Sắp mở đăng ký")
             ));
         }
@@ -595,5 +612,38 @@ public class DatabaseSeeder implements CommandLineRunner {
             r2.setNotes("Nhập nước bù khoáng Revive và Pocari Sweat đợt cuối tháng");
             stockReceiptRepository.save(r2);
         }
+    }
+
+    private void seedAuditLogs() {
+        if (auditLogRepository.count() < 10) {
+            LocalDateTime now = LocalDateTime.now();
+            auditLogRepository.saveAll(List.of(
+                createAuditLog("admin", "AD01", "Đăng nhập hệ thống", "Xác thực tài khoản quản trị viên thành công", "An ninh & Đăng nhập", "192.168.1.105", "Thành công", now.minusMinutes(12)),
+                createAuditLog("admin", "AD01", "Cập nhật bảng giá sân", "Điều chỉnh phụ thu khung giờ cao điểm 17:00 - 21:00 chi nhánh Thủ Đức (CN01)", "Bảng giá & Khuyến mãi", "192.168.1.105", "Thành công", now.minusHours(1).minusMinutes(25)),
+                createAuditLog("baophuc", "NVQ01", "Chuyển trạng thái bảo trì", "Tạm khóa bảo trì sân CL06 (Thủ Đức) để thay thảm sàn thi đấu BWF", "Quản lý sân", "192.168.1.42", "Thành công", now.minusHours(3)),
+                createAuditLog("system", "SYS", "Sao lưu cơ sở dữ liệu tự động", "Tạo bản sao lưu định kỳ backup_ute_sport_auto_20261019.sql.gz (28.5 MB)", "Hệ thống sao lưu", "127.0.0.1", "Thành công", now.minusHours(5)),
+                createAuditLog("thu_ngan_01", "NV01", "Xác nhận thanh toán tiền cọc", "Ghi nhận giao dịch chuyển khoản VietQR 60.000đ cho đơn đặt sân DS001248", "Thanh toán & Thu ngân", "192.168.1.18", "Thành công", now.minusHours(6)),
+                createAuditLog("admin", "AD01", "Phân quyền người dùng", "Gán vai trò Quản lý chi nhánh Bình Thạnh cho tài khoản ql_binhthanh", "Tài khoản & Phân quyền", "192.168.1.105", "Thành công", now.minusHours(8)),
+                createAuditLog("admin", "AD01", "Cấu hình tham số hệ thống", "Cập nhật thời hạn giữ chỗ trước khi hủy cọc thành 15 phút", "Cấu hình thông số", "192.168.1.105", "Thành công", now.minusHours(14)),
+                createAuditLog("system", "SYS", "Đồng bộ giao dịch VietQR", "Kiểm tra webhook đối soát với ngân hàng VietinBank/MBBank", "Tích hợp VietQR", "127.0.0.1", "Thành công", now.minusHours(18)),
+                createAuditLog("giam_doc", "GD01", "Phê duyệt kế hoạch giải đấu", "Phê duyệt điều lệ Giải Cầu Lông Doanh Nghiệp Cúp Thủ Đức 2026", "Giải đấu & Sự kiện", "192.168.1.200", "Thành công", now.minusDays(1)),
+                createAuditLog("admin", "AD01", "Sao lưu CSDL thủ công", "Tạo bản sao lưu backup_ute_sport_manual_20261018.sql.gz trước khi bảo trì", "Hệ thống sao lưu", "192.168.1.105", "Thành công", now.minusDays(1).minusHours(2)),
+                createAuditLog("baophuc", "NVQ01", "Nhập kho sản phẩm POS", "Nhập bổ sung 50 ống cầu Yonex Aerosensa 50 cho chi nhánh CN01", "Kho hàng & Dịch vụ", "192.168.1.42", "Thành công", now.minusDays(2)),
+                createAuditLog("system", "SYS", "Tối ưu hóa chỉ mục CSDL", "Rebuild index bảng bookings và audit_logs định kỳ", "Bảo trì CSDL", "127.0.0.1", "Thành công", now.minusDays(3))
+            ));
+        }
+    }
+
+    private AuditLog createAuditLog(String username, String userCode, String actionType, String details, String module, String ip, String status, LocalDateTime time) {
+        AuditLog l = new AuditLog();
+        l.setUsername(username);
+        l.setUserCode(userCode);
+        l.setActionType(actionType);
+        l.setDetails(details);
+        l.setModule(module);
+        l.setIpAddress(ip);
+        l.setStatus(status);
+        l.setActionTime(time);
+        return l;
     }
 }
