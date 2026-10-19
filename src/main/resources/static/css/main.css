@@ -3256,23 +3256,22 @@ body.has-mobile-nav {
     gap: 10px !important;
     padding: 10px 12px !important;
   }
+  /* 3. Tab Navigation on Home: Clean 50/50 Segmented Control */
   .dash-tabs-nav {
     display: flex !important;
-    overflow-x: auto !important;
-    white-space: nowrap !important;
-    -webkit-overflow-scrolling: touch !important;
-    gap: 6px !important;
-    padding-bottom: 4px !important;
-  }
-  .dash-tabs-nav::-webkit-scrollbar {
-    display: none;
+    width: 100% !important;
+    gap: 8px !important;
   }
   .dash-tab-btn {
-    padding: 7px 12px !important;
-    font-size: 12.5px !important;
-    flex-shrink: 0 !important;
+    flex: 1 !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 9px 8px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
   }
-  /* HIDE Tab 4 (Giải Đấu) & Tab 5 (Tiện Ích) on mobile home tab-bar to prevent wrapping */
+  /* HIDE Tab 2 (Lưới Lịch Sân Trực Tuyến), Tab 4 (Giải Đấu) & Tab 5 (Tiện Ích) on mobile */
+  .dash-tabs-nav .dash-tab-btn:nth-child(2),
   .dash-tabs-nav .dash-tab-btn:nth-child(4),
   .dash-tabs-nav .dash-tab-btn:nth-child(5) {
     display: none !important;
