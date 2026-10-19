@@ -32,7 +32,7 @@ public class Tournament {
     private LocalDateTime endDate;
 
     @Lob
-    @Column(name = "rules", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "rules")
     private String rules;
 
     @Column(name = "category", length = 50)
