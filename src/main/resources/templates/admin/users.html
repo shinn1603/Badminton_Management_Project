@@ -154,6 +154,12 @@
                 <option value="CN03">Chi nhánh Quận 9 (CN03)</option>
                 <option value="CN04">Chi nhánh Gò Vấp (CN04)</option>
               </select>
+
+              <select class="branch-select" id="statusFilterSelect" onchange="applyUserFilters()">
+                <option value="ALL">Tất cả trạng thái</option>
+                <option value="ACTIVE">Chỉ Hoạt động</option>
+                <option value="LOCKED">Chỉ Đã khóa</option>
+              </select>
             </div>
 
             <!-- ỐNG TÌM KIẾM TÀI KHOẢN TRONG TAB PHẠM VI DỮ LIỆU CHI NHÁNH -->
@@ -255,6 +261,14 @@
             <option value="ALL">Toàn chuỗi (Không giới hạn)</option>
           </select>
         </div>
+
+        <div class="form-group" id="statusAssignGroup">
+          <label class="form-label" for="inpStatus">Trạng thái tài khoản</label>
+          <select class="form-control" id="inpStatus">
+            <option value="Hoạt động">Hoạt động (Cho phép đăng nhập)</option>
+            <option value="Bị khóa">Bị khóa (Chặn đăng nhập hệ thống)</option>
+          </select>
+        </div>
       </div>
 
       <div class="modal-footer">
@@ -285,9 +299,20 @@
     // Danh sách tài khoản được đồng bộ 100% trực tiếp từ CSDL SQL Server (Bảng users) qua API /api/admin/users
     let cachedUsers = [];
 
+    // Helper: Kiểm tra trạng thái khóa đồng bộ với cơ sở dữ liệu
+    function isUserLocked(u) {
+      if (!u || !u.status) return false;
+      const s = String(u.status).trim().toLowerCase();
+      return s.includes('khóa') || s === 'locked' || s === 'inactive';
+    }
+
     async function loadUsers() {
       try {
-        const token = localStorage.getItem('jwt_token');
+        let token = localStorage.getItem('jwt_token');
+        if (!token && typeof document !== 'undefined' && document.cookie) {
+          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+          if (match) token = match[1];
+        }
         const headers = { 'Accept': 'application/json' };
         if (token) headers['Authorization'] = 'Bearer ' + token;
         const res = await fetch('/api/admin/users', { headers });
@@ -304,6 +329,7 @@
       }
 
       renderUserTable(cachedUsers);
+      applyUserFilters();
     }
 
     function renderUserTable(users) {
@@ -327,16 +353,23 @@
       users.forEach((u, idx) => {
         const roleInfo = ROLE_LABELS[u.role] || { label: u.role, badge: 'badge-blue' };
         const branchLabel = BRANCH_LABELS[u.branchCode] || u.branchCode || 'Toàn chuỗi';
-        const isLocked = (u.status || '').toLowerCase() === 'khóa' || (u.status || '').toLowerCase() === 'đã khóa';
+        const isLocked = isUserLocked(u);
         const statusBadge = isLocked
-          ? '<span class="clean-kpi-badge badge-amber">Đã khóa</span>'
-          : '<span class="clean-kpi-badge badge-green">Hoạt động</span>';
-        const lockBtnText = isLocked ? 'Mở khóa' : 'Khóa';
+          ? '<span class="clean-kpi-badge badge-amber" style="background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); font-weight: 700;">Đã khóa</span>'
+          : '<span class="clean-kpi-badge badge-green" style="font-weight: 700;">Hoạt động</span>';
+        
+        const lockBtn = isLocked
+          ? `<button class="btn-action btn-outline-action" style="margin-left: 4px; background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid #10b981; font-weight: 700;" onclick="toggleUserStatus('${escapeHtml(u.username)}')">Mở khóa</button>`
+          : `<button class="btn-action btn-outline-action" style="margin-left: 4px; color: #ef4444; border-color: rgba(239, 68, 68, 0.35);" onclick="toggleUserStatus('${escapeHtml(u.username)}')">Khóa</button>`;
         const contactInfo = u.phone || u.email || '—';
 
         const tr = document.createElement('tr');
         tr.setAttribute('data-role', u.role);
         tr.setAttribute('data-branch', u.branchCode || 'ALL');
+        tr.setAttribute('data-status', isLocked ? 'LOCKED' : 'ACTIVE');
+        if (isLocked) {
+          tr.style.background = 'rgba(239, 68, 68, 0.03)';
+        }
         tr.innerHTML = `
           <td style="text-align: center;">${idx + 1}</td>
           <td><strong>${escapeHtml(u.username)}</strong></td>
@@ -346,8 +379,8 @@
           <td>${statusBadge}</td>
           <td style="font-size: 12px; color: var(--text-muted);">${escapeHtml(contactInfo)}</td>
           <td style="text-align: right; white-space: nowrap;">
-            <button class="btn-action btn-outline-action" onclick="openUserModal('${escapeHtml(u.username)}', '${escapeHtml(u.fullName || '')}', '${escapeHtml(u.role)}', '${escapeHtml(u.branchCode || 'ALL')}', '${escapeHtml(u.phone || '')}')">Sửa</button>
-            <button class="btn-action btn-outline-action" style="margin-left: 4px;" onclick="toggleUserStatus('${escapeHtml(u.username)}')">${lockBtnText}</button>
+            <button class="btn-action btn-outline-action" onclick="openUserModal('${escapeHtml(u.username)}', '${escapeHtml(u.fullName || '')}', '${escapeHtml(u.role)}', '${escapeHtml(u.branchCode || 'ALL')}', '${escapeHtml(u.phone || '')}', '${escapeHtml(u.status || 'Hoạt động')}')">Sửa</button>
+            ${lockBtn}
           </td>
         `;
         tbody.appendChild(tr);
@@ -357,9 +390,12 @@
       if (countEl) countEl.innerText = `Hiển thị ${users.length} tài khoản trong cơ sở dữ liệu`;
     }
 
-    function openUserModal(username, fullname, role, branch, phone) {
+    function openUserModal(username, fullname, role, branch, phone, status) {
       const modal = document.getElementById('userModal');
       const title = document.getElementById('modalTitle');
+      const statusGroup = document.getElementById('statusAssignGroup');
+      const inpStatus = document.getElementById('inpStatus');
+
       if (username) {
         title.innerText = 'Cập nhật tài khoản: ' + username;
         document.getElementById('inpUsername').value = username;
@@ -369,6 +405,10 @@
         document.getElementById('inpBranch').value = branch || 'CN01';
         document.getElementById('inpPhone').value = phone || '';
         document.getElementById('inpPassword').value = '';
+        if (inpStatus) {
+          inpStatus.value = isUserLocked({ status }) ? 'Bị khóa' : 'Hoạt động';
+        }
+        if (statusGroup) statusGroup.style.display = 'block';
       } else {
         title.innerText = 'Cấp tài khoản người dùng mới';
         document.getElementById('inpUsername').value = '';
@@ -378,6 +418,8 @@
         document.getElementById('inpPhone').value = '';
         document.getElementById('inpRole').value = 'POS';
         document.getElementById('inpBranch').value = 'CN01';
+        if (inpStatus) inpStatus.value = 'Hoạt động';
+        if (statusGroup) statusGroup.style.display = 'none';
       }
       modal.classList.add('open');
     }
@@ -393,6 +435,7 @@
       const role = document.getElementById('inpRole').value;
       const branchCode = document.getElementById('inpBranch').value;
       const phone = document.getElementById('inpPhone').value.trim();
+      const status = document.getElementById('inpStatus') ? document.getElementById('inpStatus').value : 'Hoạt động';
 
       if (!username) {
         if (window.showToast) showToast('Vui lòng nhập tên đăng nhập!', 'error');
@@ -403,7 +446,7 @@
         return;
       }
 
-      const payload = { username, fullName, role, branchCode, phone };
+      const payload = { username, fullName, role, branchCode, phone, status };
       if (password) payload.password = password;
 
       try {
@@ -431,12 +474,12 @@
         // Fallback local update
         const idx = cachedUsers.findIndex(u => u.username === username);
         if (idx >= 0) {
-          cachedUsers[idx] = { ...cachedUsers[idx], fullName, role, branchCode, phone };
+          cachedUsers[idx] = { ...cachedUsers[idx], fullName, role, branchCode, phone, status };
         } else {
-          cachedUsers.push({ id: Date.now(), username, fullName, role, branchCode, phone, status: 'Hoạt động' });
+          cachedUsers.push({ id: Date.now(), username, fullName, role, branchCode, phone, status });
         }
         renderUserTable(cachedUsers);
-        updateKpis(cachedUsers);
+        applyUserFilters();
         if (window.showToast) showToast(`Đã cập nhật tài khoản ${username}!`, 'success');
         closeUserModal();
       }
@@ -457,7 +500,7 @@
       }
 
       const u = cachedUsers.find(x => x.username === username);
-      const isCurrentlyLocked = u && ((u.status || '').toLowerCase() === 'khóa' || (u.status || '').toLowerCase() === 'đã khóa' || (u.status || '').toLowerCase() === 'bị khóa');
+      const isCurrentlyLocked = isUserLocked(u);
       const actionName = isCurrentlyLocked ? 'mở khóa' : 'khóa';
 
       if (!confirm(`Bạn có chắc chắn muốn ${actionName} tài khoản [${username}] không?`)) {
@@ -486,7 +529,11 @@
         }
 
         if (res.ok && data.success) {
-          if (window.showToast) showToast(`Đã ${actionName} tài khoản ${username} thành công! [${data.status}]`, 'success');
+          const newStatus = data.status || (isCurrentlyLocked ? 'Hoạt động' : 'Bị khóa');
+          if (u) {
+            u.status = newStatus;
+          }
+          if (window.showToast) showToast(`Đã ${actionName} tài khoản ${username} thành công! [${newStatus}]`, 'success');
           await loadUsers();
         } else {
           const errMsg = data.message || `Lỗi khi ${actionName} tài khoản (Mã phản hồi: ${res.status})`;
@@ -498,6 +545,7 @@
         if (u) {
           u.status = isCurrentlyLocked ? 'Hoạt động' : 'Bị khóa';
           renderUserTable(cachedUsers);
+          applyUserFilters();
           if (window.showToast) showToast(`Đã đổi trạng thái tài khoản ${username} thành [${u.status}]`, 'info');
         }
       }
@@ -544,21 +592,24 @@
       const qTab = document.getElementById('userSearchInputTab');
       const qHeader = document.getElementById('userSearchInput');
       const q = ((qTab ? qTab.value : (qHeader ? qHeader.value : '')) || '').toLowerCase().trim();
+      const statusFilter = document.getElementById('statusFilterSelect') ? document.getElementById('statusFilterSelect').value : 'ALL';
       const rows = document.querySelectorAll('#userTableBody tr');
 
       let visible = 0;
       rows.forEach(r => {
         const rowRole = r.getAttribute('data-role') || '';
         const rowBranch = r.getAttribute('data-branch') || '';
+        const rowStatus = r.getAttribute('data-status') || '';
         const text = r.innerText.toLowerCase();
 
         const matchRole = (currentRoleFilter === 'ALL' || rowRole === currentRoleFilter);
         const matchBranch = (currentBranchFilter === 'ALL') ||
                             (currentBranchFilter === 'ALL_CHAIN' && rowBranch === 'ALL') ||
                             (rowBranch === currentBranchFilter);
+        const matchStatus = (statusFilter === 'ALL') || (statusFilter === rowStatus);
         const matchQ = !q || text.includes(q);
 
-        if (matchRole && matchBranch && matchQ) {
+        if (matchRole && matchBranch && matchStatus && matchQ) {
           r.style.display = '';
           visible++;
         } else {
@@ -568,7 +619,7 @@
 
       const countLabel = document.getElementById('userTableCountLabel');
       if (countLabel) {
-        countLabel.textContent = `Hiển thị ${visible} tài khoản (Đồng bộ trực tiếp từ SQL Server)`;
+        countLabel.textContent = `Hiển thị ${visible} tài khoản phù hợp bộ lọc`;
       }
     }
 

@@ -295,7 +295,17 @@ public class UserService {
         if (payload.containsKey("branchCode")) u.setBranchCode(payload.get("branchCode"));
         if (payload.containsKey("phone")) u.setPhone(payload.get("phone"));
         if (payload.containsKey("email")) u.setEmail(payload.get("email"));
-        if (payload.containsKey("status")) u.setStatus(payload.get("status"));
+        if (payload.containsKey("status") && payload.get("status") != null && !payload.get("status").isBlank()) {
+            String newStat = payload.get("status").trim();
+            u.setStatus(newStat);
+            customerRepository.findByCustomerCode(username.trim())
+                    .or(() -> customerRepository.findByCustomerCodeIgnoreCase(username.trim()))
+                    .or(() -> customerRepository.findByPhone(username.trim()))
+                    .ifPresent(c -> {
+                        c.setStatus(newStat);
+                        customerRepository.save(c);
+                    });
+        }
         return userRepository.save(u);
     }
 
@@ -359,13 +369,16 @@ public class UserService {
             throw new IllegalArgumentException("Tên đăng nhập không được để trống!");
         }
         String cleanUser = username.trim();
-        Optional<User> userOpt = userRepository.findByUsername(cleanUser);
+        Optional<User> userOpt = userRepository.findByUsername(cleanUser)
+                .or(() -> userRepository.findByUsernameIgnoreCase(cleanUser))
+                .or(() -> userRepository.findByPhone(cleanUser));
 
         User user;
         if (userOpt.isPresent()) {
             user = userOpt.get();
         } else {
             Optional<Customer> custOpt = customerRepository.findByCustomerCode(cleanUser)
+                    .or(() -> customerRepository.findByCustomerCodeIgnoreCase(cleanUser))
                     .or(() -> customerRepository.findByPhone(cleanUser));
             if (custOpt.isPresent()) {
                 Customer c = custOpt.get();
@@ -383,17 +396,16 @@ public class UserService {
             }
         }
 
-        String newStatus;
-        if ("Hoạt động".equalsIgnoreCase(user.getStatus())) {
-            newStatus = "Bị khóa";
-        } else {
-            newStatus = "Hoạt động";
-        }
+        String curStatus = (user.getStatus() != null) ? user.getStatus().trim() : "Hoạt động";
+        boolean isCurrentlyLocked = curStatus.toLowerCase().contains("khóa") || curStatus.equalsIgnoreCase("locked") || curStatus.equalsIgnoreCase("inactive");
+        String newStatus = isCurrentlyLocked ? "Hoạt động" : "Bị khóa";
+
         user.setStatus(newStatus);
         User saved = userRepository.save(user);
 
         // Sync to Customer table if matching customer exists
         customerRepository.findByCustomerCode(cleanUser)
+                .or(() -> customerRepository.findByCustomerCodeIgnoreCase(cleanUser))
                 .or(() -> customerRepository.findByPhone(cleanUser))
                 .or(() -> (user.getPhone() != null && !user.getPhone().isEmpty()) ? customerRepository.findByPhone(user.getPhone()) : Optional.empty())
                 .ifPresent(cust -> {
