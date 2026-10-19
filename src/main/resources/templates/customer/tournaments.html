@@ -740,7 +740,7 @@
         const isFull = current >= max || status === 'Hết chỗ';
         const isClosed = status === 'Đã đóng đăng ký';
         const isUpcoming = status === 'Sắp mở đăng ký';
-        const isCompleted = status === 'Đã hoàn thành' || status === 'Đã kết thúc' || isPast;
+        const isCompleted = status === 'Đã hoàn thành' || status === 'Đã kết thúc' || (isPast && status !== 'Đang mở đăng ký' && status !== 'Sắp mở đăng ký');
 
         let badgeClass = 'badge-success';
         let badgeText = 'ĐANG MỞ ĐĂNG KÝ';

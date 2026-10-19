@@ -133,7 +133,7 @@ html {
 html {
   max-width: 100vw;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
   box-sizing: border-box;
 }
 
@@ -146,7 +146,7 @@ body {
   min-height: 100vh;
   max-width: 100vw;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
   position: relative;
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
@@ -181,6 +181,7 @@ textarea {
   display: flex;
   min-height: 100vh;
   width: 100%;
+  position: relative;
 }
 
 /* --- SIDEBAR (EMERALD LUXURY) --- */
@@ -194,6 +195,8 @@ textarea {
   position: sticky;
   top: 0;
   height: 100vh;
+  min-height: 100vh;
+  max-height: 100vh;
   transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1), background-color var(--transition-normal);
   z-index: 50;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
@@ -350,6 +353,8 @@ textarea {
 }
 
 .sidebar-bottom {
+  margin-top: auto !important;
+  flex-shrink: 0;
   padding: 14px 16px;
   border-top: 1px solid var(--sidebar-border);
   display: flex;
@@ -3389,7 +3394,7 @@ body.has-mobile-nav {
   html, body, .layout-container, .main-wrapper, .dashboard-main-container, .cust-navbar, .page-content, .booking-wrapper, .history-container, .profile-layout, .tour-container, .policy-container {
     max-width: 100vw !important;
     width: 100% !important;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     box-sizing: border-box !important;
   }
 

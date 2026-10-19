@@ -3463,6 +3463,96 @@ public class ApiController {
         }
     }
 
+    @PutMapping("/director/tournaments/{id}/status")
+    public ResponseEntity<?> updateTournamentStatus(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+        try {
+            Optional<Tournament> opt = tournamentRepository.findById(id);
+            if (opt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "Không tìm thấy giải đấu: " + id));
+            }
+            Tournament t = opt.get();
+            String newStatus = (String) payload.get("status");
+            if (newStatus == null || newStatus.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Trạng thái giải đấu không được để trống!"));
+            }
+            t.setStatus(newStatus.trim());
+
+            if (payload.containsKey("startDate") && payload.get("startDate") != null && !payload.get("startDate").toString().isEmpty()) {
+                try {
+                    t.setStartDate(LocalDateTime.parse(payload.get("startDate").toString()));
+                } catch (Exception ignored) {}
+            }
+            if (payload.containsKey("endDate") && payload.get("endDate") != null && !payload.get("endDate").toString().isEmpty()) {
+                try {
+                    t.setEndDate(LocalDateTime.parse(payload.get("endDate").toString()));
+                } catch (Exception ignored) {}
+            }
+
+            tournamentRepository.save(t);
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Đã cập nhật trạng thái giải đấu '" + t.getTournamentName() + "' sang [" + t.getStatus() + "] thành công!",
+                "tournament", t
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/director/tournaments/{id}")
+    public ResponseEntity<?> updateTournamentDetails(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+        try {
+            Optional<Tournament> opt = tournamentRepository.findById(id);
+            if (opt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false, "message", "Không tìm thấy giải đấu: " + id));
+            }
+            Tournament t = opt.get();
+            if (payload.containsKey("tournamentName") && payload.get("tournamentName") != null && !payload.get("tournamentName").toString().isBlank()) {
+                t.setTournamentName(payload.get("tournamentName").toString().trim());
+            }
+            if (payload.containsKey("status") && payload.get("status") != null && !payload.get("status").toString().isBlank()) {
+                t.setStatus(payload.get("status").toString().trim());
+            }
+            if (payload.containsKey("branchCode") && payload.get("branchCode") != null) {
+                t.setBranchCode(payload.get("branchCode").toString().trim());
+            }
+            if (payload.containsKey("category") && payload.get("category") != null) {
+                t.setCategory(payload.get("category").toString().trim());
+            }
+            if (payload.containsKey("maxParticipants")) {
+                t.setMaxParticipants(Integer.parseInt(payload.get("maxParticipants").toString()));
+            }
+            if (payload.containsKey("entryFee")) {
+                t.setEntryFee(new BigDecimal(payload.get("entryFee").toString()));
+            }
+            if (payload.containsKey("totalPrize")) {
+                t.setTotalPrize(new BigDecimal(payload.get("totalPrize").toString()));
+            }
+            if (payload.containsKey("rules")) {
+                t.setRules((String) payload.get("rules"));
+            }
+            if (payload.containsKey("startDate") && payload.get("startDate") != null && !payload.get("startDate").toString().isEmpty()) {
+                try {
+                    t.setStartDate(LocalDateTime.parse(payload.get("startDate").toString()));
+                } catch (Exception ignored) {}
+            }
+            if (payload.containsKey("endDate") && payload.get("endDate") != null && !payload.get("endDate").toString().isEmpty()) {
+                try {
+                    t.setEndDate(LocalDateTime.parse(payload.get("endDate").toString()));
+                } catch (Exception ignored) {}
+            }
+
+            tournamentRepository.save(t);
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Đã cập nhật thông tin giải đấu '" + t.getTournamentName() + "' thành công!",
+                "tournament", t
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi: " + e.getMessage()));
+        }
+    }
+
     @PostMapping("/director/tournaments")
     public ResponseEntity<?> createTournament(@RequestBody Map<String, Object> payload) {
         try {

@@ -723,7 +723,7 @@ INSERT INTO users (username, password, full_name, email, phone, role, staff_code
 
 -- 5.14 DỮ LIỆU GIẢI ĐẤU VÀ SỰ KIỆN (tournaments)
 INSERT INTO tournaments (tournament_code, branch_code, tournament_name, category, start_date, end_date, rules, max_participants, current_participants, entry_fee, total_prize, status) VALUES
-('GD01', 'CN01', N'Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026', N'Đôi nam nữ', '2026-10-10 08:00:00', '2026-10-12 18:00:00', N'Thi đấu theo thể thức loại trực tiếp 3 hiệp 21 điểm theo luật BWF. Mỗi VĐV chỉ được đăng ký 1 nội dung.', 32, 24, 300000, 20000000, N'Đang mở đăng ký'),
+('GD01', 'CN01', N'Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026', N'Đôi nam nữ', '2026-10-10 08:00:00', '2026-10-12 18:00:00', N'Thi đấu theo thể thức loại trực tiếp 3 hiệp 21 điểm theo luật BWF. Mỗi VĐV chỉ được đăng ký 1 nội dung.', 32, 24, 300000, 20000000, N'Đã hoàn thành'),
 ('GD02', 'CN01', N'Giải Cầu Lông Doanh Nghiệp & Sinh Viên Cúp Thủ Đức 2026', N'Tổng hợp nhiều nội dung', '2026-10-25 08:00:00', '2026-10-26 17:00:00', N'Giải đấu phong trào kết nối các doanh nghiệp và cựu sinh viên đam mê cầu lông.', 24, 0, 250000, 15000000, N'Sắp mở đăng ký'),
 ('GD03', 'CN02', N'Giải Đơn Nam Bình Thạnh Mở Rộng 2026', N'Đơn nam', '2026-11-05 08:00:00', '2026-11-06 18:00:00', N'Giải đơn nam các CLB phong trào khu vực Bình Thạnh - Phú Nhuận.', 16, 0, 200000, 10000000, N'Sắp mở đăng ký');
 

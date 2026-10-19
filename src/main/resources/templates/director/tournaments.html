@@ -282,7 +282,7 @@
         </div>
       </header>
 
-      <div class="main-content">
+      <div class="page-content">
         <!-- LUXURY HERO BANNER -->
         <div class="hero-banner" style="margin-bottom: 24px;">
           <div class="hero-banner-content">
@@ -320,9 +320,11 @@
                   <option value="ALL">-- Tất cả chi nhánh --</option>
                 </select>
                 <select class="form-control" id="filterTourStatus" onchange="filterActiveTournamentTab()" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
-                  <option value="ALL">-- Tất cả trạng thái --</option>
-                  <option value="Chờ phê duyệt" selected>Chờ phê duyệt</option>
+                  <option value="ALL" selected>-- Tất cả trạng thái --</option>
+                  <option value="Chờ phê duyệt">Chờ phê duyệt</option>
+                  <option value="Sắp mở đăng ký">Sắp mở đăng ký</option>
                   <option value="Đang mở đăng ký">Đang mở đăng ký</option>
+                  <option value="Đang diễn ra">Đang diễn ra</option>
                   <option value="Đã hoàn thành">Đã hoàn thành</option>
                   <option value="Từ chối">Từ chối</option>
                 </select>
@@ -530,6 +532,52 @@
     </div>
   </div>
 
+  <!-- MODAL MỞ LẠI GIẢI ĐẤU CŨ HOẶC CẬP NHẬT THỜI GIAN -->
+  <div class="modal-overlay" id="reopenModal">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <div>
+          <h3 id="reopenModalTitle">Mở lại giải đấu / Cập nhật thời gian</h3>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Gia hạn thời gian và mở lại đăng ký tham gia cho giải đấu</div>
+        </div>
+        <button class="modal-close-btn" onclick="closeReopenModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="reopenTourId">
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label">Tên giải đấu</label>
+          <input type="text" class="form-control" id="reopenTourName" readonly style="background: var(--surface-subtle); font-weight: 600;">
+        </div>
+
+        <div class="form-row" style="margin-bottom: 14px;">
+          <div class="form-group">
+            <label class="form-label">Thời gian bắt đầu mới <span style="color: var(--danger);">*</span></label>
+            <input type="datetime-local" class="form-control" id="reopenTourStart">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Thời gian kết thúc mới <span style="color: var(--danger);">*</span></label>
+            <input type="datetime-local" class="form-control" id="reopenTourEnd">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Trạng thái mới <span style="color: var(--danger);">*</span></label>
+          <select class="form-control" id="reopenTourStatus">
+            <option value="Đang mở đăng ký" selected>Đang mở đăng ký (Khách hàng có thể đăng ký ngay)</option>
+            <option value="Sắp mở đăng ký">Sắp mở đăng ký</option>
+            <option value="Đang diễn ra">Đang diễn ra (Khóa sân thi đấu)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeReopenModal()">Hủy bỏ</button>
+        <button class="btn btn-primary" id="btnSubmitReopen" onclick="submitReopenTournament()">Xác nhận mở lại giải đấu</button>
+      </div>
+    </div>
+  </div>
+
   <script src="/js/global-hub.js"></script>
   <script>
     let currentTab = 1;
@@ -610,6 +658,13 @@
       }
     }
 
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+      });
+    }
+
     function renderTournaments(tournaments) {
       const tbody = document.getElementById('tournamentsTableBody');
       if (!tbody) return;
@@ -622,9 +677,19 @@
       let html = '';
       tournaments.forEach(t => {
         const isPending = (t.status === 'Chờ phê duyệt');
-        const isActive = (t.status === 'Đang mở đăng ký' || t.status === 'Đang diễn ra');
+        const isUpcoming = (t.status === 'Sắp mở đăng ký');
+        const isOpen = (t.status === 'Đang mở đăng ký');
+        const isRunning = (t.status === 'Đang diễn ra');
         const isDone = (t.status === 'Đã hoàn thành');
-        const badgeClass = isPending ? 'badge-warning' : (isActive ? 'badge-success' : (isDone ? 'badge-blue' : 'badge-danger'));
+        const isRejected = (t.status === 'Từ chối');
+
+        let badgeStyle = 'background: #f1f5f9; color: #475569;';
+        if (isPending) badgeStyle = 'background: #fef3c7; color: #b45309; border: 1px solid #fde68a;';
+        else if (isUpcoming) badgeStyle = 'background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe;';
+        else if (isOpen) badgeStyle = 'background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;';
+        else if (isRunning) badgeStyle = 'background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;';
+        else if (isDone) badgeStyle = 'background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1;';
+        else if (isRejected) badgeStyle = 'background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca;';
 
         let startFormatted = t.startDate ? t.startDate.replace('T', ' ').substring(0, 16) : '';
         let endFormatted = t.endDate ? t.endDate.replace('T', ' ').substring(0, 16) : '';
@@ -632,37 +697,67 @@
         let actionHtml = '';
         if (isPending) {
           actionHtml = `
-            <div style="display: flex; gap: 6px; justify-content: flex-end;">
-              <button type="button" class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approveTournament(${t.id})">Phê duyệt</button>
-              <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444; border-color: #fca5a5;" onclick="rejectTournament(${t.id})">Từ chối</button>
+            <div style="display: flex; gap: 5px; justify-content: flex-end; flex-wrap: wrap;">
+              <button type="button" class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="changeTournamentStatus(${t.id}, 'Đang mở đăng ký', '${escapeHtml(t.tournamentName)}')">Mở đăng ký</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444; border-color: #fca5a5;" onclick="rejectTournament(${t.id})">Từ chối</button>
             </div>
           `;
-        } else if (isActive) {
+        } else if (isUpcoming) {
           actionHtml = `
-            <div style="display: flex; gap: 6px; justify-content: flex-end;">
-              <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: var(--primary);" onclick="viewRegistrations('${t.tournamentCode}', '${t.tournamentName}')">DS đội (${t.currentParticipants})</button>
+            <div style="display: flex; gap: 5px; justify-content: flex-end; flex-wrap: wrap;">
+              <button type="button" class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px; background: #059669;" onclick="changeTournamentStatus(${t.id}, 'Đang mở đăng ký', '${escapeHtml(t.tournamentName)}')">Mở đăng ký ngay</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: var(--text-dark);" onclick="viewRegistrations('${t.tournamentCode}', '${escapeHtml(t.tournamentName)}')">Xem DS</button>
+            </div>
+          `;
+        } else if (isOpen) {
+          actionHtml = `
+            <div style="display: flex; gap: 5px; justify-content: flex-end; flex-wrap: wrap;">
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #0284c7; border-color: #7dd3fc;" onclick="changeTournamentStatus(${t.id}, 'Đang diễn ra', '${escapeHtml(t.tournamentName)}')">Bắt đầu đấu</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: var(--primary);" onclick="viewRegistrations('${t.tournamentCode}', '${escapeHtml(t.tournamentName)}')">DS đội (${t.currentParticipants})</button>
+            </div>
+          `;
+        } else if (isRunning) {
+          actionHtml = `
+            <div style="display: flex; gap: 5px; justify-content: flex-end; flex-wrap: wrap;">
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #16a34a; border-color: #86efac;" onclick="changeTournamentStatus(${t.id}, 'Đã hoàn thành', '${escapeHtml(t.tournamentName)}')">Kết thúc giải</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: var(--primary);" onclick="viewRegistrations('${t.tournamentCode}', '${escapeHtml(t.tournamentName)}')">DS đội (${t.currentParticipants})</button>
             </div>
           `;
         } else {
+          // isDone or isRejected or past date
           actionHtml = `
-            <div style="display: flex; gap: 6px; justify-content: flex-end;">
-              <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: var(--text-muted);" onclick="viewRegistrations('${t.tournamentCode}', '${t.tournamentName}')">Xem DS đội</button>
+            <div style="display: flex; gap: 5px; justify-content: flex-end; flex-wrap: wrap;">
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #d97706; border-color: #fde68a;" onclick="openReopenModal(${t.id}, '${escapeHtml(t.tournamentName)}', '${t.startDate || ''}', '${t.endDate || ''}')">Mở lại giải</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: var(--text-muted);" onclick="viewRegistrations('${t.tournamentCode}', '${escapeHtml(t.tournamentName)}')">Xem DS</button>
             </div>
           `;
         }
+
+        const statusSelectHtml = `
+          <div style="margin-top: 5px;">
+            <select class="form-control" style="font-size: 11px; padding: 2px 6px; height: 26px; border-radius: 5px; background: var(--surface); color: var(--text-dark); cursor: pointer;" onchange="changeTournamentStatus(${t.id}, this.value, '${escapeHtml(t.tournamentName)}')">
+              <option value="Chờ phê duyệt" ${t.status === 'Chờ phê duyệt' ? 'selected' : ''}>Chờ phê duyệt</option>
+              <option value="Sắp mở đăng ký" ${t.status === 'Sắp mở đăng ký' ? 'selected' : ''}>Sắp mở đăng ký</option>
+              <option value="Đang mở đăng ký" ${t.status === 'Đang mở đăng ký' ? 'selected' : ''}>Đang mở đăng ký</option>
+              <option value="Đang diễn ra" ${t.status === 'Đang diễn ra' ? 'selected' : ''}>Đang diễn ra</option>
+              <option value="Đã hoàn thành" ${t.status === 'Đã hoàn thành' ? 'selected' : ''}>Đã hoàn thành</option>
+              <option value="Từ chối" ${t.status === 'Từ chối' ? 'selected' : ''}>Từ chối</option>
+            </select>
+          </div>
+        `;
 
         html += `
           <tr id="tourRow-${t.id}">
             <td style="font-weight: 700; color: var(--primary); font-size: 13.5px;">${t.tournamentCode}</td>
             <td>
               <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                <span style="font-weight: 600; color: var(--text-dark);">${t.tournamentName}</span>
+                <span style="font-weight: 600; color: var(--text-dark);">${escapeHtml(t.tournamentName)}</span>
                 <span class="badge" style="background: rgba(13, 148, 136, 0.12); color: #0d9488; font-size: 11px; padding: 2px 7px; border-radius: 4px; font-weight: 600; border: 1px solid rgba(13, 148, 136, 0.25);">${t.category || 'Đôi nam nữ'}</span>
               </div>
-              <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px; max-width: 280px; line-height: 1.35;">${t.rules || 'Quy chuẩn BWF'}</div>
+              <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px; max-width: 280px; line-height: 1.35;">${escapeHtml(t.rules || 'Quy chuẩn BWF')}</div>
             </td>
             <td>
-              <div style="font-weight: 600; color: var(--text-dark);">${t.branchName}</div>
+              <div style="font-weight: 600; color: var(--text-dark);">${escapeHtml(t.branchName)}</div>
               <div style="font-size: 11px; color: var(--text-muted);">Mã: ${t.branchCode || 'Chuỗi'}</div>
             </td>
             <td>
@@ -678,7 +773,8 @@
               <div style="font-size: 11px; color: var(--text-muted);">Phí: ${formatVND(t.entryFee)}/đội</div>
             </td>
             <td style="text-align: center;">
-              <span class="badge ${badgeClass}">${t.status}</span>
+              <span class="badge" style="${badgeStyle}; font-size: 11.5px; padding: 3px 8px; font-weight: 600;">${t.status}</span>
+              ${statusSelectHtml}
             </td>
             <td style="text-align: right;">
               ${actionHtml}
@@ -842,6 +938,105 @@
       } catch (e) {
         console.error(e);
         alert('Lỗi kết nối máy chủ!');
+      }
+    }
+
+    async function changeTournamentStatus(id, newStatus, currentName) {
+      if (!confirm(`Xác nhận chuyển trạng thái giải đấu "${currentName}" sang [${newStatus}]?`)) {
+        loadDirectorTournaments();
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/director/tournaments/${id}/status`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          credentials: 'include',
+          body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          if (window.showToast) showToast(data.message || `Đã chuyển sang [${newStatus}] thành công!`, 'success');
+          else alert(data.message || `Đã chuyển trạng thái thành công!`);
+          await loadDirectorTournaments();
+        } else {
+          alert(data.message || 'Lỗi khi cập nhật trạng thái giải đấu!');
+          await loadDirectorTournaments();
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Lỗi kết nối máy chủ!');
+        await loadDirectorTournaments();
+      }
+    }
+
+    function openReopenModal(id, name, start, end) {
+      document.getElementById('reopenTourId').value = id;
+      document.getElementById('reopenTourName').value = name || '';
+
+      const now = new Date();
+      // Start = now + 5 days at 08:00
+      const sDate = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000);
+      sDate.setHours(8, 0, 0, 0);
+      const eDate = new Date(sDate.getTime() + 2 * 24 * 60 * 60 * 1000);
+      eDate.setHours(18, 0, 0, 0);
+
+      const pad = n => String(n).padStart(2, '0');
+      const toIsoLocal = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+      document.getElementById('reopenTourStart').value = toIsoLocal(sDate);
+      document.getElementById('reopenTourEnd').value = toIsoLocal(eDate);
+      document.getElementById('reopenTourStatus').value = 'Đang mở đăng ký';
+
+      document.getElementById('reopenModal').classList.add('active');
+    }
+
+    function closeReopenModal() {
+      document.getElementById('reopenModal').classList.remove('active');
+    }
+
+    async function submitReopenTournament() {
+      const id = document.getElementById('reopenTourId').value;
+      const name = document.getElementById('reopenTourName').value;
+      const start = document.getElementById('reopenTourStart').value;
+      const end = document.getElementById('reopenTourEnd').value;
+      const status = document.getElementById('reopenTourStatus').value;
+
+      if (!start || !end) {
+        alert('Vui lòng chọn thời gian bắt đầu và kết thúc mới!');
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmitReopen');
+      btn.disabled = true;
+      btn.textContent = 'Đang xử lý...';
+
+      try {
+        const res = await fetch(`/api/director/tournaments/${id}/status`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          credentials: 'include',
+          body: JSON.stringify({
+            status: status,
+            startDate: start,
+            endDate: end
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          if (window.showToast) showToast(data.message || 'Đã mở lại giải đấu thành công!', 'success');
+          else alert(data.message || 'Đã mở lại giải đấu thành công!');
+          closeReopenModal();
+          await loadDirectorTournaments();
+        } else {
+          alert(data.message || 'Lỗi khi mở lại giải đấu!');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Lỗi kết nối máy chủ!');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Xác nhận mở lại giải đấu';
       }
     }
 
