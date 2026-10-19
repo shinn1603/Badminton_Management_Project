@@ -39,16 +39,16 @@ public class ApiController {
     @Value("${vietqr.webhook.token:UTE_VIETQR_SECRET_TOKEN_2026}")
     private String webhookToken;
 
-    @Value("${vietqr.bank.bin:970422}")
+    @Value("${vietqr.bank.bin:970418}")
     private String vietqrBankBin;
 
-    @Value("${vietqr.bank.name:MBBank (Ngân hàng Quân Đội)}")
+    @Value("${vietqr.bank.name:BIDV (Ngân hàng TMCP Đầu tư và Phát triển Việt Nam)}")
     private String vietqrBankName;
 
-    @Value("${vietqr.account.no:0903123456}")
+    @Value("${vietqr.account.no:8800410051}")
     private String vietqrAccountNo;
 
-    @Value("${vietqr.account.name:UTE BADMINTON CLUB}")
+    @Value("${vietqr.account.name:NGUYEN PHUOC THO}")
     private String vietqrAccountName;
 
     private String sanitizeErrorMessage(Exception e) {
