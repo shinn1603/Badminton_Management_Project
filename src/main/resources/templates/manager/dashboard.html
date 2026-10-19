@@ -654,7 +654,7 @@
               <option value="Chờ xác nhận">Chờ xác nhận (Khách online)</option>
               <option value="Đã xác nhận" selected>Đã xác nhận (Khách hẹn trước)</option>
               <option value="Đang sử dụng">Khách đang vào chơi (POS trực tiếp)</option>
-              <option value="Đã cọc 30%">Đã cọc 30% qua QR</option>
+              <option value="Đã cọc">Đã cọc (Chuyển khoản QR)</option>
             </select>
           </div>
         </div>
@@ -896,7 +896,7 @@
 
       const statusClass = b.status === 'Đang sử dụng' ? 'badge-in-use' :
                           b.status === 'Hoàn thành' ? 'badge-completed' :
-                          b.status === 'Đã cọc 30%' ? 'badge-pending' : 'badge-available';
+                          (b.status === 'Đã cọc' || b.status === 'Đã cọc 30%') ? 'badge-pending' : 'badge-available';
 
       const deposit = Number(b.depositAmount) || 0;
       const total = Number(b.totalPrice) || 0;
@@ -1129,7 +1129,7 @@
       tbody.innerHTML = bookings.slice(0, 7).map(b => {
         const statusClass = b.status === 'Đang sử dụng' ? 'badge-in-use' :
                             b.status === 'Hoàn thành' ? 'badge-completed' :
-                            b.status === 'Đã cọc 30%' ? 'badge-pending' : 'badge-available';
+                            (b.status === 'Đã cọc' || b.status === 'Đã cọc 30%') ? 'badge-pending' : 'badge-available';
         return `
           <tr>
             <td><strong>#${escapeHtml(b.bookingCode)}</strong></td>

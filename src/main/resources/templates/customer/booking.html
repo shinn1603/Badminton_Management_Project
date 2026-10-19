@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đặt Sân Cầu Lông & Khóa Slot Thời Gian Thực - UTE Badminton</title>
+  <title>Đặt Sân Cầu Lông Trực Tuyến - UTE Badminton</title>
   <link rel="stylesheet" href="/css/main.css">
   <style>
     :root {
@@ -625,10 +625,10 @@
         <span class="hero-pulse-dot"></span> Đặt Sân Trực Tuyến
       </div>
       <h1 class="hero-title">
-        Đặt Sân & <span>Giữ Chỗ Tức Thì</span>
+        Đặt Sân <span>Trực Tuyến</span>
       </h1>
       <p class="hero-sub">
-        Tra cứu lịch trống theo thời gian thực, giữ chỗ tự động và nhận vé QR điện tử sau khi thanh toán.
+        Tra cứu lịch trống và đặt sân nhanh chóng theo từng khung giờ.
       </p>
     </div>
   </section>
@@ -649,7 +649,7 @@
           <span style="color: var(--primary);">4. Xác nhận</span>
         </div>
         <div style="font-size: 11.5px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--primary-border); white-space: nowrap;">
-          Giữ chỗ 10 phút
+          Hỗ trợ 24/7
         </div>
       </div>
 
@@ -806,14 +806,14 @@
 
         <!-- Deposit highlight -->
         <div class="deposit-highlight-box">
-          <div class="deposit-label">Tiền Cọc Giữ Chỗ (30%)</div>
+          <div class="deposit-label">Đặt Cọc</div>
           <div class="deposit-val" id="sumDeposit">0 đ</div>
-          <div class="deposit-sub" id="depositRemainingText">70% còn lại thanh toán tại quầy POS khi nhận sân.</div>
+          <div class="deposit-sub" id="depositRemainingText">Còn lại thanh toán khi nhận sân</div>
         </div>
 
         <!-- Voucher / Promo Code Box -->
         <div style="background: var(--surface-subtle); border: 1px dashed rgba(16, 185, 129, 0.4); border-radius: 10px; padding: 12px; margin-bottom: 14px;">
-          <label style="font-size: 11.5px; font-weight: 700; color: var(--cust-text-main); display: block; margin-bottom: 5px;">Mã Ưu Đãi / Voucher (CSDL):</label>
+          <label style="font-size: 11.5px; font-weight: 700; color: var(--cust-text-main); display: block; margin-bottom: 5px;">Mã Ưu Đãi / Voucher:</label>
           <div style="display: flex; gap: 8px;">
             <input type="text" id="promoCodeInput" class="form-control" placeholder="vd: KM01, KM02..." style="font-size: 12.5px; padding: 7px 10px; text-transform: uppercase;" autocomplete="off">
             <button type="button" class="btn btn-outline" id="btnApplyPromo" onclick="applyPromoCode()" style="padding: 7px 12px; font-size: 12px; font-weight: 700; white-space: nowrap;">Áp Dụng</button>
@@ -835,11 +835,11 @@
         </div>
 
         <button type="button" class="btn btn-primary" id="btnSubmitLockBooking" onclick="executeBookingLock()" disabled style="width: 100%; padding: 12px; font-size: 14px; font-weight: 700; border-radius: 10px;">
-          Xác Nhận Khóa Slot & Nhận Mã VietQR
+          Xác Nhận Đặt Sân
         </button>
 
         <div style="text-align: center; margin-top: 12px; font-size: 11.5px; color: var(--cust-text-muted); line-height: 1.4;">
-          Chính sách: Khóa slot 10 phút để quét mã cọc. Hoàn tiền 100% tự động nếu báo hủy trước 4 giờ.
+          Hỗ trợ hủy lịch và hoàn tiền theo quy định hệ thống.
         </div>
       </div>
     </div>
@@ -849,13 +849,13 @@
   <div class="slot-modal-overlay" id="bookingVietqrModal">
     <div class="vietqr-modal-card">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-        <span class="badge badge-green" style="font-size: 12px; padding: 4px 10px;">Khóa Giữ Chỗ Thành Công</span>
+        <span class="badge badge-green" style="font-size: 12px; padding: 4px 10px;">Đặt Sân Thành Công</span>
         <button type="button" class="btn-icon" onclick="closeBookingVietQrModal()" style="border: none; background: transparent; cursor: pointer; color: var(--text-muted); font-size: 18px;">✕</button>
       </div>
 
-      <h3 style="margin: 0 0 6px; font-size: 20px; font-weight: 800; color: var(--text-dark);">Quét Mã VietQR Chuyển Khoản Cọc</h3>
+      <h3 style="margin: 0 0 6px; font-size: 20px; font-weight: 800; color: var(--text-dark);">Thanh Toán VietQR</h3>
       <p style="font-size: 12.5px; color: var(--text-muted); margin: 0 0 14px;">
-        Hệ thống đã khóa duy nhất slot này cho bạn trong <strong style="color: #ef4444;" id="bookingTimerText">10:00</strong>. Các slot và sân khác hoàn toàn không bị ảnh hưởng.
+        Vui lòng quét mã và thanh toán trong <strong style="color: #ef4444;" id="bookingTimerText">10:00</strong>.
       </p>
 
       <div class="vietqr-qr-frame">
@@ -868,7 +868,7 @@
           <strong id="bkgBookingCode" style="color: var(--primary); font-family: monospace; font-size: 14px;">DS000000</strong>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-          <span style="color: var(--text-muted);">Số tiền cọc (30%):</span>
+          <span style="color: var(--text-muted);">Số tiền cọc:</span>
           <strong id="bkgDepositAmount" style="color: #d97706; font-size: 15px;">0 đ</strong>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
@@ -908,7 +908,7 @@
           <span style="font-size: 18px; font-weight: 900; color: #ffffff;">UTE SPORT ARENA</span>
         </div>
         <p style="line-height: 1.6; margin-bottom: 18px;">
-          Hệ thống chuỗi sân cầu lông tiêu chuẩn quốc tế BWF. Tiên phong ứng dụng công nghệ khóa giữ chỗ thời gian thực, đối soát thanh toán tự động VietQR và dịch vụ chăm sóc người chơi hàng đầu.
+          Hệ thống chuỗi sân cầu lông tiêu chuẩn quốc tế BWF với cơ sở vật chất hiện đại, dịch vụ đặt sân chuyên nghiệp và tiện nghi cao cấp.
         </p>
         <div>
           <span style="color: #6ee7b7; font-weight: 700;">Hotline Đặt Sân:</span>
@@ -933,8 +933,8 @@
           <li><a href="/customer/booking">Đặt Sân Trực Tuyến</a></li>
           <li><a href="/customer/tournaments">Đăng Ký Giải Đấu UTE</a></li>
           <li><a href="/customer/profile">Tích Điểm Thẻ Hội Viên</a></li>
-          <li><a href="/customer/history">Tra Cứu Lịch Sử & Check-in</a></li>
-          <li><a href="/customer/policy">Chính Sách Hoàn Cọc 100%</a></li>
+          <li><a href="/customer/history">Lịch Sử Đặt Sân</a></li>
+          <li><a href="/customer/policy">Chính Sách & Quy Định</a></li>
         </ul>
       </div>
 
@@ -956,7 +956,7 @@
       </div>
       <div style="display: flex; gap: 20px;">
         <span>Tiêu chuẩn thảm thi đấu BWF</span>
-        <span>Thanh toán VietQR tự động</span>
+        <span>Thanh toán VietQR tiện lợi</span>
         <span>Hỗ trợ kỹ thuật 24/7</span>
       </div>
     </div>
@@ -1426,7 +1426,7 @@
 
       const btn = document.getElementById('btnSubmitLockBooking');
       btn.disabled = true;
-      btn.innerText = 'Đang khóa slot giữ chỗ...';
+      btn.innerText = 'Đang xử lý...';
 
       const branch = document.getElementById('selBranch').value;
       const date = document.getElementById('selDate').value;
@@ -1462,17 +1462,17 @@
 
         const data = await res.json();
         if (data.success) {
-          showToast(`Khóa thành công ${selectedCourt.courtName} lúc ${timeSlotString}!`, 'success');
+          showToast(`Đặt sân thành công cho ${selectedCourt.courtName}!`, 'success');
           openBookingVietQrModal(data);
           loadSlotsForCourt();
         } else {
-          showToast(data.message || 'Không thể khóa slot. Vui lòng chọn giờ khác!', 'error');
+          showToast(data.message || 'Khung giờ này đã được đặt. Vui lòng chọn giờ khác!', 'error');
         }
       } catch (err) {
-        showToast('Lỗi máy chủ khi khóa slot!', 'error');
+        showToast('Lỗi máy chủ!', 'error');
       } finally {
         btn.disabled = false;
-        btn.innerText = 'Xác Nhận Khóa Slot & Nhận Mã VietQR';
+        btn.innerText = 'Xác Nhận Đặt Sân';
       }
     }
 
@@ -1547,10 +1547,10 @@
         const data = await res.json();
 
         if (data.success || res.ok) {
-          showToast(`Đã ghi nhận tiền cọc cho đơn ${bookingCode} trong cơ sở dữ liệu!`, 'success');
+          showToast(`Thanh toán thành công đơn ${bookingCode}!`, 'success');
           closeBookingVietQrModal();
           setTimeout(() => {
-            if (confirm('Đặt sân và thanh toán cọc thành công! Bạn có muốn chuyển đến trang Lịch Sử & Check-in QR ngay không?')) {
+            if (confirm('Đặt sân và thanh toán thành công! Bạn có muốn xem lịch sử đặt sân không?')) {
               window.location.href = '/customer/history';
             }
           }, 600);

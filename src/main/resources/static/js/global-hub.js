@@ -551,7 +551,7 @@ function showToast(message, type = 'success') {
         ` : `
           <div class="drawer-guest-card">
             <div class="drawer-guest-title">Chào mừng quý khách!</div>
-            <div class="drawer-guest-sub">Đăng nhập để nhận ưu đãi cọc 30% và tích điểm đổi giờ chơi miễn phí.</div>
+            <div class="drawer-guest-sub">Đăng nhập để nhận nhiều ưu đãi và tích điểm thành viên.</div>
             <a href="/customer/auth" class="drawer-login-btn">
               <svg class="svg-icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
               <span>Đăng Nhập / Đăng Ký</span>

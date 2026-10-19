@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thanh Toán Tiền Cọc 30% (VietQR / VNPay) - UTE Badminton</title>
+  <title>Thanh Toán Đặt Sân - UTE Badminton</title>
   <link rel="stylesheet" href="/css/main.css">
   <style>
     :root {
@@ -484,7 +484,7 @@
 
         <div class="qr-frame">
           <img id="qrCodeImg" class="qr-code-img" src="/images/vietqr-bank.png" onerror="this.src='https://img.vietqr.io/image/970418-8800410051-compact2.png?amount=30000&addInfo=CK%20DAT%20SAN&accountName=NGUYEN%20PHUOC%20THO'" alt="Mã VietQR Chuyển Khoản" style="width: 200px; height: 200px; object-fit: contain; display: block; margin: 0 auto;">
-          <div style="font-size: 11px; font-weight: 700; color: var(--cust-primary); margin-top: 6px;">VIETQR 24/7 - ĐỐI SOÁT TỰ ĐỘNG</div>
+          <div style="font-size: 11px; font-weight: 700; color: var(--cust-primary); margin-top: 6px;">QUÉT MÃ VIETQR ĐỂ THANH TOÁN</div>
         </div>
 
         <table class="bank-info-table">
@@ -504,7 +504,7 @@
             <td id="qrAccountName">NGUYEN PHUOC THO</td>
           </tr>
           <tr>
-            <td>Số tiền cọc (30%):</td>
+            <td>Số tiền cọc:</td>
             <td>
               <span id="qrDepositAmount" style="color: var(--cust-primary-hover); font-size: 14px; font-weight: 700;">Đang nạp...</span>
               <button type="button" class="btn-copy-tag" onclick="copyText(document.getElementById('qrDepositAmount').textContent.replace(/\D/g, ''))">Sao chép</button>
@@ -522,7 +522,7 @@
         <div style="margin-top: 18px;">
           <button type="button" class="btn btn-primary" id="btnConfirmPay" onclick="confirmPaymentSuccess()" style="width: 100%; height: 42px; font-size: 13.5px; font-weight: 700; border-radius: 8px;">
             <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            Tôi Đã Chuyển Khoản Thành Công
+            Xác Nhận Đã Chuyển Khoản
           </button>
           <a href="/customer/booking" style="display: block; margin-top: 12px; font-size: 12px; color: var(--cust-text-muted); text-decoration: none;">
             ← Quay lại trang chọn sân & giờ
@@ -536,9 +536,9 @@
       <div class="invoice-card">
         <div class="invoice-header">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <div style="font-size: 11px; text-transform: uppercase; color: var(--cust-primary); font-weight: 600;">Phiếu Giữ Chỗ Trực Tuyến</div>
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--cust-primary); font-weight: 600;">Phiếu Đặt Sân</div>
             <div style="font-size: 11.5px; font-weight: 700; color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 2px 8px; border-radius: 6px;">
-              Giữ chỗ: <span id="payTimer">10:00</span>
+              Thời gian: <span id="payTimer">10:00</span>
             </div>
           </div>
           <div style="font-size: 16px; font-weight: 800; color: var(--cust-text-main);">Chi Tiết Đơn Đặt Sân</div>
@@ -577,17 +577,17 @@
               <span class="val" id="invTotal" style="font-size: 14px;">0 đ</span>
             </div>
             <div class="invoice-row" style="margin-bottom: 6px;">
-              <span class="lbl" style="color: var(--cust-primary-hover); font-weight: 700;">Tiền cọc giữ sân (30%):</span>
+              <span class="lbl" style="color: var(--cust-primary-hover); font-weight: 700;">Tiền cọc:</span>
               <span class="val" id="invDeposit" style="color: var(--cust-primary-hover); font-size: 16px; font-weight: 800;">0 đ</span>
             </div>
             <div class="invoice-row" style="margin-bottom: 0;">
-              <span class="lbl" style="font-size: 11.5px;">Còn lại thanh toán tại quầy:</span>
-              <span class="val" id="invRemaining" style="font-size: 11.5px; color: var(--cust-text-muted);">0 đ (70%)</span>
+              <span class="lbl" style="font-size: 11.5px;">Còn lại:</span>
+              <span class="val" id="invRemaining" style="font-size: 11.5px; color: var(--cust-text-muted);">0 đ</span>
             </div>
           </div>
 
           <div id="bookingStatusAlert" style="background: var(--cust-primary-light); border: 1px solid var(--cust-primary-border); border-radius: 6px; padding: 10px 12px; font-size: 11.5px; color: var(--cust-primary-hover); line-height: 1.5;">
-            <strong>Chính sách hoàn cọc:</strong> Hoàn 100% tự động khi hủy trước giờ chơi tối thiểu 4 tiếng.
+            <strong>Quy định hủy sân:</strong> Miễn phí hủy và hoàn tiền khi thông báo trước 4 tiếng.
           </div>
         </div>
       </div>
@@ -600,12 +600,12 @@
       <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--cust-primary-light); color: var(--cust-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; border: 1px solid var(--cust-primary-border);">
         <svg class="svg-icon" style="width: 28px; height: 28px;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
       </div>
-      <h3 style="font-size: 18px; font-weight: 800; color: var(--cust-text-main); margin-bottom: 6px;">Đặt Cọc Thành Công!</h3>
+      <h3 style="font-size: 18px; font-weight: 800; color: var(--cust-text-main); margin-bottom: 6px;">Thanh Toán Thành Công!</h3>
       <p style="font-size: 12.5px; color: var(--cust-text-muted); line-height: 1.5; margin-bottom: 18px;">
-        Hệ thống đã ghi nhận tiền cọc <strong id="modalDepositTxt" style="color: var(--cust-primary);">0 đ</strong> vào cơ sở dữ liệu. Mã vé QR điện tử đã sẵn sàng để quét nhận sân tại quầy POS!
+        Hệ thống đã ghi nhận thanh toán cọc <strong id="modalDepositTxt" style="color: var(--cust-primary);">0 đ</strong> thành công. Bạn có thể kiểm tra thông tin và mã vé trong lịch sử đặt sân!
       </p>
       <button type="button" class="btn btn-primary" onclick="window.location.href='/customer/history'" style="width: 100%; height: 40px; font-size: 13px; font-weight: 600; border-radius: 6px;">
-        Xem Vé Điện Tử & Lịch Sử Đặt Chỗ
+        Xem Lịch Sử Đặt Sân
       </button>
     </div>
   </div>

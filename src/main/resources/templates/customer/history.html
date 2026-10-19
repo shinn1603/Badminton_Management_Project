@@ -556,7 +556,7 @@
     <div class="policy-alert-box" style="display: flex; align-items: center; gap: 10px;">
       <svg class="svg-icon" style="width: 18px; height: 18px; flex-shrink: 0; color: var(--cust-primary);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
       <div style="font-size: 12.5px;">
-        <strong>Chính sách hoàn cọc:</strong> Hoàn 100% tiền cọc tự động khi hủy trước giờ chơi tối thiểu 4 tiếng.
+        <strong>Quy định hủy sân:</strong> Miễn phí hủy và hoàn tiền khi thông báo trước 4 tiếng.
       </div>
     </div>
 
@@ -595,7 +595,7 @@
             <rect x="14" y="54" width="4" height="4"/><rect x="84" y="54" width="4" height="4"/>
             <rect x="38" y="70" width="4" height="4"/><rect x="54" y="70" width="4" height="4"/>
           </svg>
-          <div style="font-size: 10.5px; font-weight: 700; color: var(--cust-primary); margin-top: 4px;">QUÉT MÃ TẠI QUẦY ĐỂ NHẬN SÂN</div>
+          <div style="font-size: 10.5px; font-weight: 700; color: var(--cust-primary); margin-top: 4px;">MÃ CHECK-IN TẠI QUẦY</div>
         </div>
 
         <div style="text-align: left; font-size: 12.5px; margin-bottom: 18px;">
@@ -608,16 +608,16 @@
             <strong id="tktTime">17:00 - 19:00</strong>
           </div>
           <div style="display: flex; justify-content: space-between;">
-            <span style="color: var(--cust-text-muted);">Số tiền còn lại thanh toán:</span>
+            <span style="color: var(--cust-text-muted);">Còn lại:</span>
             <strong id="tktRemaining" style="color: var(--cust-accent);">220.500 đ</strong>
           </div>
         </div>
 
         <button type="button" class="btn btn-primary" onclick="resendTicketEmail()" id="btnResendEmail" style="width: 100%; height: 38px; font-size: 13px; font-weight: 700; margin-bottom: 8px; border-radius: 8px;">
-          📩 Gửi Phiếu & Vé Về Email
+          Gửi Vé Về Email
         </button>
         <button type="button" class="btn btn-outline" onclick="closeModals()" style="width: 100%; height: 36px; font-size: 12.5px; border-radius: 8px;">
-          Đóng Vé Điện Tử
+          Đóng
         </button>
       </div>
     </div>
@@ -740,7 +740,7 @@
 
       let html = '';
       list.forEach(item => {
-        const rawStatus = item.status || 'Chờ cọc 30%';
+        const rawStatus = item.status || 'Đã đặt';
         let category = 'upcoming';
         let badgeClass = 'badge-success';
         let badgeText = rawStatus;
@@ -748,12 +748,12 @@
         if (rawStatus.includes('hủy') || rawStatus.includes('Hủy')) {
           category = 'cancelled';
           badgeClass = 'badge-danger';
-          badgeText = 'Đã Hủy Đơn';
+          badgeText = 'Đã Hủy';
           cancelledCount++;
         } else if (rawStatus.includes('hoàn thành') || rawStatus.includes('Hoàn thành') || rawStatus.includes('thanh toán') || rawStatus.includes('Thanh toán')) {
           category = 'completed';
           badgeClass = 'badge-blue';
-          badgeText = 'Đã Hoàn Thành Trận';
+          badgeText = 'Hoàn Thành';
           completedCount++;
         } else {
           category = 'upcoming';
@@ -781,7 +781,7 @@
             </div>
             <div class="b-card-body">
               <div>
-                <div class="b-info-title">${courtLabel} (Thảm BWF)</div>
+                <div class="b-info-title">${courtLabel}</div>
                 <div class="b-info-sub">
                   <span>${branchLabel}</span>
                   <span>Ngày chơi: <strong>${dateLabel}</strong> | Khung giờ: <strong>${slotLabel}</strong></span>
@@ -790,23 +790,23 @@
               </div>
 
               <div>
-                <div class="b-price-item">Tổng tiền dịch vụ: <strong>${total.toLocaleString('vi-VN')} đ</strong></div>
-                <div class="b-price-item" style="color: var(--cust-primary-hover); margin: 3px 0;">Đã cọc: <strong>${deposit.toLocaleString('vi-VN')} đ (VietQR)</strong></div>
-                <div class="b-price-item">Thanh toán tại quầy: <strong style="color: var(--cust-accent);">${remaining.toLocaleString('vi-VN')} đ</strong></div>
+                <div class="b-price-item">Tổng tiền: <strong>${total.toLocaleString('vi-VN')} đ</strong></div>
+                <div class="b-price-item" style="color: var(--cust-primary-hover); margin: 3px 0;">Đã cọc: <strong>${deposit.toLocaleString('vi-VN')} đ</strong></div>
+                <div class="b-price-item">Còn lại: <strong style="color: var(--cust-accent);">${remaining.toLocaleString('vi-VN')} đ</strong></div>
               </div>
 
               <div class="b-actions" id="actions-${item.bookingCode}">
                 ${category === 'upcoming' ? `
                   <button type="button" class="btn btn-primary" onclick="openQrModal('${item.bookingCode}', '${courtLabel}', '${slotLabel}', '${dateLabel}', '${remaining.toLocaleString('vi-VN')} đ')">
                     <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                    Mã Vé Check-in QR
+                    Mã Check-in QR
                   </button>
                   <button type="button" class="btn btn-outline" style="color: #dc2626; border-color: #fca5a5;" onclick="handleCancelRequest('${item.bookingCode}', 5, ${deposit})">
                     Hủy Đặt Sân
                   </button>
                 ` : category === 'completed' ? `
                   <button type="button" class="btn btn-outline" onclick="openReviewModal('${item.bookingCode}', '${courtLabel}')">
-                    Đánh Giá Sân (5 sao)
+                    Đánh Giá
                   </button>
                   <a href="/customer/booking" class="btn btn-outline">
                     Đặt Lại Sân Này
@@ -883,8 +883,8 @@
     async function handleCancelRequest(code, hoursBeforeMatch, depositAmount) {
       const isFullRefund = hoursBeforeMatch >= 4;
       const confirmText = isFullRefund
-        ? `Thời gian đến giờ chơi còn hơn ${hoursBeforeMatch} tiếng.\nBạn được HOÀN LẠI 100% TIỀN CỌC (${Number(depositAmount).toLocaleString('vi-VN')} đ).\n\nXác nhận hủy đơn ${code}?`
-        : `Cảnh báo: Thời gian đến giờ chơi dưới 4 tiếng.\nTheo quy chế, hệ thống không áp dụng hoàn cọc.\n\nBạn có chắc chắn muốn hủy đơn ${code}?`;
+        ? `Thời gian đến giờ chơi còn hơn ${hoursBeforeMatch} tiếng.\nBạn được hoàn 100% tiền cọc (${Number(depositAmount).toLocaleString('vi-VN')} đ).\n\nXác nhận hủy đơn ${code}?`
+        : `Thời gian đến giờ chơi dưới 4 tiếng (không áp dụng hoàn tiền).\n\nBạn có chắc chắn muốn hủy đơn ${code}?`;
 
       if (!confirm(confirmText)) return;
 
@@ -896,9 +896,9 @@
         });
 
         if (res.ok) {
-          showToast(`Đã hủy đặt sân ${code} thành công! Cơ sở dữ liệu đã cập nhật trạng thái 'Đã hủy'.`, 'success');
+          showToast(`Đã hủy đặt sân ${code} thành công!`, 'success');
         } else {
-          showToast(`Đã hủy đặt sân ${code} trên hệ thống!`, 'info');
+          showToast(`Đã gửi yêu cầu hủy đơn ${code}!`, 'info');
         }
 
         // Dynamically update card in UI
@@ -908,13 +908,13 @@
           const badge = document.getElementById(`badge-${code}`);
           if (badge) {
             badge.className = 'badge badge-danger';
-            badge.textContent = 'Đã Hủy Đơn';
+            badge.textContent = 'Đã Hủy';
           }
           const actions = document.getElementById(`actions-${code}`);
           if (actions) {
             actions.innerHTML = `
               <button type="button" class="btn btn-outline" disabled style="opacity: 0.6; cursor: not-allowed;">
-                Đã Hủy Hoàn Tất
+                Đã Hủy
               </button>
             `;
           }
@@ -962,7 +962,7 @@
           <span style="font-size: 18px; font-weight: 900; color: #ffffff;">UTE SPORT ARENA</span>
         </div>
         <p style="line-height: 1.6; margin-bottom: 18px;">
-          Hệ thống chuỗi sân cầu lông tiêu chuẩn quốc tế BWF. Tiên phong ứng dụng công nghệ khóa giữ chỗ thời gian thực, đối soát thanh toán tự động VietQR và dịch vụ chăm sóc người chơi hàng đầu.
+          Hệ thống chuỗi sân cầu lông tiêu chuẩn quốc tế BWF với cơ sở vật chất hiện đại, dịch vụ đặt sân chuyên nghiệp và tiện nghi cao cấp.
         </p>
         <div>
           <span style="color: #6ee7b7; font-weight: 700;">Hotline Đặt Sân:</span>
@@ -987,8 +987,8 @@
           <li><a href="/customer/booking">Đặt Sân Trực Tuyến</a></li>
           <li><a href="/customer/tournaments">Đăng Ký Giải Đấu UTE</a></li>
           <li><a href="/customer/profile">Tích Điểm Thẻ Hội Viên</a></li>
-          <li><a href="/customer/history">Tra Cứu Lịch Sử & Check-in</a></li>
-          <li><a href="/customer/policy">Chính Sách Hoàn Cọc 100%</a></li>
+          <li><a href="/customer/history">Lịch Sử Đặt Sân</a></li>
+          <li><a href="/customer/policy">Chính Sách & Quy Định</a></li>
         </ul>
       </div>
 
@@ -1010,7 +1010,7 @@
       </div>
       <div style="display: flex; gap: 20px;">
         <span>Tiêu chuẩn thảm thi đấu BWF</span>
-        <span>Thanh toán VietQR tự động</span>
+        <span>Thanh toán VietQR tiện lợi</span>
         <span>Hỗ trợ kỹ thuật 24/7</span>
       </div>
     </div>

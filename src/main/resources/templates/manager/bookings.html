@@ -457,7 +457,7 @@
                     <option value="Đang sử dụng">Đang sử dụng</option>
                     <option value="Hoàn thành">Hoàn thành</option>
                     <option value="Đã hủy">Đã hủy</option>
-                    <option value="Đã cọc 30%">Đã cọc 30%</option>
+                    <option value="Đã cọc">Đã cọc</option>
                   </select>
                 </div>
                 <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;" id="recordsCountText">7 / 7 bản ghi</span>
@@ -600,7 +600,7 @@
                   <option value="Đã xác nhận" selected>Đã xác nhận</option>
                   <option value="Đang sử dụng">Đang sử dụng</option>
                   <option value="Hoàn thành">Hoàn thành</option>
-                  <option value="Đã cọc 30%">Đã cọc 30%</option>
+                  <option value="Đã cọc">Đã cọc</option>
                   <option value="Quá giờ check-in">Quá giờ check-in (Cảnh báo)</option>
                   <option value="Đã hủy">Đã hủy</option>
                 </select>
@@ -671,6 +671,7 @@
         case 'Đang sử dụng': return 'badge-in-use';
         case 'Đã xác nhận': return 'badge-available';
         case 'Chờ xác nhận': return 'badge-pending';
+        case 'Đã cọc':
         case 'Đã cọc 30%': return 'badge-pending';
         case 'Hoàn thành': return 'badge-completed';
         case 'Đã hủy': return 'badge-danger';
@@ -687,7 +688,7 @@
     function updateStats() {
       const total = bookings.length;
       const pending = bookings.filter(b => b.status === 'Chờ xác nhận').length;
-      const confirmed = bookings.filter(b => b.status === 'Đã xác nhận' || b.status === 'Đã cọc 30%').length;
+      const confirmed = bookings.filter(b => b.status === 'Đã xác nhận' || b.status === 'Đã cọc' || b.status === 'Đã cọc 30%').length;
       const rev = bookings.filter(b => b.status !== 'Đã hủy').reduce((acc, cur) => acc + (cur.price || 0), 0);
 
       const elTotal = document.getElementById('statTotalCount');
