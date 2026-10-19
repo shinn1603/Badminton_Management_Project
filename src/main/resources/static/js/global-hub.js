@@ -53,10 +53,18 @@ function updateThemeIcon(theme) {
 // 2. Sidebar Toggle & State
 function toggleSidebar() {
   const sidebar = document.getElementById('appSidebar') || document.querySelector('.sidebar');
+  const sbBackdrop = document.getElementById('sidebarMobileBackdrop');
   if (sidebar) {
-    sidebar.classList.toggle('collapsed');
-    const isCollapsed = sidebar.classList.contains('collapsed');
-    localStorage.setItem('sidebar_collapsed', isCollapsed ? 'true' : 'false');
+    if (window.innerWidth <= 768) {
+      sidebar.classList.toggle('mobile-open');
+      if (sbBackdrop) {
+        sbBackdrop.classList.toggle('open', sidebar.classList.contains('mobile-open'));
+      }
+    } else {
+      sidebar.classList.toggle('collapsed');
+      const isCollapsed = sidebar.classList.contains('collapsed');
+      localStorage.setItem('sidebar_collapsed', isCollapsed ? 'true' : 'false');
+    }
   }
 }
 
@@ -379,4 +387,288 @@ function showToast(message, type = 'success') {
     }
   });
 })();
+
+// =========================================================================
+// 8. MOBILE RESPONSIVE NAVIGATION SYSTEM (BOTTOM TAB BAR + OFF-CANVAS DRAWER)
+// =========================================================================
+(function initMobileNavSystem() {
+  function setupMobileNav() {
+    const p = window.location.pathname.toLowerCase();
+    const isCustomerPage = p.startsWith('/customer/') || p === '/' || p.startsWith('/booking') || document.querySelector('.cust-navbar');
+    const isAuthPage = p.startsWith('/customer/auth') || p.startsWith('/customer/login') || p === '/login';
+
+    // 1. Customer Pages: Inject Mobile Bottom Navigation Bar & Mobile Off-Canvas Drawer
+    if (isCustomerPage && !isAuthPage) {
+      document.body.classList.add('has-mobile-nav');
+
+      // 1.1 Mobile Bottom Navigation Bar
+      if (!document.getElementById('mobileBottomNav')) {
+        const bottomNav = document.createElement('nav');
+        bottomNav.id = 'mobileBottomNav';
+        bottomNav.className = 'mobile-bottom-nav';
+        bottomNav.setAttribute('aria-label', 'Điều hướng dưới chân trang');
+
+        const isHome = p === '/' || p === '/customer/home';
+        const isBooking = p.startsWith('/customer/booking') || p.startsWith('/booking');
+        const isTournaments = p.startsWith('/customer/tournaments');
+        const isHistory = p.startsWith('/customer/history');
+        const isProfile = p.startsWith('/customer/profile');
+
+        bottomNav.innerHTML = `
+          <a href="/customer/home" class="mob-nav-item ${isHome ? 'active' : ''}">
+            <div class="mob-nav-icon">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </div>
+            <span class="mob-nav-label">Trang chủ</span>
+          </a>
+          <a href="/customer/tournaments" class="mob-nav-item ${isTournaments ? 'active' : ''}">
+            <div class="mob-nav-icon">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+            </div>
+            <span class="mob-nav-label">Giải đấu</span>
+          </a>
+          <a href="/customer/booking" class="mob-nav-item mob-nav-booking ${isBooking ? 'active' : ''}">
+            <div class="mob-nav-highlight-btn">
+              <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="12" y1="14" x2="12" y2="18"></line><line x1="10" y1="16" x2="14" y2="16"></line></svg>
+            </div>
+            <span class="mob-nav-label">Đặt sân</span>
+          </a>
+          <a href="/customer/history" class="mob-nav-item ${isHistory ? 'active' : ''}">
+            <div class="mob-nav-icon">
+              <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <span class="mob-nav-label">Lịch sử</span>
+          </a>
+          <a href="/customer/profile" class="mob-nav-item ${isProfile ? 'active' : ''}">
+            <div class="mob-nav-icon">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <span class="mob-nav-label">Hội viên</span>
+          </a>
+        `;
+        document.body.appendChild(bottomNav);
+      }
+
+      // 1.2 Hamburger Button in Top Navbar
+      const navActions = document.querySelector('.cust-nav-actions');
+      if (navActions && !document.getElementById('btnCustomerMenuOpen')) {
+        const hamburgerBtn = document.createElement('button');
+        hamburgerBtn.type = 'button';
+        hamburgerBtn.id = 'btnCustomerMenuOpen';
+        hamburgerBtn.className = 'cust-hamburger-btn';
+        hamburgerBtn.title = 'Mở danh mục';
+        hamburgerBtn.setAttribute('aria-label', 'Mở danh mục');
+        hamburgerBtn.innerHTML = `
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        `;
+        hamburgerBtn.addEventListener('click', toggleCustomerDrawer);
+        navActions.appendChild(hamburgerBtn);
+      }
+
+      // 1.3 Off-Canvas Slide Drawer
+      if (!document.getElementById('mobileNavDrawer')) {
+        const backdrop = document.createElement('div');
+        backdrop.id = 'mobileDrawerBackdrop';
+        backdrop.className = 'mobile-drawer-backdrop';
+        backdrop.addEventListener('click', closeCustomerDrawer);
+        document.body.appendChild(backdrop);
+
+        const drawer = document.createElement('aside');
+        drawer.id = 'mobileNavDrawer';
+        drawer.className = 'mobile-nav-drawer';
+
+        let user = null;
+        try {
+          const raw = localStorage.getItem('utesport_user');
+          if (raw) user = JSON.parse(raw);
+        } catch (e) {}
+
+        const userSectionHtml = user && user.fullName ? `
+          <div class="drawer-user-card">
+            <div class="drawer-user-avatar">${(user.fullName || 'KH').substring(0, 2).toUpperCase()}</div>
+            <div class="drawer-user-info">
+              <div class="drawer-user-name">${user.fullName}</div>
+              <div class="drawer-user-tier">${user.tier || 'HỘI VIÊN TIÊU CHUẨN'}</div>
+            </div>
+          </div>
+          <div class="drawer-user-quick-actions">
+            <a href="/customer/profile" class="drawer-quick-btn">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <span>Hồ sơ & Điểm</span>
+            </a>
+            <button type="button" class="drawer-quick-btn danger" onclick="if(window.RBAC && window.RBAC.logoutCustomer) window.RBAC.logoutCustomer(); else { localStorage.clear(); window.location.href='/customer/auth'; }">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <span>Đăng xuất</span>
+            </button>
+          </div>
+        ` : `
+          <div class="drawer-guest-card">
+            <div class="drawer-guest-title">Chào mừng quý khách!</div>
+            <div class="drawer-guest-sub">Đăng nhập để nhận ưu đãi cọc 30% và tích điểm đổi giờ chơi miễn phí.</div>
+            <a href="/customer/auth" class="drawer-login-btn">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+              <span>Đăng Nhập / Đăng Ký</span>
+            </a>
+          </div>
+        `;
+
+        const isHome = p === '/' || p === '/customer/home';
+        const isBooking = p.startsWith('/customer/booking') || p.startsWith('/booking');
+        const isTournaments = p.startsWith('/customer/tournaments');
+        const isHistory = p.startsWith('/customer/history');
+        const isProfile = p.startsWith('/customer/profile');
+
+        drawer.innerHTML = `
+          <div class="drawer-header">
+            <div class="drawer-brand">
+              <div class="drawer-brand-icon">
+                <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+              </div>
+              <div>
+                <div class="drawer-brand-title">UTE SPORT</div>
+                <div class="drawer-brand-sub">Hệ Thống Cầu Lông</div>
+              </div>
+            </div>
+            <button type="button" class="drawer-close-btn" id="btnCustomerDrawerClose" aria-label="Đóng menu">
+              <svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+
+          <div class="drawer-body">
+            ${userSectionHtml}
+
+            <div class="drawer-nav-section">
+              <div class="drawer-section-title">DANH MỤC TRẢI NGHIỆM</div>
+              <nav class="drawer-nav-list">
+                <a href="/customer/home" class="drawer-nav-link ${isHome ? 'active' : ''}">
+                  <span class="drawer-nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span>
+                  <span>Trang chủ</span>
+                  <svg class="drawer-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </a>
+                <a href="/customer/booking" class="drawer-nav-link ${isBooking ? 'active' : ''}">
+                  <span class="drawer-nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
+                  <span>Đặt sân trực tuyến</span>
+                  <span class="drawer-badge-hot">HOT</span>
+                  <svg class="drawer-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </a>
+                <a href="/customer/tournaments" class="drawer-nav-link ${isTournaments ? 'active' : ''}">
+                  <span class="drawer-nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg></span>
+                  <span>Giải đấu & Sự kiện</span>
+                  <svg class="drawer-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </a>
+                <a href="/customer/history" class="drawer-nav-link ${isHistory ? 'active' : ''}">
+                  <span class="drawer-nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
+                  <span>Lịch sử đặt sân</span>
+                  <svg class="drawer-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </a>
+                <a href="/customer/profile" class="drawer-nav-link ${isProfile ? 'active' : ''}">
+                  <span class="drawer-nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
+                  <span>Hội viên & Điểm thưởng</span>
+                  <svg class="drawer-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </a>
+                <a href="/customer/policy" class="drawer-nav-link ${p.startsWith('/customer/policy') ? 'active' : ''}">
+                  <span class="drawer-nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>
+                  <span>Bảng giá & Chính sách</span>
+                  <svg class="drawer-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </a>
+              </nav>
+            </div>
+
+            <div class="drawer-support-box">
+              <div class="drawer-support-title">HỖ TRỢ TRỰC TIẾP</div>
+              <div class="drawer-support-item">
+                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                <div>
+                  <div class="drawer-support-label">Hotline 24/7:</div>
+                  <a href="tel:0987654321" class="drawer-support-phone">0987.654.321</a>
+                </div>
+              </div>
+              <div class="drawer-support-hours">Giờ phục vụ: 05:00 - 23:00 hàng ngày</div>
+            </div>
+          </div>
+
+          <div class="drawer-footer">
+            <button type="button" class="drawer-theme-toggle" onclick="toggleTheme()">
+              <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+              <span>Đổi giao diện Sáng / Tối</span>
+            </button>
+          </div>
+        `;
+
+        document.body.appendChild(drawer);
+        document.getElementById('btnCustomerDrawerClose').addEventListener('click', closeCustomerDrawer);
+      }
+    }
+
+    // 2. Internal / Management Pages: Sidebar Off-Canvas Support on Mobile
+    const sidebar = document.getElementById('appSidebar') || document.querySelector('.sidebar');
+    if (sidebar) {
+      if (!document.getElementById('sidebarMobileBackdrop')) {
+        const sbBackdrop = document.createElement('div');
+        sbBackdrop.id = 'sidebarMobileBackdrop';
+        sbBackdrop.className = 'sidebar-mobile-backdrop';
+        sbBackdrop.addEventListener('click', () => {
+          sidebar.classList.remove('mobile-open');
+          sbBackdrop.classList.remove('open');
+        });
+        document.body.appendChild(sbBackdrop);
+      }
+
+      sidebar.querySelectorAll('.menu-item, a').forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth <= 768) {
+            sidebar.classList.remove('mobile-open');
+            const sbBackdrop = document.getElementById('sidebarMobileBackdrop');
+            if (sbBackdrop) sbBackdrop.classList.remove('open');
+          }
+        });
+      });
+
+      document.querySelectorAll('.btn-sidebar-toggle, #btnToggleSidebar, [onclick*="toggleSidebar"]').forEach(btn => {
+        btn.onclick = function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleSidebar();
+        };
+      });
+    }
+  }
+
+  function toggleCustomerDrawer() {
+    const drawer = document.getElementById('mobileNavDrawer');
+    const backdrop = document.getElementById('mobileDrawerBackdrop');
+    if (!drawer) return;
+    const isOpen = drawer.classList.contains('open');
+    if (isOpen) {
+      closeCustomerDrawer();
+    } else {
+      drawer.classList.add('open');
+      if (backdrop) backdrop.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeCustomerDrawer() {
+    const drawer = document.getElementById('mobileNavDrawer');
+    const backdrop = document.getElementById('mobileDrawerBackdrop');
+    if (drawer) drawer.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  window.toggleCustomerDrawer = toggleCustomerDrawer;
+  window.closeCustomerDrawer = closeCustomerDrawer;
+  window.toggleSidebar = toggleSidebar;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupMobileNav);
+  } else {
+    setupMobileNav();
+  }
+})();
+
 
