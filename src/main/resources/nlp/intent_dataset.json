@@ -6,10 +6,10 @@
         "xin chào", "chào bot", "hello", "hi shop", "chào bạn", "alo", "ad ơi", "admin ơi", "chào admin",
         "xin chao", "chao bot", "hi admin", "alo bot", "ad oi", "chao em", "cho mình hỏi", "cho e hoi",
         "bắt đầu lại", "làm mới hội thoại", "reset", "xóa lịch sử", "bat dau lai", "lam moi", "quay lại từ đầu",
-        "chào trợ lý ảo", "bắt đầu", "start", "menu chính", "về trang chủ"
+        "chào trợ lý ảo", "bắt đầu", "start", "menu chính", "về trang chủ", "help me", "giúp tôi với", "huong dan"
       ],
       "responses": [
-        "Xin chào bạn! Tôi là trợ lý ảo chính thức của Chuỗi Sân Cầu Lông UTE Sport. Tôi có thể giúp bạn tìm chi nhánh, tra cứu lịch sân trống và đặt sân giữ chỗ tức thì."
+        "Xin chào bạn! Tôi là trợ lý ảo chính thức của Chuỗi Sân Cầu Lông UTE Sport. Tôi có thể hỗ trợ bạn mọi thông tin: Đặt sân giữ chỗ, tra cứu sân trống, bảng giá, cơ sở vật chất, thuê vợt & phụ kiện, giải đấu, chính sách tích điểm hội viên và nội quy sân bãi. Bạn đang quan tâm dịch vụ nào?"
       ]
     },
     {
@@ -19,34 +19,37 @@
         "dat san", "toi muon dat san", "dat san cho toi", "dat di", "dat luon", "dong y dat", "tien hanh dat",
         "ok đặt sân", "ok dat san", "chốt sân này nha", "chot san", "giữ chỗ sân này", "giu cho", "book sân nhé",
         "book san", "đặt giúp mình", "dat giup minh", "lấy sân này nhé", "xác nhận đặt sân", "xac nhan dat",
-        "đồng ý giữ chỗ", "dong y giu cho", "tạo đơn đặt sân", "tao don", "đặt ca này nha"
+        "đồng ý giữ chỗ", "dong y giu cho", "tạo đơn đặt sân", "tao don", "đặt ca này nha", "lấy sân này đi"
       ],
       "responses": [
         "Hệ thống đã ghi nhận yêu cầu đặt sân và tiến hành tạo đơn giữ chỗ thời gian thực cho bạn."
       ]
     },
     {
-      "tag": "CHECK_BOOKING",
+      "tag": "SEARCH_SLOTS",
       "patterns": [
-        "kiểm tra đơn", "tra cứu đơn", "xem đơn của tôi", "kiểm tra mã đặt sân", "xem lại đơn", "đơn đặt chỗ của tôi",
-        "kiem tra don", "tra cuu don", "xem don cua toi", "kiem tra ma dat san", "xem lai don", "don dat cho",
-        "mã đơn", "ma don", "kiểm tra vé", "tra cuu ve", "xem vé điện tử", "đơn DS", "check đơn", "check ma don",
-        "tôi đã đặt sân thành công chưa", "toi da dat san chua", "tìm thông tin đơn", "xem lịch đặt của tôi"
+        "hôm nay còn sân trống không", "tối nay có sân nào trống không", "sân trống lúc 18h", "còn sân lúc 19h không",
+        "hom nay con san trong khong", "toi nay co san nao trong khong", "san trong luc 18h", "con san luc 19h khong",
+        "check lịch trống ngày mai", "ngày mai còn sân lúc 20h không", "tìm sân từ 18h đến 20h", "có sân nào trống không",
+        "check lich trong", "ngay mai con san khong", "tim san trong", "khung giờ nào còn trống",
+        "kiểm tra sân trống", "xem lịch sân", "thứ 7 còn sân không", "chủ nhật có sân không", "sân trống chiều nay",
+        "gio nao con trong", "sân nào còn trống", "xem gio trong"
       ],
       "responses": [
-        "Bạn vui lòng cung cấp mã đơn (ví dụ: DS001234) hoặc số điện thoại đặt sân để tôi tra cứu trạng thái đơn ngay lập tức."
+        "Hệ thống đang kiểm tra danh sách sân trống theo thời gian thực tại các chi nhánh cho bạn."
       ]
     },
     {
-      "tag": "CANCEL_BOOKING",
+      "tag": "PRICING_INFO",
       "patterns": [
-        "hủy sân", "tôi muốn hủy sân", "hủy đơn đặt sân", "hủy lịch chơi", "chính sách hủy sân", "hủy có được hoàn tiền không",
-        "huy san", "toi muon huy san", "huy don dat san", "huy lich choi", "chinh sach huy", "hoan tien coc",
-        "hủy ca chơi", "huy ca choi", "bận việc không đi được muốn hủy", "đổi ý muốn hủy", "hủy sân trước mấy tiếng",
-        "cách hủy sân", "cach huy san", "hoàn cọc khi hủy", "làm sao để hủy đặt sân"
+        "giá thuê sân bao nhiêu", "bảng giá", "giá thuê 1 tiếng", "thuê sân bao nhiêu tiền", "bảng giá giờ cao điểm",
+        "gia thue san bao nhieu", "bang gia", "gia thue 1 tieng", "thue san bao nhieu tien", "gia gio cao diem",
+        "giá ban ngày", "giá ban đêm", "giá sân vip", "sinh viên có được giảm giá không", "khung giờ vàng",
+        "gia ban ngay", "gia buoi toi", "gia san yonex", "giam gia sinh vien", "thuê vợt bao nhiêu",
+        "tiền sân 2 tiếng hết bao nhiêu", "chi phí thuê sân", "bảng giá chi tiết", "phụ thu cuối tuần bao nhiêu"
       ],
       "responses": [
-        "Chính sách hủy sân UTE Sport: Bạn được phép hủy và hoàn lại 100% tiền cọc nếu thực hiện trước giờ chơi tối thiểu 12 tiếng. Nếu sát giờ chơi, tiền cọc sẽ không được hoàn lại."
+        "Biểu phí thuê sân tiêu chuẩn tại UTE Sport:\n• Khung giờ tiêu chuẩn (05:30 - 17:00): 80.000đ - 100.000đ/giờ\n• Khung Giờ Vàng (17:00 - 21:00): 140.000đ/giờ (Thảm Yonex BWF cao cấp)\n• Khung giờ muộn (21:00 - 22:30): 90.000đ/giờ\n• Cuối tuần (T7, CN): Phụ thu 15.000đ/giờ. Sinh viên UTE được giảm 10% khi xuất trình thẻ sinh viên."
       ]
     },
     {
@@ -59,33 +62,113 @@
         "có mấy cơ sở", "co may co so", "đường đi đến sân", "vị trí sân cầu lông", "chi nhánh nào gần tôi nhất"
       ],
       "responses": [
-        "Hệ thống UTE Sport hiện có 3 chi nhánh: CN01 tại Thủ Đức (Số 1 Võ Văn Ngân), CN02 tại Quận 9 (Lê Văn Việt), và CN03 tại Bình Thạnh (Điện Biên Phủ). Bạn đang ở khu vực nào để tôi gợi ý cơ sở gần nhất?"
+        "Hệ thống UTE Sport hiện có các cơ sở:\n• CN01 (Thủ Đức): Số 1 Võ Văn Ngân, TP. Thủ Đức (Cạnh ĐH Sư Phạm Kỹ Thuật)\n• CN02 (Bình Thạnh): Số 234 Điện Biên Phủ, P. 25, Q. Bình Thạnh (Gần ngã tư Hàng Xanh)\n• CN03 (Quận 9): Số 70 Đỗ Xuân Hợp, P. Phước Long B, TP. Thủ Đức (Gần Khu Công Nghệ Cao)\nMở cửa từ 05:30 đến 22:30 mỗi ngày."
       ]
     },
     {
-      "tag": "PRICING_INFO",
+      "tag": "CHECK_BOOKING",
       "patterns": [
-        "giá thuê sân bao nhiêu", "bảng giá", "giá thuê 1 tiếng", "thuê sân bao nhiêu tiền", "bảng giá giờ cao điểm",
-        "gia thue san bao nhieu", "bang gia", "gia thue 1 tieng", "thue san bao nhieu tien", "gia gio cao diem",
-        "giá ban ngày", "giá ban đêm", "giá sân vip", "sinh viên có được giảm giá không", "khung giờ vàng",
-        "gia ban ngay", "gia buoi toi", "gia san yonex", "giam gia sinh vien", "thuê vợt bao nhiêu",
-        "tiền sân 2 tiếng hết bao nhiêu", "chi phí thuê sân", "bảng giá chi tiết"
+        "kiểm tra đơn", "tra cứu đơn", "xem đơn của tôi", "kiểm tra mã đặt sân", "xem lại đơn", "đơn đặt chỗ của tôi",
+        "kiem tra don", "tra cuu don", "xem don cua toi", "kiem tra ma dat san", "xem lai don", "don dat cho",
+        "mã đơn", "ma don", "kiểm tra vé", "tra cuu ve", "xem vé điện tử", "đơn DS", "check đơn", "check ma don",
+        "tôi đã đặt sân thành công chưa", "toi da dat san chua", "tìm thông tin đơn", "xem lịch đặt của tôi"
       ],
       "responses": [
-        "Bảng giá UTE Sport: Khung giờ tiêu chuẩn (05:00 - 17:00) từ 80.000đ - 100.000đ/giờ; Khung giờ cao điểm (17:00 - 23:00) từ 120.000đ - 140.000đ/giờ (Sân VIP Yonex). Học sinh sinh viên UTE được giảm 10% khi xuất trình thẻ."
+        "Bạn vui lòng cung cấp mã đơn (ví dụ: DS001234) hoặc số điện thoại đặt chỗ để tôi kiểm tra trạng thái vé và lịch thi đấu ngay lập tức."
       ]
     },
     {
-      "tag": "SEARCH_SLOTS",
+      "tag": "CANCEL_BOOKING",
       "patterns": [
-        "hôm nay còn sân trống không", "tối nay có sân nào trống không", "sân trống lúc 18h", "còn sân lúc 19h không",
-        "hom nay con san trong khong", "toi nay co san nao trong khong", "san trong luc 18h", "con san luc 19h khong",
-        "check lịch trống ngày mai", "ngày mai còn sân lúc 20h không", "tìm sân từ 18h đến 20h", "có sân nào trống không",
-        "check lich trong", "ngay mai con san khong", "tim san trong", "khung giờ nào còn trống",
-        "kiểm tra sân trống", "xem lịch sân", "thứ 7 còn sân không", "chủ nhật có sân không"
+        "hủy sân", "tôi muốn hủy sân", "hủy đơn đặt sân", "hủy lịch chơi", "chính sách hủy sân", "hủy có được hoàn tiền không",
+        "huy san", "toi muon huy san", "huy don dat san", "huy lich choi", "chinh sach huy", "hoan tien coc",
+        "hủy ca chơi", "huy ca choi", "bận việc không đi được muốn hủy", "đổi ý muốn hủy", "hủy sân trước mấy tiếng",
+        "cách hủy sân", "cach huy san", "hoàn cọc khi hủy", "làm sao để hủy đặt sân", "hủy đơn DS"
       ],
       "responses": [
-        "Hệ thống đang kiểm tra danh sách sân trống theo thời gian thực tại các chi nhánh cho bạn."
+        "Chính sách hủy sân & hoàn cọc UTE Sport:\n• Hủy trước giờ chơi trên 4 tiếng: Hoàn cọc 100% vào ví tích điểm hoặc số tài khoản đăng ký.\n• Hủy dưới 4 tiếng trước giờ chơi: Không hỗ trợ hoàn cọc nhằm bù đắp chi phí giữ sân và điện nước chuẩn bị.\nĐể hủy đơn, bạn chỉ cần nhập 'Hủy đơn DSxxxxxx' kèm lý do."
+      ]
+    },
+    {
+      "tag": "COURT_FACILITIES",
+      "patterns": [
+        "thông tin sân", "sân có những gì", "cơ sở vật chất", "loại thảm gì", "thảm yonex hay enlio",
+        "thong tin san", "co so vat chat", "loai tham gi", "tham cau long", "đèn chiếu sáng thế nào",
+        "sân có máy lạnh không", "sân có quạt không", "có chỗ đậu xe ô tô không", "bãi giữ xe máy thế nào",
+        "co cho dau o to khong", "bai xe may", "sân có phòng tắm không", "phòng tắm nóng lạnh", "phòng thay đồ",
+        "phong tam", "phong thay do", "sân có wifi không", "chiều cao trần bao nhiêu", "tiêu chuẩn sân bwf",
+        "sân có quầy nước không", "tiện ích sân", "sân có khán đài không", "khán đài xem đấu"
+      ],
+      "responses": [
+        "Cơ sở vật chất & Tiện ích tại Chuỗi Sân UTE Sport:\n• Mặt sân: 100% thảm Yonex & Enlio dày 5.0mm đạt chuẩn thi đấu quốc tế BWF, độ bám cao chống trơn trượt và giảm chấn khớp gối.\n• Ánh sáng & Không gian: Hệ thống đèn LED rọi chống lóa cao cấp, trần cao 9.5m thông thoáng, quạt công nghiệp mát mẻ.\n• Tiện ích đi kèm: Bãi đỗ ô tô và xe máy rộng rãi có bảo vệ 24/7, phòng tắm nóng lạnh & phòng thay đồ miễn phí, Wifi tốc độ cao phủ kín sân."
+      ]
+    },
+    {
+      "tag": "SERVICES_EQUIPMENT",
+      "patterns": [
+        "cho thuê vợt", "thuê vợt cầu lông", "ở đây có cho thuê vợt không", "thuê giày cầu lông", "có bán cầu lông không",
+        "thue vot", "thue giay", "mua cau long", "ban cau", "căng cước vợt", "đan vợt", "dan vot", "cang cuoc",
+        "có nước uống không", "quầy nước f&b", "bán nước revive", "pocari", "aquafina", "quấn cán vợt",
+        "dịch vụ đi kèm", "dich vu di kem", "mua quả cầu", "thuê dụng cụ", "thue dung cu", "phụ kiện cầu lông"
+      ],
+      "responses": [
+        "Dịch vụ & Thiết bị thể thao tại quầy lễ tân UTE Sport:\n• Cho thuê vợt thi đấu: Yonex Astrox, Victor Thruster (50.000đ/ca).\n• Cho thuê giày chuyên dụng đế kếp: Đủ size từ 37 - 44 (20.000đ/đôi).\n• Bán quả cầu lông chính hãng: Cầu Yonex AS-40, VinaStar, Thành Công 77 (bán theo ống hoặc lẻ quả).\n• Dịch vụ đan vợt điện tử: Cước Yonex BG65 (120k), BG66 Ultimax (160k).\n• Quầy F&B: Đầy đủ Revive, Pocari Sweat, Aquafina, RedBull, Nước điện giải mát lạnh."
+      ]
+    },
+    {
+      "tag": "TOURNAMENTS",
+      "patterns": [
+        "giải đấu", "có giải đấu nào không", "lịch thi đấu giải", "đăng ký tham gia giải", "giải cầu lông sinh viên",
+        "giai dau", "co giai nao khong", "lich thi dau", "dang ky giai", "tournament", "giải thưởng bao nhiêu",
+        "thể thức thi đấu", "đôi nam nữ", "đơn nam", "giải ute mở rộng", "bảng xếp hạng giải đấu", "le phi tham gia giai"
+      ],
+      "responses": [
+        "Hệ thống giải đấu tại UTE Sport:\n• Hiện chuỗi đang mở đăng ký: 'Giải Cầu Lông Sinh Viên UTE Mở Rộng 2026' và 'Giải Đôi Nam Nữ Master UTE'.\n• Tổng giá trị giải thưởng: Lên đến 30.000.000đ tiền mặt kèm cúp và huy chương vàng BWF.\n• Bạn có thể truy cập mục 'Giải Đấu' trên thanh menu để chọn bảng đấu và đăng ký trực tuyến."
+      ]
+    },
+    {
+      "tag": "MEMBERSHIP_LOYALTY",
+      "patterns": [
+        "tích điểm", "hạng thành viên", "thẻ hội viên", "quy chế tích điểm", "đổi điểm thưởng", "voucher giảm giá",
+        "tich diem", "hang thanh vien", "the hoi vien", "diem thuong", "doi voucher", "ưu đãi khách hàng",
+        "hạng đồng bạc vàng", "hạng kim cương", "thành viên vip", "chính sách thành viên", "làm sao để lên hạng"
+      ],
+      "responses": [
+        "Chính sách Hội viên & Điểm thưởng UTE Sport Rewards:\n• Tích lũy tự động: Mỗi 1.000đ chi tiêu thuê sân hoặc mua nước/vợt được tích 1 điểm thưởng.\n• Hạng thành viên:\n  - Đồng (Khởi tạo): Giá gốc tiêu chuẩn.\n  - Bạc (Từ 1.000 điểm): Giảm 5% mọi hóa đơn.\n  - Vàng (Từ 3.000 điểm): Giảm 10% tiền sân + miễn phí thuê vợt.\n  - Kim Cương (Từ 5.000 điểm): Giảm 15% + tặng 1 ống cầu/tháng.\n• Điểm thưởng có thể dùng để thanh toán tiền sân hoặc đổi voucher giảm giá tại trang cá nhân."
+      ]
+    },
+    {
+      "tag": "PAYMENT_METHODS",
+      "patterns": [
+        "phương thức thanh toán", "thanh toán thế nào", "chuyển khoản ngân hàng", "quét mã qr", "vietqr",
+        "phuong thuc thanh toan", "thanh toan the nao", "chuyen khoan", "quet ma qr", "cọc bao nhiêu",
+        "cọc 30 phần trăm", "tiền mặt tại quầy", "có trả tiền mặt được không", "thanh toán thẻ",
+        "có xuất hóa đơn đỏ không", "xuất hóa đơn vat", "xuat hoa don do", "hóa đơn công ty"
+      ],
+      "responses": [
+        "Phương thức thanh toán & Hóa đơn tại UTE Sport:\n• Đặt trực tuyến: Quét mã VietQR tự động qua mọi ứng dụng ngân hàng và ví điện tử, hệ thống giữ chỗ ngay sau 3 giây.\n• Tỷ lệ cọc: Cọc trước 30% giá trị ca chơi khi đặt online, 70% còn lại thanh toán tại quầy khi nhận sân.\n• Tại quầy: Chấp nhận tiền mặt, chuyển khoản VietQR, quẹt thẻ POS.\n• Xuất hóa đơn: Hỗ trợ xuất hóa đơn điện tử VAT (hóa đơn đỏ) cho các công ty/câu lạc bộ có nhu cầu."
+      ]
+    },
+    {
+      "tag": "RULES_REGULATIONS",
+      "patterns": [
+        "nội quy sân", "quy định trang phục", "mang giày gì", "có bắt buộc giày cầu lông không", "giày đế kếp",
+        "noi quy", "quy dinh", "giay de kep", "giay non marking", "đi trễ có bị mất sân không", "thời gian nhận sân",
+        "di tre", "mang thức ăn vào sân", "hút thuốc", "mang thú cưng vào sân", "quy định thi đấu"
+      ],
+      "responses": [
+        "Nội quy sân đấu tại Chuỗi Sân UTE Sport:\n1. Trang phục: Bắt buộc đi giày cầu lông chuyên dụng có đế kếp không để lại vệt màu (Non-marking) để bảo vệ mặt thảm BWF.\n2. Giờ giấc: Quý khách vui lòng đến trước 10 phút để nhận sân. Nếu đi trễ quá 15 phút mà không báo trước, hệ thống có quyền nhượng slot cho khách vãng lai.\n3. Vệ sinh & An toàn: Không hút thuốc, không mang kẹo cao su, rượu bia hoặc thức ăn có dầu mỡ vào khu vực thảm thi đấu."
+      ]
+    },
+    {
+      "tag": "LOST_FOUND_SUPPORT",
+      "patterns": [
+        "quên đồ", "tôi để quên đồ ở sân", "tìm đồ thất lạc", "quên áo", "quên vợt", "bị mất đồ",
+        "quen do", "that lac do", "mat do", "hotline hỗ trợ", "số điện thoại quản lý", "khiếu nại",
+        "gặp nhân viên tư vấn", "gặp hỗ trợ viên", "hotline", "so dien thoai tong dai", "liên hệ ai"
+      ],
+      "responses": [
+        "Hỗ trợ khách hàng & Tìm đồ thất lạc:\n• Đồ để quên: Mọi đồ đạc khách để quên tại sân đều được camera an ninh ghi nhận và lễ tân lưu giữ tại phòng quản lý cơ sở. Bạn vui lòng liên hệ ngay hotline chi nhánh để nhận lại.\n• Hotline khẩn cấp toàn hệ thống: 1900 6868 hoặc 0903.123.456 (Hỗ trợ 05:30 - 23:00 hàng ngày).\n• Khiếu nại dịch vụ: Bạn có thể phản ánh trực tiếp với quản lý ca trực hoặc gửi email về cskh@utesport.vn."
       ]
     },
     {
@@ -97,7 +180,7 @@
         "bài toán lớp 12", "đại số tuyến tính", "ma trận nghịch đảo", "sin cos tan"
       ],
       "responses": [
-        "Dạ tôi là trợ lý ảo hỗ trợ đặt sân tại Chuỗi Sân Cầu Lông UTE Sport, không có tính năng giải bài tập toán học! Bạn có muốn tra cứu giá sân, lịch trống hay đặt lịch chơi cầu lông không ạ?"
+        "Dạ tôi là trợ lý ảo hỗ trợ tại Chuỗi Sân Cầu Lông UTE Sport, không có tính năng giải bài tập toán học! Bạn có muốn tra cứu giá sân, tiện ích bãi xe hay đặt lịch chơi cầu lông không ạ?"
       ]
     },
     {
@@ -109,7 +192,7 @@
         "chiến tranh thế giới thứ 2", "chơi game cùng tôi", "kể chuyện ma", "bạn mấy tuổi rồi"
       ],
       "responses": [
-        "Dạ tôi là trợ lý ảo chuyên hỗ trợ dịch vụ tại Chuỗi Sân Cầu Lông UTE Sport. Tôi chưa được học để trò chuyện về chủ đề này. Tôi có thể hỗ trợ bạn đặt sân, kiểm tra bảng giá hoặc tìm chi nhánh gần nhất nhé!"
+        "Dạ tôi là trợ lý ảo chuyên hỗ trợ dịch vụ tại Chuỗi Sân Cầu Lông UTE Sport. Tôi chưa được học để trò chuyện về chủ đề ngoài lề này. Tôi có thể hỗ trợ bạn thông tin cơ sở vật chất, bảng giá, thuê vợt hoặc cách đặt sân nhé!"
       ]
     }
   ]

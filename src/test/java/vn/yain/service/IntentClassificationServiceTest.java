@@ -32,7 +32,6 @@ public class IntentClassificationServiceTest {
 
     @Test
     void testBookingIntentWithTypo() {
-        // "đặt săm" gõ sai chính tả nhưng character 3-gram vẫn bắt được
         IntentClassificationService.PredictionResult res = service.predict("đặt sân cho mình luôn đi");
         assertEquals("CONFIRM_BOOKING", res.getIntent());
     }
@@ -49,5 +48,53 @@ public class IntentClassificationServiceTest {
         IntentClassificationService.PredictionResult res = service.predict("dạy tôi nấu bún bò huế đi bạn");
         assertEquals("OUT_OF_SCOPE_GENERAL", res.getIntent());
         assertTrue(res.isOutOfScope());
+    }
+
+    @Test
+    void testCourtFacilitiesIntent() {
+        IntentClassificationService.PredictionResult res = service.predict("sân có bãi đỗ xe ô tô và phòng tắm nóng lạnh không");
+        assertEquals("COURT_FACILITIES", res.getIntent());
+        assertFalse(res.isOutOfScope());
+        assertTrue(res.getDefaultResponse().contains("thảm"));
+    }
+
+    @Test
+    void testServicesEquipmentIntent() {
+        IntentClassificationService.PredictionResult res = service.predict("ở đây có cho thuê vợt yonex và thuê giày không shop");
+        assertEquals("SERVICES_EQUIPMENT", res.getIntent());
+        assertFalse(res.isOutOfScope());
+        assertTrue(res.getDefaultResponse().contains("vợt"));
+    }
+
+    @Test
+    void testMembershipLoyaltyIntent() {
+        IntentClassificationService.PredictionResult res = service.predict("làm sao để tích điểm lên hạng thành viên vàng và đổi voucher");
+        assertEquals("MEMBERSHIP_LOYALTY", res.getIntent());
+        assertFalse(res.isOutOfScope());
+        assertTrue(res.getDefaultResponse().contains("điểm"));
+    }
+
+    @Test
+    void testPaymentMethodsIntent() {
+        IntentClassificationService.PredictionResult res = service.predict("công ty tôi muốn thanh toán và xuất hóa đơn vat đỏ có được ko");
+        assertEquals("PAYMENT_METHODS", res.getIntent());
+        assertFalse(res.isOutOfScope());
+        assertTrue(res.getDefaultResponse().contains("hóa đơn"));
+    }
+
+    @Test
+    void testLostAndFoundSupportIntent() {
+        IntentClassificationService.PredictionResult res = service.predict("tôi để quên cái áo khoác và cây vợt ở sân chiều qua");
+        assertEquals("LOST_FOUND_SUPPORT", res.getIntent());
+        assertFalse(res.isOutOfScope());
+        assertTrue(res.getDefaultResponse().contains("quên"));
+    }
+
+    @Test
+    void testRulesRegulationsIntent() {
+        IntentClassificationService.PredictionResult res = service.predict("nội quy sân mang giày gì có bắt buộc giày đế kếp non marking ko");
+        assertEquals("RULES_REGULATIONS", res.getIntent());
+        assertFalse(res.isOutOfScope());
+        assertTrue(res.getDefaultResponse().contains("giày"));
     }
 }

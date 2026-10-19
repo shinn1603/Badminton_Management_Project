@@ -525,7 +525,7 @@ public class ChatbotService {
         // =========================================================================
         // INTENT 5: TRA CỨU GIẢI ĐẤU & LỊCH THI ĐẤU (TOURNAMENTS)
         // =========================================================================
-        if (matches(normalized, "giai dau", "giai cau long", "co giai nao", "lich thi dau", "dang ky giai", "tournament")) {
+        if ("TOURNAMENTS".equals(mlTag) || matches(normalized, "giai dau", "giai cau long", "co giai nao", "lich thi dau", "dang ky giai", "tournament")) {
             List<Tournament> tournaments = tournamentRepository.findAll();
             StringBuilder sb = new StringBuilder("Hệ thống giải đấu cầu lông đang mở đăng ký tại UTE Sport:\n\n");
 
@@ -562,7 +562,7 @@ public class ChatbotService {
         // =========================================================================
         // INTENT 6: DỊCH VỤ ĐI KÈM & THUÊ DỤNG CỤ
         // =========================================================================
-        if (matches(normalized, "thue vot", "co vot khong", "ban cau", "mua cau", "dan vot", "cang vot", "nuoc uong", "dich vu", "phu kien")) {
+        if ("SERVICES_EQUIPMENT".equals(mlTag) || matches(normalized, "thue vot", "co vot khong", "ban cau", "mua cau", "dan vot", "cang vot", "nuoc uong", "dich vu", "phu kien")) {
             String serviceInfo =
                     "Danh mục dịch vụ và thiết bị thể thao tại các cơ sở UTE Sport:\n\n" +
                     "1. Cho thuê vợt thi đấu:\n" +
@@ -687,23 +687,92 @@ public class ChatbotService {
         }
 
         // =========================================================================
-        // INTENT 10: QUY ĐỊNH CỌC VÀ HỦY SÂN
+        // INTENT 10: THÔNG TIN SÂN & CƠ SỞ VẬT CHẤT (COURT_FACILITIES)
         // =========================================================================
-        if (matches(normalized, "coc", "tien coc", "huy san", "hoan tien", "chinh sach", "quy dinh", "noi quy", "giay")) {
-            String policy =
-                    "Chính sách đặt cọc và nội quy sân tại UTE Sport:\n\n" +
-                    "1. Mức cọc: Quý khách cọc trước 30% giá trị ca chơi qua mã VietQR tự động khi đặt trên hệ thống.\n" +
-                    "2. Thời hạn giữ chỗ: Khi bấm đặt sân, hệ thống tạm khóa sân trong 10 phút để quý khách chuyển khoản.\n" +
-                    "3. Chính sách hoàn cọc:\n" +
-                    "   • Hủy trước giờ chơi trên 4 tiếng: Hoàn cọc 100% vào tài khoản thành viên.\n" +
-                    "   • Hủy trong vòng 4 tiếng trước giờ chơi: Không hỗ trợ hoàn cọc để bù đắp chi phí giữ sân.\n" +
-                    "4. Nội quy thi đấu: Quý khách vui lòng mang giày cầu lông đế kếp không để lại vệt màu (Non-marking) và đến trước 10 phút nhận sân.";
-
+        if ("COURT_FACILITIES".equals(mlTag) || matches(normalized, "co so vat chat", "loai tham", "tham yonex", "tham enlio", "may lanh", "quat", "dau xe", "do xe", "bai xe", "phong tam", "phong thay do", "wifi", "anh sang", "chieu cao", "khan dai")) {
             return ChatMessageDto.builder()
                     .sender("bot")
-                    .intent("POLICY")
-                    .text(policy)
-                    .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Các chi nhánh của bạn", "Bảng giá thuê sân"))
+                    .intent("COURT_FACILITIES")
+                    .text("Cơ sở vật chất & Tiện ích tại Chuỗi Sân Cầu Lông UTE Sport:\n\n" +
+                          "• Mặt sân thi đấu: 100% thảm Yonex & Enlio dày 5.0mm đạt chuẩn quốc tế BWF, độ bám cao chống trơn trượt và giảm chấn khớp gối tối đa.\n" +
+                          "• Không gian & Ánh sáng: Hệ thống đèn LED rọi chống chói 500 Lux, trần cao 9.5m thông thoáng, quạt làm mát công nghiệp mát mẻ.\n" +
+                          "• Bãi đỗ xe: Bãi đỗ ô tô và xe máy rộng rãi ngay trong khuôn viên có bảo vệ túc trực và camera an ninh 24/7.\n" +
+                          "• Tiện ích miễn phí: Phòng tắm nóng lạnh & phòng thay đồ riêng biệt nam/nữ, Wifi cáp quang tốc độ cao phủ kín sân.")
+                    .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân", "Chi nhánh nào gần tôi?"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
+        // INTENT 11: HỘI VIÊN & TÍCH LŨY ĐIỂM THƯỞNG (MEMBERSHIP_LOYALTY)
+        // =========================================================================
+        if ("MEMBERSHIP_LOYALTY".equals(mlTag) || matches(normalized, "tich diem", "the hoi vien", "hang thanh vien", "diem thuong", "doi voucher", "dong bac vang", "kim cuong", "vip", "uu dai")) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("MEMBERSHIP_LOYALTY")
+                    .text("Chính sách Hội viên & Điểm thưởng UTE Sport Rewards:\n\n" +
+                          "• Cơ chế tích lũy: Mỗi 1.000 đ chi tiêu thuê sân hoặc mua nước/dụng cụ được tích ngay 1 điểm thưởng.\n" +
+                          "• Các hạng thẻ thành viên:\n" +
+                          "   1. Hạng Đồng (Mới đăng ký): Tận hưởng dịch vụ tiêu chuẩn.\n" +
+                          "   2. Hạng Bạc (Từ 1.000 điểm): Giảm 5% tổng hóa đơn.\n" +
+                          "   3. Hạng Vàng (Từ 3.000 điểm): Giảm 10% tiền sân + miễn phí thuê vợt thi đấu.\n" +
+                          "   4. Hạng Kim Cương (Từ 5.000 điểm): Giảm 15% tiền sân + tặng 1 ống cầu Yonex mỗi tháng.\n\n" +
+                          "Điểm thưởng có thể dùng cấn trừ trực tiếp khi thanh toán tiền sân hoặc đổi voucher giảm giá trên cổng khách hàng.")
+                    .quickReplies(List.of("Bảng giá thuê sân", "Hôm nay có sân nào trống từ 18h đến 20h không?", "Hướng dẫn đặt sân"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
+        // INTENT 12: PHƯƠNG THỨC THANH TOÁN & HÓA ĐƠN VAT (PAYMENT_METHODS)
+        // =========================================================================
+        if ("PAYMENT_METHODS".equals(mlTag) || matches(normalized, "thanh toan the nao", "phuong thuc thanh toan", "chuyen khoan", "quet ma qr", "vietqr", "tien mat", "hoa don do", "vat")) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("PAYMENT_METHODS")
+                    .text("Phương thức thanh toán & Hóa đơn tại UTE Sport:\n\n" +
+                          "1. Đặt sân trực tuyến: Quét mã VietQR chuyển khoản nhanh 24/7 qua mọi ứng dụng ngân hàng hoặc ví điện tử (MoMo, ZaloPay). Hệ thống tự động khóa giữ sân sau 3 giây.\n" +
+                          "2. Mức cọc: Quý khách cọc trước 30% giá trị ca chơi khi đặt online, 70% còn lại thanh toán tại quầy khi nhận sân.\n" +
+                          "3. Thanh toán tại quầy POS: Hỗ trợ tiền mặt, chuyển khoản VietQR, quẹt thẻ ngân hàng (Visa/Master/Napas).\n" +
+                          "4. Xuất hóa đơn VAT: Hỗ trợ xuất hóa đơn điện tử đỏ VAT cho doanh nghiệp hoặc câu lạc bộ có nhu cầu.")
+                    .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân", "Chi nhánh nào gần tôi?"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
+        // INTENT 13: NỘI QUY SÂN ĐẤU & TRANG PHỤC (RULES_REGULATIONS)
+        // =========================================================================
+        if ("RULES_REGULATIONS".equals(mlTag) || matches(normalized, "noi quy", "quy dinh", "giay de kep", "giay non marking", "di tre", "mang thuc an", "hut thuoc")) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("RULES_REGULATIONS")
+                    .text("Nội quy sân đấu tại Chuỗi Sân UTE Sport:\n\n" +
+                          "1. Giày thi đấu: Bắt buộc mang giày cầu lông chuyên dụng đế kếp (Non-marking) không để lại vệt đen lên thảm BWF.\n" +
+                          "2. Giờ giấc thi đấu: Quý khách vui lòng đến trước 10 phút để khởi động và nhận sân. Nếu đi trễ quá 15 phút mà không thông báo trước cho lễ tân, hệ thống có quyền nhượng slot cho khách chờ tiếp theo.\n" +
+                          "3. Giữ gìn vệ sinh: Không hút thuốc, không nhai kẹo cao su hoặc mang thức ăn có dầu mỡ vào khu vực thảm thi đấu.")
+                    .quickReplies(List.of("Bảng giá thuê sân", "Cho thuê vợt và giày", "Hôm nay có sân nào trống từ 18h đến 20h không?"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
+        // INTENT 14: ĐỒ THẤT LẠC, KHIẾU NẠI & HOTLINE HỖ TRỢ (LOST_FOUND_SUPPORT)
+        // =========================================================================
+        if ("LOST_FOUND_SUPPORT".equals(mlTag) || matches(normalized, "quen do", "that lac", "mat do", "quen ao", "quen vot", "hotline", "so dien thoai", "khieu nai", "gap nhan vien")) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("LOST_FOUND_SUPPORT")
+                    .text("Hỗ trợ khách hàng & Xử lý đồ thất lạc tại UTE Sport:\n\n" +
+                          "• Tìm đồ bỏ quên: Toàn bộ đồ đạc khách để quên tại sân (vợt, giày, áo khoác, bình nước, chìa khóa...) đều được ban quản lý ca trực thu gom và niêm phong trong tủ đồ thất lạc.\n" +
+                          "• Cách nhận lại đồ: Vui lòng liên hệ hotline cơ sở hoặc đến quầy lễ tân chi nhánh cung cấp ngày giờ chơi và mô tả vật phẩm để nhận lại ngay.\n" +
+                          "• Hotline tổng đài 24/7: 1900 6868 hoặc 0903.123.456\n" +
+                          "• Hòm thư khiếu nại dịch vụ: cskh@utesport.vn (Cam kết phản hồi trong 2 giờ).")
+                    .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân", "Chi nhánh nào gần tôi?"))
                     .actionType("NONE")
                     .timestamp(LocalDateTime.now())
                     .build();
