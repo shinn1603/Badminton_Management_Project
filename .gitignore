@@ -42,3 +42,9 @@ build/
 scratch/
 scratch_*/
 scratch_*.*
+
+# Environment Variables & Secrets
+.env
+.env.*
+*.env
+!*.env.example
