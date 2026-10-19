@@ -38,7 +38,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*"));
+        configuration.setAllowedOriginPatterns(List.of(
+            "http://localhost:*",
+            "http://127.0.0.1:*",
+            "https://*.onrender.com",
+            "https://*.railway.app",
+            "https://*.up.railway.app",
+            "*"
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
@@ -72,7 +79,7 @@ public class SecurityConfig {
                 .requestMatchers("/", "/login", "/logout", "/error").permitAll()
                 .requestMatchers("/customer/**", "/pos/**", "/manager/**", "/director/**", "/admin/**").permitAll()
                 // Allow public auth, webhooks, and websocket endpoints
-                .requestMatchers("/api/auth/**", "/ws/**", "/ws-court/**", "/webhook/**", "/api/webhook/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/health", "/ws/**", "/ws-court/**", "/webhook/**", "/api/webhook/**").permitAll()
                 .requestMatchers("/api/chatbot/**", "/api/upload/**").permitAll()
                 // Public customer booking, courts and catalog lookups
                 .requestMatchers("/api/courts", "/api/courts/**").permitAll()

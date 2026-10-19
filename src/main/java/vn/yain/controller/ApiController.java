@@ -163,6 +163,19 @@ public class ApiController {
     private static final Map<String, Map<String, Object>> forgotPasswordOtpMap = new java.util.concurrent.ConcurrentHashMap<>();
 
     // ==========================================
+    // 0. HEALTH CHECK ENDPOINT (Render / Railway / Cloud Uptime)
+    // ==========================================
+    @GetMapping("/health")
+    public ResponseEntity<?> healthCheck() {
+        return ResponseEntity.ok(Map.of(
+            "status", "UP",
+            "service", "Badminton Management System",
+            "profile", System.getProperty("spring.profiles.active", "default"),
+            "timestamp", System.currentTimeMillis()
+        ));
+    }
+
+    // ==========================================
     // 1. AUTHENTICATION & JWT ENDPOINTS
     // ==========================================
 
@@ -1450,10 +1463,6 @@ public class ApiController {
             } catch (Exception ignored) {}
         }
 
-        if (customerCode == null || customerCode.isBlank()) {
-            customerCode = phone.isBlank() ? "GUEST" : phone.trim();
-        }
-
         String email = (String) payload.get("email");
         if ((email == null || email.isBlank()) && !phone.isBlank()) {
             Customer c = customerRepository.findByPhone(phone.trim()).orElse(null);
@@ -1461,6 +1470,29 @@ public class ApiController {
             if (email == null || email.isBlank()) {
                 User u = userRepository.findByPhone(phone.trim()).orElse(null);
                 if (u != null && u.getEmail() != null) email = u.getEmail();
+            }
+        }
+
+        if (customerCode == null || customerCode.isBlank() || customerRepository.findByCustomerCode(customerCode.trim()).isEmpty()) {
+            if (!phone.isBlank()) {
+                Customer c = customerRepository.findByPhone(phone.trim()).orElse(null);
+                if (c != null) {
+                    customerCode = c.getCustomerCode();
+                } else {
+                    // Create customer record to satisfy Foreign Key constraint
+                    Customer newC = new Customer();
+                    newC.setCustomerCode("KH" + String.format("%05d", (int)(Math.random() * 90000 + 10000)));
+                    newC.setFullName(!player1Name.isBlank() ? player1Name : (!teamName.isBlank() ? teamName : "Vận Động Viên"));
+                    newC.setPhone(phone.trim());
+                    newC.setEmail(email);
+                    newC.setPassword("123456");
+                    newC.setMembershipTier("Đồng");
+                    newC.setStatus("Hoạt động");
+                    Customer savedC = customerRepository.save(newC);
+                    customerCode = savedC.getCustomerCode();
+                }
+            } else {
+                customerCode = "KH01";
             }
         }
 

@@ -13,10 +13,19 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Pure WebSocket and SockJS fallback endpoint with restricted origins
+        String[] allowedOrigins = new String[]{
+            "http://localhost:*",
+            "http://127.0.0.1:*",
+            "https://*.utesport.vn",
+            "https://*.onrender.com",
+            "https://*.railway.app",
+            "https://*.up.railway.app",
+            "*"
+        };
         registry.addEndpoint("/ws-court")
-                .setAllowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*", "https://*.utesport.vn");
+                .setAllowedOriginPatterns(allowedOrigins);
         registry.addEndpoint("/ws-court")
-                .setAllowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*", "https://*.utesport.vn")
+                .setAllowedOriginPatterns(allowedOrigins)
                 .withSockJS();
     }
 

@@ -1,0 +1,15 @@
+# Build and IDE artifacts
+target/
+.git
+.gitignore
+.dockerignore
+.mvn
+.vscode
+.agent
+.settings
+.classpath
+.project
+.factorypath
+*.md
+database/
+scripts/
