@@ -380,10 +380,10 @@ class ApiControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$[0].tournamentCode", notNullValue()));
 
-        // 2. Dang ky tham gia giai dau GD01
+        // 2. Dang ky tham gia giai dau dang mo GD02
         Map<String, Object> regPayload = new HashMap<>();
-        regPayload.put("tournamentCode", "GD01");
-        regPayload.put("tournamentName", "Giai Cau Long Mua Thu UTE Open 2026");
+        regPayload.put("tournamentCode", "GD02");
+        regPayload.put("tournamentName", "Giai Cau Long Doanh Nghiep & Sinh Vien Cup Thu Duc 2026");
         regPayload.put("teamName", "CLB UTE Masters Test");
         regPayload.put("category", "Doi Nam Nu");
         regPayload.put("player1Name", "Nguyen Van Test");

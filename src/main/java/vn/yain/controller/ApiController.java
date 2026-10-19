@@ -2367,6 +2367,14 @@ public class ApiController {
     private double calculateSlotDurationHours(String timeSlot) {
         if (timeSlot == null || !timeSlot.contains("-")) return 1.0;
         try {
+            if (timeSlot.contains(",")) {
+                String[] segments = timeSlot.split(",");
+                double total = 0;
+                for (String seg : segments) {
+                    total += calculateSlotDurationHours(seg.trim());
+                }
+                return total > 0 ? total : 1.0;
+            }
             String[] parts = timeSlot.split("-");
             String start = parts[0].trim();
             String end = parts[1].trim();

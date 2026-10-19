@@ -1689,29 +1689,56 @@
 
         <!-- BOOKING CONFIRMATION BAR -->
         <div style="background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 18px 20px; margin-bottom: 20px;">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;">
+          <!-- Slot Summary & Price Highlights -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; align-items: start;">
             <div>
-              <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Khung giờ đã chọn:</label>
-              <div id="modalSelectedSlotSummary" style="font-size: 15px; font-weight: 800; color: var(--primary);">Vui lòng chọn 1 hoặc nhiều khung giờ phía trên</div>
+              <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); display: block; margin-bottom: 4px;">Khung giờ đã chọn:</label>
+              <div id="modalSelectedSlotSummary" style="font-size: 14.5px; font-weight: 800; color: var(--primary);">Vui lòng chọn 1 hoặc nhiều khung giờ phía trên</div>
             </div>
             <div style="text-align: right;">
-              <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">Tiền cọc:</label>
-              <div id="modalDepositSummary" style="font-size: 17px; font-weight: 900; color: #d97706;">0 đ</div>
-              <div id="modalTotalSummary" style="font-size: 11.5px; color: var(--text-muted);">(Tổng giá thuê: 0 đ)</div>
+              <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); display: block; margin-bottom: 4px;">Tiền cọc (30%):</label>
+              <div id="modalDepositSummary" style="font-size: 19px; font-weight: 900; color: #d97706;">0 đ</div>
+              <div id="modalDiscountLine" style="display: none; font-size: 12px; color: #10b981; font-weight: 700; margin-top: 2px;">Voucher: -0 đ</div>
+              <div id="modalTotalSummary" style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">(Tổng giá thuê: 0 đ)</div>
             </div>
           </div>
 
+          <!-- PROMO / VOUCHER SECTION -->
+          <div style="background: var(--surface); border: 1px dashed rgba(16, 185, 129, 0.45); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <label style="font-size: 12px; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 6px; margin: 0;">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: #10b981;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                <span>Mã Ưu Đãi / Voucher:</span>
+              </label>
+              <span id="modalPromoStatusText" style="font-size: 11px; color: var(--text-muted);">Áp dụng voucher để giảm giá</span>
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="text" id="modalPromoCodeInput" class="form-control" placeholder="Nhập mã ưu đãi (vd: KM01, KM02...)" style="font-size: 12.5px; padding: 8px 12px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;" autocomplete="off">
+              <button type="button" class="btn btn-outline" id="btnModalApplyPromo" onclick="applyModalPromoCode()" style="padding: 8px 16px; font-size: 12px; font-weight: 700; white-space: nowrap; border-color: #10b981; color: #059669; background: rgba(16, 185, 129, 0.08);">
+                Áp Dụng
+              </button>
+              <button type="button" class="btn btn-outline" id="btnModalCancelPromo" onclick="removeModalPromoCode()" style="padding: 8px 12px; font-size: 12px; display: none; color: #ef4444; border-color: #ef4444; background: rgba(239, 68, 68, 0.08);">
+                Hủy mã
+              </button>
+            </div>
+
+            <div id="modalPromoFeedback" style="font-size: 12px; margin-top: 6px; display: none;"></div>
+            <div id="modalActivePromosTags" style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px;"></div>
+          </div>
+
+          <!-- CUSTOMER CONTACT INPUTS -->
           <div class="modal-cust-inputs-grid">
             <div>
               <label style="font-size: 12px; font-weight: 600; color: var(--text-dark); display: block; margin-bottom: 4px;">Họ tên người đặt (*):</label>
-              <input type="text" id="modalCustName" class="form-control" placeholder="vd: Nguyen Van A" maxlength="50" autocomplete="off" oninput="this.value = this.value.replace(/[0-9]/g, '').replace(/[^\p{L}\s'-]/gu, '')">
+              <input type="text" id="modalCustName" class="form-control" placeholder="vd: Nguyễn Văn A" maxlength="50" autocomplete="off" oninput="this.value = this.value.replace(/[0-9]/g, '').replace(/[^\p{L}\s'-]/gu, '')">
             </div>
             <div>
               <label style="font-size: 12px; font-weight: 600; color: var(--text-dark); display: block; margin-bottom: 4px;">Số điện thoại (*):</label>
               <input type="tel" id="modalCustPhone" class="form-control" placeholder="vd: 0903123456" maxlength="10" inputmode="numeric" autocomplete="off" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)">
             </div>
             <div>
-              <label style="font-size: 12px; font-weight: 600; color: var(--text-dark); display: block; margin-bottom: 4px;">Email:</label>
+              <label style="font-size: 12px; font-weight: 600; color: var(--text-dark); display: block; margin-bottom: 4px;">Email (nhận xác nhận):</label>
               <input type="email" id="modalCustEmail" class="form-control" placeholder="vd: customer@gmail.com" autocomplete="off">
             </div>
           </div>
@@ -1799,6 +1826,58 @@
         .replace(/'/g, '&#39;');
     }
 
+    // Helper: Format YYYY-MM-DD to DD/MM/YYYY
+    function formatVnDate(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+      return dateStr;
+    }
+
+    // Helper: Merge consecutive time slots into unified range (e.g. 18:00 - 19:00 + 19:00 - 20:00 -> 18:00 - 20:00)
+    function mergeContinuousTimeSlots(slots) {
+      if (!slots || slots.length === 0) return '';
+      const slotStrings = slots.map(s => (typeof s === 'string' ? s : (s.timeSlot || s.time || '')).trim()).filter(Boolean);
+      if (slotStrings.length === 0) return '';
+
+      const parsed = [];
+      slotStrings.forEach(s => {
+        const parts = s.split('-');
+        if (parts.length === 2) {
+          const [sH, sM] = parts[0].trim().split(':').map(n => parseInt(n, 10));
+          const [eH, eM] = parts[1].trim().split(':').map(n => parseInt(n, 10));
+          const startMin = (isNaN(sH) ? 0 : sH) * 60 + (isNaN(sM) ? 0 : sM);
+          const endMin = (isNaN(eH) ? 0 : eH) * 60 + (isNaN(eM) ? 0 : eM);
+          parsed.push({ startMin, endMin });
+        }
+      });
+
+      if (parsed.length === 0) return slotStrings.join(', ');
+
+      parsed.sort((a, b) => a.startMin - b.startMin);
+
+      const merged = [];
+      parsed.forEach(curr => {
+        if (merged.length === 0) {
+          merged.push({ ...curr });
+        } else {
+          const last = merged[merged.length - 1];
+          if (curr.startMin <= last.endMin) {
+            last.endMin = Math.max(last.endMin, curr.endMin);
+          } else {
+            merged.push({ ...curr });
+          }
+        }
+      });
+
+      const pad = n => String(n).padStart(2, '0');
+      const fmt = m => `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
+
+      return merged.map(r => `${fmt(r.startMin)} - ${fmt(r.endMin)}`).join(', ');
+    }
+
     let currentModalCourt = {
       courtCode: '',
       courtName: '',
@@ -1807,6 +1886,8 @@
     };
     let currentSelectedSlot = null;
     let currentBookedSlots = [];
+    let modalSelectedSlots = [];
+    let modalAppliedPromo = null;
     let vietqrTimerInterval = null;
 
     // Tab switching for Customer Portal
@@ -2147,6 +2228,7 @@
         branchCode: branchCode || 'CN01'
       };
       modalSelectedSlots = [];
+      modalAppliedPromo = null;
 
       document.getElementById('gridModalCourtTitle').innerText = `Đặt Sân - ${courtName}`;
       document.getElementById('gridModalBranchSub').innerText = `Chi nhánh ${branchCode} • Mã sân: ${courtCode}`;
@@ -2156,6 +2238,18 @@
         dateInput.value = preselectedDate || (document.getElementById('matrixViewDate')?.value || new Date().toISOString().split('T')[0]);
       }
 
+      // Reset promo UI
+      const promoInput = document.getElementById('modalPromoCodeInput');
+      if (promoInput) promoInput.value = '';
+      const promoFeedback = document.getElementById('modalPromoFeedback');
+      if (promoFeedback) { promoFeedback.style.display = 'none'; promoFeedback.innerText = ''; }
+      const cancelPromoBtn = document.getElementById('btnModalCancelPromo');
+      if (cancelPromoBtn) cancelPromoBtn.style.display = 'none';
+      const promoStatus = document.getElementById('modalPromoStatusText');
+      if (promoStatus) promoStatus.innerText = 'Áp dụng voucher để giảm giá';
+
+      loadModalBranchPromotions(currentModalCourt.branchCode);
+
       // Prefill user profile info if logged in
       const rawUser = localStorage.getItem('utesport_user');
       if (rawUser) {
@@ -2163,6 +2257,7 @@
           const u = JSON.parse(rawUser);
           if (u.fullName) document.getElementById('modalCustName').value = u.fullName;
           if (u.phone) document.getElementById('modalCustPhone').value = u.phone;
+          if (u.email && document.getElementById('modalCustEmail')) document.getElementById('modalCustEmail').value = u.email;
         } catch(e) {}
       } else {
         if (!document.getElementById('modalCustName').value) {
@@ -2183,6 +2278,135 @@
     function closeCourtTimeGridModal() {
       const modal = document.getElementById('courtTimeGridModal');
       if (modal) modal.classList.remove('active');
+    }
+
+    // Load available vouchers for current branch
+    async function loadModalBranchPromotions(branchCode) {
+      const container = document.getElementById('modalActivePromosTags');
+      if (!container) return;
+      container.innerHTML = '';
+      try {
+        const res = await fetch(`/api/pricing/summary?branchCode=${encodeURIComponent(branchCode || 'CN01')}`);
+        const data = await res.json();
+        if (data.activePromotions && data.activePromotions.length > 0) {
+          let html = '<span style="font-size: 11px; color: var(--text-muted); width: 100%; margin-bottom: 2px;">Gợi ý mã hôm nay (bấm để dùng):</span>';
+          data.activePromotions.forEach(p => {
+            const discText = p.discountType && p.discountType.includes('%') ? (p.discountValue + '%') : (Number(p.discountValue).toLocaleString('vi-VN') + 'đ');
+            html += `
+              <button type="button" onclick="selectModalPromoTag('${escapeHtml(p.promoCode)}')" class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px dashed rgba(16, 185, 129, 0.4); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">
+                ${escapeHtml(p.promoCode)} (-${discText})
+              </button>
+            `;
+          });
+          container.innerHTML = html;
+        } else {
+          container.innerHTML = '<span style="font-size: 11px; color: var(--text-muted);">Chi nhánh áp dụng giá chuẩn, chưa có voucher ưu đãi.</span>';
+        }
+      } catch (e) {
+        container.innerHTML = '';
+      }
+    }
+
+    function selectModalPromoTag(code) {
+      const input = document.getElementById('modalPromoCodeInput');
+      if (input) input.value = code;
+      applyModalPromoCode(code);
+    }
+
+    async function applyModalPromoCode(codeToApply) {
+      const input = document.getElementById('modalPromoCodeInput');
+      const code = (codeToApply || (input ? input.value : '')).trim().toUpperCase();
+      const feedback = document.getElementById('modalPromoFeedback');
+      const cancelBtn = document.getElementById('btnModalCancelPromo');
+      const promoStatus = document.getElementById('modalPromoStatusText');
+      const branchCode = currentModalCourt ? currentModalCourt.branchCode : 'CN01';
+
+      if (!code) {
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.style.color = '#ef4444';
+          feedback.innerText = 'Vui lòng nhập mã khuyến mãi!';
+        }
+        return;
+      }
+
+      if (!modalSelectedSlots || modalSelectedSlots.length === 0) {
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.style.color = '#ef4444';
+          feedback.innerText = 'Vui lòng chọn ít nhất 1 khung giờ trước khi áp dụng mã!';
+        }
+        return;
+      }
+
+      const orderAmount = modalSelectedSlots.reduce((sum, s) => sum + s.price, 0);
+
+      try {
+        const res = await fetch('/api/promotions/apply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            promoCode: code,
+            branchCode: branchCode,
+            orderAmount: orderAmount
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          modalAppliedPromo = {
+            promoCode: data.promoCode,
+            promoName: data.promoName,
+            discountType: data.discountType || '',
+            discountValue: Number(data.discountValue) || 0,
+            discountAmount: Number(data.discountAmount) || 0
+          };
+          if (input) input.value = data.promoCode;
+          if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.color = '#10b981';
+            feedback.innerText = data.message;
+          }
+          if (cancelBtn) cancelBtn.style.display = 'inline-block';
+          if (promoStatus) promoStatus.innerHTML = `<span style="color: #10b981; font-weight: 700;">Đã áp dụng: ${escapeHtml(data.promoCode)}</span>`;
+          showToast(data.message, 'success');
+          updateModalSelectedSummary();
+        } else {
+          modalAppliedPromo = null;
+          if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.color = '#ef4444';
+            feedback.innerText = data.message || 'Mã không hợp lệ hoặc không áp dụng cho chi nhánh này!';
+          }
+          if (cancelBtn) cancelBtn.style.display = 'none';
+          if (promoStatus) promoStatus.innerText = 'Áp dụng voucher để giảm giá';
+          showToast(data.message || 'Mã không hợp lệ!', 'warning');
+          updateModalSelectedSummary();
+        }
+      } catch (e) {
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.style.color = '#ef4444';
+          feedback.innerText = 'Lỗi kết nối máy chủ khi kiểm tra mã!';
+        }
+      }
+    }
+
+    function removeModalPromoCode() {
+      modalAppliedPromo = null;
+      const input = document.getElementById('modalPromoCodeInput');
+      if (input) input.value = '';
+      const feedback = document.getElementById('modalPromoFeedback');
+      if (feedback) {
+        feedback.style.display = 'none';
+        feedback.innerText = '';
+      }
+      const cancelBtn = document.getElementById('btnModalCancelPromo');
+      if (cancelBtn) cancelBtn.style.display = 'none';
+      const promoStatus = document.getElementById('modalPromoStatusText');
+      if (promoStatus) promoStatus.innerText = 'Áp dụng voucher để giảm giá';
+      showToast('Đã hủy áp dụng mã ưu đãi', 'info');
+      updateModalSelectedSummary();
     }
 
     function setModalDate(offsetDays) {
@@ -2294,27 +2518,72 @@
       const summaryEl = document.getElementById('modalSelectedSlotSummary');
       const depositEl = document.getElementById('modalDepositSummary');
       const totalEl = document.getElementById('modalTotalSummary');
+      const discountLine = document.getElementById('modalDiscountLine');
       const btnLock = document.getElementById('btnConfirmLockSlot');
       const dateStr = document.getElementById('modalBookingDate')?.value || '';
 
       if (!modalSelectedSlots || modalSelectedSlots.length === 0) {
-        if (summaryEl) summaryEl.innerText = 'Vui lòng chọn 1 hoặc nhiều khung giờ phía trên';
+        if (summaryEl) summaryEl.innerHTML = '<span style="font-size: 13.5px; color: var(--text-muted); font-weight: 500;">Vui lòng chọn 1 hoặc nhiều khung giờ phía trên</span>';
         if (depositEl) depositEl.innerText = '0 đ';
         if (totalEl) totalEl.innerText = '(Tổng giá thuê: 0 đ)';
+        if (discountLine) discountLine.style.display = 'none';
         if (btnLock) btnLock.disabled = true;
         return;
       }
 
       const totalRental = modalSelectedSlots.reduce((sum, s) => sum + s.price, 0);
-      const totalDeposit = Math.round(totalRental * 0.3);
       const count = modalSelectedSlots.length;
-      const slotNames = modalSelectedSlots.map(s => s.timeSlot).join(', ');
+
+      // Merge consecutive slots cleanly (e.g. 18:00 - 19:00 + 19:00 - 20:00 -> 18:00 - 20:00)
+      const mergedSlots = mergeContinuousTimeSlots(modalSelectedSlots.map(s => s.timeSlot));
+      const formattedDate = formatVnDate(dateStr);
+      const rawCourtName = currentModalCourt ? currentModalCourt.courtName : 'Sân';
+      const courtDisplayName = rawCourtName.replace(/^Sân cầu lông\s+/i, 'Sân ');
 
       if (summaryEl) {
-        summaryEl.innerHTML = `<strong>${escapeHtml(currentModalCourt ? currentModalCourt.courtName : 'Sân')}</strong> • ${escapeHtml(slotNames)} <span style="color: var(--text-muted); font-size: 12px; font-weight: 600;">(${count} giờ • ${escapeHtml(dateStr)})</span>`;
+        summaryEl.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span class="badge badge-primary" style="font-size: 13px; font-weight: 800; padding: 4px 10px; border-radius: 6px;">${escapeHtml(courtDisplayName)}</span>
+            <span style="font-size: 15px; font-weight: 800; color: var(--text-dark);">${escapeHtml(mergedSlots)}</span>
+            <span style="color: var(--text-muted); font-size: 12.5px; font-weight: 600;">• ${escapeHtml(formattedDate)} (${count} tiếng)</span>
+          </div>
+        `;
       }
-      if (depositEl) depositEl.innerText = `${totalDeposit.toLocaleString('vi-VN')} đ`;
-      if (totalEl) totalEl.innerText = `(Tổng giá thuê: ${totalRental.toLocaleString('vi-VN')} đ • ${count} giờ)`;
+
+      // Compute dynamic discount if promo applied
+      let discount = 0;
+      if (modalAppliedPromo) {
+        if (modalAppliedPromo.discountType && modalAppliedPromo.discountType.includes('%')) {
+          discount = Math.round(totalRental * (modalAppliedPromo.discountValue / 100));
+        } else if (modalAppliedPromo.discountAmount) {
+          discount = Math.min(modalAppliedPromo.discountAmount, totalRental);
+        }
+      }
+
+      if (discount > 0) {
+        if (discountLine) {
+          discountLine.style.display = 'block';
+          discountLine.innerHTML = `Voucher <span style="font-family: monospace; font-weight: 800;">${escapeHtml(modalAppliedPromo.promoCode)}</span>: -${discount.toLocaleString('vi-VN')} đ`;
+        }
+      } else {
+        if (discountLine) discountLine.style.display = 'none';
+      }
+
+      const finalTotal = Math.max(0, totalRental - discount);
+      const finalDeposit = Math.round(finalTotal * 0.3);
+      const remaining70 = finalTotal - finalDeposit;
+
+      if (depositEl) {
+        depositEl.innerText = `${finalDeposit.toLocaleString('vi-VN')} đ`;
+      }
+      if (totalEl) {
+        if (discount > 0) {
+          totalEl.innerHTML = `Tạm tính: <span style="text-decoration: line-through;">${totalRental.toLocaleString('vi-VN')} đ</span> &rarr; <strong>${finalTotal.toLocaleString('vi-VN')} đ</strong> • Còn lại: ${remaining70.toLocaleString('vi-VN')} đ`;
+        } else {
+          totalEl.innerHTML = `Tổng giá thuê: <strong>${totalRental.toLocaleString('vi-VN')} đ</strong> (${count} tiếng) • Còn lại: ${remaining70.toLocaleString('vi-VN')} đ`;
+        }
+      }
+
       if (btnLock) btnLock.disabled = false;
     }
 
@@ -2368,18 +2637,31 @@
       btnLock.innerText = 'Đang xử lý...';
 
       const custEmail = document.getElementById('modalCustEmail') ? document.getElementById('modalCustEmail').value.trim() : '';
-      const combinedTimeSlot = modalSelectedSlots.map(s => s.timeSlot).join(', ');
+      const mergedTimeSlot = mergeContinuousTimeSlots(modalSelectedSlots.map(s => s.timeSlot));
       const totalRental = modalSelectedSlots.reduce((sum, s) => sum + s.price, 0);
-      const totalDeposit = Math.round(totalRental * 0.3);
+
+      let discount = 0;
+      if (modalAppliedPromo) {
+        if (modalAppliedPromo.discountType && modalAppliedPromo.discountType.includes('%')) {
+          discount = Math.round(totalRental * (modalAppliedPromo.discountValue / 100));
+        } else if (modalAppliedPromo.discountAmount) {
+          discount = Math.min(modalAppliedPromo.discountAmount, totalRental);
+        }
+      }
+      const finalRental = Math.max(0, totalRental - discount);
+      const finalDeposit = Math.round(finalRental * 0.3);
 
       try {
         const payload = {
           courtCode: currentModalCourt.courtCode,
           branchCode: currentModalCourt.branchCode,
           date: bookingDate,
-          timeSlot: combinedTimeSlot,
-          totalPrice: totalRental,
-          depositAmount: totalDeposit,
+          timeSlot: mergedTimeSlot,
+          totalPrice: finalRental,
+          depositAmount: finalDeposit,
+          discountAmount: discount,
+          promoCode: modalAppliedPromo ? modalAppliedPromo.promoCode : null,
+          notes: modalAppliedPromo ? `Áp dụng mã ${modalAppliedPromo.promoCode} (-${discount.toLocaleString('vi-VN')} đ)` : '',
           customerName: custName,
           customerPhone: custPhone,
           customerEmail: custEmail

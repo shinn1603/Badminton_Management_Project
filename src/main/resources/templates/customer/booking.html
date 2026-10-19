@@ -987,6 +987,48 @@
         .replace(/'/g, '&#39;');
     }
 
+    // Helper: Merge consecutive time slots into unified range (e.g. 18:00 - 19:00 + 19:00 - 20:00 -> 18:00 - 20:00)
+    function mergeContinuousTimeSlots(slots) {
+      if (!slots || slots.length === 0) return '';
+      const slotStrings = slots.map(s => (typeof s === 'string' ? s : (s.timeSlot || s.time || '')).trim()).filter(Boolean);
+      if (slotStrings.length === 0) return '';
+
+      const parsed = [];
+      slotStrings.forEach(s => {
+        const parts = s.split('-');
+        if (parts.length === 2) {
+          const [sH, sM] = parts[0].trim().split(':').map(n => parseInt(n, 10));
+          const [eH, eM] = parts[1].trim().split(':').map(n => parseInt(n, 10));
+          const startMin = (isNaN(sH) ? 0 : sH) * 60 + (isNaN(sM) ? 0 : sM);
+          const endMin = (isNaN(eH) ? 0 : eH) * 60 + (isNaN(eM) ? 0 : eM);
+          parsed.push({ startMin, endMin });
+        }
+      });
+
+      if (parsed.length === 0) return slotStrings.join(', ');
+
+      parsed.sort((a, b) => a.startMin - b.startMin);
+
+      const merged = [];
+      parsed.forEach(curr => {
+        if (merged.length === 0) {
+          merged.push({ ...curr });
+        } else {
+          const last = merged[merged.length - 1];
+          if (curr.startMin <= last.endMin) {
+            last.endMin = Math.max(last.endMin, curr.endMin);
+          } else {
+            merged.push({ ...curr });
+          }
+        }
+      });
+
+      const pad = n => String(n).padStart(2, '0');
+      const fmt = m => `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
+
+      return merged.map(r => `${fmt(r.startMin)} - ${fmt(r.endMin)}`).join(', ');
+    }
+
     function isSlotOverlapping(s1, s2) {
       if (!s1 || !s2) return false;
       if (s1.trim().toLowerCase() === s2.trim().toLowerCase()) return true;
@@ -1264,7 +1306,7 @@
       let courtTotal = 0;
       selectedSlots.forEach(s => courtTotal += s.price);
 
-      const slotTimesText = selectedSlots.map(s => s.time).join(', ');
+      const slotTimesText = mergeContinuousTimeSlots(selectedSlots.map(s => s.time));
       document.getElementById('sumSlots').textContent = `${slotTimesText} (${selectedSlots.length} giờ)`;
       document.getElementById('sumCourtPrice').textContent = courtTotal.toLocaleString('vi-VN') + ' đ';
 
@@ -1455,7 +1497,7 @@
         });
 
         // Lock primary slot or combined slot with promo discount
-        const timeSlotString = selectedSlots.map(s => s.time).join(', ');
+        const timeSlotString = mergeContinuousTimeSlots(selectedSlots.map(s => s.time));
         const payload = {
           courtCode: selectedCourt.courtCode,
           branchCode: branch,

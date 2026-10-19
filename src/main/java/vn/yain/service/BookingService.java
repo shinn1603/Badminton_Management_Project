@@ -293,15 +293,18 @@ public class BookingService {
         }
 
         // Duration and pricing
-        int duration = 1;
+        int duration = 0;
         if (timeSlot.contains(",")) {
-            duration = timeSlot.split(",").length;
+            String[] parts = timeSlot.split(",");
+            for (String part : parts) {
+                int[] h = parseSlotHours(part.trim());
+                duration += (h[1] > h[0]) ? (h[1] - h[0]) : 1;
+            }
         } else {
             int[] hours = parseSlotHours(timeSlot);
-            if (hours[1] > hours[0]) {
-                duration = hours[1] - hours[0];
-            }
+            duration = (hours[1] > hours[0]) ? (hours[1] - hours[0]) : 1;
         }
+        if (duration <= 0) duration = 1;
 
         BigDecimal courtTotal = BigDecimal.ZERO;
         if (payload.get("totalPrice") != null) {
@@ -314,8 +317,9 @@ public class BookingService {
                 String[] parts = timeSlot.split(",");
                 for (String part : parts) {
                     int[] h = parseSlotHours(part.trim());
+                    int partDuration = (h[1] > h[0]) ? (h[1] - h[0]) : 1;
                     BigDecimal rate = pricingService != null ? pricingService.calculateHourlyRate(court, h[0]) : (court != null && court.getHourlyRate() != null ? court.getHourlyRate() : new BigDecimal("90000"));
-                    courtTotal = courtTotal.add(rate);
+                    courtTotal = courtTotal.add(rate.multiply(BigDecimal.valueOf(partDuration)));
                 }
             } else {
                 int[] hours = parseSlotHours(timeSlot);
