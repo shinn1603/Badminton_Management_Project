@@ -1092,7 +1092,7 @@ public class ApiController {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth != null && auth.isAuthenticated() && !"anonymousUser".equalsIgnoreCase(auth.getName())
                     && auth.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN")
-                    || a.getAuthority().equals("ROLE_MANAGER") || a.getAuthority().equals("ROLE_STAFF") || a.getAuthority().equals("ROLE_DIRECTOR"))) {
+                    || a.getAuthority().equals("ROLE_MANAGER") || a.getAuthority().equals("ROLE_POS") || a.getAuthority().equals("ROLE_DIRECTOR") || a.getAuthority().equals("ROLE_STAFF"))) {
                 String currentUsername = auth.getName();
                 Booking b = bookingRepository.findByBookingCode(code).orElse(null);
                 if (b != null) {

@@ -176,6 +176,8 @@
       POS: { label: 'Thu ngân POS', badgeStyle: 'background: #f4f4f5; color: #52525b; border: 1px solid #e4e4e7;', desc: 'Đặt sân quầy POS, thu cọc và in hóa đơn tại quầy' },
       CUSTOMER: { label: 'Khách hàng', badgeStyle: 'background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;', desc: 'Đặt sân trực tuyến & xem thông tin giải đấu' }
     };
+    // Đảm bảo không bao giờ hiện role STAFF lạ mắt, tự động quy về Thu ngân POS
+    ROLE_TITLES.STAFF = ROLE_TITLES.POS;
 
     function escapeHtml(str) {
       if (!str) return '';

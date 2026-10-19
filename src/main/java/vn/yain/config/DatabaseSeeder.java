@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Configuration
 @RequiredArgsConstructor
@@ -201,19 +202,17 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     private void seedCustomers() {
-        if (customerRepository.count() < 6) {
-            List<Customer> customers = List.of(
-                createCustomer("KH001", "Lê Bá Đạt", "0912345678", "dat.le@gmail.com", "123456", new BigDecimal("42.5"), 4250, "Kim Cương"),
-                createCustomer("KH002", "Nguyễn Hoàng Nam", "0903123456", "nam.nguyen@gmail.com", "123456", new BigDecimal("28.0"), 2800, "Vàng"),
-                createCustomer("KH003", "Phạm Gia Huy", "0988777666", "huy.pham@gmail.com", "123456", new BigDecimal("15.0"), 1500, "Bạc"),
-                createCustomer("KH004", "Vũ Thị Mai Anh", "0977555444", "maianh.vu@gmail.com", "123456", new BigDecimal("8.0"), 800, "Bạc"),
-                createCustomer("KH005", "Trần Thanh Hằng", "0933444555", "hang.tran@gmail.com", "123456", new BigDecimal("4.0"), 400, "Đồng"),
-                createCustomer("KH006", "Bùi Khánh Linh", "0909111222", "linh.bui@gmail.com", "123456", new BigDecimal("3.5"), 350, "Đồng")
-            );
-            for (Customer c : customers) {
-                if (customerRepository.findByCustomerCode(c.getCustomerCode()).isEmpty()) {
-                    customerRepository.save(c);
-                }
+        List<Customer> customers = List.of(
+            createCustomer("KH001", "Lê Bá Đạt", "0912345678", "dat.le@gmail.com", "123456", new BigDecimal("42.5"), 4250, "Kim Cương"),
+            createCustomer("KH002", "Nguyễn Hoàng Nam", "0903123456", "nam.nguyen@gmail.com", "123456", new BigDecimal("28.0"), 2800, "Vàng"),
+            createCustomer("KH003", "Phạm Gia Huy", "0988777666", "huy.pham@gmail.com", "123456", new BigDecimal("15.0"), 1500, "Bạc"),
+            createCustomer("KH004", "Vũ Thị Mai Anh", "0977555444", "maianh.vu@gmail.com", "123456", new BigDecimal("8.0"), 800, "Bạc"),
+            createCustomer("KH005", "Trần Thanh Hằng", "0933444555", "hang.tran@gmail.com", "123456", new BigDecimal("4.0"), 400, "Đồng"),
+            createCustomer("KH006", "Bùi Khánh Linh", "0909111222", "linh.bui@gmail.com", "123456", new BigDecimal("3.5"), 350, "Đồng")
+        );
+        for (Customer c : customers) {
+            if (customerRepository.findByCustomerCode(c.getCustomerCode()).isEmpty()) {
+                customerRepository.save(c);
             }
         }
     }
@@ -232,25 +231,23 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     private void seedStaff() {
-        if (staffRepository.count() < 12) {
-            List<Staff> staffList = List.of(
-                createStaff("NS01", "ALL", "Võ Hoàng Nam", "Giám đốc điều hành", "0901111222", "nam.vh@utesport.vn", "Quận 1, TP. Hồ Chí Minh"),
-                createStaff("NS02", "CN01", "Trần Phúc Bảo", "Quản lý chi nhánh Thủ Đức", "0903123456", "bao.tran@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh"),
-                createStaff("NS03", "CN01", "Nguyễn Thanh Tâm", "Thu ngân quầy POS", "0904555666", "tam.nguyen@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh"),
-                createStaff("NS04", "CN01", "Lê Thị Mai", "Thu ngân quầy POS", "0904777888", "mai.lt@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh"),
-                createStaff("NS05", "CN02", "Nguyễn Văn Quản", "Quản lý chi nhánh Bình Thạnh", "0903333444", "quan.nv@utesport.vn", "Bình Thạnh, TP. Hồ Chí Minh"),
-                createStaff("NS06", "CN03", "Trần Hữu Nam", "Quản lý chi nhánh Quận 9", "0903789012", "nam.th@utesport.vn", "Quận 9, TP. Hồ Chí Minh"),
-                createStaff("NS07", "CN04", "Lê Hoàng Khang", "Quản lý chi nhánh Gò Vấp", "0903555777", "khang.lh@utesport.vn", "Gò Vấp, TP. Hồ Chí Minh"),
-                createStaff("NS08", "CN04", "Lê Văn Hùng", "Nhân viên kỹ thuật sân", "0908111333", "hung.lv@utesport.vn", "Gò Vấp, TP. Hồ Chí Minh"),
-                createStaff("NS09", "CN01", "Bùi Khánh Linh", "Lễ tân & Dịch vụ", "0909111222", "linh.bk@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh"),
-                createStaff("NS10", "CN01", "Nguyễn Hoàng Nam", "Thu ngân POS quầy", "0903888777", "nam.nh@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh"),
-                createStaff("NS11", "CN01", "Phạm Gia Huy", "Kỹ thuật & Bảo dưỡng sân", "0988777666", "huy.pg@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh"),
-                createStaff("NS12", "CN01", "Trịnh Gia Vinh", "Kỹ thuật & Bảo dưỡng sân", "0977222333", "vinh.tg@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh")
-            );
-            for (Staff s : staffList) {
-                if (staffRepository.findByStaffCode(s.getStaffCode()).isEmpty()) {
-                    staffRepository.save(s);
-                }
+        List<Staff> staffList = List.of(
+            createStaff("NS01", "ALL", "Võ Hoàng Nam", "Giám đốc điều hành", "0901111222", "nam.vh@utesport.vn", "Quận 1, TP. Hồ Chí Minh"),
+            createStaff("NS02", "CN01", "Trần Phúc Bảo", "Quản lý chi nhánh Thủ Đức", "0903123456", "bao.tran@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh"),
+            createStaff("NS03", "CN01", "Nguyễn Thanh Tâm", "Thu ngân quầy POS", "0904555666", "tam.nguyen@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh"),
+            createStaff("NS04", "CN01", "Lê Thị Mai", "Thu ngân quầy POS", "0904777888", "mai.lt@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh"),
+            createStaff("NS05", "CN02", "Nguyễn Văn Quản", "Quản lý chi nhánh Bình Thạnh", "0903333444", "quan.nv@utesport.vn", "Bình Thạnh, TP. Hồ Chí Minh"),
+            createStaff("NS06", "CN03", "Trần Hữu Nam", "Quản lý chi nhánh Quận 9", "0903789012", "nam.th@utesport.vn", "Quận 9, TP. Hồ Chí Minh"),
+            createStaff("NS07", "CN04", "Lê Hoàng Khang", "Quản lý chi nhánh Gò Vấp", "0903555777", "khang.lh@utesport.vn", "Gò Vấp, TP. Hồ Chí Minh"),
+            createStaff("NS08", "CN04", "Lê Văn Hùng", "Nhân viên kỹ thuật sân", "0908111333", "hung.lv@utesport.vn", "Gò Vấp, TP. Hồ Chí Minh"),
+            createStaff("NS09", "CN01", "Bùi Khánh Linh", "Lễ tân & Dịch vụ", "0909111222", "linh.bk@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh"),
+            createStaff("NS10", "CN01", "Nguyễn Hoàng Nam", "Thu ngân POS quầy", "0903888777", "nam.nh@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh"),
+            createStaff("NS11", "CN01", "Phạm Gia Huy", "Kỹ thuật & Bảo dưỡng sân", "0988777666", "huy.pg@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh"),
+            createStaff("NS12", "CN01", "Trịnh Gia Vinh", "Kỹ thuật & Bảo dưỡng sân", "0977222333", "vinh.tg@utesport.vn", "TP. Thủ Đức, TP. Hồ Chí Minh")
+        );
+        for (Staff s : staffList) {
+            if (staffRepository.findByStaffCode(s.getStaffCode()).isEmpty()) {
+                staffRepository.save(s);
             }
         }
     }
@@ -269,24 +266,75 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     private void seedUsers() {
-        if (userRepository.count() < 12) {
-            List<User> users = List.of(
-                createUser("director", "123456", "Nguyễn Phước Thọ", "DIRECTOR", "ALL", "0901111222", "director@utesport.vn", "NS01"),
-                createUser("manager", "123456", "Trần Phúc Bảo", "MANAGER", "CN01", "0903123456", "manager@utesport.vn", "NS02"),
-                createUser("pos", "123456", "Nguyễn Thanh Tâm", "POS", "CN01", "0904555666", "pos@utesport.vn", "NS03"),
-                createUser("admin", "123456", "Trần Biểu Hương", "ADMIN", "ALL", "0908888999", "admin@utesport.vn", null),
-                createUser("customer", "123456", "Lê Bá Đạt", "CUSTOMER", "CN01", "0912345678", "khachhang@gmail.com", null),
-                createUser("nam.vh", "123456", "Võ Hoàng Nam", "DIRECTOR", "ALL", "0901111222", "nam.vh@utesport.vn", "NS01"),
-                createUser("quan.nv", "123456", "Nguyễn Văn Quản", "MANAGER", "CN02", "0903333444", "quan.nv@utesport.vn", "NS05"),
-                createUser("nam.th", "123456", "Trần Hữu Nam", "MANAGER", "CN03", "0903789012", "nam.th@utesport.vn", "NS06"),
-                createUser("khang.lh", "123456", "Lê Hoàng Khang", "MANAGER", "CN04", "0903555777", "khang.lh@utesport.vn", "NS07"),
-                createUser("mai.lt", "123456", "Lê Thị Mai", "POS", "CN01", "0904777888", "mai.lt@utesport.vn", "NS04"),
-                createUser("ql_cn01", "123456", "Trần Phúc Bảo", "MANAGER", "CN01", "0903123456", "bao.tran@utesport.vn", "NS02"),
-                createUser("nv_cn01", "123456", "Nguyễn Thị Mai", "STAFF", "CN01", "0903999888", "mai.nguyen@utesport.vn", "NS04")
-            );
-            for (User u : users) {
-                if (userRepository.findByUsername(u.getUsername()).isEmpty()) {
-                    userRepository.save(u);
+        // 1. Quét và chuyển đổi dứt điểm bất kỳ tài khoản có vai trò 'STAFF' sang 'POS' (Thu ngân POS)
+        userRepository.findAll().forEach(u -> {
+            if ("STAFF".equalsIgnoreCase(u.getRole())) {
+                u.setRole("POS");
+                userRepository.save(u);
+            }
+        });
+
+        // 2. Danh sách chuẩn hóa toàn bộ tài khoản đăng nhập & trải nghiệm nhanh
+        List<User> users = List.of(
+            // 5 Tài khoản trải nghiệm nhanh chính trên trang Đăng nhập (/login)
+            createUser("director", "123456", "Nguyễn Phước Thọ", "DIRECTOR", "ALL", "0901111222", "director@utesport.vn", "NS01"),
+            createUser("manager", "123456", "Trần Phúc Bảo", "MANAGER", "CN01", "0903123456", "manager@utesport.vn", "NS02"),
+            createUser("pos", "123456", "Nguyễn Thanh Tâm", "POS", "CN01", "0904555666", "pos@utesport.vn", "NS03"),
+            createUser("admin", "123456", "Trần Biểu Hương", "ADMIN", "ALL", "0908888999", "admin@utesport.vn", null),
+            createUser("customer", "123456", "Lê Bá Đạt", "CUSTOMER", "CN01", "0912345678", "khachhang@gmail.com", null),
+
+            // Ban Giám Đốc chuỗi
+            createUser("nam.vh", "123456", "Võ Hoàng Nam", "DIRECTOR", "ALL", "0901111222", "nam.vh@utesport.vn", "NS01"),
+
+            // Quản lý các chi nhánh (CN01, CN02, CN03, CN04)
+            createUser("ql_cn01", "123456", "Trần Phúc Bảo", "MANAGER", "CN01", "0903123456", "bao.tran@utesport.vn", "NS02"),
+            createUser("quan.nv", "123456", "Nguyễn Văn Quản", "MANAGER", "CN02", "0903333444", "quan.nv@utesport.vn", "NS05"),
+            createUser("ql_cn02", "123456", "Nguyễn Văn Quản", "MANAGER", "CN02", "0903333444", "quan.nv.mgr@utesport.vn", "NS05"),
+            createUser("nam.th", "123456", "Trần Hữu Nam", "MANAGER", "CN03", "0903789012", "nam.th@utesport.vn", "NS06"),
+            createUser("ql_cn03", "123456", "Trần Hữu Nam", "MANAGER", "CN03", "0903789012", "nam.th.mgr@utesport.vn", "NS06"),
+            createUser("khang.lh", "123456", "Lê Hoàng Khang", "MANAGER", "CN04", "0903555777", "khang.lh@utesport.vn", "NS07"),
+            createUser("ql_cn04", "123456", "Lê Hoàng Khang", "MANAGER", "CN04", "0903555777", "khang.lh.mgr@utesport.vn", "NS07"),
+
+            // Thu ngân POS các chi nhánh (CN01, CN02, CN03, CN04)
+            createUser("mai.lt", "123456", "Lê Thị Mai", "POS", "CN01", "0904777888", "mai.lt@utesport.vn", "NS04"),
+            createUser("nv_cn01", "123456", "Nguyễn Thị Mai", "POS", "CN01", "0903999888", "mai.nguyen@utesport.vn", "NS04"),
+            createUser("tam.nguyen", "123456", "Nguyễn Thanh Tâm", "POS", "CN01", "0904555666", "tam.nguyen@utesport.vn", "NS03"),
+            createUser("nam.nh", "123456", "Nguyễn Hoàng Nam", "POS", "CN01", "0903888777", "nam.nh@utesport.vn", "NS10"),
+            createUser("huy.pg", "123456", "Phạm Gia Huy", "POS", "CN01", "0988777666", "huy.pg@utesport.vn", "NS11"),
+            createUser("nv_cn02", "123456", "Lê Văn Quý", "POS", "CN02", "0908111222", "quy.le@utesport.vn", null),
+            createUser("nv_cn03", "123456", "Hoàng Thị Lan", "POS", "CN03", "0909555444", "lan.hoang@utesport.vn", null),
+            createUser("nv_cn04", "123456", "Lê Văn Hùng", "POS", "CN04", "0908111333", "hung.lv@utesport.vn", "NS08")
+        );
+
+        for (User u : users) {
+            Optional<User> existing = userRepository.findByUsername(u.getUsername());
+            if (existing.isEmpty()) {
+                userRepository.save(u);
+            } else {
+                User ex = existing.get();
+                boolean changed = false;
+                if ("STAFF".equalsIgnoreCase(ex.getRole())) {
+                    ex.setRole("POS");
+                    changed = true;
+                }
+                if (!passwordEncoder.matches("123456", ex.getPassword())) {
+                    ex.setPassword(passwordEncoder.encode("123456"));
+                    changed = true;
+                }
+                if (ex.getFullName() == null || ex.getFullName().isBlank()) {
+                    ex.setFullName(u.getFullName());
+                    changed = true;
+                }
+                if (ex.getRole() == null || ex.getRole().isBlank()) {
+                    ex.setRole(u.getRole());
+                    changed = true;
+                }
+                if (ex.getBranchCode() == null || ex.getBranchCode().isBlank()) {
+                    ex.setBranchCode(u.getBranchCode());
+                    changed = true;
+                }
+                if (changed) {
+                    userRepository.save(ex);
                 }
             }
         }
