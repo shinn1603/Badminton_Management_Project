@@ -240,12 +240,17 @@ public class GeminiAiService {
             String bookingCode = bookingService.generateUniqueBookingCode();
             ctx.lastBookingCode = bookingCode;
 
+            String cName = (ctx.customerName != null && !ctx.customerName.isBlank()) ? ctx.customerName : "Khách đặt qua AI";
+            String cPhone = (ctx.customerPhone != null && !ctx.customerPhone.isBlank()) ? ctx.customerPhone : "0903123456";
+            String cCode = ctx.customerCode;
+
             Booking booking = new Booking();
             booking.setBookingCode(bookingCode);
             booking.setBranchCode(branchCode);
             booking.setCourtCode(courtCode);
-            booking.setCustomerName("Khách đặt qua AI");
-            booking.setCustomerPhone("0903123456");
+            booking.setCustomerName(cName);
+            booking.setCustomerPhone(cPhone);
+            booking.setCustomerCode(cCode);
             booking.setBookingDate(ctx.date != null ? ctx.date : LocalDate.now());
             booking.setTimeSlot(slot);
             booking.setHourlyPrice(totalPrice.divide(new BigDecimal(2), RoundingMode.HALF_UP));

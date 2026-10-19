@@ -19,7 +19,9 @@
         "dat san", "toi muon dat san", "dat san cho toi", "dat di", "dat luon", "dong y dat", "tien hanh dat",
         "ok đặt sân", "ok dat san", "chốt sân này nha", "chot san", "giữ chỗ sân này", "giu cho", "book sân nhé",
         "book san", "đặt giúp mình", "dat giup minh", "lấy sân này nhé", "xác nhận đặt sân", "xac nhan dat",
-        "đồng ý giữ chỗ", "dong y giu cho", "tạo đơn đặt sân", "tao don", "đặt ca này nha", "lấy sân này đi"
+        "đồng ý giữ chỗ", "dong y giu cho", "tạo đơn đặt sân", "tao don", "đặt ca này nha", "lấy sân này đi",
+        "khoá sân", "khoa san", "tự khoá sân", "tu khoa san", "chức năng tự khoá sân", "khoá sân giữ chỗ",
+        "tự động khoá sân", "đặt và khoá sân", "khoá sân cho tôi", "khoá sân này"
       ],
       "responses": [
         "Hệ thống đã ghi nhận yêu cầu đặt sân và tiến hành tạo đơn giữ chỗ thời gian thực cho bạn."

@@ -159,11 +159,31 @@
 
       showTypingIndicator();
 
+      // Retrieve logged-in user and token if available
+      const token = localStorage.getItem('utesport_token');
+      let user = null;
+      try {
+        user = JSON.parse(localStorage.getItem('utesport_user') || 'null');
+      } catch (e) {}
+
+      const reqHeaders = { 'Content-Type': 'application/json' };
+      if (token) {
+        reqHeaders['Authorization'] = 'Bearer ' + token;
+      }
+
+      const payload = {
+        message: text || '',
+        sessionId: sessionId,
+        fullName: user ? (user.fullName || user.name) : null,
+        phone: user ? user.phone : null,
+        customerCode: user ? user.customerCode : null
+      };
+
       try {
         const res = await fetch('/api/chatbot/message', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text || '', sessionId: sessionId })
+          headers: reqHeaders,
+          body: JSON.stringify(payload)
         });
 
         hideTypingIndicator();
@@ -279,16 +299,36 @@
           confBtn.addEventListener('click', async function () {
             confBtn.disabled = true;
             confBtn.innerText = 'Đang kiểm tra giao dịch...';
+
+            const token = localStorage.getItem('utesport_token');
+            let user = null;
+            try {
+              user = JSON.parse(localStorage.getItem('utesport_user') || 'null');
+            } catch (e) {}
+
+            const payHeaders = { 'Content-Type': 'application/json' };
+            if (token) {
+              payHeaders['Authorization'] = 'Bearer ' + token;
+            }
+
+            const payBody = {
+              amount: data.paymentData.depositAmount,
+              paymentMethod: 'VietQR Pro',
+              customerPhone: user ? user.phone : null,
+              customerName: user ? (user.fullName || user.name) : null,
+              customerCode: user ? user.customerCode : null
+            };
+
             try {
               const payRes = await fetch(`/api/bookings/${bCode}/deposit`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: data.paymentData.depositAmount, paymentMethod: 'VietQR Pro' })
+                headers: payHeaders,
+                body: JSON.stringify(payBody)
               });
               if (payRes.ok) {
                 confBtn.innerText = 'Đã thanh toán cọc thành công';
                 confBtn.style.background = '#059669';
-                appendMessage('bot', `Hệ thống đã nhận được tiền cọc 30% cho mã đơn ${bCode}. Sân của bạn đã được khóa cố định. Bạn vui lòng đến trước 10 phút để nhận sân tại quầy lễ tân.`);
+                appendMessage('bot', `Hệ thống đã nhận được tiền cọc 30% cho mã đơn **${bCode}**. Sân của bạn đã được khóa cố định chính thức và đơn được lưu vào [Lịch Sử Đặt Sân](/customer/history). Bạn vui lòng đến trước 10 phút để nhận sân tại quầy lễ tân.`);
               } else {
                 confBtn.disabled = false;
                 confBtn.innerText = 'Xác nhận đã chuyển khoản cọc';
@@ -338,6 +378,8 @@
       let clean = escapeHtml(str);
       // Format **bold**
       clean = clean.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      // Format markdown link [text](url)
+      clean = clean.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" style="color: #059669; font-weight: 700; text-decoration: underline;" target="_self">$1</a>');
       // Format new lines
       clean = clean.replace(/\n/g, '<br>');
       return clean;

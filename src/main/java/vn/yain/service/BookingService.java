@@ -463,15 +463,28 @@ public class BookingService {
         booking.setPaymentMethod(paymentMethod != null ? paymentMethod : "VietQR Pro");
         Booking updated = bookingRepository.save(booking);
 
-        // Tích điểm thưởng cho khách hàng nếu có mã khách hàng
-        if (customerRepository != null && updated.getCustomerCode() != null) {
-            customerRepository.findByCustomerCode(updated.getCustomerCode()).ifPresent(c -> {
-                int addPts = depositAmount != null
-                        ? depositAmount.divide(BigDecimal.valueOf(1000), java.math.RoundingMode.HALF_UP).intValue()
-                        : 30;
-                c.setRewardPoints((c.getRewardPoints() != null ? c.getRewardPoints() : 0) + addPts);
-                customerRepository.save(c);
-            });
+        // Khóa cố định sân trên hệ thống và hủy bỏ bộ đếm tạm giữ chỗ 10 phút
+        if (updated.getCourtCode() != null) {
+            courtService.updateCourtStatus(updated.getCourtCode(), "Đang sử dụng");
+        }
+
+        // Tự động liên kết mã khách hàng & tích lũy điểm thưởng thành viên
+        if (customerRepository != null) {
+            if (updated.getCustomerCode() == null && updated.getCustomerPhone() != null && !updated.getCustomerPhone().isBlank()) {
+                customerRepository.findByPhone(updated.getCustomerPhone().trim()).ifPresent(c -> {
+                    updated.setCustomerCode(c.getCustomerCode());
+                    bookingRepository.save(updated);
+                });
+            }
+            if (updated.getCustomerCode() != null) {
+                customerRepository.findByCustomerCode(updated.getCustomerCode()).ifPresent(c -> {
+                    int addPts = depositAmount != null
+                            ? depositAmount.divide(BigDecimal.valueOf(1000), java.math.RoundingMode.HALF_UP).intValue()
+                            : 30;
+                    c.setRewardPoints((c.getRewardPoints() != null ? c.getRewardPoints() : 0) + addPts);
+                    customerRepository.save(c);
+                });
+            }
         }
 
         // Record payment transaction

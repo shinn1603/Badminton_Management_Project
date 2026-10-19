@@ -597,15 +597,40 @@ public class ApiController {
             return ResponseEntity.ok(Collections.emptyList());
         }
 
-        List<Booking> bookings = new ArrayList<>();
+        Set<Booking> resultSet = new LinkedHashSet<>();
+
+        // 1. Tìm theo số điện thoại người dùng
         if (u.getPhone() != null && !u.getPhone().trim().isEmpty()) {
-            bookings = bookingRepository.findByCustomerPhoneOrderByBookingDateDesc(u.getPhone().trim());
-        }
-        if (bookings.isEmpty() && u.getFullName() != null) {
-            bookings = bookingRepository.findByCustomerNameContainingIgnoreCase(u.getFullName().trim());
+            resultSet.addAll(bookingRepository.findByCustomerPhoneOrderByBookingDateDesc(u.getPhone().trim()));
         }
 
-        return ResponseEntity.ok(bookings);
+        // 2. Tìm theo mã khách hàng (Customer profile)
+        if (u.getPhone() != null && !u.getPhone().trim().isEmpty()) {
+            customerRepository.findByPhone(u.getPhone().trim()).ifPresent(c -> {
+                if (c.getCustomerCode() != null) {
+                    resultSet.addAll(bookingRepository.findByCustomerCodeOrderByBookingDateDesc(c.getCustomerCode()));
+                }
+            });
+        }
+
+        // 3. Tìm theo họ và tên đầy đủ
+        if (u.getFullName() != null && !u.getFullName().trim().isEmpty()) {
+            resultSet.addAll(bookingRepository.findByCustomerNameContainingIgnoreCase(u.getFullName().trim()));
+        }
+
+        // 4. Tìm theo username nếu username khớp mã khách hàng
+        if (u.getUsername() != null && !u.getUsername().trim().isEmpty()) {
+            resultSet.addAll(bookingRepository.findByCustomerCodeOrderByBookingDateDesc(u.getUsername().trim().toUpperCase()));
+        }
+
+        List<Booking> list = new ArrayList<>(resultSet);
+        list.sort((a, b) -> {
+            if (b.getBookingDate() == null) return -1;
+            if (a.getBookingDate() == null) return 1;
+            return b.getBookingDate().compareTo(a.getBookingDate());
+        });
+
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/admin/users")
@@ -1048,11 +1073,65 @@ public class ApiController {
     }
 
     @PostMapping("/bookings/{code}/deposit")
-    public ResponseEntity<?> confirmDeposit(@PathVariable String code, @RequestBody Map<String, Object> payload) {
+    public ResponseEntity<?> confirmDeposit(
+            @PathVariable String code,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestBody Map<String, Object> payload) {
         try {
             BigDecimal amount = payload.get("amount") != null ? new BigDecimal(payload.get("amount").toString()) : null;
             String method = (String) payload.getOrDefault("paymentMethod", "VietQR Pro");
             String txRef = (String) payload.getOrDefault("txRef", "VQR-" + System.currentTimeMillis() % 1000000);
+
+            // Gán thông tin người dùng nếu đơn trước đó tạo tự động qua AI chưa có SĐT chính thức
+            String customerPhone = (String) payload.get("customerPhone");
+            String customerName = (String) payload.get("customerName");
+            String customerCode = (String) payload.get("customerCode");
+
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                if (jwtTokenProvider.validateToken(token)) {
+                    String username = jwtTokenProvider.getUsernameFromToken(token);
+                    userRepository.findByUsername(username).ifPresent(u -> {
+                        bookingRepository.findByBookingCode(code).ifPresent(b -> {
+                            boolean needSave = false;
+                            if (b.getCustomerPhone() == null || b.getCustomerPhone().isBlank() || "0903123456".equals(b.getCustomerPhone())) {
+                                if (u.getPhone() != null && !u.getPhone().isBlank()) {
+                                    b.setCustomerPhone(u.getPhone().trim());
+                                    needSave = true;
+                                }
+                            }
+                            if (b.getCustomerName() == null || b.getCustomerName().isBlank() || "Khách đặt qua AI".equals(b.getCustomerName())) {
+                                if (u.getFullName() != null && !u.getFullName().isBlank()) {
+                                    b.setCustomerName(u.getFullName().trim());
+                                    needSave = true;
+                                }
+                            }
+                            if (needSave) {
+                                bookingRepository.save(b);
+                            }
+                        });
+                    });
+                }
+            } else if (customerPhone != null && !customerPhone.isBlank()) {
+                bookingRepository.findByBookingCode(code).ifPresent(b -> {
+                    boolean needSave = false;
+                    if (b.getCustomerPhone() == null || b.getCustomerPhone().isBlank() || "0903123456".equals(b.getCustomerPhone())) {
+                        b.setCustomerPhone(customerPhone.trim());
+                        needSave = true;
+                    }
+                    if (customerName != null && !customerName.isBlank() && (b.getCustomerName() == null || "Khách đặt qua AI".equals(b.getCustomerName()))) {
+                        b.setCustomerName(customerName.trim());
+                        needSave = true;
+                    }
+                    if (customerCode != null && !customerCode.isBlank()) {
+                        b.setCustomerCode(customerCode.trim());
+                        needSave = true;
+                    }
+                    if (needSave) {
+                        bookingRepository.save(b);
+                    }
+                });
+            }
 
             Booking updated = bookingService.confirmDeposit(code, amount, method, txRef);
             return ResponseEntity.ok(Map.of("success", true, "booking", updated));
@@ -1617,10 +1696,46 @@ public class ApiController {
     // ==========================================
 
     @PostMapping("/chatbot/message")
-    public ResponseEntity<?> sendChatMessage(@RequestBody Map<String, String> payload) {
-        String message = payload.get("message");
-        String sessionId = payload.get("sessionId");
-        vn.yain.dto.ChatMessageDto reply = chatbotService.processMessage(message, sessionId);
+    public ResponseEntity<?> sendChatMessage(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestBody Map<String, Object> payload) {
+        String message = (String) payload.get("message");
+        String sessionId = (String) payload.get("sessionId");
+
+        String customerName = (String) payload.get("fullName");
+        if (customerName == null) customerName = (String) payload.get("customerName");
+        String customerPhone = (String) payload.get("phone");
+        if (customerPhone == null) customerPhone = (String) payload.get("customerPhone");
+        String customerCode = (String) payload.get("customerCode");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            if (jwtTokenProvider.validateToken(token)) {
+                String username = jwtTokenProvider.getUsernameFromToken(token);
+                Optional<User> uOpt = userRepository.findByUsername(username);
+                if (uOpt.isPresent()) {
+                    User u = uOpt.get();
+                    if (customerName == null || customerName.isBlank()) {
+                        customerName = u.getFullName();
+                    }
+                    if (customerPhone == null || customerPhone.isBlank()) {
+                        customerPhone = u.getPhone();
+                    }
+                }
+            }
+        }
+
+        if (customerCode == null && customerPhone != null && !customerPhone.isBlank()) {
+            Optional<Customer> cOpt = customerRepository.findByPhone(customerPhone.trim());
+            if (cOpt.isPresent()) {
+                customerCode = cOpt.get().getCustomerCode();
+                if (customerName == null || customerName.isBlank()) {
+                    customerName = cOpt.get().getFullName();
+                }
+            }
+        }
+
+        vn.yain.dto.ChatMessageDto reply = chatbotService.processMessage(message, sessionId, customerName, customerPhone, customerCode);
         return ResponseEntity.ok(reply);
     }
 

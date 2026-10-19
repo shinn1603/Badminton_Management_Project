@@ -79,4 +79,23 @@ public class ChatbotMicroFaqTest {
         assertTrue(reply.getText().contains("9.5m"));
         assertTrue(reply.getText().contains("500 Lux"));
     }
+
+    @Test
+    void testAutoLockExplain() {
+        ChatMessageDto reply = chatbotService.processMessage("chức năng tự khóa sân là gì", "session_test");
+        assertNotNull(reply);
+        assertEquals("FAQ_AUTO_LOCK_EXPLAIN", reply.getIntent());
+        assertTrue(reply.getText().contains("Tự Khóa Sân"));
+        assertTrue(reply.getText().contains("10 phút"));
+        assertTrue(reply.getText().contains("Lịch Sử Đặt Sân"));
+    }
+
+    @Test
+    void testBookingPromptNoTime() {
+        ChatMessageDto reply = chatbotService.processMessage("tôi muốn đặt sân", "session_test");
+        assertNotNull(reply);
+        assertEquals("BOOKING_PROMPT", reply.getIntent());
+        assertTrue(reply.getText().contains("khung giờ nào"));
+        assertTrue(reply.getText().contains("10 phút"));
+    }
 }
