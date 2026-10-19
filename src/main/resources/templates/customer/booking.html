@@ -489,9 +489,16 @@
     }
     @media (max-width: 1100px) { .cust-footer-inner { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 768px) {
+      .booking-hero-box { display: none !important; }
       .booking-wrapper { grid-template-columns: 1fr; }
       .order-summary-panel { position: static; }
-      .cust-footer-inner { grid-template-columns: 1fr; }
+      .cust-nav-menu { display: none; }
+      .cust-footer-inner { grid-template-columns: 1fr !important; gap: 16px !important; }
+      .cust-footer-inner > div:nth-child(2),
+      .cust-footer-inner > div:nth-child(3),
+      .cust-footer-inner > div:nth-child(4) { display: none !important; }
+      .cust-footer-inner > div:first-child p { display: none !important; }
+      .footer-bottom-bar > div:last-child { display: none !important; }
     }
     .footer-col-title {
       font-size: 14px;

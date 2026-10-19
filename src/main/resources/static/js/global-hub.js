@@ -1,9 +1,52 @@
 /**
  * UTE SPORT - GLOBAL COMPONENT & THEME CONTROLLER
- * Supports: Sidebar Toggle, Theme Toggle (Light/Dark), Tab Switching, Toast Alerts, Modal Controls
+ * Supports: Sidebar Toggle, Theme Toggle (Light/Dark), Tab Switching, Toast Alerts, Modal Controls, Device Detection
  */
 
-// 0. Auto-load RBAC Role Guard & User Sync
+// 0. DEVICE DETECTION & ADAPTIVE COMPACT MODE (PHONE vs DESKTOP)
+(function detectDevice() {
+  function checkDevice() {
+    const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
+    const isSmallScreen = window.innerWidth <= 768;
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    const isMobile = isMobileUA || isSmallScreen;
+
+    window.UTE_DEVICE = {
+      isMobile: isMobile,
+      isMobileUA: isMobileUA,
+      isTouch: isTouch,
+      screenWidth: window.innerWidth,
+      screenHeight: window.innerHeight
+    };
+
+    const root = document.documentElement;
+    if (isMobile) {
+      root.classList.add('is-mobile');
+      root.classList.remove('is-desktop');
+      if (document.body) {
+        document.body.classList.add('is-mobile');
+        document.body.classList.remove('is-desktop');
+      }
+    } else {
+      root.classList.add('is-desktop');
+      root.classList.remove('is-mobile');
+      if (document.body) {
+        document.body.classList.add('is-desktop');
+        document.body.classList.remove('is-mobile');
+      }
+    }
+  }
+
+  checkDevice();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkDevice);
+  }
+  window.addEventListener('resize', checkDevice);
+  window.addEventListener('orientationchange', checkDevice);
+})();
+
+// 0.1. Auto-load RBAC Role Guard & User Sync
 (function () {
   if (!window.RBAC && !document.querySelector('script[src*="auth-guard.js"]')) {
     const s = document.createElement('script');

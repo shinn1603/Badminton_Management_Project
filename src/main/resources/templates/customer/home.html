@@ -811,11 +811,30 @@
       .cust-footer-inner { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 768px) {
-      .dashboard-kpi-grid { grid-template-columns: 1fr; }
-      .courts-card-grid { grid-template-columns: 1fr; }
-      .amenities-feature-grid { grid-template-columns: 1fr; }
+      .dashboard-hero-section { padding: 22px 16px 26px !important; }
+      .dashboard-hero-section .hero-container { grid-template-columns: 1fr !important; gap: 16px !important; text-align: center !important; }
+      .dashboard-hero-section .hero-badge-tag { margin: 0 auto 10px !important; font-size: 11px !important; }
+      .dashboard-hero-section .hero-title { font-size: 21px !important; line-height: 1.25 !important; }
+      .dashboard-hero-section .hero-description { display: none !important; }
+      .dashboard-hero-section .btn-hero-outline { display: none !important; }
+      .dashboard-hero-section .btn-hero-primary { width: 100% !important; max-width: 280px !important; margin: 0 auto !important; }
+      .hero-finder-card, #bookingConsole { display: none !important; }
+      .dashboard-kpi-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+      .dashboard-kpi-grid .dash-kpi-card:nth-child(3),
+      .dashboard-kpi-grid .dash-kpi-card:nth-child(4) { display: none !important; }
+      .dash-kpi-caption { display: none !important; }
+      .dash-kpi-card { padding: 10px 12px !important; }
+      .dash-tabs-nav .dash-tab-btn:nth-child(4),
+      .dash-tabs-nav .dash-tab-btn:nth-child(5) { display: none !important; }
+      .courts-card-grid { grid-template-columns: 1fr !important; }
+      .amenities-feature-grid { grid-template-columns: 1fr !important; }
       .cust-nav-menu { display: none; }
-      .cust-footer-inner { grid-template-columns: 1fr; }
+      .cust-footer-inner { grid-template-columns: 1fr !important; gap: 16px !important; }
+      .cust-footer-inner > div:nth-child(2),
+      .cust-footer-inner > div:nth-child(3),
+      .cust-footer-inner > div:nth-child(4) { display: none !important; }
+      .cust-footer-inner > div:first-child p { display: none !important; }
+      .footer-bottom-bar > div:last-child { display: none !important; }
     }
 
     /* TIME SLOT GRID MODAL & MATRIX CSS */
