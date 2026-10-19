@@ -759,10 +759,19 @@
         document.getElementById('qrTransferContent').textContent = `CK ${b.bookingCode}`;
         document.getElementById('modalDepositTxt').textContent = deposit.toLocaleString('vi-VN') + ' đ';
 
-        // Dynamic VietQR generator link
+        // Dynamic VietQR generator link & Bank info
+        const bName = data.bankName || 'MBBank (Ngân Hàng Quân Đội)';
+        const accNo = data.accountNo || '0903123456';
+        const accName = data.accountName || 'UTE BADMINTON CLUB';
+        const bin = data.bankBin || '970422';
+
+        if (document.getElementById('qrBankName')) document.getElementById('qrBankName').textContent = bName;
+        if (document.getElementById('qrAccountNo')) document.getElementById('qrAccountNo').textContent = accNo;
+        if (document.getElementById('qrAccountName')) document.getElementById('qrAccountName').textContent = accName;
+
         const qrImg = document.getElementById('qrCodeImg');
         if (qrImg) {
-          qrImg.src = `https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=${deposit}&addInfo=CK%20${b.bookingCode}&accountName=UTE%20BADMINTON%20CLUB`;
+          qrImg.src = `https://img.vietqr.io/image/${bin}-${accNo}-compact2.png?amount=${deposit}&addInfo=CK%20${b.bookingCode}&accountName=${encodeURIComponent(accName)}`;
         }
 
         // Check booking status

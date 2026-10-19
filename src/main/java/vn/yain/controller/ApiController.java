@@ -39,6 +39,18 @@ public class ApiController {
     @Value("${vietqr.webhook.token:UTE_VIETQR_SECRET_TOKEN_2026}")
     private String webhookToken;
 
+    @Value("${vietqr.bank.bin:970422}")
+    private String vietqrBankBin;
+
+    @Value("${vietqr.bank.name:MBBank (Ngân hàng Quân Đội)}")
+    private String vietqrBankName;
+
+    @Value("${vietqr.account.no:0903123456}")
+    private String vietqrAccountNo;
+
+    @Value("${vietqr.account.name:UTE BADMINTON CLUB}")
+    private String vietqrAccountName;
+
     private String sanitizeErrorMessage(Exception e) {
         log.error("Internal processing error: {}", e.getMessage(), e);
         if (e instanceof IllegalArgumentException || e instanceof IllegalStateException) {
@@ -922,6 +934,10 @@ public class ApiController {
                         resp.put("branchName", br.getBranchName());
                         resp.put("branchAddress", br.getAddress());
                     });
+                    resp.put("bankBin", vietqrBankBin);
+                    resp.put("bankName", vietqrBankName);
+                    resp.put("accountNo", vietqrAccountNo);
+                    resp.put("accountName", vietqrAccountName);
                     return ResponseEntity.ok(resp);
                 })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
