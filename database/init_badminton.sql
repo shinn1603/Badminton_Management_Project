@@ -791,10 +791,17 @@ INSERT INTO tournament_matches (match_code, tournament_code, court_code, player1
 INSERT INTO system_settings (setting_code, setting_name, setting_value, description) VALUES
 ('CFG_DEPOSIT_RATE', N'Tỷ lệ đặt cọc tối thiểu (%)', '30', N'Khách hàng phải thanh toán cọc ít nhất 30% để giữ sân hợp lệ (QĐ-KH02)'),
 ('CFG_HOLDING_MINUTES', N'Thời gian tạm giữ chỗ chờ cọc (Phút)', '10', N'Sau 10 phút nếu không có giao dịch cọc, hệ thống tự động giải phóng ô sân (QĐ-KH02)'),
-('CFG_CANCEL_HOURS', N'Thời hạn hủy sân tối thiểu để được hoàn cọc (Giờ)', '4', N'Hủy trước giờ chơi tối thiểu 4 tiếng được hoàn 100% tiền cọc (QĐ-KH03)'),
+('CFG_CANCEL_HOURS', N'Thời hạn hủy sân tối thiểu để được hoàn cọc (Giờ)', '12', N'Hủy trước giờ chơi tối thiểu 12 tiếng để được nhận lại tiền cọc vào tài khoản'),
 ('CFG_ADVANCE_DAYS', N'Số ngày tối đa được phép đặt trước', '30', N'Giới hạn đặt sân trong vòng 30 ngày tới'),
 ('CFG_VNPAY_TMN', N'Mã đối tác VNPay (TMN Code)', 'UTESPORT2026', N'Tích hợp cổng thanh toán VNPay QR Sandbox/Production'),
-('CFG_MOMO_PARTNER', N'Partner Code MoMo Business', 'MOMO_UTE_BADMINTON', N'Tích hợp cổng Ví điện tử MoMo Business');
+('CFG_VNPAY_ENV', N'Môi trường VNPay', 'SANDBOX', N'Môi trường thử nghiệm Sandbox hoặc Production'),
+('CFG_VNPAY_SECRET', N'Khóa bí mật VNPay Hash Secret', '••••••••••••••••••••••••', N'Khóa mã hóa bảo mật checksum giao dịch VNPay'),
+('CFG_MOMO_PARTNER', N'Partner Code MoMo Business', 'MOMO_UTE_BADMINTON', N'Tích hợp cổng Ví điện tử MoMo Business'),
+('CFG_MOMO_KEY', N'Access Key MoMo', 'F8B24C5E9012A34B', N'Khóa truy cập API tích hợp MoMo Business'),
+('CFG_POINTS_PER_1000', N'Số điểm tích lũy cho mỗi 1.000 VNĐ chi tiêu', '1', N'Nhập số điểm nhận được cho mỗi 1.000 VNĐ chi tiêu'),
+('CFG_TIER_SILVER_POINTS', N'Hạn mức điểm lên Hạng Bạc', '500', N'Tích lũy đủ 500 điểm để thăng hạng Bạc (Giảm 5%)'),
+('CFG_TIER_GOLD_POINTS', N'Hạn mức điểm lên Hạng Vàng', '2000', N'Tích lũy đủ 2.000 điểm để thăng hạng Vàng (Giảm 10%)'),
+('CFG_TIER_DIAMOND_POINTS', N'Hạn mức điểm lên Hạng Kim Cương', '4000', N'Tích lũy đủ 4.000 điểm để thăng hạng Kim Cương (Giảm 15%)');
 -- 6. TẠO CÁC CHỈ MỤC INDEX TỐI ƯU HIỆU NĂNG TRUY VẤN (BUG-MED-25)
 IF NOT EXISTS (SELECT name FROM sys.indexes WHERE name = N'idx_bookings_date_court')
     CREATE INDEX idx_bookings_date_court ON bookings(booking_date, court_code);

@@ -53,6 +53,9 @@ public class BookingService {
     private vn.yain.repository.CustomerRepository customerRepository;
 
     @Autowired(required = false)
+    private vn.yain.repository.SystemSettingRepository systemSettingRepository;
+
+    @Autowired(required = false)
     private EmailService emailService;
 
     @Value("${vietqr.bank.bin:970422}")
@@ -478,10 +481,28 @@ public class BookingService {
             }
             if (updated.getCustomerCode() != null) {
                 customerRepository.findByCustomerCode(updated.getCustomerCode()).ifPresent(c -> {
+                    int ptsMultiplier = 1;
+                    int silverPts = 500;
+                    int goldPts = 2000;
+                    int diamondPts = 4000;
+                    if (systemSettingRepository != null) {
+                        ptsMultiplier = systemSettingRepository.findBySettingCode("CFG_POINTS_PER_1000")
+                                .map(s -> { try { return Math.max(1, Integer.parseInt(s.getSettingValue().trim())); } catch (Exception e) { return 1; } }).orElse(1);
+                        silverPts = systemSettingRepository.findBySettingCode("CFG_TIER_SILVER_POINTS")
+                                .map(s -> { try { return Integer.parseInt(s.getSettingValue().trim()); } catch (Exception e) { return 500; } }).orElse(500);
+                        goldPts = systemSettingRepository.findBySettingCode("CFG_TIER_GOLD_POINTS")
+                                .map(s -> { try { return Integer.parseInt(s.getSettingValue().trim()); } catch (Exception e) { return 2000; } }).orElse(2000);
+                        diamondPts = systemSettingRepository.findBySettingCode("CFG_TIER_DIAMOND_POINTS")
+                                .map(s -> { try { return Integer.parseInt(s.getSettingValue().trim()); } catch (Exception e) { return 4000; } }).orElse(4000);
+                    }
                     int addPts = depositAmount != null
-                            ? depositAmount.divide(BigDecimal.valueOf(1000), java.math.RoundingMode.HALF_UP).intValue()
-                            : 30;
-                    c.setRewardPoints((c.getRewardPoints() != null ? c.getRewardPoints() : 0) + addPts);
+                            ? depositAmount.divide(BigDecimal.valueOf(1000), java.math.RoundingMode.HALF_UP).intValue() * ptsMultiplier
+                            : 30 * ptsMultiplier;
+                    int newTotalPts = (c.getRewardPoints() != null ? c.getRewardPoints() : 0) + addPts;
+                    c.setRewardPoints(newTotalPts);
+                    if (newTotalPts >= diamondPts) c.setMembershipTier("Kim Cương");
+                    else if (newTotalPts >= goldPts && !"Kim Cương".equalsIgnoreCase(c.getMembershipTier())) c.setMembershipTier("Vàng");
+                    else if (newTotalPts >= silverPts && !"Kim Cương".equalsIgnoreCase(c.getMembershipTier()) && !"Vàng".equalsIgnoreCase(c.getMembershipTier())) c.setMembershipTier("Bạc");
                     customerRepository.save(c);
                 });
             }

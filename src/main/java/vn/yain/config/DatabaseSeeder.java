@@ -616,15 +616,24 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     private void seedSystemSettings() {
-        if (systemSettingRepository.count() < 6) {
-            systemSettingRepository.saveAll(List.of(
-                createSetting("CFG_DEPOSIT_RATE", "Tỷ lệ đặt cọc tối thiểu (%)", "30", "Khách hàng phải thanh toán cọc ít nhất 30% để giữ sân hợp lệ (QĐ-KH02)"),
-                createSetting("CFG_HOLDING_MINUTES", "Thời gian tạm giữ chỗ chờ cọc (Phút)", "10", "Sau 10 phút nếu không có giao dịch cọc, hệ thống tự động giải phóng ô sân (QĐ-KH02)"),
-                createSetting("CFG_CANCEL_HOURS", "Thời hạn hủy sân tối thiểu để được hoàn cọc (Giờ)", "4", "Hủy trước giờ chơi tối thiểu 4 tiếng được hoàn 100% tiền cọc (QĐ-KH03)"),
-                createSetting("CFG_ADVANCE_DAYS", "Số ngày tối đa được phép đặt trước", "30", "Giới hạn đặt sân trong vòng 30 ngày tới"),
-                createSetting("CFG_VNPAY_TMN", "Mã đối tác VNPay (TMN Code)", "UTESPORT2026", "Tích hợp cổng thanh toán VNPay QR Sandbox/Production"),
-                createSetting("CFG_MOMO_PARTNER", "Partner Code MoMo Business", "MOMO_UTE_BADMINTON", "Tích hợp cổng Ví điện tử MoMo Business")
-            ));
+        saveSettingIfMissing("CFG_DEPOSIT_RATE", "Tỷ lệ đặt cọc tối thiểu (%)", "30", "Khách hàng phải thanh toán cọc ít nhất 30% để giữ sân hợp lệ");
+        saveSettingIfMissing("CFG_HOLDING_MINUTES", "Thời gian tạm giữ chỗ chờ cọc (Phút)", "10", "Sau 10 phút nếu không có giao dịch cọc, hệ thống tự động giải phóng ô sân");
+        saveSettingIfMissing("CFG_CANCEL_HOURS", "Thời hạn hủy sân tối thiểu để được hoàn cọc (Giờ)", "12", "Hủy trước giờ chơi tối thiểu 12 tiếng để được nhận lại tiền cọc");
+        saveSettingIfMissing("CFG_ADVANCE_DAYS", "Số ngày tối đa được phép đặt trước", "30", "Giới hạn đặt sân trong vòng 30 ngày tới");
+        saveSettingIfMissing("CFG_VNPAY_TMN", "Mã đối tác VNPay (TMN Code)", "UTESPORT2026", "Tích hợp cổng thanh toán VNPay QR Sandbox/Production");
+        saveSettingIfMissing("CFG_VNPAY_ENV", "Môi trường VNPay", "SANDBOX", "Môi trường thử nghiệm Sandbox hoặc Production");
+        saveSettingIfMissing("CFG_VNPAY_SECRET", "Khóa bí mật VNPay Hash Secret", "••••••••••••••••••••••••", "Khóa mã hóa bảo mật checksum giao dịch VNPay");
+        saveSettingIfMissing("CFG_MOMO_PARTNER", "Partner Code MoMo Business", "MOMO_UTE_BADMINTON", "Tích hợp cổng Ví điện tử MoMo Business");
+        saveSettingIfMissing("CFG_MOMO_KEY", "Access Key MoMo", "F8B24C5E9012A34B", "Khóa truy cập API tích hợp MoMo Business");
+        saveSettingIfMissing("CFG_POINTS_PER_1000", "Số điểm tích lũy cho mỗi 1.000 VNĐ chi tiêu", "1", "Nhập số điểm nhận được cho mỗi 1.000 VNĐ chi tiêu");
+        saveSettingIfMissing("CFG_TIER_SILVER_POINTS", "Hạn mức điểm lên Hạng Bạc", "500", "Tích lũy đủ 500 điểm để thăng hạng Bạc (Giảm 5%)");
+        saveSettingIfMissing("CFG_TIER_GOLD_POINTS", "Hạn mức điểm lên Hạng Vàng", "2000", "Tích lũy đủ 2.000 điểm để thăng hạng Vàng (Giảm 10%)");
+        saveSettingIfMissing("CFG_TIER_DIAMOND_POINTS", "Hạn mức điểm lên Hạng Kim Cương", "4000", "Tích lũy đủ 4.000 điểm để thăng hạng Kim Cương (Giảm 15%)");
+    }
+
+    private void saveSettingIfMissing(String code, String name, String val, String desc) {
+        if (systemSettingRepository.findBySettingCode(code).isEmpty()) {
+            systemSettingRepository.save(createSetting(code, name, val, desc));
         }
     }
 

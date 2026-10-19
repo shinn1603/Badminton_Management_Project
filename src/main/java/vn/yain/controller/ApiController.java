@@ -466,16 +466,31 @@ public class ApiController {
             totalHours = cust.getTotalPlayHours();
         }
 
+        int ptsMultiplier = 1;
+        int silverPts = 500;
+        int goldPts = 2000;
+        int diamondPts = 4000;
+        if (systemSettingRepository != null) {
+            ptsMultiplier = systemSettingRepository.findBySettingCode("CFG_POINTS_PER_1000")
+                    .map(s -> { try { return Math.max(1, Integer.parseInt(s.getSettingValue().trim())); } catch (Exception e) { return 1; } }).orElse(1);
+            silverPts = systemSettingRepository.findBySettingCode("CFG_TIER_SILVER_POINTS")
+                    .map(s -> { try { return Integer.parseInt(s.getSettingValue().trim()); } catch (Exception e) { return 500; } }).orElse(500);
+            goldPts = systemSettingRepository.findBySettingCode("CFG_TIER_GOLD_POINTS")
+                    .map(s -> { try { return Integer.parseInt(s.getSettingValue().trim()); } catch (Exception e) { return 2000; } }).orElse(2000);
+            diamondPts = systemSettingRepository.findBySettingCode("CFG_TIER_DIAMOND_POINTS")
+                    .map(s -> { try { return Integer.parseInt(s.getSettingValue().trim()); } catch (Exception e) { return 4000; } }).orElse(4000);
+        }
+
         int points = cust != null && cust.getRewardPoints() != null ? cust.getRewardPoints() : 0;
         if (points == 0 && totalSpent.compareTo(BigDecimal.ZERO) > 0) {
-            points = totalSpent.divide(BigDecimal.valueOf(1000), 0, java.math.RoundingMode.FLOOR).intValue();
+            points = totalSpent.divide(BigDecimal.valueOf(1000), 0, java.math.RoundingMode.FLOOR).intValue() * ptsMultiplier;
         }
 
         String tier = "Đồng";
         double hoursVal = totalHours.doubleValue();
-        if (hoursVal >= 80) tier = "Kim Cương";
-        else if (hoursVal >= 40) tier = "Vàng";
-        else if (hoursVal >= 20) tier = "Bạc";
+        if (hoursVal >= 80 || points >= diamondPts) tier = "Kim Cương";
+        else if (hoursVal >= 40 || points >= goldPts) tier = "Vàng";
+        else if (hoursVal >= 20 || points >= silverPts) tier = "Bạc";
         else tier = "Đồng";
 
         if (cust != null && cust.getMembershipTier() != null && !cust.getMembershipTier().isBlank()) {
@@ -748,6 +763,20 @@ public class ApiController {
             for (SystemSetting s : list) {
                 map.put(s.getSettingCode(), s.getSettingValue());
             }
+            map.putIfAbsent("CFG_DEPOSIT_RATE", "30");
+            map.putIfAbsent("CFG_HOLDING_MINUTES", "10");
+            map.putIfAbsent("CFG_CANCEL_HOURS", "12");
+            map.putIfAbsent("CFG_ADVANCE_DAYS", "30");
+            map.putIfAbsent("CFG_VNPAY_TMN", "UTESPORT2026");
+            map.putIfAbsent("CFG_VNPAY_ENV", "SANDBOX");
+            map.putIfAbsent("CFG_VNPAY_SECRET", "••••••••••••••••••••••••");
+            map.putIfAbsent("CFG_MOMO_PARTNER", "MOMO_UTE_BADMINTON");
+            map.putIfAbsent("CFG_MOMO_KEY", "F8B24C5E9012A34B");
+            map.putIfAbsent("CFG_POINTS_PER_1000", "1");
+            map.putIfAbsent("CFG_TIER_SILVER_POINTS", "500");
+            map.putIfAbsent("CFG_TIER_GOLD_POINTS", "2000");
+            map.putIfAbsent("CFG_TIER_DIAMOND_POINTS", "4000");
+
             return ResponseEntity.ok(Map.of("success", true, "list", list, "settings", map));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
@@ -781,7 +810,7 @@ public class ApiController {
             AuditLog auditLog = new AuditLog();
             auditLog.setUsername("admin");
             auditLog.setActionType("Cập nhật cấu hình thông số hệ thống");
-            auditLog.setDetails("Cập nhật quy định đặt cọc, thời gian giữ slot và thông số hệ thống");
+            auditLog.setDetails("Cập nhật quy định đặt cọc, chính sách tích điểm và thông số hệ thống");
             auditLog.setModule("Phân hệ Quản trị");
             auditLog.setStatus("Thành công");
             auditLog.setActionTime(LocalDateTime.now());
@@ -796,22 +825,36 @@ public class ApiController {
     @PostMapping("/admin/settings/reset")
     public ResponseEntity<?> resetAdminSettings() {
         try {
-            Map<String, String> defaults = Map.of(
-                "CFG_DEPOSIT_RATE", "30",
-                "CFG_HOLDING_MINUTES", "10",
-                "CFG_CANCEL_HOURS", "12",
-                "CFG_ADVANCE_DAYS", "30",
-                "CFG_VNPAY_TMN", "UTESPORT2026",
-                "CFG_MOMO_PARTNER", "MOMO_UTE_BADMINTON"
+            Map<String, String> defaults = Map.ofEntries(
+                Map.entry("CFG_DEPOSIT_RATE", "30"),
+                Map.entry("CFG_HOLDING_MINUTES", "10"),
+                Map.entry("CFG_CANCEL_HOURS", "12"),
+                Map.entry("CFG_ADVANCE_DAYS", "30"),
+                Map.entry("CFG_VNPAY_TMN", "UTESPORT2026"),
+                Map.entry("CFG_VNPAY_ENV", "SANDBOX"),
+                Map.entry("CFG_VNPAY_SECRET", "••••••••••••••••••••••••"),
+                Map.entry("CFG_MOMO_PARTNER", "MOMO_UTE_BADMINTON"),
+                Map.entry("CFG_MOMO_KEY", "F8B24C5E9012A34B"),
+                Map.entry("CFG_POINTS_PER_1000", "1"),
+                Map.entry("CFG_TIER_SILVER_POINTS", "500"),
+                Map.entry("CFG_TIER_GOLD_POINTS", "2000"),
+                Map.entry("CFG_TIER_DIAMOND_POINTS", "4000")
             );
             for (Map.Entry<String, String> entry : defaults.entrySet()) {
                 Optional<SystemSetting> sOpt = systemSettingRepository.findBySettingCode(entry.getKey());
+                SystemSetting s;
                 if (sOpt.isPresent()) {
-                    SystemSetting s = sOpt.get();
+                    s = sOpt.get();
                     s.setSettingValue(entry.getValue());
                     s.setUpdatedAt(LocalDateTime.now());
-                    systemSettingRepository.save(s);
+                } else {
+                    s = new SystemSetting();
+                    s.setSettingCode(entry.getKey());
+                    s.setSettingName(entry.getKey());
+                    s.setSettingValue(entry.getValue());
+                    s.setUpdatedAt(LocalDateTime.now());
                 }
+                systemSettingRepository.save(s);
             }
 
             AuditLog auditLog = new AuditLog();
@@ -823,7 +866,7 @@ public class ApiController {
             auditLog.setActionTime(LocalDateTime.now());
             auditLogRepository.save(auditLog);
 
-            return ResponseEntity.ok(Map.of("success", true, "message", "Đã khôi phục cài đặt mặc định"));
+            return ResponseEntity.ok(Map.of("success", true, "message", "Đã khôi phục cài đặt mặc định thành công"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
