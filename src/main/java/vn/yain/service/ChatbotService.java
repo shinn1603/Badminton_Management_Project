@@ -172,6 +172,169 @@ public class ChatbotService {
         }
 
         // =========================================================================
+        // MICRO-FAQ 1: CHI TIẾT PHÒNG TẮM & NƯỚC NÓNG
+        // =========================================================================
+        if ((normalized.contains("tam") && (normalized.contains("phong") || normalized.contains("buong") || normalized.contains("nuoc nong") || normalized.contains("may cho") || normalized.contains("khan") || normalized.contains("say toc")))
+                || matches(normalized, "phong tam may cho", "may buong tam", "co nuoc nong", "nuoc nong khong", "may say toc", "dau goi", "sua tam", "khan tam", "tam o dau")) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("FAQ_BATHROOM_DETAIL")
+                    .text("Chi tiết tiện ích phòng tắm tại các cơ sở UTE Sport:\n\n" +
+                          "• Số lượng buồng tắm: Mỗi chi nhánh được thiết kế từ 4 - 6 buồng tắm riêng biệt khép kín (chia khu nam và nữ riêng).\n" +
+                          "• Bình nước nóng: 100% buồng tắm đều trang bị bình nước nóng Ariston cao cấp, phục vụ nước nóng tắm sảng khoái và thư giãn cơ bắp sau trận đấu.\n" +
+                          "• Tiện ích miễn phí: Có sẵn dầu gội, sữa tắm, máy sấy tóc tại bàn trang điểm và móc treo đồ sạch sẽ.\n" +
+                          "• Khăn tắm: Có cho thuê khăn bông tiệt trùng (10.000đ/cái) hoặc bạn có thể tự mang khăn cá nhân.")
+                    .quickReplies(List.of("Bãi đỗ xe ô tô thế nào?", "Bảng giá thuê sân", "Hôm nay có sân nào trống từ 18h đến 20h không?"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
+        // MICRO-FAQ 2: CHI TIẾT VỚ / TẤT THỂ THAO
+        // =========================================================================
+        if (((containsWord(normalized, "tat") || containsWord(normalized, "vo")) && (normalized.contains("doi") || normalized.contains("chong truot") || normalized.contains("co ngan") || normalized.contains("co trung") || matches(normalized, "ban tat", "ban vo", "mua tat", "mua vo", "tat the thao", "vo the thao", "tat bao nhieu", "vo bao nhieu", "gia tat", "gia vo")))
+                || matches(normalized, "tat la 1 doi", "tat la mot doi", "ban tat", "ban vo", "vo may tien", "tat bao nhieu", "vo 1 doi", "tat the thao", "vo chong truot")) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("FAQ_SOCKS_DETAIL")
+                    .text("Thông tin về Vớ/Tất thể thao tại quầy phụ kiện UTE Sport:\n\n" +
+                          "• Quy cách bán: Bán theo từng đôi (1 đôi / gói nguyên seal chính hãng).\n" +
+                          "• Chủng loại: Vớ thể thao Yonex & Victor cổ ngắn và cổ trung, dệt kim sợi Cotton co giãn 4 chiều dày dặn, lòng bàn chân có đệm xù chống trơn trượt và bảo vệ gót chân.\n" +
+                          "• Đơn giá: 25.000 đ/đôi (có đủ màu đen, trắng, xám).")
+                    .quickReplies(List.of("Thuê giày cầu lông", "Thuê vợt thi đấu", "Bảng giá thuê sân"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
+        // MICRO-FAQ 3: CHI TIẾT TÊN CÁC DÒNG VỢT CHO THUÊ & MỨC CĂNG
+        // =========================================================================
+        if ((normalized.contains("vot") && (normalized.contains("ten gi") || normalized.contains("hang gi") || normalized.contains("loai gi") || normalized.contains("hieu gi") || normalized.contains("cang") || normalized.contains("do cang") || normalized.contains("thong so") || normalized.contains("astrox") || normalized.contains("100zz") || normalized.contains("88d") || normalized.contains("lining")))
+                || matches(normalized, "vot ten gi", "thue vot gi", "vot hang gi", "cac loai vot", "cang may kg", "do cang vot", "hang vot nao")) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("FAQ_RACKETS_DETAIL")
+                    .text("Chi tiết các dòng vợt cho thuê tại UTE Sport:\n\n" +
+                          "1. Dòng Cao Cấp / Thi Đấu Chuyên Nghiệp (50.000đ/ca):\n" +
+                          "   • Yonex Astrox 88D Pro / 88S Pro (Vợt công thủ toàn diện thế hệ mới)\n" +
+                          "   • Yonex Astrox 100ZZ (Vợt tấn công smash cắm sân cực mạnh)\n" +
+                          "   • Yonex Nanoflare 1000Z (Vợt tốc độ phản tạt chớp nhoáng)\n" +
+                          "   • Lining Axforce 80 / Halbertec 8000 (Đầm tay, trợ lực tốt)\n" +
+                          "2. Dòng Phổ Thông / Dễ Chơi (30.000đ/ca):\n" +
+                          "   • Yonex Play / Game series, Victor DriveX\n\n" +
+                          "• Thông số kỹ thuật: Trọng lượng 4U (83g), chu vi cán G5 vừa tay, đan sẵn cước Yonex BG65 / BG66 Ultimax với mức căng chuẩn 10.5 kg - 11.0 kg (23 - 24.5 lbs).")
+                    .quickReplies(List.of("1 ống cầu tên gì và mấy quả?", "Thuê giày cầu lông", "Bảng giá thuê sân"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
+        // MICRO-FAQ 4: CHI TIẾT CÁC LOẠI CẦU & ỐNG CẦU
+        // =========================================================================
+        if ((normalized.contains("cau") && (normalized.contains("ong") || normalized.contains("ten gi") || normalized.contains("may qua") || normalized.contains("hang gi") || normalized.contains("ban le") || normalized.contains("loai gi") || normalized.contains("hieu gi")))
+                || matches(normalized, "ong cau ten gi", "1 ong cau", "ong cau may qua", "cau ten gi", "cau hieu gi", "ban le tung qua", "gia 1 qua cau", "cau ben nhat")) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("FAQ_SHUTTLECOCK_DETAIL")
+                    .text("Chi tiết các loại quả cầu lông tại quầy lễ tân UTE Sport:\n\n" +
+                          "• Quy cách đóng gói: 1 ống tiêu chuẩn gồm 12 quả cầu lông vũ cao cấp.\n" +
+                          "• Các thương hiệu có sẵn:\n" +
+                          "   1. Cầu Yonex Aerosensa AS-40: 420.000 đ/ống (Chuẩn thi đấu quốc tế BWF, đường bay ổn định tuyệt đối, lông bền nhất).\n" +
+                          "   2. Cầu Thành Công 77: 260.000 đ/ống (Được ưa chuộng số 1 phong trào, bay chuẩn, đầm tay).\n" +
+                          "   3. Cầu VinaStar ruột đỏ: 250.000 đ/ống (Tốc độ bay vừa phải, đường cầu sắc nét).\n" +
+                          "   4. Cầu Hải Yến S90: 240.000 đ/ống.\n" +
+                          "• Bán lẻ: Có bán lẻ từng quả cho khách đánh thiếu cầu (Cầu Thành Công: 25.000 đ/quả; Cầu Yonex AS-40: 38.000 đ/quả).")
+                    .quickReplies(List.of("Vợt cho thuê tên gì?", "Cho thuê giày", "Hôm nay có sân nào trống từ 18h đến 20h không?"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
+        // MICRO-FAQ 5: CHI TIẾT BÃI ĐỖ XE & PHÍ GIỮ XE
+        // =========================================================================
+        if ((normalized.contains("xe") && (normalized.contains("gui") || normalized.contains("do") || normalized.contains("o to") || normalized.contains("oto") || normalized.contains("7 cho") || normalized.contains("mat tien") || normalized.contains("phi gui") || normalized.contains("bai")))
+                || matches(normalized, "phi gui xe", "tien gui xe", "gui xe may", "dau o to", "do xe o to", "xe 7 cho", "bai xe", "co mat tien gui xe")) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("FAQ_PARKING_DETAIL")
+                    .text("Thông tin Bãi giữ xe tại Chuỗi Sân Cầu Lông UTE Sport:\n\n" +
+                          "• Chi phí gửi xe: MIỄN PHÍ 100% tiền gửi xe máy và xe ô tô cho tất cả khách hàng đến chơi sân.\n" +
+                          "• Bãi xe ô tô: Khuôn viên rộng rãi, đỗ thoải mái các dòng xe 4 chỗ, 7 chỗ (Innova, Fortuner, Carnival...) và xe bán tải, quay đầu xe dễ dàng.\n" +
+                          "• Bãi xe máy: Có mái che thoáng mát, sức chứa trên 150 xe mỗi cơ sở.\n" +
+                          "• An ninh: Có nhân viên bảo vệ phát vé thẻ từ và camera an ninh hồng ngoại giám sát 24/24.")
+                    .quickReplies(List.of("Phòng tắm có nước nóng không?", "Bảng giá thuê sân", "Chi nhánh nào gần tôi?"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
+        // MICRO-FAQ 6: CHI TIẾT GIÀY & BẢNG SIZE
+        // =========================================================================
+        if ((normalized.contains("giay") && (normalized.contains("size") || normalized.contains("lefus") || normalized.contains("kawasaki") || normalized.contains("khu khuan") || normalized.contains("co lon") || normalized.contains("co nho")))
+                || matches(normalized, "size bao nhieu", "co size", "size giay", "thue giay size", "giay hang gi", "giay lefus", "giay kawasaki")) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("FAQ_SHOES_DETAIL")
+                    .text("Chi tiết Dịch vụ cho thuê giày cầu lông tại UTE Sport:\n\n" +
+                          "• Thương hiệu: Giày Lefus, Kawasaki, Victor chuyên dụng có đế cao su kếp (Non-marking) giảm chấn khớp chân và không trầy xước mặt thảm BWF.\n" +
+                          "• Bảng size: Có sẵn đầy đủ size từ Size 36 đến Size 44 (cả nam và nữ).\n" +
+                          "• Giá thuê: 20.000 đ/đôi/ca chơi.\n" +
+                          "• Vệ sinh & Khử khuẩn: 100% giày sau mỗi lượt chơi đều được xịt cồn y tế khử khuẩn và sấy khô bằng máy khử mùi tia cực tím UV.")
+                    .quickReplies(List.of("Tất là 1 đôi à?", "Vợt cho thuê tên gì?", "Hôm nay có sân nào trống từ 18h đến 20h không?"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
+        // MICRO-FAQ 7: CHI TIẾT MENU NƯỚC & ĐỒ ĂN NHẸ F&B
+        // =========================================================================
+        if (matches(normalized, "mi ly", "xuc xich", "do an nhe", "bo huc", "redbull", "pocari", "revive", "aquafina", "nuoc ngot", "ban nuoc gi", "ban do an", "chuoi")) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("FAQ_FOOD_DRINK_DETAIL")
+                    .text("Menu Quầy Nước & Đồ Ăn Nhanh tại UTE Sport:\n\n" +
+                          "• Nước giải khát thể thao (Ướp lạnh):\n" +
+                          "   - Revive bù khoáng / chanh muối: 15.000 đ/chai\n" +
+                          "   - Pocari Sweat điện giải ion: 20.000 đ/chai\n" +
+                          "   - Bò Húc (RedBull Thái nhập): 20.000 đ/lon\n" +
+                          "   - Nước suối Aquafina 500ml: 10.000 đ/chai\n" +
+                          "   - Nước dừa tươi đóng lon: 20.000 đ/lon\n" +
+                          "• Đồ ăn nhẹ nạp năng lượng:\n" +
+                          "   - Mì ly Modern / Cung Đình (sẵn nước sôi, đũa): 15.000 đ/ly\n" +
+                          "   - Xúc xích tiệt trùng CP: 15.000 đ/cây\n" +
+                          "   - Chuối tươi thể thao giàu Kali: 8.000 đ/trái.")
+                    .quickReplies(List.of("Bảng giá thuê sân", "Hôm nay có sân nào trống từ 18h đến 20h không?", "Chi nhánh nào gần tôi?"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
+        // MICRO-FAQ 8: CHI TIẾT THÔNG SỐ SÂN, ĐÈN & TRẦN NHÀ
+        // =========================================================================
+        if (matches(normalized, "chieu cao tran", "tran cao", "may quat", "den may lux", "lux", "khoang cach san", "day may mm", "thong so san")) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("FAQ_COURT_SPECS_DETAIL")
+                    .text("Thông số kỹ thuật chuẩn hóa tại Chuỗi Sân Cầu Lông UTE Sport:\n\n" +
+                          "• Mặt thảm: Thảm vân cát Yonex & Enlio độ dày 5.0mm (lớp bọt PVC chống sốc đàn hồi cao, đạt chuẩn quốc tế BWF).\n" +
+                          "• Chiều cao trần: Đạt 9.5m tiêu chuẩn thi đấu quốc tế, đánh cầu cao sâu hoàn toàn không bị chạm trần.\n" +
+                          "• Hệ thống chiếu sáng: Đèn LED rọi chống lóa cao cấp gắn nghiêng góc 45°, độ sáng đạt 500 Lux, không gây chói mắt khi nhìn lên đỡ cầu.\n" +
+                          "• Làm mát: Bố trí từ 6 - 8 quạt công nghiệp xung quanh, đối lưu gió mát mẻ mà không làm bạt luồng bay của quả cầu.\n" +
+                          "• Khoảng cách: Cách biên giữa hai sân 1.2m, cách tường sau 1.5m đảm bảo an toàn tối đa khi cứu cầu.")
+                    .quickReplies(List.of("Phòng tắm có nước nóng không?", "Bãi đỗ xe ô tô thế nào?", "Bảng giá thuê sân"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
         // INTENT 0: BẮT ĐẦU LẠI / LÀM MỚI HỘI THOẠI
         // =========================================================================
         if ("GREETING_RESET".equals(mlTag) || matches(normalized, "bat dau lai", "lam moi", "xoa lich su", "reset", "chao bot", "hello", "xin chao")) {
@@ -798,6 +961,11 @@ public class ChatbotService {
             }
         }
         return false;
+    }
+
+    private boolean containsWord(String text, String word) {
+        if (text == null || word == null) return false;
+        return text.matches(".*\\b" + Pattern.quote(word) + "\\b.*");
     }
 
     private String removeAccents(String text) {
