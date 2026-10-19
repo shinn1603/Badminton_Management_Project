@@ -339,11 +339,11 @@ class SqlServerApiWorkflowIntegrationTest {
     // ==========================================
 
     @Test
-    @DisplayName("API SQL 09: Dang ky tham gia giai dau GD01 va kiem tra cap nhat so slot")
+    @DisplayName("API SQL 09: Dang ky tham gia giai dau GD02 va kiem tra cap nhat so slot")
     void testTournamentRegisterApi() throws Exception {
         Map<String, Object> reg = new HashMap<>();
-        reg.put("tournamentCode", "GD01");
-        reg.put("tournamentName", "Giai Cau Long Mua Thu UTE Open 2026");
+        reg.put("tournamentCode", "GD02");
+        reg.put("tournamentName", "Giai Cau Long Doanh Nghiep & Sinh Vien Cup Thu Duc 2026");
         reg.put("teamName", "Doi VDV Sao Vang Test");
         reg.put("category", "Doi Nam");
         reg.put("player1Name", "Nguyen Van A");

@@ -629,6 +629,11 @@ public class DatabaseSeeder implements CommandLineRunner {
         saveSettingIfMissing("CFG_TIER_SILVER_POINTS", "Hạn mức điểm lên Hạng Bạc", "500", "Tích lũy đủ 500 điểm để thăng hạng Bạc (Giảm 5%)");
         saveSettingIfMissing("CFG_TIER_GOLD_POINTS", "Hạn mức điểm lên Hạng Vàng", "2000", "Tích lũy đủ 2.000 điểm để thăng hạng Vàng (Giảm 10%)");
         saveSettingIfMissing("CFG_TIER_DIAMOND_POINTS", "Hạn mức điểm lên Hạng Kim Cương", "4000", "Tích lũy đủ 4.000 điểm để thăng hạng Kim Cương (Giảm 15%)");
+        saveSettingIfMissing("CFG_MAIL_HOST", "Máy chủ gửi thư SMTP", "smtp.gmail.com", "Địa chỉ máy chủ SMTP (mặc định: smtp.gmail.com)");
+        saveSettingIfMissing("CFG_MAIL_PORT", "Cổng kết nối SMTP", "587", "Cổng gửi thư STARTTLS (mặc định: 587)");
+        saveSettingIfMissing("CFG_MAIL_USERNAME", "Tài khoản gửi email (Gmail)", "tho8189@gmail.com", "Địa chỉ email Gmail của Ban quản trị để gửi OTP và vé điện tử");
+        saveSettingIfMissing("CFG_MAIL_PASSWORD", "Mật khẩu ứng dụng Google (App Password)", "", "Mật khẩu ứng dụng 16 ký tự tạo từ myaccount.google.com/apppasswords");
+        saveSettingIfMissing("CFG_MAIL_FROM_NAME", "Tên hiển thị người gửi", "UTE Sport Badminton Arena", "Tên hiển thị thương hiệu trong hộp thư người nhận");
     }
 
     private void saveSettingIfMissing(String code, String name, String val, String desc) {

@@ -8,13 +8,18 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import vn.yain.entity.*;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import vn.yain.repository.BranchRepository;
 import vn.yain.repository.CourtRepository;
 import vn.yain.repository.CustomerRepository;
+import vn.yain.repository.SystemSettingRepository;
 import vn.yain.repository.UserRepository;
 
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -36,14 +41,250 @@ public class EmailService {
     @Autowired
     private UserRepository userRepository;
 
-    @Value("${spring.mail.username:utesport.badminton@gmail.com}")
-    private String fromEmail;
+    @Autowired
+    private SystemSettingRepository systemSettingRepository;
+
+    @Value("${spring.mail.host:smtp.gmail.com}")
+    private String springMailHost;
+
+    @Value("${spring.mail.port:587}")
+    private int springMailPort;
+
+    @Value("${spring.mail.username:tho8189@gmail.com}")
+    private String springMailUsername;
 
     @Value("${spring.mail.password:}")
-    private String mailPassword;
+    private String springMailPassword;
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+
+    public String getResolvedUsername() {
+        String dbUser = getSetting("CFG_MAIL_USERNAME", null);
+        if (dbUser != null && !dbUser.isBlank()) {
+            return dbUser.trim();
+        }
+        if (springMailUsername != null && !springMailUsername.isBlank()) {
+            return springMailUsername.trim();
+        }
+        return "tho8189@gmail.com";
+    }
+
+    public String getResolvedPassword() {
+        String dbPass = getSetting("CFG_MAIL_PASSWORD", null);
+        if (dbPass != null && !dbPass.isBlank()) {
+            return dbPass.trim().replace(" ", "");
+        }
+        if (springMailPassword != null && !springMailPassword.isBlank()) {
+            return springMailPassword.trim().replace(" ", "");
+        }
+        return "";
+    }
+
+    public String getResolvedHost() {
+        String dbHost = getSetting("CFG_MAIL_HOST", null);
+        if (dbHost != null && !dbHost.isBlank()) {
+            return dbHost.trim();
+        }
+        if (springMailHost != null && !springMailHost.isBlank()) {
+            return springMailHost.trim();
+        }
+        return "smtp.gmail.com";
+    }
+
+    public int getResolvedPort() {
+        String dbPort = getSetting("CFG_MAIL_PORT", null);
+        if (dbPort != null && !dbPort.isBlank()) {
+            try {
+                return Integer.parseInt(dbPort.trim());
+            } catch (Exception ignored) {}
+        }
+        return springMailPort > 0 ? springMailPort : 587;
+    }
+
+    public String getResolvedFromName() {
+        String dbName = getSetting("CFG_MAIL_FROM_NAME", null);
+        if (dbName != null && !dbName.isBlank()) {
+            return dbName.trim();
+        }
+        return "UTE Sport Badminton Arena";
+    }
+
+    private String getSetting(String code, String fallback) {
+        if (systemSettingRepository != null) {
+            try {
+                return systemSettingRepository.findBySettingCode(code)
+                        .map(SystemSetting::getSettingValue)
+                        .filter(v -> v != null && !v.isBlank())
+                        .orElse(fallback);
+            } catch (Exception ignored) {}
+        }
+        return fallback;
+    }
+
+    /**
+     * Khởi tạo đối tượng JavaMailSender linh hoạt từ cấu hình CSDL hoặc application.properties
+     */
+    public JavaMailSender getDynamicMailSender() {
+        String username = getResolvedUsername();
+        String password = getResolvedPassword();
+        String host = getResolvedHost();
+        int port = getResolvedPort();
+
+        if (password.isBlank() || username.isBlank()) {
+            return null;
+        }
+
+        JavaMailSenderImpl sender = new JavaMailSenderImpl();
+        sender.setHost(host);
+        sender.setPort(port);
+        sender.setUsername(username);
+        sender.setPassword(password);
+        sender.setDefaultEncoding("UTF-8");
+
+        Properties props = sender.getJavaMailProperties();
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.starttls.required", "true");
+        props.put("mail.smtp.connectiontimeout", "6000");
+        props.put("mail.smtp.timeout", "6000");
+        props.put("mail.smtp.writetimeout", "6000");
+        props.put("mail.smtp.ssl.trust", host);
+
+        return sender;
+    }
+
+    /**
+     * Phân tích và dịch mã lỗi SMTP từ Google hoặc nhà cung cấp thư thành thông báo tiếng Việt dễ hiểu
+     */
+    public String parseSmtpError(Exception e) {
+        String msg = e.getMessage() != null ? e.getMessage() : "";
+        String full = e.toString() + " " + msg;
+        if (e.getCause() != null) {
+            full += " " + e.getCause().toString() + " " + e.getCause().getMessage();
+        }
+
+        if (full.contains("535") || full.contains("AuthenticationFailedException") || full.contains("Username and Password not accepted") || full.contains("BadCredentials")) {
+            return "LỖI XÁC THỰC GOOGLE (Mã 535 - Username and Password not accepted):\n"
+                 + "• Google KHÔNG cho phép dùng mật khẩu đăng nhập Gmail thông thường.\n"
+                 + "• Bạn bắt buộc phải bật 'Xác minh 2 bước' (2-Step Verification) trên tài khoản Google, sau đó vào https://myaccount.google.com/apppasswords để tạo 'Mật khẩu ứng dụng' (App Password) gồm 16 ký tự.\n"
+                 + "• LƯU Ý: Nếu bạn vừa đổi mật khẩu chính của Gmail, Google đã tự động hủy tất cả Mật khẩu ứng dụng cũ. Bạn cần tạo lại mã 16 ký tự mới!";
+        }
+        if (full.contains("Could not connect to SMTP host") || full.contains("ConnectException") || full.contains("timed out") || full.contains("SocketTimeoutException")) {
+            return "LỖI KẾT NỐI MÁY CHỦ SMTP: Không thể kết nối đến máy chủ SMTP (" + getResolvedHost() + ":" + getResolvedPort() + "). Vui lòng kiểm tra đường truyền Internet hoặc tường lửa chặn cổng 587.";
+        }
+        if (full.contains("AddressException") || full.contains("Illegal address") || full.contains("From address")) {
+            return "LỖI ĐỊA CHỈ EMAIL: Địa chỉ email người gửi hoặc người nhận không hợp lệ. Vui lòng kiểm tra định dạng email (vd: tho8189@gmail.com).";
+        }
+        return "Lỗi gửi email qua SMTP: " + msg;
+    }
+
+    /**
+     * Kiểm tra kết nối SMTP thực tế và gửi thư thử nghiệm
+     */
+    public Map<String, Object> testMailConnection(String targetEmail) {
+        String username = getResolvedUsername();
+        String password = getResolvedPassword();
+        String host = getResolvedHost();
+        int port = getResolvedPort();
+        String fromName = getResolvedFromName();
+
+        String recipient = (targetEmail != null && !targetEmail.isBlank()) ? targetEmail.trim() : username;
+        if (recipient == null || recipient.isBlank() || !recipient.contains("@")) {
+            return Map.of(
+                "success", false,
+                "message", "Địa chỉ email người nhận thử nghiệm không hợp lệ: " + recipient
+            );
+        }
+
+        if (password.isBlank()) {
+            return Map.of(
+                "success", false,
+                "message", "Chưa nhập Mật khẩu ứng dụng Google (App Password)! Vui lòng lấy mã 16 ký tự từ https://myaccount.google.com/apppasswords và lưu cấu hình."
+            );
+        }
+
+        JavaMailSender sender = getDynamicMailSender();
+        if (sender == null) {
+            return Map.of(
+                "success", false,
+                "message", "Chưa thể khởi tạo kết nối SMTP. Vui lòng kiểm tra lại địa chỉ Gmail người gửi và Mật khẩu ứng dụng."
+            );
+        }
+
+        try {
+            MimeMessage message = sender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(username, fromName);
+            helper.setTo(recipient);
+            helper.setSubject("🧪 [UTE Sport] Kiểm tra kết nối dịch vụ Email SMTP thành công!");
+
+            String html = """
+                <!DOCTYPE html>
+                <html>
+                <head><meta charset="UTF-8"></head>
+                <body style="font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px; color: #1e293b;">
+                    <div style="max-width: 540px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border: 1px solid #e2e8f0;">
+                        <div style="background: linear-gradient(135deg, #059669 0%%, #10b981 100%%); padding: 24px; text-align: center; color: #ffffff;">
+                            <h2 style="margin: 0; font-size: 20px; font-weight: 800;">🏸 UTE SPORT BADMINTON ARENA</h2>
+                            <p style="margin: 6px 0 0; font-size: 13px; opacity: 0.95;">KIỂM TRA KẾT NỐI HỆ THỐNG GỬI EMAIL TỰ ĐỘNG</p>
+                        </div>
+                        <div style="padding: 24px;">
+                            <div style="background: #ecfdf5; border-left: 4px solid #10b981; padding: 14px 16px; border-radius: 6px; margin-bottom: 18px;">
+                                <strong style="color: #065f46; font-size: 15px;">🎉 Kết nối máy chủ SMTP Google thành công rực rỡ!</strong>
+                                <p style="margin: 6px 0 0; font-size: 13px; color: #047857; line-height: 1.5;">
+                                    Hệ thống đã xác thực thành công tài khoản gửi thư với máy chủ <strong>%s:%d</strong>.
+                                </p>
+                            </div>
+                            <table style="width: 100%%; font-size: 13px; border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 8px 0; color: #64748b; width: 36%%;">Email người gửi:</td>
+                                    <td style="padding: 8px 0; font-weight: 600; color: #0f172a;">%s</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; color: #64748b;">Tên hiển thị:</td>
+                                    <td style="padding: 8px 0; font-weight: 600; color: #0f172a;">%s</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; color: #64748b;">Email người nhận:</td>
+                                    <td style="padding: 8px 0; font-weight: 600; color: #2563eb;">%s</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0; color: #64748b;">Thời gian kiểm tra:</td>
+                                    <td style="padding: 8px 0; color: #334155;">%s</td>
+                                </tr>
+                            </table>
+                            <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid #f1f5f9; font-size: 12px; color: #64748b; line-height: 1.5;">
+                                Giờ đây, các email đặt sân (E-Ticket), mã OTP khôi phục mật khẩu và thông báo giải đấu sẽ được gửi trực tiếp từ tài khoản này.
+                            </div>
+                        </div>
+                        <div style="background: #f8fafc; padding: 12px 24px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 11.5px; color: #94a3b8;">
+                            Hệ Thống Quản Lý Thể Thao UTE Sport Badminton Club | 01 Võ Văn Ngân, Thủ Đức
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """.formatted(host, port, username, fromName, recipient, java.time.LocalDateTime.now().format(TIME_FMT));
+
+            helper.setText(html, true);
+            sender.send(message);
+
+            log.info("[EMAIL TEST SUCCESS] Đã gửi thư kiểm tra thành công từ [{}] tới [{}]", username, recipient);
+            return Map.of(
+                "success", true,
+                "message", "Kết nối SMTP thành công! Email thử nghiệm đã được gửi tới " + recipient + "."
+            );
+        } catch (Exception e) {
+            log.error("[EMAIL TEST ERROR] Gửi thử nghiệm thất bại: {}", e.getMessage(), e);
+            String parsedError = parseSmtpError(e);
+            return Map.of(
+                "success", false,
+                "message", parsedError,
+                "rawError", e.getMessage() != null ? e.getMessage() : e.toString()
+            );
+        }
+    }
 
     /**
      * Gửi email HTML bất đồng bộ (Non-blocking)
@@ -62,31 +303,33 @@ public class EmailService {
         }
 
         String recipient = to.trim();
+        JavaMailSender sender = getDynamicMailSender();
 
-        // Kiểm tra xem đã có cấu hình SMTP thực tế hay chưa
-        boolean hasSmtpConfig = mailSender != null && mailPassword != null && !mailPassword.isBlank();
-
-        if (hasSmtpConfig) {
+        if (sender != null) {
             try {
-                MimeMessage mimeMessage = mailSender.createMimeMessage();
+                MimeMessage mimeMessage = sender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-                helper.setFrom(fromEmail, "UTE Sport Badminton Arena");
+                String from = getResolvedUsername();
+                String fromName = getResolvedFromName();
+                helper.setFrom(from, fromName);
                 helper.setTo(recipient);
                 helper.setSubject(subject);
                 helper.setText(htmlBody, true);
 
-                mailSender.send(mimeMessage);
-                log.info("[EMAIL SERVICE] Đã gửi email thành công tới: {} | Tiêu đề: {}", recipient, subject);
+                sender.send(mimeMessage);
+                log.info("[EMAIL SERVICE] Đã gửi email thành công qua SMTP tới: {} | Tiêu đề: {}", recipient, subject);
                 return true;
             } catch (Exception e) {
-                log.error("[EMAIL SERVICE] Lỗi khi gửi qua SMTP (chuyển sang mô phỏng log): {}", e.getMessage());
+                log.error("[EMAIL SERVICE] Lỗi khi gửi qua SMTP (chuyển sang mô phỏng log): {} | Chi tiết: {}", e.getMessage(), parseSmtpError(e));
             }
+        } else {
+            log.warn("[EMAIL SERVICE] Chưa cấu hình SMTP (username/password trống), chuyển sang chế độ mô phỏng log.");
         }
 
         // Chế độ mô phỏng (Development / Offline Logger)
         log.info("================================================================================");
         log.info("[EMAIL SIMULATION - UTE SPORT NOTIFICATION]");
-        log.info("From: {} (UTE Sport Badminton Arena)", fromEmail);
+        log.info("From: {} ({})", getResolvedUsername(), getResolvedFromName());
         log.info("To: {}", recipient);
         log.info("Subject: {}", subject);
         log.info("Timestamp: {}", java.time.LocalDateTime.now().format(TIME_FMT));

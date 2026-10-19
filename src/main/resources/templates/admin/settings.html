@@ -181,6 +181,82 @@
           </div>
         </div>
 
+        <!-- CẤU HÌNH GỬI EMAIL TỰ ĐỘNG (GMAIL SMTP) -->
+        <div class="card" style="margin-top: 20px; border-left: 4px solid #3b82f6;">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h2 class="card-title">Cấu hình Dịch vụ Gửi Email Tự Động (Google Gmail SMTP)</h2>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Dùng gửi mã OTP đặt lại mật khẩu, vé điện tử E-Ticket đặt sân và thông báo giải đấu</div>
+            </div>
+            <span class="badge" style="font-size: 11px; padding: 4px 10px; background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3);">Google SMTP TLS (587)</span>
+          </div>
+          <div class="card-body">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+              <!-- Cột trái: Thông tin cấu hình -->
+              <div>
+                <div class="form-group">
+                  <label class="form-label" style="font-weight: 600;">Địa chỉ Gmail gửi (Tài khoản Google) *</label>
+                  <input type="email" class="form-control" id="cfgMailUsername" placeholder="ví dụ: tho8189@gmail.com" value="tho8189@gmail.com">
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Địa chỉ Gmail của Quản trị viên/Hệ thống dùng làm người gửi thư</div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" style="font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Mật khẩu ứng dụng Google (16 ký tự App Password) *</span>
+                    <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: #2563eb; font-size: 11.5px; text-decoration: none; font-weight: 600;">🔗 Tạo mã tại Google &rarr;</a>
+                  </label>
+                  <div style="position: relative; display: flex; align-items: center;">
+                    <input type="password" class="form-control" id="cfgMailPassword" placeholder="Nhập mã 16 ký tự (vd: abcd efgh ijkl mnop)" style="padding-right: 42px; letter-spacing: 1px; font-family: monospace;">
+                    <button type="button" onclick="toggleMailPassVisibility()" style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 15px;" title="Hiện/Ẩn mật khẩu">👁️</button>
+                  </div>
+                  <div style="font-size: 11.5px; color: #dc2626; margin-top: 5px; line-height: 1.4;">
+                    ⚠️ <strong>Lưu ý quan trọng:</strong> KHÔNG dùng mật khẩu đăng nhập Gmail thông thường (Google sẽ chặn 100%). Bắt buộc phải dùng <strong>Mật khẩu ứng dụng (App Password)</strong>.
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group" style="flex: 2;">
+                    <label class="form-label">Tên hiển thị người gửi</label>
+                    <input type="text" class="form-control" id="cfgMailFromName" value="UTE Sport Badminton Arena">
+                  </div>
+                  <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Cổng SMTP</label>
+                    <input type="number" class="form-control" id="cfgMailPort" value="587">
+                  </div>
+                </div>
+                <input type="hidden" id="cfgMailHost" value="smtp.gmail.com">
+              </div>
+
+              <!-- Cột phải: Hướng dẫn nhanh & Kiểm tra gửi thư -->
+              <div>
+                <!-- Hộp hướng dẫn 3 bước -->
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; font-size: 12.5px; color: #334155; line-height: 1.6;">
+                  <strong style="color: #0f172a; display: block; margin-bottom: 6px; font-size: 13px;">📋 3 bước lấy Mật khẩu ứng dụng Google (1 phút):</strong>
+                  1. Đăng nhập tài khoản Google & bật <strong>Xác minh 2 bước</strong>.<br>
+                  2. Mở liên kết: <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: #2563eb; font-weight: 600; text-decoration: underline;">myaccount.google.com/apppasswords</a>.<br>
+                  3. Đặt tên <em>"UTESport"</em> &rarr; Bấm <strong>Tạo</strong> &rarr; Copy 16 chữ cái dán vào ô bên trái.<br>
+                  <span style="color: #b45309; font-size: 11.5px; display: block; margin-top: 6px; background: #fef3c7; padding: 6px 10px; border-radius: 6px;">
+                    💡 <em>Nếu bạn vừa đổi mật khẩu chính của Gmail, Google đã tự động hủy tất cả Mật khẩu ứng dụng cũ. Bạn chỉ cần tạo mã mới là được!</em>
+                  </span>
+                </div>
+
+                <!-- Khung test gửi email trực tiếp -->
+                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px 16px;">
+                  <div style="font-weight: 700; font-size: 13px; color: #1e40af; margin-bottom: 6px;">🧪 Kiểm Tra Kết Nối & Gửi Thử Email</div>
+                  <div style="font-size: 11.5px; color: #3b82f6; margin-bottom: 10px;">Nhập email người nhận để gửi thư kiểm tra kết nối thực tế tới Google SMTP</div>
+                  <div style="display: flex; gap: 8px;">
+                    <input type="email" class="form-control" id="cfgTestMailRecipient" placeholder="Nhập email nhận thử (vd: tho8189@gmail.com)..." style="flex: 1; font-size: 12.5px;">
+                    <button type="button" class="btn btn-primary" id="btnTestMail" onclick="sendTestEmail()" style="white-space: nowrap; font-size: 12.5px; padding: 7px 16px; background: #2563eb; border-color: #2563eb;">
+                      <span>📩 Gửi Thử Ngay</span>
+                    </button>
+                  </div>
+                  <div id="testMailResult" style="margin-top: 10px; font-size: 12px; display: none;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="card" style="margin-top: 20px;">
           <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
             <div>
@@ -301,10 +377,85 @@
           if (map.CFG_TIER_GOLD_POINTS) document.getElementById('cfgTierGoldPoints').value = map.CFG_TIER_GOLD_POINTS;
           if (map.CFG_TIER_DIAMOND_POINTS) document.getElementById('cfgTierDiamondPoints').value = map.CFG_TIER_DIAMOND_POINTS;
 
+          if (map.CFG_MAIL_USERNAME) document.getElementById('cfgMailUsername').value = map.CFG_MAIL_USERNAME;
+          if (map.CFG_MAIL_PASSWORD) document.getElementById('cfgMailPassword').value = map.CFG_MAIL_PASSWORD;
+          if (map.CFG_MAIL_FROM_NAME) document.getElementById('cfgMailFromName').value = map.CFG_MAIL_FROM_NAME;
+          if (map.CFG_MAIL_PORT) document.getElementById('cfgMailPort').value = map.CFG_MAIL_PORT;
+          if (map.CFG_MAIL_HOST) document.getElementById('cfgMailHost').value = map.CFG_MAIL_HOST;
+
+          const testRecip = document.getElementById('cfgTestMailRecipient');
+          if (testRecip && !testRecip.value && map.CFG_MAIL_USERNAME) {
+            testRecip.value = map.CFG_MAIL_USERNAME;
+          }
+
           updatePointsPreview();
         }
       } catch (e) {
         console.warn('Lỗi khi tải cấu hình hệ thống:', e);
+      }
+    }
+
+    function toggleMailPassVisibility() {
+      const input = document.getElementById('cfgMailPassword');
+      if (input) {
+        input.type = input.type === 'password' ? 'text' : 'password';
+      }
+    }
+
+    async function sendTestEmail() {
+      const recipient = document.getElementById('cfgTestMailRecipient').value.trim();
+      const btn = document.getElementById('btnTestMail');
+      const resBox = document.getElementById('testMailResult');
+
+      if (!recipient) {
+        if (window.showToast) showToast('Vui lòng nhập email nhận thử nghiệm!', 'warning');
+        document.getElementById('cfgTestMailRecipient').focus();
+        return;
+      }
+
+      // Lưu trước các thông số vừa nhập vào CSDL
+      await saveSettings();
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Đang gửi thử...</span>';
+      resBox.style.display = 'block';
+      resBox.innerHTML = '<div style="color: #2563eb; padding: 10px; background: #dbeafe; border-radius: 6px; font-weight: 500;">Đang kết nối tới máy chủ Google SMTP và gửi thư thử nghiệm... Vui lòng đợi trong giây lát!</div>';
+
+      try {
+        let token = localStorage.getItem('jwt_token');
+        if (!token && typeof document !== 'undefined' && document.cookie) {
+          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+          if (match) token = match[1];
+        }
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/admin/mail/test', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ recipient: recipient })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          resBox.innerHTML = `<div style="color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 12px 14px; border-radius: 6px; line-height: 1.5;">
+            <strong>🎉 THÀNH CÔNG RỰC RỠ!</strong><br>${data.message}
+          </div>`;
+          if (window.showToast) showToast('Kết nối Google SMTP thành công!', 'success');
+        } else {
+          const rawMsg = data.message || 'Lỗi không xác định khi kết nối SMTP';
+          resBox.innerHTML = `<div style="color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; padding: 12px 14px; border-radius: 6px; line-height: 1.5; white-space: pre-line;">
+            <strong>❌ GỬI THƯ THẤT BẠI:</strong>\n${rawMsg}
+          </div>`;
+          if (window.showToast) showToast('Lỗi gửi email kiểm tra!', 'error');
+        }
+      } catch (err) {
+        resBox.innerHTML = `<div style="color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; padding: 12px 14px; border-radius: 6px;">
+          <strong>❌ LỖI KẾT NỐI:</strong> ${err.message || 'Không thể kết nối máy chủ.'}
+        </div>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>📩 Gửi Thử Ngay</span>';
       }
     }
 
@@ -322,7 +473,12 @@
         CFG_POINTS_PER_1000: document.getElementById('cfgPointsPer1000').value.trim(),
         CFG_TIER_SILVER_POINTS: document.getElementById('cfgTierSilverPoints').value.trim(),
         CFG_TIER_GOLD_POINTS: document.getElementById('cfgTierGoldPoints').value.trim(),
-        CFG_TIER_DIAMOND_POINTS: document.getElementById('cfgTierDiamondPoints').value.trim()
+        CFG_TIER_DIAMOND_POINTS: document.getElementById('cfgTierDiamondPoints').value.trim(),
+        CFG_MAIL_USERNAME: document.getElementById('cfgMailUsername').value.trim(),
+        CFG_MAIL_PASSWORD: document.getElementById('cfgMailPassword').value.trim().replace(/\s+/g, ''),
+        CFG_MAIL_FROM_NAME: document.getElementById('cfgMailFromName').value.trim(),
+        CFG_MAIL_PORT: document.getElementById('cfgMailPort').value.trim(),
+        CFG_MAIL_HOST: document.getElementById('cfgMailHost').value.trim()
       };
 
       try {
@@ -382,6 +538,11 @@
         document.getElementById('cfgTierSilverPoints').value = '500';
         document.getElementById('cfgTierGoldPoints').value = '2000';
         document.getElementById('cfgTierDiamondPoints').value = '4000';
+        document.getElementById('cfgMailUsername').value = 'tho8189@gmail.com';
+        document.getElementById('cfgMailPassword').value = '';
+        document.getElementById('cfgMailFromName').value = 'UTE Sport Badminton Arena';
+        document.getElementById('cfgMailPort').value = '587';
+        document.getElementById('cfgMailHost').value = 'smtp.gmail.com';
         updatePointsPreview();
         if (window.showToast) showToast('Đã khôi phục thông số mặc định', 'info');
       }

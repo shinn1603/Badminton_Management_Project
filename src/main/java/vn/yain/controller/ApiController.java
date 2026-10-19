@@ -841,6 +841,11 @@ public class ApiController {
             map.putIfAbsent("CFG_TIER_SILVER_POINTS", "500");
             map.putIfAbsent("CFG_TIER_GOLD_POINTS", "2000");
             map.putIfAbsent("CFG_TIER_DIAMOND_POINTS", "4000");
+            map.putIfAbsent("CFG_MAIL_HOST", "smtp.gmail.com");
+            map.putIfAbsent("CFG_MAIL_PORT", "587");
+            map.putIfAbsent("CFG_MAIL_USERNAME", "tho8189@gmail.com");
+            map.putIfAbsent("CFG_MAIL_PASSWORD", "");
+            map.putIfAbsent("CFG_MAIL_FROM_NAME", "UTE Sport Badminton Arena");
 
             return ResponseEntity.ok(Map.of("success", true, "list", list, "settings", map));
         } catch (Exception e) {
@@ -875,7 +880,7 @@ public class ApiController {
             AuditLog auditLog = new AuditLog();
             auditLog.setUsername("admin");
             auditLog.setActionType("Cập nhật cấu hình thông số hệ thống");
-            auditLog.setDetails("Cập nhật quy định đặt cọc, chính sách tích điểm và thông số hệ thống");
+            auditLog.setDetails("Cập nhật quy định đặt cọc, thông số SMTP email và chính sách tích điểm");
             auditLog.setModule("Phân hệ Quản trị");
             auditLog.setStatus("Thành công");
             auditLog.setActionTime(LocalDateTime.now());
@@ -903,7 +908,12 @@ public class ApiController {
                 Map.entry("CFG_POINTS_PER_1000", "1"),
                 Map.entry("CFG_TIER_SILVER_POINTS", "500"),
                 Map.entry("CFG_TIER_GOLD_POINTS", "2000"),
-                Map.entry("CFG_TIER_DIAMOND_POINTS", "4000")
+                Map.entry("CFG_TIER_DIAMOND_POINTS", "4000"),
+                Map.entry("CFG_MAIL_HOST", "smtp.gmail.com"),
+                Map.entry("CFG_MAIL_PORT", "587"),
+                Map.entry("CFG_MAIL_USERNAME", "tho8189@gmail.com"),
+                Map.entry("CFG_MAIL_PASSWORD", ""),
+                Map.entry("CFG_MAIL_FROM_NAME", "UTE Sport Badminton Arena")
             );
             for (Map.Entry<String, String> entry : defaults.entrySet()) {
                 Optional<SystemSetting> sOpt = systemSettingRepository.findBySettingCode(entry.getKey());
@@ -934,6 +944,21 @@ public class ApiController {
             return ResponseEntity.ok(Map.of("success", true, "message", "Đã khôi phục cài đặt mặc định thành công"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/admin/mail/test")
+    public ResponseEntity<?> testMailConnection(@RequestBody(required = false) Map<String, String> payload) {
+        try {
+            String recipient = payload != null ? payload.get("recipient") : null;
+            if (emailService == null) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Dịch vụ Email chưa được khởi tạo."));
+            }
+            Map<String, Object> result = emailService.testMailConnection(recipient);
+            boolean success = Boolean.TRUE.equals(result.get("success"));
+            return success ? ResponseEntity.ok(result) : ResponseEntity.badRequest().body(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi kiểm tra email: " + e.getMessage()));
         }
     }
 
