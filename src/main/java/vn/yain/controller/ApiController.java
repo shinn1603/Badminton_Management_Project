@@ -17,6 +17,7 @@ import vn.yain.service.BookingService;
 import vn.yain.service.CourtService;
 import vn.yain.service.PricingService;
 import vn.yain.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -194,15 +195,53 @@ public class ApiController {
     // 1. AUTHENTICATION & JWT ENDPOINTS
     // ==========================================
 
+    private String getClientIp(HttpServletRequest request) {
+        if (request == null) return "127.0.0.1";
+        String xf = request.getHeader("X-Forwarded-For");
+        if (xf != null && !xf.isBlank()) {
+            return xf.split(",")[0].trim();
+        }
+        return request.getRemoteAddr() != null ? request.getRemoteAddr() : "127.0.0.1";
+    }
+
     @PostMapping("/auth/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> credentials, HttpServletRequest request) {
         try {
             String username = credentials.get("username");
             String password = credentials.get("password");
             Map<String, Object> authResult = userService.authenticate(username, password);
             authResult.put("success", true);
+
+            // Ghi nhật ký Audit Log đăng nhập thành công
+            if (auditLogRepository != null && username != null) {
+                try {
+                    AuditLog logEntry = new AuditLog();
+                    logEntry.setUsername(username);
+                    logEntry.setActionType("Đăng nhập hệ thống");
+                    logEntry.setDetails("Xác thực tài khoản [" + username + "] thành công qua cổng bảo mật");
+                    logEntry.setModule("An ninh & Đăng nhập");
+                    logEntry.setIpAddress(getClientIp(request));
+                    logEntry.setStatus("Thành công");
+                    logEntry.setActionTime(LocalDateTime.now());
+                    auditLogRepository.save(logEntry);
+                } catch (Exception ignored) {}
+            }
+
             return ResponseEntity.ok(authResult);
         } catch (IllegalArgumentException | IllegalStateException e) {
+            if (auditLogRepository != null && credentials.get("username") != null) {
+                try {
+                    AuditLog logEntry = new AuditLog();
+                    logEntry.setUsername(credentials.get("username"));
+                    logEntry.setActionType("Đăng nhập thất bại");
+                    logEntry.setDetails("Đăng nhập không thành công: " + e.getMessage());
+                    logEntry.setModule("An ninh & Đăng nhập");
+                    logEntry.setIpAddress(getClientIp(request));
+                    logEntry.setStatus("Cảnh báo");
+                    logEntry.setActionTime(LocalDateTime.now());
+                    auditLogRepository.save(logEntry);
+                } catch (Exception ignored) {}
+            }
             return ResponseEntity.status(401).body(Map.of("success", false, "message", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
@@ -657,9 +696,22 @@ public class ApiController {
     }
 
     @PostMapping("/admin/users")
-    public ResponseEntity<?> saveAdminUser(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> saveAdminUser(@RequestBody Map<String, String> payload, HttpServletRequest request) {
         try {
             User u = userService.saveOrUpdateUser(payload);
+            if (auditLogRepository != null && u != null) {
+                try {
+                    AuditLog logEntry = new AuditLog();
+                    logEntry.setUsername("admin");
+                    logEntry.setActionType("Phân quyền & Cập nhật người dùng");
+                    logEntry.setDetails("Thiết lập tài khoản [" + u.getUsername() + "] - Vai trò: " + u.getRole() + " - Chi nhánh: " + (u.getBranchCode() != null ? u.getBranchCode() : "Tất cả"));
+                    logEntry.setModule("Tài khoản & Phân quyền");
+                    logEntry.setIpAddress(getClientIp(request));
+                    logEntry.setStatus("Thành công");
+                    logEntry.setActionTime(LocalDateTime.now());
+                    auditLogRepository.save(logEntry);
+                } catch (Exception ignored) {}
+            }
             return ResponseEntity.ok(Map.of("success", true, "user", u));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
@@ -667,9 +719,22 @@ public class ApiController {
     }
 
     @PostMapping("/admin/users/{username}/toggle-status")
-    public ResponseEntity<?> toggleAdminUserStatus(@PathVariable String username) {
+    public ResponseEntity<?> toggleAdminUserStatus(@PathVariable String username, HttpServletRequest request) {
         try {
             User u = userService.toggleUserStatus(username);
+            if (auditLogRepository != null && u != null) {
+                try {
+                    AuditLog logEntry = new AuditLog();
+                    logEntry.setUsername("admin");
+                    logEntry.setActionType("Khóa / Mở khóa tài khoản");
+                    logEntry.setDetails("Chuyển trạng thái tài khoản [" + username + "] sang: " + u.getStatus());
+                    logEntry.setModule("Tài khoản & Phân quyền");
+                    logEntry.setIpAddress(getClientIp(request));
+                    logEntry.setStatus("Thành công");
+                    logEntry.setActionTime(LocalDateTime.now());
+                    auditLogRepository.save(logEntry);
+                } catch (Exception ignored) {}
+            }
             return ResponseEntity.ok(Map.of("success", true, "status", u.getStatus()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));

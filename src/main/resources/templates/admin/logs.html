@@ -172,10 +172,30 @@
         </div>
 
         <div class="card" style="margin-bottom: 24px;">
-          <div class="card-header">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
             <div>
               <h2 class="card-title">Nhật ký truy vết hệ thống (Audit Trail)</h2>
               <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Ghi nhận mọi thao tác nhạy cảm: Cập nhật CSDL gốc, sao lưu, đổi bảng giá, hủy đặt cọc, phân quyền</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <div style="position: relative; width: 220px;">
+                <input type="text" id="auditSearchInput" class="form-control" placeholder="Tìm sự kiện, tài khoản..." oninput="filterAuditLogs()" style="padding: 6px 10px; font-size: 12.5px;">
+              </div>
+              <select id="auditModuleFilter" class="form-control" onchange="filterAuditLogs()" style="width: auto; padding: 6px 10px; font-size: 12.5px;">
+                <option value="ALL">Tất cả phân hệ</option>
+                <option value="Cơ sở dữ liệu">Cơ sở dữ liệu</option>
+                <option value="Hệ thống sao lưu">Hệ thống sao lưu</option>
+                <option value="Bảng giá">Bảng giá</option>
+                <option value="Khuyến mãi">Khuyến mãi</option>
+                <option value="Đặt sân & Thu ngân">Đặt sân & Thu ngân</option>
+                <option value="Tài khoản & Phân quyền">Tài khoản & Phân quyền</option>
+                <option value="An ninh & Đăng nhập">An ninh & Đăng nhập</option>
+                <option value="Phân hệ Quản trị">Cấu hình hệ thống</option>
+              </select>
+              <button class="btn btn-outline" onclick="loadAuditLogs()" style="padding: 6px 12px; font-size: 12.5px;" title="Tải lại nhật ký mới nhất từ CSDL">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; margin-right: 4px;"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                Làm mới
+              </button>
             </div>
           </div>
 
@@ -255,6 +275,8 @@
       }
     }
 
+    let allAuditLogs = [];
+
     async function loadAuditLogs() {
       try {
         let token = localStorage.getItem('jwt_token');
@@ -269,15 +291,42 @@
         if (res.ok) {
           const data = await res.json();
           if (data.logs && Array.isArray(data.logs)) {
-            renderAuditLogsTable(data.logs);
+            allAuditLogs = data.logs;
+            filterAuditLogs();
             return;
           }
         }
+        allAuditLogs = [];
         renderAuditLogsTable([]);
       } catch (e) {
         console.warn('Lỗi khi tải nhật ký hoạt động:', e);
+        allAuditLogs = [];
         renderAuditLogsTable([]);
       }
+    }
+
+    function filterAuditLogs() {
+      const searchKw = (document.getElementById('auditSearchInput')?.value || '').trim().toLowerCase();
+      const moduleVal = document.getElementById('auditModuleFilter')?.value || 'ALL';
+
+      let filtered = allAuditLogs.filter(log => {
+        if (moduleVal !== 'ALL') {
+          const m = (log.module || '').toLowerCase();
+          const targetM = moduleVal.toLowerCase();
+          if (!m.includes(targetM) && targetM !== m) return false;
+        }
+        if (searchKw) {
+          const matchUsername = (log.username || '').toLowerCase().includes(searchKw);
+          const matchAction = (log.actionType || '').toLowerCase().includes(searchKw);
+          const matchDetails = (log.details || '').toLowerCase().includes(searchKw);
+          const matchIp = (log.ipAddress || '').toLowerCase().includes(searchKw);
+          const matchModule = (log.module || '').toLowerCase().includes(searchKw);
+          return matchUsername || matchAction || matchDetails || matchIp || matchModule;
+        }
+        return true;
+      });
+
+      renderAuditLogsTable(filtered);
     }
 
     function renderAuditLogsTable(logs) {

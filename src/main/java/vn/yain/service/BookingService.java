@@ -56,6 +56,9 @@ public class BookingService {
     private vn.yain.repository.SystemSettingRepository systemSettingRepository;
 
     @Autowired(required = false)
+    private vn.yain.repository.AuditLogRepository auditLogRepository;
+
+    @Autowired(required = false)
     private EmailService emailService;
 
     @Value("${vietqr.bank.bin:970422}")
@@ -669,6 +672,20 @@ public class BookingService {
         courtRepository.findByCourtCode(booking.getCourtCode()).ifPresent(court -> {
             courtService.updateCourtStatus(court.getCourtCode(), "Trống");
         });
+
+        // Ghi AuditLog hủy đặt sân
+        if (auditLogRepository != null) {
+            try {
+                vn.yain.entity.AuditLog log = new vn.yain.entity.AuditLog();
+                log.setUsername(booking.getCustomerPhone() != null && !booking.getCustomerPhone().isBlank() ? booking.getCustomerPhone() : "Khách hàng");
+                log.setActionType("HỦY ĐẶT SÂN & THU HỒI CỌC");
+                log.setModule("Đặt sân & Thu ngân");
+                log.setStatus("Thành công");
+                log.setActionTime(LocalDateTime.now());
+                log.setDetails("Hủy đơn " + bookingCode + " (Sân " + booking.getCourtCode() + ", " + booking.getBookingDate() + " khung " + booking.getTimeSlot() + "). Tiền cọc: " + (booking.getDepositAmount() != null ? booking.getDepositAmount() : "0") + "đ. Lý do: " + reason);
+                auditLogRepository.save(log);
+            } catch (Exception ignored) {}
+        }
 
         broadcastBookingEvent(BookingNotificationDto.builder()
                 .eventType("BOOKING_CANCELLED")
