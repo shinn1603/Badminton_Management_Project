@@ -24,8 +24,8 @@
       defaultName: 'Trần Phúc Bảo',
       branchCode: 'CN01',
       branchName: 'CN Thủ Đức',
-      allowedPrefixes: ['/manager/', '/login'],
-      prohibitedPrefixes: ['/director/', '/admin/', '/pos/'],
+      allowedPrefixes: ['/manager/', '/pos/grid', '/booking/grid', '/login'],
+      prohibitedPrefixes: ['/director/', '/admin/'],
       homeUrl: '/manager/dashboard',
       deniedMessage: 'Tài khoản Quản lý chi nhánh chỉ có quyền quản lý phân hệ Chi nhánh Thủ Đức!'
     },
@@ -34,8 +34,8 @@
       defaultName: 'Nguyễn Phước Thọ',
       branchCode: 'ALL',
       branchName: 'Toàn hệ thống',
-      allowedPrefixes: ['/director/', '/login'],
-      prohibitedPrefixes: ['/admin/', '/manager/', '/pos/'],
+      allowedPrefixes: ['/director/', '/pos/grid', '/booking/grid', '/manager/', '/login'],
+      prohibitedPrefixes: ['/admin/'],
       homeUrl: '/director/dashboard',
       deniedMessage: 'Tài khoản Giám Đốc chỉ quản lý phân hệ Ban Điều Hành chuỗi!'
     },
@@ -44,8 +44,8 @@
       defaultName: 'Trần Biểu Hương',
       branchCode: 'ALL',
       branchName: 'Trung tâm kỹ thuật',
-      allowedPrefixes: ['/admin/', '/login'],
-      prohibitedPrefixes: ['/director/', '/manager/', '/pos/'],
+      allowedPrefixes: ['/admin/', '/director/', '/manager/', '/pos/', '/login'],
+      prohibitedPrefixes: [],
       homeUrl: '/admin/users',
       deniedMessage: 'Tài khoản Quản trị viên chỉ quản trị phân hệ Cấu hình & Tài khoản hệ thống!'
     },
@@ -207,20 +207,24 @@
         window.location.href = '/customer/home';
         return;
       }
-      if (currentUser.role === 'DIRECTOR' && target !== 'DIRECTOR') {
-        alert(ROLE_CONFIG.DIRECTOR.deniedMessage);
-        window.location.href = '/director/dashboard';
-        return;
+      if (currentUser.role === 'DIRECTOR') {
+        const isAllowedDirector = target === 'DIRECTOR' || lowerPath === '/pos/grid' || lowerPath === '/booking/grid' || target === 'MANAGER';
+        if (!isAllowedDirector) {
+          alert(ROLE_CONFIG.DIRECTOR.deniedMessage);
+          window.location.href = '/director/dashboard';
+          return;
+        }
       }
-      if (currentUser.role === 'ADMIN' && target !== 'ADMIN') {
-        alert(ROLE_CONFIG.ADMIN.deniedMessage);
-        window.location.href = '/admin/users';
-        return;
+      if (currentUser.role === 'ADMIN') {
+        // Superadmin has full access across management and operational modules
       }
-      if (currentUser.role === 'MANAGER' && target !== 'MANAGER') {
-        alert(ROLE_CONFIG.MANAGER.deniedMessage);
-        window.location.href = '/manager/dashboard';
-        return;
+      if (currentUser.role === 'MANAGER') {
+        const isAllowedManager = target === 'MANAGER' || lowerPath === '/pos/grid' || lowerPath === '/booking/grid';
+        if (!isAllowedManager) {
+          alert(ROLE_CONFIG.MANAGER.deniedMessage);
+          window.location.href = '/manager/dashboard';
+          return;
+        }
       }
       if (currentUser.role === 'POS' && target !== 'POS') {
         alert(ROLE_CONFIG.POS.deniedMessage);
@@ -263,21 +267,66 @@
 
       // Strict role isolation in UI navigation
       if (currentUser.role === 'DIRECTOR') {
-        document.querySelectorAll('a[href^="/admin/"], a[href^="/manager/"], a[href^="/pos/"]').forEach(el => {
+        document.querySelectorAll('a[href^="/admin/"]').forEach(el => {
           el.style.display = 'none';
         });
       } else if (currentUser.role === 'ADMIN') {
-        document.querySelectorAll('a[href^="/director/"], a[href^="/manager/"], a[href^="/pos/"]').forEach(el => {
-          el.style.display = 'none';
-        });
+        // Admin retains technical access to all modules
       } else if (currentUser.role === 'MANAGER') {
-        document.querySelectorAll('a[href^="/director/"], a[href^="/admin/"], a[href^="/pos/"]').forEach(el => {
+        document.querySelectorAll('a[href^="/director/"], a[href^="/admin/"]').forEach(el => {
           el.style.display = 'none';
         });
       } else if (currentUser.role === 'POS') {
         document.querySelectorAll('a[href^="/director/"], a[href^="/admin/"], a[href^="/manager/"]').forEach(el => {
           el.style.display = 'none';
         });
+      }
+
+      // Supervisory Return Buttons for POS Grid
+      const currentPathLower = window.location.pathname.toLowerCase();
+      if (currentPathLower.startsWith('/pos/')) {
+        const dBackSidebar = document.getElementById('directorPosBackLink');
+        const dBackHeader = document.getElementById('directorHeaderBackBtn');
+        if (currentUser.role === 'DIRECTOR') {
+          if (dBackSidebar) {
+            dBackSidebar.href = '/director/branches';
+            const mText = dBackSidebar.querySelector('.menu-text');
+            if (mText) mText.textContent = 'Quay lại Chi nhánh';
+            dBackSidebar.style.display = 'flex';
+          }
+          if (dBackHeader) {
+            dBackHeader.href = '/director/branches';
+            const span = dBackHeader.querySelector('span');
+            if (span) span.textContent = 'Quay lại Chi nhánh';
+            dBackHeader.style.display = 'inline-flex';
+          }
+        } else if (currentUser.role === 'ADMIN') {
+          if (dBackSidebar) {
+            dBackSidebar.href = '/admin/users';
+            const mText = dBackSidebar.querySelector('.menu-text');
+            if (mText) mText.textContent = 'Quay lại Quản trị';
+            dBackSidebar.style.display = 'flex';
+          }
+          if (dBackHeader) {
+            dBackHeader.href = '/admin/users';
+            const span = dBackHeader.querySelector('span');
+            if (span) span.textContent = 'Quay lại Quản trị';
+            dBackHeader.style.display = 'inline-flex';
+          }
+        } else if (currentUser.role === 'MANAGER') {
+          if (dBackSidebar) {
+            dBackSidebar.href = '/manager/dashboard';
+            const mText = dBackSidebar.querySelector('.menu-text');
+            if (mText) mText.textContent = 'Quay lại Quản lý';
+            dBackSidebar.style.display = 'flex';
+          }
+          if (dBackHeader) {
+            dBackHeader.href = '/manager/dashboard';
+            const span = dBackHeader.querySelector('span');
+            if (span) span.textContent = 'Quay lại Quản lý';
+            dBackHeader.style.display = 'inline-flex';
+          }
+        }
       }
 
       // Strict branch-level isolation:

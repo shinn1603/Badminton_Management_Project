@@ -5,7 +5,10 @@
  */
 
 let appData = {};
-let currentBranch = 'CN01';
+const initialUrlBranch = (typeof window !== 'undefined' && window.location.search)
+  ? new URLSearchParams(window.location.search).get('branchCode')
+  : null;
+let currentBranch = initialUrlBranch || 'CN01';
 let currentDateStr = '';
 let activeSlotCell = null;
 let posItems = [];
@@ -140,11 +143,18 @@ async function loadBranchesForPos() {
   const branchFilterEl = document.getElementById('branchFilter');
   if (!branchFilterEl) return;
   try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlBranch = urlParams.get('branchCode');
+
     const res = await fetch('/api/branches');
     if (res.ok) {
       const branches = await res.json();
       if (Array.isArray(branches) && branches.length > 0) {
-        const curVal = branchFilterEl.value || 'CN01';
+        let curVal = urlBranch || branchFilterEl.value || branches[0].branchCode;
+        if (!branches.some(b => b.branchCode === curVal)) {
+          curVal = branches[0].branchCode;
+        }
+
         branchFilterEl.innerHTML = '';
         branches.forEach(b => {
           const opt = document.createElement('option');
@@ -153,10 +163,10 @@ async function loadBranchesForPos() {
           if (b.branchCode === curVal) opt.selected = true;
           branchFilterEl.appendChild(opt);
         });
-        if (!branchFilterEl.value && branches.length > 0) {
-          branchFilterEl.value = branches[0].branchCode;
-        }
+
+        branchFilterEl.value = curVal;
         currentBranch = branchFilterEl.value;
+        updateBranchBadgeText();
       }
     }
   } catch (e) {
@@ -392,11 +402,27 @@ async function changeBranch() {
   const branchFilterEl = document.getElementById('branchFilter');
   if (branchFilterEl) {
     currentBranch = branchFilterEl.value;
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('branchCode', currentBranch);
+      window.history.replaceState({}, '', url);
+    } catch (e) {}
+    updateBranchBadgeText();
   }
   const dateInput = document.getElementById('gridDateInput');
   await loadCourtsForBranch(currentBranch);
   if (dateInput) {
     await renderGridForDate(dateInput.value);
+  }
+}
+
+function updateBranchBadgeText() {
+  const branchFilterEl = document.getElementById('branchFilter');
+  const headerText = document.getElementById('posHeaderBranchText');
+  if (branchFilterEl && headerText && branchFilterEl.selectedIndex >= 0) {
+    const selOpt = branchFilterEl.options[branchFilterEl.selectedIndex];
+    const bName = selOpt ? selOpt.textContent : currentBranch;
+    headerText.textContent = `Sơ đồ & Lưới đặt sân thời gian thực - ${bName}`;
   }
 }
 
