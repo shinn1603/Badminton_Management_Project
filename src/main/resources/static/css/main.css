@@ -130,6 +130,13 @@ html {
   padding: 0;
 }
 
+html {
+  max-width: 100vw;
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-page);
@@ -137,6 +144,10 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  max-width: 100vw;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
@@ -2543,8 +2554,8 @@ body.has-mobile-nav {
   top: 0;
   right: 0;
   bottom: 0;
-  width: 310px;
-  max-width: 86vw;
+  width: 285px;
+  max-width: 82vw;
   background: var(--surface);
   z-index: 10001;
   transform: translateX(100%);
@@ -3372,7 +3383,87 @@ body.has-mobile-nav {
   .tour-card-banner {
     height: 140px !important;
   }
+
+  /* 11. HARD ZERO-OVERFLOW LOCK FOR MOBILE VIEWPORT */
+  html, body, .layout-container, .main-wrapper, .dashboard-main-container, .cust-navbar, .page-content, .booking-wrapper, .history-container, .profile-layout, .tour-container, .policy-container {
+    max-width: 100vw !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .cust-navbar {
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+
+  .cust-nav-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  .dashboard-hero-section,
+  .hero-container,
+  .dashboard-main-container,
+  .dash-section-card,
+  .courts-card-grid,
+  .court-display-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .dashboard-main-container {
+    margin: 12px auto 40px !important;
+    padding: 0 12px !important;
+  }
+
+  .dash-section-card {
+    padding: 14px 12px !important;
+  }
+
+  /* Branch Filter Select on Mobile */
+  .dash-branch-filter {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 4px !important;
+  }
+
+  .dash-branch-filter select,
+  #dashBranchPicker {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Matrix table and pricing table inside scrolling wrapper */
+  .matrix-table-wrap,
+  .pricing-matrix-box {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    box-sizing: border-box !important;
+  }
+
+  .cust-matrix-table {
+    min-width: 650px !important;
+  }
+
+  .pricing-table-clean {
+    min-width: 480px !important;
+  }
 }
+
 
 
 
