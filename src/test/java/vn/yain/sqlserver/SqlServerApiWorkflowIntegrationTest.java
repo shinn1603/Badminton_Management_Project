@@ -22,6 +22,7 @@ import java.util.Map;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -307,8 +308,12 @@ class SqlServerApiWorkflowIntegrationTest {
         Integer p01After = jdbcTemplate.queryForObject("SELECT stock_quantity FROM products WHERE product_code = 'P01'", Integer.class);
         assertEquals(p01Initial + 25, p01After, "Ton kho P01 phai tang dung 25");
 
+        Integer detailCount = jdbcTemplate.queryForObject("SELECT count(*) FROM stock_product_details WHERE receipt_code = ?", Integer.class, rCode);
+        assertTrue(detailCount != null && detailCount > 0, "Chi tiet phieu nhap stock_product_details phai duoc luu");
+
         // Cleanup
         jdbcTemplate.update("UPDATE products SET stock_quantity = ? WHERE product_code = 'P01'", p01Initial);
+        jdbcTemplate.update("DELETE FROM stock_product_details WHERE receipt_code = ?", rCode);
         jdbcTemplate.update("DELETE FROM stock_receipts WHERE receipt_code = ?", rCode);
     }
 
@@ -370,5 +375,100 @@ class SqlServerApiWorkflowIntegrationTest {
                         .content(objectMapper.writeValueAsString(chatReq)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.text", notNullValue()));
+    }
+
+    @Test
+    @DisplayName("API SQL 11: Gui phieu va ve dien tu E-Ticket ve email khach hang")
+    void testSendTicketEmailApi() throws Exception {
+        String testCode = "DS_TEST_EMAIL_" + System.currentTimeMillis();
+        jdbcTemplate.update("""
+            INSERT INTO bookings (booking_code, customer_name, customer_phone, customer_email, branch_code, court_code, booking_date, time_slot, total_price, deposit_amount, status)
+            VALUES (?, N'Nguyễn Văn Test', '0909111222', 'old_email@gmail.com', 'CN01', 'CL01', ?, '17:00 - 18:00', 100000, 30000, N'Đã cọc 30%')
+        """, testCode, LocalDate.now().plusDays(2).toString());
+
+        try {
+            // Gửi vé với email mới
+            Map<String, String> payload = Map.of("email", "new_recipient@gmail.com");
+            mockMvc.perform(post("/api/bookings/" + testCode + "/send-ticket-email")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(payload)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success", is(true)))
+                    .andExpect(jsonPath("$.email", is("new_recipient@gmail.com")));
+
+            // Kiểm tra CSDL SQL Server đã cập nhật email
+            String savedEmail = jdbcTemplate.queryForObject("SELECT customer_email FROM bookings WHERE booking_code = ?", String.class, testCode);
+            assertEquals("new_recipient@gmail.com", savedEmail);
+        } finally {
+            jdbcTemplate.update("DELETE FROM bookings WHERE booking_code = ?", testCode);
+        }
+    }
+
+    @Test
+    @DisplayName("API SQL 12: Quy trinh khoi phuc mat khau bang ma OTP qua Email")
+    void testForgotPasswordAndResetWorkflowApi() throws Exception {
+        String testUser = "user_reset_" + System.currentTimeMillis();
+        String testEmail = "reset_test_" + System.currentTimeMillis() + "@gmail.com";
+        String testPhone = "0988" + (int)(Math.random() * 900000 + 100000);
+
+        jdbcTemplate.update("""
+            INSERT INTO users (username, password, full_name, email, phone, role, status, created_at)
+            VALUES (?, '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi', N'Khách Reset Test', ?, ?, 'CUSTOMER', N'Hoạt động', GETDATE())
+        """, testUser, testEmail, testPhone);
+
+        try {
+            // Bước 1: Yêu cầu gửi OTP khôi phục mật khẩu qua email
+            Map<String, String> forgotReq = Map.of("identifier", testUser);
+            mockMvc.perform(post("/api/auth/forgot-password")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(forgotReq)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success", is(true)))
+                    .andExpect(jsonPath("$.email", containsString("@")));
+
+            // Bước 2: Thử reset password không có OTP -> Phải bị từ chối
+            Map<String, String> noOtpReq = Map.of("identifier", testUser, "newPassword", "newPassword123");
+            mockMvc.perform(post("/api/auth/reset-password")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(noOtpReq)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success", is(false)));
+
+            // Bước 3: Thử reset password với mã OTP sai -> Phải bị từ chối
+            Map<String, String> wrongOtpReq = Map.of("identifier", testUser, "newPassword", "newPassword123", "otp", "999999");
+            mockMvc.perform(post("/api/auth/reset-password")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(wrongOtpReq)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success", is(false)));
+
+            // Bước 4: Lấy OTP hợp lệ từ Map của controller (thông qua reflection)
+            java.lang.reflect.Field otpField = ApiController.class.getDeclaredField("forgotPasswordOtpMap");
+            otpField.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            Map<String, Map<String, Object>> otpMap = (Map<String, Map<String, Object>>) otpField.get(apiController);
+            Map<String, Object> otpInfo = otpMap.get(testUser.toLowerCase());
+            assertNotNull(otpInfo, "Phải tìm thấy mã OTP cho user");
+            String validOtp = (String) otpInfo.get("otp");
+
+            // Bước 5: Đặt lại mật khẩu với OTP hợp lệ (Dùng phone làm identifier để kiểm tra đa khóa)
+            Map<String, String> validResetReq = Map.of("identifier", testPhone, "newPassword", "newPassword123", "otp", validOtp);
+            mockMvc.perform(post("/api/auth/reset-password")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(validResetReq)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success", is(true)));
+
+            // Bước 6: Đăng nhập thử với mật khẩu mới
+            Map<String, String> loginReq = Map.of("username", testUser, "password", "newPassword123");
+            mockMvc.perform(post("/api/auth/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(loginReq)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success", is(true)))
+                    .andExpect(jsonPath("$.token", notNullValue()));
+        } finally {
+            jdbcTemplate.update("DELETE FROM users WHERE username = ?", testUser);
+        }
     }
 }

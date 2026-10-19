@@ -20,10 +20,24 @@
       }
     }
 
+    .receipt-item-header {
+      display: grid;
+      grid-template-columns: 2fr 80px 115px 120px 36px;
+      gap: 10px;
+      padding: 8px 4px;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--border-subtle);
+      margin-bottom: 10px;
+    }
+
     .receipt-item-row {
       display: grid;
-      grid-template-columns: 1.8fr 65px 95px 105px 32px;
-      gap: 8px;
+      grid-template-columns: 2fr 80px 115px 120px 36px;
+      gap: 10px;
       margin-bottom: 12px;
       align-items: center;
     }
@@ -257,37 +271,48 @@
                 Chi tiết hàng hóa nhập:
               </div>
 
+              <!-- TIÊU ĐỀ CÁC CỘT DỮ LIỆU NHẬP KHO -->
+              <div class="receipt-item-header">
+                <div>Mặt hàng / Sản phẩm</div>
+                <div style="text-align: center;">Số lượng</div>
+                <div style="text-align: right;">Đơn giá nhập</div>
+                <div style="text-align: right;">Thành tiền</div>
+                <div style="text-align: center;">Xóa</div>
+              </div>
+
               <div id="receiptItemsContainer">
                 <div class="receipt-item-row">
-                  <select class="form-control" onchange="handleProductChange(this)">
-                    <option value="P01" selected>Nước Revive Chanh Muối 500ml</option>
-                    <option value="P02">Nước Pocari Sweat 500ml</option>
-                    <option value="P03">Nước suối Aquafina 500ml</option>
-                    <option value="P04">Nước tăng lực Bò Húc Red Bull</option>
-                    <option value="P05">Ống Cầu Hải Yến Đỏ (12 quả)</option>
-                    <option value="P06">Ống Cầu Thành Công 77</option>
-                    <option value="P07">Quấn cán vợt VS</option>
+                  <select class="form-control receipt-item-product" onchange="handleProductChange(this)">
+                    <option value="P01" selected>Nước bù khoáng Revive Chanh muối 500ml</option>
+                    <option value="P02">Nước điện giải Pocari Sweat 500ml</option>
+                    <option value="P03">Nước suối tinh khiết Aquafina 500ml</option>
+                    <option value="P04">Nước tăng lực Bò Húc Red Bull Thái</option>
+                    <option value="P05">Ống Cầu Lông Hải Yến Đỏ (12 quả)</option>
+                    <option value="P06">Ống Cầu Lông Thành Công 77 (12 quả)</option>
+                    <option value="P07">Quấn cán vợt cầu lông VS chống trượt</option>
+                    <option value="P08">Khăn lau mồ hôi thể thao Yonex</option>
                   </select>
-                  <input type="number" class="form-control" placeholder="SL" value="50" min="1" oninput="calcTotals()">
-                  <input type="number" class="form-control" placeholder="Giá nhập" value="8000" step="1000" oninput="calcTotals()">
+                  <input type="number" class="form-control receipt-item-qty" placeholder="SL" value="50" min="1" oninput="calcTotals()" style="text-align: center;">
+                  <input type="number" class="form-control receipt-item-price" placeholder="Giá nhập" value="8000" step="1000" oninput="calcTotals()" style="text-align: right;">
                   <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); text-align: right;" class="item-subtotal">400.000 đ</div>
-                  <button type="button" class="btn-icon" style="color: #ef4444;" onclick="this.parentElement.remove(); calcTotals();">✕</button>
+                  <button type="button" class="btn-icon receipt-item-delete" style="color: #ef4444;" title="Xóa dòng" onclick="this.parentElement.remove(); calcTotals();">✕</button>
                 </div>
 
                 <div class="receipt-item-row">
-                  <select class="form-control" onchange="handleProductChange(this)">
-                    <option value="P05" selected>Ống Cầu Hải Yến Đỏ (12 quả)</option>
-                    <option value="P01">Nước Revive Chanh Muối 500ml</option>
-                    <option value="P02">Nước Pocari Sweat 500ml</option>
-                    <option value="P03">Nước suối Aquafina 500ml</option>
-                    <option value="P04">Nước tăng lực Bò Húc Red Bull</option>
-                    <option value="P06">Ống Cầu Thành Công 77</option>
-                    <option value="P07">Quấn cán vợt VS</option>
+                  <select class="form-control receipt-item-product" onchange="handleProductChange(this)">
+                    <option value="P05" selected>Ống Cầu Lông Hải Yến Đỏ (12 quả)</option>
+                    <option value="P01">Nước bù khoáng Revive Chanh muối 500ml</option>
+                    <option value="P02">Nước điện giải Pocari Sweat 500ml</option>
+                    <option value="P03">Nước suối tinh khiết Aquafina 500ml</option>
+                    <option value="P04">Nước tăng lực Bò Húc Red Bull Thái</option>
+                    <option value="P06">Ống Cầu Lông Thành Công 77 (12 quả)</option>
+                    <option value="P07">Quấn cán vợt cầu lông VS chống trượt</option>
+                    <option value="P08">Khăn lau mồ hôi thể thao Yonex</option>
                   </select>
-                  <input type="number" class="form-control" placeholder="SL" value="20" min="1" oninput="calcTotals()">
-                  <input type="number" class="form-control" placeholder="Giá nhập" value="145000" step="5000" oninput="calcTotals()">
+                  <input type="number" class="form-control receipt-item-qty" placeholder="SL" value="20" min="1" oninput="calcTotals()" style="text-align: center;">
+                  <input type="number" class="form-control receipt-item-price" placeholder="Giá nhập" value="145000" step="5000" oninput="calcTotals()" style="text-align: right;">
                   <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); text-align: right;" class="item-subtotal">2.900.000 đ</div>
-                  <button type="button" class="btn-icon" style="color: #ef4444;" onclick="this.parentElement.remove(); calcTotals();">✕</button>
+                  <button type="button" class="btn-icon receipt-item-delete" style="color: #ef4444;" title="Xóa dòng" onclick="this.parentElement.remove(); calcTotals();">✕</button>
                 </div>
               </div>
 
@@ -397,11 +422,18 @@
       if (token) headers['Authorization'] = 'Bearer ' + token;
 
       try {
-        const res = await fetch(`/api/products?branchCode=${encodeURIComponent(branch)}`, { headers });
+        const res = await fetch(`/api/products?catalog=true`, { headers });
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
-            availableProducts = data;
+            const map = new Map();
+            data.forEach(p => {
+              const code = (p.productCode || '').trim();
+              if (code && !map.has(code)) {
+                map.set(code, p);
+              }
+            });
+            availableProducts = Array.from(map.values());
           }
         }
       } catch (e) {
@@ -421,7 +453,7 @@
       const selectedCode = selectEl.value;
       const prod = availableProducts.find(p => p.productCode === selectedCode);
       const row = selectEl.closest('.receipt-item-row');
-      const costInput = row.querySelectorAll('input')[1];
+      const costInput = row.querySelector('.receipt-item-price') || row.querySelectorAll('input')[1];
       if (prod && costInput) {
         costInput.value = Math.round(Number(prod.costPrice || 0));
       }
@@ -434,37 +466,41 @@
       let totalSum = 0;
 
       rows.forEach(r => {
-        const qtyInp = r.querySelectorAll('input')[0];
-        const priceInp = r.querySelectorAll('input')[1];
+        const qtyInp = r.querySelector('.receipt-item-qty') || r.querySelectorAll('input')[0];
+        const priceInp = r.querySelector('.receipt-item-price') || r.querySelectorAll('input')[1];
         const subtotalEl = r.querySelector('.item-subtotal');
 
-        const qty = Number(qtyInp.value) || 0;
-        const price = Number(priceInp.value) || 0;
+        const qty = qtyInp ? (Number(qtyInp.value) || 0) : 0;
+        const price = priceInp ? (Number(priceInp.value) || 0) : 0;
         const sub = qty * price;
 
         totalQty += qty;
         totalSum += sub;
 
-        subtotalEl.innerText = Math.round(sub).toLocaleString('vi-VN') + ' đ';
+        if (subtotalEl) {
+          subtotalEl.innerText = Math.round(sub).toLocaleString('vi-VN') + ' đ';
+        }
       });
 
-      document.getElementById('totalItemsCount').innerText = totalQty + ' món';
-      document.getElementById('grandTotal').innerText = Math.round(totalSum).toLocaleString('vi-VN') + ' đ';
+      const totalItemsCountEl = document.getElementById('totalItemsCount');
+      if (totalItemsCountEl) totalItemsCountEl.innerText = totalQty + ' món';
+      const grandTotalEl = document.getElementById('grandTotal');
+      if (grandTotalEl) grandTotalEl.innerText = Math.round(totalSum).toLocaleString('vi-VN') + ' đ';
     }
 
     function addReceiptRow(defaultCode = 'P01', defaultQty = 10) {
       const container = document.getElementById('receiptItemsContainer');
-      const prod = availableProducts.find(p => p.productCode === defaultCode) || availableProducts[0];
+      const prod = availableProducts.find(p => p.productCode === defaultCode) || availableProducts[0] || {};
       const div = document.createElement('div');
       div.className = 'receipt-item-row';
       div.innerHTML = `
-        <select class="form-control" onchange="handleProductChange(this)">
+        <select class="form-control receipt-item-product" onchange="handleProductChange(this)">
           ${renderProductSelectOptions(defaultCode)}
         </select>
-        <input type="number" class="form-control" placeholder="SL" value="${defaultQty}" min="1" oninput="calcTotals()">
-        <input type="number" class="form-control" placeholder="Giá nhập" value="${Math.round(Number(prod.costPrice || 8000))}" step="1000" oninput="calcTotals()">
+        <input type="number" class="form-control receipt-item-qty" placeholder="SL" value="${defaultQty}" min="1" oninput="calcTotals()" style="text-align: center;">
+        <input type="number" class="form-control receipt-item-price" placeholder="Giá nhập" value="${Math.round(Number(prod.costPrice || 8000))}" step="1000" oninput="calcTotals()" style="text-align: right;">
         <div style="font-size: 13.5px; font-weight: 800; color: var(--primary); text-align: right;" class="item-subtotal">0 đ</div>
-        <button type="button" class="btn-icon" style="color: #ef4444;" onclick="this.parentElement.remove(); calcTotals();">✕</button>
+        <button type="button" class="btn-icon receipt-item-delete" style="color: #ef4444;" title="Xóa dòng" onclick="this.parentElement.remove(); calcTotals();">✕</button>
       `;
       container.appendChild(div);
       calcTotals();
@@ -508,15 +544,18 @@
       const items = [];
 
       rows.forEach(r => {
-        const productSelect = r.querySelector('select');
+        const productSelect = r.querySelector('.receipt-item-product') || r.querySelector('select');
         const productCode = productSelect ? productSelect.value : '';
-        const qtyInp = r.querySelectorAll('input')[0];
-        const priceInp = r.querySelectorAll('input')[1];
+        const selectedOpt = productSelect && productSelect.selectedIndex >= 0 ? productSelect.options[productSelect.selectedIndex] : null;
+        const productName = selectedOpt ? selectedOpt.text.trim() : '';
+        const qtyInp = r.querySelector('.receipt-item-qty') || r.querySelectorAll('input')[0];
+        const priceInp = r.querySelector('.receipt-item-price') || r.querySelectorAll('input')[1];
         const qty = qtyInp ? (Number(qtyInp.value) || 0) : 0;
         const unitPrice = priceInp ? (Number(priceInp.value) || 0) : 0;
         if (qty > 0 && productCode) {
           items.push({
             productCode: productCode,
+            productName: productName,
             quantity: qty,
             importPrice: unitPrice,
             unitPrice: unitPrice

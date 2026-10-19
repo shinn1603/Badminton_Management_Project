@@ -317,6 +317,44 @@ public class DatabaseManagementService {
     }
 
     /**
+     * Tải lên một tệp sao lưu (.sql) từ máy tính vào thư mục database/backups
+     */
+    public synchronized Map<String, Object> saveUploadedBackup(org.springframework.web.multipart.MultipartFile file, String adminUsername) throws Exception {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Vui lòng chọn tệp tin sao lưu (.sql) để tải lên!");
+        }
+        String originalName = file.getOriginalFilename();
+        if (originalName == null || (!originalName.toLowerCase().endsWith(".sql") && !originalName.toLowerCase().endsWith(".sql.gz"))) {
+            throw new IllegalArgumentException("Chỉ chấp nhận tệp định dạng .sql hoặc .sql.gz!");
+        }
+        ensureBackupDirectory();
+        String safeName = new File(originalName).getName().replaceAll("[^a-zA-Z0-9._-]", "_");
+        if (!safeName.toLowerCase().endsWith(".sql") && !safeName.toLowerCase().endsWith(".sql.gz")) {
+            safeName += ".sql";
+        }
+        File targetFile = new File(BACKUP_DIR_PATH, safeName);
+        file.transferTo(targetFile);
+
+        AuditLog auditLog = new AuditLog();
+        auditLog.setUsername(adminUsername != null ? adminUsername : "admin");
+        auditLog.setActionType("Tải lên bản sao lưu");
+        auditLog.setDetails(String.format("Tải lên tệp sao lưu %s (Dung lượng: %.2f KB) từ máy tính",
+                safeName, targetFile.length() / 1024.0));
+        auditLog.setModule("Hệ thống sao lưu");
+        auditLog.setStatus("Thành công");
+        auditLog.setActionTime(LocalDateTime.now());
+        auditLogRepository.save(auditLog);
+
+        Map<String, Object> resp = new LinkedHashMap<>();
+        resp.put("success", true);
+        resp.put("filename", safeName);
+        resp.put("sizeBytes", targetFile.length());
+        resp.put("sizeKb", String.format("%.2f KB", targetFile.length() / 1024.0));
+        resp.put("message", "Đã tải lên tệp sao lưu " + safeName + " thành công!");
+        return resp;
+    }
+
+    /**
      * Phục hồi cơ sở dữ liệu từ file sao lưu
      */
     public synchronized Map<String, Object> restoreDatabase(String filename, String adminUsername) throws Exception {

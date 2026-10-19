@@ -219,10 +219,21 @@
         </div>
 
         <div class="card">
-          <div class="card-header">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div>
               <h2 class="card-title">Quản lý các bản Sao lưu CSDL chuỗi sân (Database Backups)</h2>
-              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Tự động sao lưu định kỳ và hỗ trợ tạo bản sao lưu thủ công hoàn chỉnh (.sql) có thể tải về hoặc phục hồi</div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Lưu trữ tệp .sql an toàn trên ổ cứng máy chủ. Tải về máy tính cá nhân hoặc tải lên tệp .sql để phục hồi bất kỳ lúc nào</div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="file" id="uploadBackupFileInput" accept=".sql" style="display: none;" onchange="handleUploadBackup(this)">
+              <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;" onclick="document.getElementById('uploadBackupFileInput').click()" title="Tải tệp .sql từ máy tính cá nhân lên hệ thống">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                Tải lên tệp .sql từ máy
+              </button>
+              <button class="btn btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="backupDatabaseNow()" title="Tạo ngay một bản sao lưu CSDL mới">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Sao lưu ngay
+              </button>
             </div>
           </div>
 
@@ -419,8 +430,12 @@
           if (backups.length === 0) {
             tbody.innerHTML = `
               <tr>
-                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
-                  Chưa có bản sao lưu nào trong thư mục <code>database/backups/</code>. Nhấn nút "Sao lưu CSDL ngay" để tạo bản sao lưu mới.
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 28px;">
+                  <div style="font-size: 13.5px; font-weight: 600; color: var(--text-dark); margin-bottom: 6px;">Chưa có bản sao lưu nào trong thư mục <code>database/backups/</code></div>
+                  <div style="font-size: 12px; margin-bottom: 12px; color: var(--text-muted);">Bản sao lưu sẽ được lưu cố định trên ổ cứng máy chủ và không bị mất khi thoát trang.</div>
+                  <button class="btn btn-primary" style="padding: 6px 16px; font-size: 12px;" onclick="backupDatabaseNow()">
+                    Sao lưu CSDL ngay
+                  </button>
                 </td>
               </tr>
             `;
@@ -588,6 +603,46 @@
       } catch (err) {
         console.error('Lỗi khi phục hồi sao lưu:', err);
         if (window.showToast) { showToast('Lỗi phục hồi: ' + err.message, 'danger'); }
+      }
+    }
+
+    async function handleUploadBackup(input) {
+      if (!input || !input.files || input.files.length === 0) return;
+      const file = input.files[0];
+      if (!file.name.toLowerCase().endsWith('.sql') && !file.name.toLowerCase().endsWith('.sql.gz')) {
+        if (window.showToast) { showToast('Vui lòng chọn tệp có định dạng .sql hoặc .sql.gz', 'danger'); } else { alert('Chỉ chấp nhận tệp .sql hoặc .sql.gz'); }
+        input.value = '';
+        return;
+      }
+      const formData = new FormData();
+      formData.append('file', file);
+
+      if (window.showToast) { showToast('Đang tải lên tệp sao lưu: ' + file.name + '...', 'info'); }
+
+      try {
+        const res = await fetch('/api/admin/database/upload', {
+          method: 'POST',
+          credentials: 'include',
+          headers: getAuthHeaders(false),
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          if (window.showToast) {
+            showToast(data.message || 'Đã tải lên tệp sao lưu thành công!', 'success');
+          } else {
+            alert(data.message || 'Tải lên thành công!');
+          }
+          await Promise.all([loadDatabaseStatus(), loadBackupLogs(), loadAuditLogs()]);
+        } else {
+          const msg = data.message || 'Không thể tải lên tệp sao lưu';
+          if (window.showToast) { showToast(msg, 'danger'); } else { alert('Lỗi: ' + msg); }
+        }
+      } catch (err) {
+        console.error('Lỗi tải lên tệp sao lưu:', err);
+        if (window.showToast) { showToast('Lỗi kết nối khi tải lên: ' + err.message, 'danger'); }
+      } finally {
+        input.value = '';
       }
     }
 

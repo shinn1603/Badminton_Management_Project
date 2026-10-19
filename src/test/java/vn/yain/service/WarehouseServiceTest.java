@@ -34,6 +34,9 @@ class WarehouseServiceTest {
     @Mock
     private BookingRepository bookingRepository;
 
+    @Mock
+    private vn.yain.repository.StockProductDetailRepository stockProductDetailRepository;
+
     @InjectMocks
     private WarehouseService warehouseService;
 
@@ -99,6 +102,7 @@ class WarehouseServiceTest {
         Product grip = new Product();
         grip.setProductCode("SP_GRIP");
         grip.setProductName("Quấn cán Yonex AC102EX");
+        grip.setBranchCode("CN01");
         grip.setStockQuantity(10);
         grip.setCostPrice(new BigDecimal("25000"));
 

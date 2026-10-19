@@ -613,8 +613,13 @@
           </div>
         </div>
 
+        <div style="margin-bottom: 12px; text-align: left;">
+          <label style="font-size: 11.5px; color: var(--cust-text-muted); font-weight: 600; display: block; margin-bottom: 4px;">Email nhận vé & hóa đơn điện tử:</label>
+          <input type="email" id="tktEmailInput" class="form-control" placeholder="Nhập địa chỉ email của bạn..." style="width: 100%; padding: 8px 10px; font-size: 12.5px; border-radius: 8px; border: 1px solid var(--cust-border, #cbd5e1); box-sizing: border-box;">
+        </div>
+
         <button type="button" class="btn btn-primary" onclick="resendTicketEmail()" id="btnResendEmail" style="width: 100%; height: 38px; font-size: 13px; font-weight: 700; margin-bottom: 8px; border-radius: 8px;">
-          Gửi Vé Về Email
+          📩 Gửi Vé & Hóa Đơn Về Email
         </button>
         <button type="button" class="btn btn-outline" onclick="closeModals()" style="width: 100%; height: 36px; font-size: 12.5px; border-radius: 8px;">
           Đóng
@@ -797,7 +802,7 @@
 
               <div class="b-actions" id="actions-${item.bookingCode}">
                 ${category === 'upcoming' ? `
-                  <button type="button" class="btn btn-primary" onclick="openQrModal('${item.bookingCode}', '${courtLabel}', '${slotLabel}', '${dateLabel}', '${remaining.toLocaleString('vi-VN')} đ')">
+                  <button type="button" class="btn btn-primary" onclick="openQrModal('${item.bookingCode}', '${courtLabel}', '${slotLabel}', '${dateLabel}', '${remaining.toLocaleString('vi-VN')} đ', '${item.customerEmail || ''}')">
                     <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     Mã Check-in QR
                   </button>
@@ -805,11 +810,14 @@
                     Hủy Đặt Sân
                   </button>
                 ` : category === 'completed' ? `
+                  <button type="button" class="btn btn-primary" onclick="openQrModal('${item.bookingCode}', '${courtLabel}', '${slotLabel}', '${dateLabel}', '${remaining.toLocaleString('vi-VN')} đ', '${item.customerEmail || ''}')" style="background: var(--cust-teal, #0d9488); border-color: var(--cust-teal, #0d9488);">
+                    Xem Vé / Gửi Mail
+                  </button>
                   <button type="button" class="btn btn-outline" onclick="openReviewModal('${item.bookingCode}', '${courtLabel}')">
                     Đánh Giá
                   </button>
                   <a href="/customer/booking" class="btn btn-outline">
-                    Đặt Lại Sân Này
+                    Đặt Lại
                   </a>
                 ` : `
                   <button type="button" class="btn btn-outline" disabled style="opacity: 0.6; cursor: not-allowed;">
@@ -838,12 +846,27 @@
       if (eCanc) eCanc.textContent = cancelled;
     }
 
-    function openQrModal(code, court, time, date, remaining) {
+    function openQrModal(code, court, time, date, remaining, email) {
       document.getElementById('tktCode').textContent = code;
       document.getElementById('tktCourt').textContent = court;
       document.getElementById('tktTime').textContent = time;
       document.getElementById('tktDate').textContent = date;
       document.getElementById('tktRemaining').textContent = remaining;
+
+      const emailInput = document.getElementById('tktEmailInput');
+      if (emailInput) {
+        let defaultEmail = email || '';
+        if (!defaultEmail) {
+          try {
+            const user = JSON.parse(localStorage.getItem('utesport_user') || '{}');
+            defaultEmail = user.email || '';
+          } catch (e) {}
+        }
+        if (!defaultEmail) {
+          defaultEmail = localStorage.getItem('cust_email') || '';
+        }
+        emailInput.value = defaultEmail;
+      }
       document.getElementById('qrModal').classList.add('open');
     }
 
@@ -854,6 +877,29 @@
 
     async function resendTicketEmail() {
       const code = document.getElementById('tktCode').innerText.trim();
+      const emailInput = document.getElementById('tktEmailInput');
+      let email = emailInput ? emailInput.value.trim() : '';
+
+      if (!email) {
+        email = prompt('Vui lòng nhập địa chỉ email để nhận vé điện tử (E-Ticket):');
+        if (!email || !email.trim()) {
+          showToast('Chưa nhập email nhận vé!', 'warning');
+          return;
+        }
+        email = email.trim();
+        if (emailInput) emailInput.value = email;
+      }
+
+      if (!email.includes('@')) {
+        showToast('Địa chỉ email không đúng định dạng!', 'warning');
+        if (emailInput) emailInput.focus();
+        return;
+      }
+
+      try {
+        localStorage.setItem('cust_email', email);
+      } catch (e) {}
+
       const btn = document.getElementById('btnResendEmail');
       if (btn) {
         btn.disabled = true;
@@ -862,11 +908,12 @@
       try {
         const res = await fetch(`/api/bookings/${code}/send-ticket-email`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
         });
         const data = await res.json();
         if (data.success) {
-          showToast(data.message, 'success');
+          showToast(data.message || 'Đã gửi vé điện tử về email thành công!', 'success');
         } else {
           showToast(data.message || 'Không thể gửi vé về email!', 'error');
         }
@@ -875,7 +922,7 @@
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.innerText = '📩 Gửi Phiếu & Vé Về Email';
+          btn.innerText = '📩 Gửi Vé & Hóa Đơn Về Email';
         }
       }
     }

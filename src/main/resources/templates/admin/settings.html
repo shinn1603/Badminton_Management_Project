@@ -127,8 +127,8 @@
 
               <div class="form-group">
                 <label class="form-label">Thời hạn hủy sân tối thiểu để được hoàn cọc (Giờ)</label>
-                <input type="number" class="form-control" id="cfgCancelHours" value="12" min="1" max="72">
-                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Hủy trước giờ đánh 12 tiếng để được nhận lại tiền cọc vào tài khoản</div>
+                <input type="number" class="form-control" id="cfgCancelHours" value="4" min="1" max="72">
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Hủy trước giờ đánh 4 tiếng để được nhận lại tiền cọc vào tài khoản (Theo QĐ-KH03)</div>
               </div>
 
               <div class="form-group">
@@ -532,7 +532,7 @@
       } catch (e) {
         document.getElementById('cfgDepositRate').value = '30';
         document.getElementById('cfgHoldingMinutes').value = '10';
-        document.getElementById('cfgCancelHours').value = '12';
+        document.getElementById('cfgCancelHours').value = '4';
         document.getElementById('cfgAdvanceDays').value = '30';
         document.getElementById('cfgPointsPer1000').value = '1';
         document.getElementById('cfgTierSilverPoints').value = '500';

@@ -791,7 +791,7 @@ INSERT INTO tournament_matches (match_code, tournament_code, court_code, player1
 INSERT INTO system_settings (setting_code, setting_name, setting_value, description) VALUES
 ('CFG_DEPOSIT_RATE', N'Tỷ lệ đặt cọc tối thiểu (%)', '30', N'Khách hàng phải thanh toán cọc ít nhất 30% để giữ sân hợp lệ (QĐ-KH02)'),
 ('CFG_HOLDING_MINUTES', N'Thời gian tạm giữ chỗ chờ cọc (Phút)', '10', N'Sau 10 phút nếu không có giao dịch cọc, hệ thống tự động giải phóng ô sân (QĐ-KH02)'),
-('CFG_CANCEL_HOURS', N'Thời hạn hủy sân tối thiểu để được hoàn cọc (Giờ)', '12', N'Hủy trước giờ chơi tối thiểu 12 tiếng để được nhận lại tiền cọc vào tài khoản'),
+('CFG_CANCEL_HOURS', N'Thời hạn hủy sân tối thiểu để được hoàn cọc (Giờ)', '4', N'Hủy trước giờ chơi tối thiểu 4 tiếng để được nhận lại 100% tiền cọc vào tài khoản (QĐ-KH03)'),
 ('CFG_ADVANCE_DAYS', N'Số ngày tối đa được phép đặt trước', '30', N'Giới hạn đặt sân trong vòng 30 ngày tới'),
 ('CFG_VNPAY_TMN', N'Mã đối tác VNPay (TMN Code)', 'UTESPORT2026', N'Tích hợp cổng thanh toán VNPay QR Sandbox/Production'),
 ('CFG_VNPAY_ENV', N'Môi trường VNPay', 'SANDBOX', N'Môi trường thử nghiệm Sandbox hoặc Production'),

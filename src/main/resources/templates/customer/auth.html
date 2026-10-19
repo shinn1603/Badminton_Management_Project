@@ -904,6 +904,13 @@
       }
 
       const otp = document.getElementById('cfOtp') ? document.getElementById('cfOtp').value.trim() : '';
+      if (!otp) {
+        showToast('Vui lòng bấm "Gửi OTP về Email" và nhập mã OTP 6 chữ số!', 'warning');
+        const otpContainer = document.getElementById('custOtpContainer');
+        if (otpContainer) otpContainer.style.display = 'block';
+        if (document.getElementById('cfOtp')) document.getElementById('cfOtp').focus();
+        return;
+      }
 
       btn.disabled = true;
       btn.innerText = 'Đang xử lý...';

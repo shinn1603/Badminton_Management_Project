@@ -377,6 +377,13 @@
       }
 
       const otp = document.getElementById('fpOtp') ? document.getElementById('fpOtp').value.trim() : '';
+      if (!otp) {
+        showToast('Vui lòng bấm "Gửi OTP về Email" và nhập mã OTP 6 chữ số!', 'warning');
+        const otpContainer = document.getElementById('otpFieldContainer');
+        if (otpContainer) otpContainer.style.display = 'block';
+        if (document.getElementById('fpOtp')) document.getElementById('fpOtp').focus();
+        return;
+      }
 
       btn.disabled = true;
       btn.innerText = 'Đang xử lý...';

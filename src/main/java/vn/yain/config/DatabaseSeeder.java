@@ -382,24 +382,22 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     private void seedProducts() {
-        if (productRepository.count() < 11) {
-            List<Product> products = List.of(
-                createProduct("P01", "CN01", "Nước bù khoáng Revive Chanh muối 500ml", "Nước giải khát", "Chai", new BigDecimal("15000"), new BigDecimal("8000"), 150, 20),
-                createProduct("P02", "CN01", "Nước điện giải Pocari Sweat 500ml", "Nước giải khát", "Chai", new BigDecimal("18000"), new BigDecimal("11000"), 120, 20),
-                createProduct("P03", "CN01", "Nước suối tinh khiết Aquafina 500ml", "Nước giải khát", "Chai", new BigDecimal("10000"), new BigDecimal("5000"), 220, 30),
-                createProduct("P04", "CN01", "Nước tăng lực Bò Húc Red Bull Thái", "Nước giải khát", "Lon", new BigDecimal("20000"), new BigDecimal("12000"), 95, 15),
-                createProduct("P05", "CN01", "Ống Cầu Lông Hải Yến Đỏ (12 quả)", "Cầu lông", "Ống", new BigDecimal("180000"), new BigDecimal("145000"), 65, 10),
-                createProduct("P06", "CN01", "Ống Cầu Lông Thành Công 77 (12 quả)", "Cầu lông", "Ống", new BigDecimal("210000"), new BigDecimal("175000"), 40, 10),
-                createProduct("P07", "CN01", "Quấn cán vợt cầu lông VS chống trượt", "Phụ kiện", "Cái", new BigDecimal("15000"), new BigDecimal("7000"), 85, 15),
-                createProduct("P08", "CN01", "Khăn lau mồ hôi thể thao Yonex", "Phụ kiện", "Cái", new BigDecimal("45000"), new BigDecimal("25000"), 30, 5),
-                createProduct("P09", "CN02", "Nước bù khoáng Revive Chanh muối 500ml", "Nước giải khát", "Chai", new BigDecimal("15000"), new BigDecimal("8000"), 110, 20),
-                createProduct("P10", "CN03", "Nước bù khoáng Revive Chanh muối 500ml", "Nước giải khát", "Chai", new BigDecimal("15000"), new BigDecimal("8000"), 90, 20),
-                createProduct("P11", "CN04", "Nước bù khoáng Revive Chanh muối 500ml", "Nước giải khát", "Chai", new BigDecimal("15000"), new BigDecimal("8000"), 100, 20)
-            );
-            for (Product p : products) {
-                if (productRepository.findByProductCode(p.getProductCode()).isEmpty()) {
-                    productRepository.save(p);
-                }
+        List<Product> products = List.of(
+            createProduct("P01", "CN01", "Nước bù khoáng Revive Chanh muối 500ml", "Nước giải khát", "Chai", new BigDecimal("15000"), new BigDecimal("8000"), 150, 20),
+            createProduct("P02", "CN01", "Nước điện giải Pocari Sweat 500ml", "Nước giải khát", "Chai", new BigDecimal("18000"), new BigDecimal("11000"), 120, 20),
+            createProduct("P03", "CN01", "Nước suối tinh khiết Aquafina 500ml", "Nước giải khát", "Chai", new BigDecimal("10000"), new BigDecimal("5000"), 220, 30),
+            createProduct("P04", "CN01", "Nước tăng lực Bò Húc Red Bull Thái", "Nước giải khát", "Lon", new BigDecimal("20000"), new BigDecimal("12000"), 95, 15),
+            createProduct("P05", "CN01", "Ống Cầu Lông Hải Yến Đỏ (12 quả)", "Cầu lông", "Ống", new BigDecimal("180000"), new BigDecimal("145000"), 65, 10),
+            createProduct("P06", "CN01", "Ống Cầu Lông Thành Công 77 (12 quả)", "Cầu lông", "Ống", new BigDecimal("210000"), new BigDecimal("175000"), 40, 10),
+            createProduct("P07", "CN01", "Quấn cán vợt cầu lông VS chống trượt", "Phụ kiện", "Cái", new BigDecimal("15000"), new BigDecimal("7000"), 85, 15),
+            createProduct("P08", "CN01", "Khăn lau mồ hôi thể thao Yonex", "Phụ kiện", "Cái", new BigDecimal("45000"), new BigDecimal("25000"), 30, 5),
+            createProduct("P09", "CN02", "Nước bù khoáng Revive Chanh muối 500ml", "Nước giải khát", "Chai", new BigDecimal("15000"), new BigDecimal("8000"), 110, 20),
+            createProduct("P10", "CN03", "Nước bù khoáng Revive Chanh muối 500ml", "Nước giải khát", "Chai", new BigDecimal("15000"), new BigDecimal("8000"), 90, 20),
+            createProduct("P11", "CN04", "Nước bù khoáng Revive Chanh muối 500ml", "Nước giải khát", "Chai", new BigDecimal("15000"), new BigDecimal("8000"), 100, 20)
+        );
+        for (Product p : products) {
+            if (productRepository.findByProductCode(p.getProductCode()).isEmpty()) {
+                productRepository.save(p);
             }
         }
     }
@@ -618,7 +616,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     private void seedSystemSettings() {
         saveSettingIfMissing("CFG_DEPOSIT_RATE", "Tỷ lệ đặt cọc tối thiểu (%)", "30", "Khách hàng phải thanh toán cọc ít nhất 30% để giữ sân hợp lệ");
         saveSettingIfMissing("CFG_HOLDING_MINUTES", "Thời gian tạm giữ chỗ chờ cọc (Phút)", "10", "Sau 10 phút nếu không có giao dịch cọc, hệ thống tự động giải phóng ô sân");
-        saveSettingIfMissing("CFG_CANCEL_HOURS", "Thời hạn hủy sân tối thiểu để được hoàn cọc (Giờ)", "12", "Hủy trước giờ chơi tối thiểu 12 tiếng để được nhận lại tiền cọc");
+        saveSettingIfMissing("CFG_CANCEL_HOURS", "Thời hạn hủy sân tối thiểu để được hoàn cọc (Giờ)", "4", "Hủy trước giờ chơi tối thiểu 4 tiếng để được nhận lại 100% tiền cọc (QĐ-KH03)");
         saveSettingIfMissing("CFG_ADVANCE_DAYS", "Số ngày tối đa được phép đặt trước", "30", "Giới hạn đặt sân trong vòng 30 ngày tới");
         saveSettingIfMissing("CFG_VNPAY_TMN", "Mã đối tác VNPay (TMN Code)", "UTESPORT2026", "Tích hợp cổng thanh toán VNPay QR Sandbox/Production");
         saveSettingIfMissing("CFG_VNPAY_ENV", "Môi trường VNPay", "SANDBOX", "Môi trường thử nghiệm Sandbox hoặc Production");

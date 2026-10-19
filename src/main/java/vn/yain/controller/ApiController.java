@@ -290,19 +290,22 @@ public class ApiController {
                     .or(() -> cleanId.contains("@") ? userRepository.findByEmail(cleanId) : Optional.empty())
                     .orElse(null);
 
+            Customer cust = null;
+            if (user == null) {
+                cust = customerRepository.findByPhone(cleanId)
+                        .or(() -> customerRepository.findByCustomerCode(cleanId))
+                        .or(() -> cleanId.contains("@") ? customerRepository.findByEmail(cleanId) : Optional.empty())
+                        .orElse(null);
+            }
+
             String email = null;
             String fullName = null;
             if (user != null) {
                 email = user.getEmail();
                 fullName = user.getFullName();
-            } else {
-                Customer cust = customerRepository.findByPhone(cleanId)
-                        .or(() -> cleanId.contains("@") ? customerRepository.findByEmail(cleanId) : Optional.empty())
-                        .orElse(null);
-                if (cust != null) {
-                    email = cust.getEmail();
-                    fullName = cust.getFullName();
-                }
+            } else if (cust != null) {
+                email = cust.getEmail();
+                fullName = cust.getFullName();
             }
 
             if (email == null || email.isBlank() || !email.contains("@")) {
@@ -319,7 +322,19 @@ public class ApiController {
             otpInfo.put("email", email);
             otpInfo.put("identifier", cleanId);
             otpInfo.put("expiry", System.currentTimeMillis() + 10 * 60 * 1000); // 10 phút hiệu lực
+
+            // Lưu đa khóa để người dùng nhập bất kỳ định danh nào (username, phone, email, customerCode) đều khớp OTP
             forgotPasswordOtpMap.put(cleanId.toLowerCase(), otpInfo);
+            if (user != null) {
+                if (user.getUsername() != null) forgotPasswordOtpMap.put(user.getUsername().trim().toLowerCase(), otpInfo);
+                if (user.getPhone() != null && !user.getPhone().isBlank()) forgotPasswordOtpMap.put(user.getPhone().trim().toLowerCase(), otpInfo);
+                if (user.getEmail() != null && !user.getEmail().isBlank()) forgotPasswordOtpMap.put(user.getEmail().trim().toLowerCase(), otpInfo);
+            }
+            if (cust != null) {
+                if (cust.getCustomerCode() != null) forgotPasswordOtpMap.put(cust.getCustomerCode().trim().toLowerCase(), otpInfo);
+                if (cust.getPhone() != null && !cust.getPhone().isBlank()) forgotPasswordOtpMap.put(cust.getPhone().trim().toLowerCase(), otpInfo);
+                if (cust.getEmail() != null && !cust.getEmail().isBlank()) forgotPasswordOtpMap.put(cust.getEmail().trim().toLowerCase(), otpInfo);
+            }
 
             if (emailService != null) {
                 emailService.sendPasswordResetOtp(email, fullName, otp);
@@ -371,24 +386,38 @@ public class ApiController {
 
             String cleanId = identifier.trim();
 
-            // Nếu người dùng nhập mã OTP, kiểm tra tính hợp lệ
+            // Bắt buộc kiểm tra mã OTP
             String otp = payload.get("otp");
-            if (otp != null && !otp.isBlank()) {
-                Map<String, Object> otpInfo = forgotPasswordOtpMap.get(cleanId.toLowerCase());
-                if (otpInfo == null) {
-                    return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã xác nhận OTP không tồn tại hoặc đã hết hạn!"));
-                }
-                long expiry = (long) otpInfo.get("expiry");
-                if (System.currentTimeMillis() > expiry) {
-                    forgotPasswordOtpMap.remove(cleanId.toLowerCase());
-                    return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã xác nhận OTP đã hết hạn (quá 10 phút)! Vui lòng yêu cầu mã mới."));
-                }
-                String expectedOtp = (String) otpInfo.get("otp");
-                if (!expectedOtp.equals(otp.trim())) {
-                    return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã xác nhận OTP không chính xác. Vui lòng kiểm tra lại email!"));
-                }
-                forgotPasswordOtpMap.remove(cleanId.toLowerCase());
+            if (otp == null || otp.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "success", false,
+                        "message", "Vui lòng nhập mã xác nhận OTP 6 chữ số đã được gửi qua email!"
+                ));
             }
+
+            Map<String, Object> otpInfo = forgotPasswordOtpMap.get(cleanId.toLowerCase());
+            if (otpInfo == null) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "success", false,
+                        "message", "Mã xác nhận OTP không tồn tại hoặc đã hết hạn! Vui lòng bấm 'Gửi OTP về Email' để nhận mã mới."
+                ));
+            }
+            long expiry = (long) otpInfo.get("expiry");
+            if (System.currentTimeMillis() > expiry) {
+                forgotPasswordOtpMap.remove(cleanId.toLowerCase());
+                return ResponseEntity.badRequest().body(Map.of(
+                        "success", false,
+                        "message", "Mã xác nhận OTP đã hết hạn (quá 10 phút)! Vui lòng yêu cầu mã mới."
+                ));
+            }
+            String expectedOtp = (String) otpInfo.get("otp");
+            if (!expectedOtp.equals(otp.trim())) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "success", false,
+                        "message", "Mã xác nhận OTP không chính xác. Vui lòng kiểm tra lại email!"
+                ));
+            }
+            forgotPasswordOtpMap.remove(cleanId.toLowerCase());
 
             userService.resetPassword(cleanId, newPassword);
 
@@ -830,7 +859,7 @@ public class ApiController {
             }
             map.putIfAbsent("CFG_DEPOSIT_RATE", "30");
             map.putIfAbsent("CFG_HOLDING_MINUTES", "10");
-            map.putIfAbsent("CFG_CANCEL_HOURS", "12");
+            map.putIfAbsent("CFG_CANCEL_HOURS", "4");
             map.putIfAbsent("CFG_ADVANCE_DAYS", "30");
             map.putIfAbsent("CFG_VNPAY_TMN", "UTESPORT2026");
             map.putIfAbsent("CFG_VNPAY_ENV", "SANDBOX");
@@ -898,7 +927,7 @@ public class ApiController {
             Map<String, String> defaults = Map.ofEntries(
                 Map.entry("CFG_DEPOSIT_RATE", "30"),
                 Map.entry("CFG_HOLDING_MINUTES", "10"),
-                Map.entry("CFG_CANCEL_HOURS", "12"),
+                Map.entry("CFG_CANCEL_HOURS", "4"),
                 Map.entry("CFG_ADVANCE_DAYS", "30"),
                 Map.entry("CFG_VNPAY_TMN", "UTESPORT2026"),
                 Map.entry("CFG_VNPAY_ENV", "SANDBOX"),
@@ -1054,6 +1083,21 @@ public class ApiController {
         try {
             List<Map<String, Object>> backups = databaseManagementService.listBackups();
             return ResponseEntity.ok(Map.of("success", true, "backups", backups));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
+        }
+    }
+
+    @PostMapping("/admin/database/upload")
+    public ResponseEntity<?> uploadDatabaseBackup(@RequestParam("file") MultipartFile file) {
+        try {
+            String username = "admin";
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+                username = auth.getName();
+            }
+            Map<String, Object> result = databaseManagementService.saveUploadedBackup(file, username);
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
         }
@@ -1271,19 +1315,45 @@ public class ApiController {
                 ? payload.get("email").trim()
                 : b.getCustomerEmail();
 
-        if (targetEmail != null && !targetEmail.isBlank()) {
-            b.setCustomerEmail(targetEmail);
-            bookingRepository.save(b);
+        if ((targetEmail == null || targetEmail.isBlank()) && b.getCustomerCode() != null) {
+            customerRepository.findByCustomerCode(b.getCustomerCode())
+                    .ifPresent(c -> {
+                        if (c.getEmail() != null && !c.getEmail().isBlank()) {
+                            b.setCustomerEmail(c.getEmail().trim());
+                        }
+                    });
+            targetEmail = b.getCustomerEmail();
         }
+
+        if ((targetEmail == null || targetEmail.isBlank()) && b.getCustomerPhone() != null) {
+            userRepository.findByPhone(b.getCustomerPhone())
+                    .ifPresent(u -> {
+                        if (u.getEmail() != null && !u.getEmail().isBlank()) {
+                            b.setCustomerEmail(u.getEmail().trim());
+                        }
+                    });
+            targetEmail = b.getCustomerEmail();
+        }
+
+        if (targetEmail == null || targetEmail.isBlank() || !targetEmail.contains("@")) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Đơn đặt sân chưa có email nhận vé! Vui lòng nhập địa chỉ email hợp lệ để nhận vé điện tử."
+            ));
+        }
+
+        b.setCustomerEmail(targetEmail);
+        bookingRepository.save(b);
 
         if (emailService != null) {
             emailService.sendBookingConfirmation(b);
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "message", "Đã gửi phiếu xác nhận đặt sân & Vé điện tử E-Ticket tới: " + (targetEmail != null ? targetEmail : "email khách hàng")
+                    "message", "Đã gửi phiếu xác nhận đặt sân & Vé điện tử E-Ticket thành công tới: " + targetEmail,
+                    "email", targetEmail
             ));
         }
-        return ResponseEntity.ok(Map.of("success", true, "message", "Hệ thống đã ghi nhận yêu cầu gửi vé."));
+        return ResponseEntity.ok(Map.of("success", true, "message", "Hệ thống đã ghi nhận yêu cầu gửi vé tới: " + targetEmail));
     }
 
     @PostMapping("/bookings")
@@ -1603,7 +1673,11 @@ public class ApiController {
     // ==========================================
 
     @GetMapping("/products")
-    public List<Product> getProducts(@RequestParam(required = false) String branchCode) {
+    public List<Product> getProducts(@RequestParam(required = false) String branchCode,
+                                     @RequestParam(required = false, defaultValue = "false") boolean catalog) {
+        if (catalog) {
+            return productRepository.findAll();
+        }
         String effectiveBranch = resolveEffectiveBranchCode(branchCode);
         if (effectiveBranch != null && !effectiveBranch.trim().isEmpty() && !"ALL".equalsIgnoreCase(effectiveBranch.trim())) {
             return productRepository.findByBranchCode(effectiveBranch.trim());
