@@ -208,6 +208,29 @@
             </div>
           </div>
         </div>
+
+        <div class="card" style="margin-top: 20px; border-left: 4px solid var(--primary, #059669);">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <h2 class="card-title">Đồng bộ Database gốc & Quản lý Sao lưu</h2>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Cập nhật toàn bộ trạng thái dữ liệu hiện tại vào file seed gốc <code>database/init_badminton.sql</code> hoặc tạo bản sao lưu snapshot</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-primary" onclick="syncBaseDatabaseFromSettings()" style="padding: 6px 14px; font-size: 12.5px;">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Cập nhật Database gốc
+              </button>
+              <a href="/admin/logs" class="btn btn-outline" style="padding: 6px 14px; font-size: 12.5px; text-decoration: none; display: inline-flex; align-items: center;">
+                Quản lý sao lưu chi tiết &rarr;
+              </a>
+            </div>
+          </div>
+          <div class="card-body">
+            <p style="font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.6;">
+              Khi bạn thêm bớt sân, đặt sân, khách hàng, nhân viên, hoặc điều chỉnh bảng giá - cấu hình, mọi thay đổi đều tự động lưu vào SQL Server ngay lập tức. Để lưu lại những dữ liệu mới này làm <strong>phiên bản chuẩn ban đầu (Database gốc)</strong> cho các lần khởi tạo lại hệ thống hoặc bàn giao dự án, nhấn nút <strong>"Cập nhật Database gốc"</strong>.
+            </p>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -303,6 +326,37 @@
         document.getElementById('cfgCancelHours').value = '12';
         document.getElementById('cfgAdvanceDays').value = '30';
         if (window.showToast) showToast('Đã khôi phục thông số mặc định', 'info');
+      }
+    }
+
+    async function syncBaseDatabaseFromSettings() {
+      if (!confirm('XÁC NHẬN CẬP NHẬT DATABASE GỐC:\n\nTrích xuất toàn bộ dữ liệu thực tế hiện tại và đồng bộ vào file [database/init_badminton.sql]. Bản gốc cũ sẽ được tự động lưu trong thư mục database/backups/.\n\nBạn có muốn tiến hành không?')) return;
+      if (window.showToast) showToast('Đang trích xuất và đồng bộ dữ liệu vào file gốc...', 'info');
+      try {
+        let token = localStorage.getItem('jwt_token');
+        if (!token && typeof document !== 'undefined' && document.cookie) {
+          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+          if (match) token = match[1];
+        }
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/admin/database/sync-base', {
+          method: 'POST',
+          credentials: 'include',
+          headers: headers
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          if (window.showToast) showToast(data.message || 'Đã cập nhật database gốc thành công!', 'success');
+          else alert(data.message || 'Cập nhật database gốc thành công!');
+        } else {
+          const msg = data.message || 'Lỗi khi đồng bộ database gốc';
+          if (window.showToast) showToast(msg, 'danger');
+          else alert('Lỗi: ' + msg);
+        }
+      } catch (e) {
+        if (window.showToast) showToast('Lỗi kết nối: ' + e.message, 'danger');
       }
     }
 

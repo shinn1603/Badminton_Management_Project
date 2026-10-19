@@ -169,6 +169,9 @@ public class ApiController {
     @Autowired
     private SystemSettingRepository systemSettingRepository;
 
+    @Autowired
+    private vn.yain.service.DatabaseManagementService databaseManagementService;
+
     @Autowired(required = false)
     private vn.yain.service.EmailService emailService;
 
@@ -868,46 +871,160 @@ public class ApiController {
         return l;
     }
 
+    // ==========================================
+    // 1.9 QUẢN LÝ CƠ SỞ DỮ LIỆU & SAO LƯU (DATABASE MANAGEMENT, BASE SYNC & BACKUP)
+    // ==========================================
+
+    @GetMapping("/admin/database/status")
+    public ResponseEntity<?> getDatabaseStatus() {
+        try {
+            Map<String, Object> status = databaseManagementService.getDatabaseStatus();
+            return ResponseEntity.ok(Map.of("success", true, "data", status));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
+        }
+    }
+
+    @PostMapping("/admin/database/sync-base")
+    public ResponseEntity<?> syncBaseDatabase() {
+        try {
+            String username = "admin";
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+                username = auth.getName();
+            }
+            Map<String, Object> result = databaseManagementService.syncToBaseDatabase(username);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
+        }
+    }
+
+    @PostMapping("/admin/database/backup")
+    public ResponseEntity<?> createDatabaseBackup(@RequestBody(required = false) Map<String, String> payload) {
+        try {
+            String filename = (payload != null && payload.containsKey("filename")) ? payload.get("filename") : null;
+            String username = "admin";
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+                username = auth.getName();
+            }
+            Map<String, Object> result = databaseManagementService.createBackupSnapshot(filename, username);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
+        }
+    }
+
+    @GetMapping("/admin/database/backups")
+    public ResponseEntity<?> listDatabaseBackups() {
+        try {
+            List<Map<String, Object>> backups = databaseManagementService.listBackups();
+            return ResponseEntity.ok(Map.of("success", true, "backups", backups));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
+        }
+    }
+
+    @GetMapping("/admin/database/download")
+    public ResponseEntity<?> downloadBackupFile(@RequestParam("file") String filename) {
+        try {
+            java.io.File f = databaseManagementService.getBackupFile(filename);
+            if (f == null || !f.exists()) {
+                return ResponseEntity.notFound().build();
+            }
+            org.springframework.core.io.Resource resource = new org.springframework.core.io.FileSystemResource(f);
+            return ResponseEntity.ok()
+                    .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + f.getName() + "\"")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM)
+                    .contentLength(f.length())
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
+        }
+    }
+
+    @GetMapping("/admin/database/download-base")
+    public ResponseEntity<?> downloadBaseScript() {
+        try {
+            java.io.File f = databaseManagementService.getBaseScriptFile();
+            if (f == null || !f.exists()) {
+                return ResponseEntity.notFound().build();
+            }
+            org.springframework.core.io.Resource resource = new org.springframework.core.io.FileSystemResource(f);
+            return ResponseEntity.ok()
+                    .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"init_badminton.sql\"")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM)
+                    .contentLength(f.length())
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
+        }
+    }
+
+    @PostMapping("/admin/database/restore")
+    public ResponseEntity<?> restoreDatabase(@RequestBody Map<String, String> payload) {
+        try {
+            String filename = payload != null ? payload.get("filename") : null;
+            if (filename == null || filename.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Tên tệp sao lưu không được để trống!"));
+            }
+            String username = "admin";
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+                username = auth.getName();
+            }
+            Map<String, Object> result = databaseManagementService.restoreDatabase(filename, username);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
+        }
+    }
+
+    @PostMapping("/admin/database/reset-base")
+    public ResponseEntity<?> resetToBaseDatabase() {
+        try {
+            String username = "admin";
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+                username = auth.getName();
+            }
+            Map<String, Object> result = databaseManagementService.resetToBaseDatabase(username);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
+        }
+    }
+
     @GetMapping("/admin/logs/backups")
     public ResponseEntity<?> getAdminBackupLogs() {
         try {
+            List<Map<String, Object>> diskBackups = databaseManagementService.listBackups();
             List<AuditLog> allLogs = auditLogRepository.findTop100ByOrderByActionTimeDesc();
             List<AuditLog> backupLogs = allLogs.stream()
                     .filter(l -> "Hệ thống sao lưu".equalsIgnoreCase(l.getModule())
+                            || "Cơ sở dữ liệu".equalsIgnoreCase(l.getModule())
                             || (l.getActionType() != null && l.getActionType().toLowerCase().contains("sao lưu")))
                     .collect(Collectors.toList());
-            if (backupLogs.isEmpty()) {
-                LocalDateTime now = LocalDateTime.now();
-                backupLogs = List.of(
-                    createFallbackLog("system", "SYS", "Sao lưu cơ sở dữ liệu tự động", "Tạo bản sao lưu định kỳ backup_ute_sport_auto_20261019.sql.gz (28.5 MB)", "Hệ thống sao lưu", "127.0.0.1", "Thành công", now.minusHours(5)),
-                    createFallbackLog("admin", "AD01", "Sao lưu CSDL thủ công", "Tạo bản sao lưu backup_ute_sport_manual_20261018.sql.gz trước khi bảo trì", "Hệ thống sao lưu", "192.168.1.105", "Thành công", now.minusDays(1).minusHours(2))
-                );
-                try {
-                    auditLogRepository.saveAll(backupLogs);
-                } catch (Exception ignored) {}
-            }
-            return ResponseEntity.ok(Map.of("success", true, "backups", backupLogs));
+            return ResponseEntity.ok(Map.of("success", true, "backups", backupLogs, "diskBackups", diskBackups));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
         }
     }
 
     @PostMapping("/admin/logs/backup")
     public ResponseEntity<?> createBackupLog(@RequestBody(required = false) Map<String, String> payload) {
         try {
-            String filename = (payload != null && payload.containsKey("filename")) ? payload.get("filename") : "backup_ute_sport_manual.sql.gz";
-            AuditLog auditLog = new AuditLog();
-            auditLog.setUsername("admin");
-            auditLog.setActionType("Sao lưu cơ sở dữ liệu thủ công");
-            auditLog.setDetails("Tạo bản sao lưu " + filename + " thành công trên máy chủ CSDL SQL Server");
-            auditLog.setModule("Hệ thống sao lưu");
-            auditLog.setStatus("Thành công");
-            auditLog.setActionTime(LocalDateTime.now());
-            auditLogRepository.save(auditLog);
-
-            return ResponseEntity.ok(Map.of("success", true, "log", auditLog));
+            String filename = (payload != null && payload.containsKey("filename")) ? payload.get("filename") : null;
+            String username = "admin";
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+                username = auth.getName();
+            }
+            Map<String, Object> backupResult = databaseManagementService.createBackupSnapshot(filename, username);
+            return ResponseEntity.ok(Map.of("success", true, "backup", backupResult));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
         }
     }
 

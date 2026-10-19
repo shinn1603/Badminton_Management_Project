@@ -92,6 +92,13 @@
             <input type="text" placeholder="Tìm theo tài khoản, sự kiện...">
           </div>
 
+          <button class="btn btn-outline" style="border-color: #059669; color: #059669;" onclick="syncBaseDatabaseNow()" title="Lưu toàn bộ dữ liệu vừa chỉnh sửa thêm bớt thành bản Database gốc mới nhất">
+            <svg class="svg-icon" viewBox="0 0 24 24">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+            <span>Cập nhật Database gốc</span>
+          </button>
+
           <button class="btn btn-primary" onclick="backupDatabaseNow()">
             <svg class="svg-icon" viewBox="0 0 24 24">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -111,8 +118,56 @@
               <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
               Nhật Ký Truy Vết & An Ninh Hệ Thống
             </div>
-            <h1 class="hero-title" style="margin-bottom: 8px;">Nhật Ký Hoạt Động & An Toàn Dữ Liệu</h1>
-            <p class="hero-subtitle" style="margin-bottom: 0;">Truy vết chi tiết mọi tác vụ điều chỉnh giá sân, phân quyền tài khoản, thanh toán VietQR và sao lưu cơ sở dữ liệu</p>
+            <h1 class="hero-title" style="margin-bottom: 8px;">Nhật Ký Hoạt Động, Đồng Bộ & Sao Lưu Dữ Liệu</h1>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Truy vết chi tiết mọi tác vụ điều chỉnh giá sân, phân quyền tài khoản, cập nhật Database gốc và sao lưu an toàn toàn hệ thống</p>
+          </div>
+        </div>
+
+        <!-- DATABASE MANAGEMENT & BASE SYNC PANEL -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 class="card-title">Đồng bộ Database gốc & Trạng thái CSDL (Live Base Sync)</h2>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Cập nhật tệp script gốc <code>database/init_badminton.sql</code> thành bản mới nhất chứa toàn bộ các chỉnh sửa thêm bớt</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;" onclick="downloadBaseScript()">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Tải tệp init_badminton.sql
+              </button>
+              <button class="btn btn-primary" style="padding: 6px 14px; font-size: 12px; background: #059669; border-color: #059669;" onclick="syncBaseDatabaseNow()">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; margin-right: 4px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                Cập nhật Database gốc ngay
+              </button>
+              <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" onclick="resetToBaseDatabaseNow()" title="Khôi phục toàn bộ hệ thống về bản database gốc">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; margin-right: 4px;"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                Khôi phục về gốc
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+              <div style="padding: 14px; border-radius: 8px; background: var(--surface-subtle); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Tệp SQL Gốc (Seed)</div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-dark); margin-top: 4px; font-family: monospace;">init_badminton.sql</div>
+                <div style="font-size: 11.5px; color: #059669; margin-top: 4px;" id="statBaseSize">Đang kiểm tra...</div>
+              </div>
+              <div style="padding: 14px; border-radius: 8px; background: var(--surface-subtle); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Lần cập nhật gốc cuối</div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-dark); margin-top: 4px;" id="statBaseMod">Đang tải...</div>
+                <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">Tự động lưu bản snapshot</div>
+              </div>
+              <div style="padding: 14px; border-radius: 8px; background: var(--surface-subtle); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Tổng bản ghi CSDL</div>
+                <div style="font-size: 14px; font-weight: 700; color: #2563eb; margin-top: 4px;" id="statTotalRec">Đang tính...</div>
+                <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">Đầy đủ 25 phân hệ dữ liệu</div>
+              </div>
+              <div style="padding: 14px; border-radius: 8px; background: var(--surface-subtle); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Bản sao lưu (.sql)</div>
+                <div style="font-size: 14px; font-weight: 700; color: #d97706; margin-top: 4px;" id="statTotalBackups">Đang nạp...</div>
+                <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">Sẵn sàng tải về máy</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -120,7 +175,7 @@
           <div class="card-header">
             <div>
               <h2 class="card-title">Nhật ký truy vết hệ thống (Audit Trail)</h2>
-              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Ghi nhận mọi thao tác nhạy cảm: Đổi bảng giá, hủy đặt cọc, phân quyền, đăng nhập</div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Ghi nhận mọi thao tác nhạy cảm: Cập nhật CSDL gốc, sao lưu, đổi bảng giá, hủy đặt cọc, phân quyền</div>
             </div>
           </div>
 
@@ -147,7 +202,7 @@
           <div class="card-header">
             <div>
               <h2 class="card-title">Quản lý các bản Sao lưu CSDL chuỗi sân (Database Backups)</h2>
-              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Tự động sao lưu định kỳ hàng ngày vào lúc 02:00 sáng và hỗ trợ sao lưu thủ công</div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Tự động sao lưu định kỳ và hỗ trợ tạo bản sao lưu thủ công hoàn chỉnh (.sql) có thể tải về hoặc phục hồi</div>
             </div>
           </div>
 
@@ -268,19 +323,47 @@
       });
     }
 
+    function getAuthHeaders(isJson = false) {
+      const headers = {};
+      let token = localStorage.getItem('jwt_token');
+      if (!token && typeof document !== 'undefined' && document.cookie) {
+        const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+        if (match) token = match[1];
+      }
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      if (isJson) headers['Content-Type'] = 'application/json';
+      return headers;
+    }
+
+    async function loadDatabaseStatus() {
+      try {
+        const res = await fetch('/api/admin/database/status', { credentials: 'include', headers: getAuthHeaders() });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            const d = json.data;
+            if (d.baseScript) {
+              const baseEl = document.getElementById('statBaseSize');
+              if (baseEl) baseEl.textContent = (d.baseScript.sizeKb || 0).toLocaleString('vi-VN') + ' KB';
+              const modEl = document.getElementById('statBaseMod');
+              if (modEl) modEl.textContent = d.baseScript.lastModified ? formatDateTime(d.baseScript.lastModified) : 'Chưa có';
+            }
+            const recEl = document.getElementById('statTotalRec');
+            if (recEl) recEl.textContent = (d.totalRecords || 0).toLocaleString('vi-VN') + ' bản ghi';
+            const bkpEl = document.getElementById('statTotalBackups');
+            if (bkpEl) bkpEl.textContent = (d.totalBackups || 0) + ' tệp .sql';
+          }
+        }
+      } catch (e) {
+        console.warn('Lỗi tải trạng thái database:', e);
+      }
+    }
+
     async function loadBackupLogs() {
       const tbody = document.getElementById('backupListTable');
       if (!tbody) return;
       try {
-        let token = localStorage.getItem('jwt_token');
-        if (!token && typeof document !== 'undefined' && document.cookie) {
-          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
-          if (match) token = match[1];
-        }
-        const headers = {};
-        if (token) headers['Authorization'] = 'Bearer ' + token;
-
-        const res = await fetch('/api/admin/logs/backups', { headers });
+        const res = await fetch('/api/admin/database/backups', { credentials: 'include', headers: getAuthHeaders() });
         if (res.ok) {
           const data = await res.json();
           const backups = data.backups || [];
@@ -288,7 +371,7 @@
             tbody.innerHTML = `
               <tr>
                 <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
-                  Chưa có bản sao lưu nào được thực hiện. Nhấn nút "Sao lưu CSDL ngay" để tạo bản sao lưu mới.
+                  Chưa có bản sao lưu nào trong thư mục <code>database/backups/</code>. Nhấn nút "Sao lưu CSDL ngay" để tạo bản sao lưu mới.
                 </td>
               </tr>
             `;
@@ -296,24 +379,23 @@
           }
           tbody.innerHTML = '';
           backups.forEach(b => {
-            const timeStr = b.actionTime ? new Date(b.actionTime).toLocaleString('vi-VN') : '--';
-            const details = b.details || '';
-            const match = details.match(/backup_[^\s]+\.sql\.gz/);
-            const filename = match ? match[0] : ('backup_db_' + (b.id || 'system') + '.sql.gz');
-            const isCron = (b.actionType || '').toLowerCase().includes('tự động') || (b.username || '').toLowerCase() === 'system';
-            const methodBadge = isCron 
-              ? '<span class="badge" style="background: #eff6ff; color: #1d4ed8;">Tự động (Cron)</span>'
-              : '<span class="badge" style="background: #f0fdfa; color: #0f766e;">Thủ công</span>';
+            const timeStr = b.lastModified ? formatDateTime(b.lastModified) : '--';
+            const filename = b.filename;
+            const sizeStr = (b.sizeKb ? b.sizeKb.toLocaleString('vi-VN') + ' KB' : (b.sizeBytes ? Math.round(b.sizeBytes/1024) + ' KB' : '—'));
+            const isBaseBackup = filename.startsWith('init_badminton_backup_');
+            const methodBadge = isBaseBackup 
+              ? '<span class="badge" style="background: #fdf4ff; color: #9333ea;">Snapshot Gốc</span>'
+              : '<span class="badge" style="background: #f0fdfa; color: #0f766e;">Sao lưu CSDL</span>';
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
               <td style="font-family: monospace; font-weight: 600; color: var(--text-dark);">${escapeHtml(filename)}</td>
-              <td>28.5 MB</td>
+              <td>${escapeHtml(sizeStr)}</td>
               <td>${escapeHtml(timeStr)}</td>
               <td>${methodBadge}</td>
               <td style="text-align: right;">
                 <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="downloadBackup('${escapeHtml(filename)}')">Tải file</button>
-                <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444;" onclick="restoreBackup('${escapeHtml(filename)}')">Phục hồi</button>
+                <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444; margin-left: 4px;" onclick="restoreBackup('${escapeHtml(filename)}')">Phục hồi</button>
               </td>
             `;
             tbody.appendChild(tr);
@@ -332,42 +414,131 @@
       `;
     }
 
+    async function syncBaseDatabaseNow() {
+      if (!confirm('XÁC NHẬN CẬP NHẬT DATABASE GỐC:\n\nThao tác này sẽ trích xuất toàn bộ dữ liệu đang có trong hệ thống (sân, chi nhánh, đặt sân, khách hàng, nhân viên, bảng giá, kho hàng...) và ghi đè cập nhật vào tệp [database/init_badminton.sql].\n\nĐồng thời hệ thống sẽ tự động tạo một bản sao lưu an toàn của file gốc trước khi ghi đè.\n\nBạn có chắc chắn muốn tiến hành?')) {
+        return;
+      }
+      if (window.showToast) { showToast('Đang trích xuất dữ liệu và đồng bộ vào file gốc...', 'info'); }
+      try {
+        const res = await fetch('/api/admin/database/sync-base', {
+          method: 'POST',
+          credentials: 'include',
+          headers: getAuthHeaders(true)
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          if (window.showToast) {
+            showToast(data.message || 'Đã cập nhật database gốc thành công!', 'success');
+          } else {
+            alert(data.message || 'Cập nhật database gốc thành công!');
+          }
+          await Promise.all([loadDatabaseStatus(), loadBackupLogs(), loadAuditLogs()]);
+        } else {
+          const msg = data.message || 'Không thể đồng bộ database gốc';
+          if (window.showToast) { showToast(msg, 'danger'); } else { alert('Lỗi: ' + msg); }
+        }
+      } catch (err) {
+        console.error('Lỗi syncBaseDatabase:', err);
+        if (window.showToast) { showToast('Lỗi kết nối khi đồng bộ database gốc: ' + err.message, 'danger'); }
+      }
+    }
+
+    function downloadBaseScript() {
+      if (window.showToast) { showToast('Đang tải tệp init_badminton.sql...', 'info'); }
+      window.location.href = '/api/admin/database/download-base';
+    }
+
+    async function resetToBaseDatabaseNow() {
+      if (!confirm('CẢNH BÁO NGUY HIỂM: KHÔI PHỤC VỀ DATABASE GỐC\n\nThao tác này sẽ thực thi lại tệp [database/init_badminton.sql] để đưa toàn bộ hệ thống về trạng thái chuẩn ban đầu. Mọi dữ liệu tạm thời chưa được đồng bộ có thể bị thay đổi.\n\nBạn có tuyệt đối chắc chắn muốn khôi phục không?')) {
+        return;
+      }
+      if (window.showToast) { showToast('Đang thực hiện khôi phục hệ thống về database gốc...', 'warning'); }
+      try {
+        const res = await fetch('/api/admin/database/reset-base', {
+          method: 'POST',
+          credentials: 'include',
+          headers: getAuthHeaders(true)
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          if (window.showToast) {
+            showToast(data.message || 'Khôi phục về database gốc thành công!', 'success');
+          } else {
+            alert(data.message || 'Khôi phục về database gốc thành công!');
+          }
+          await Promise.all([loadDatabaseStatus(), loadBackupLogs(), loadAuditLogs()]);
+        } else {
+          const msg = data.message || 'Lỗi khi khôi phục database gốc';
+          if (window.showToast) { showToast(msg, 'danger'); } else { alert('Lỗi: ' + msg); }
+        }
+      } catch (err) {
+        console.error('Lỗi resetToBaseDatabase:', err);
+        if (window.showToast) { showToast('Lỗi: ' + err.message, 'danger'); }
+      }
+    }
+
     async function backupDatabaseNow() {
       const now = new Date();
-      const filename = 'backup_ute_sport_manual_' + now.toISOString().replace(/[-:T.]/g, '').slice(0, 14) + '.sql.gz';
+      const pad = n => String(n).padStart(2, '0');
+      const filename = 'backup_full_' + now.getFullYear() + pad(now.getMonth()+1) + pad(now.getDate()) + '_' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds()) + '.sql';
+
+      if (window.showToast) { showToast('Đang kết xuất bản sao lưu CSDL hoàn chỉnh: ' + filename + '...', 'info'); }
 
       try {
-        let token = localStorage.getItem('jwt_token');
-        if (!token && typeof document !== 'undefined' && document.cookie) {
-          const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
-          if (match) token = match[1];
-        }
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = 'Bearer ' + token;
-
-        const res = await fetch('/api/admin/logs/backup', {
+        const res = await fetch('/api/admin/database/backup', {
           method: 'POST',
-          headers: headers,
+          credentials: 'include',
+          headers: getAuthHeaders(true),
           body: JSON.stringify({ filename: filename })
         });
         const data = await res.json();
         if (res.ok && data.success) {
-          await Promise.all([loadBackupLogs(), loadAuditLogs()]);
+          if (window.showToast) {
+            showToast(data.message || 'Đã sao lưu CSDL thành công: ' + filename, 'success');
+          }
+          await Promise.all([loadDatabaseStatus(), loadBackupLogs(), loadAuditLogs()]);
+        } else {
+          const msg = data.message || 'Sao lưu thất bại';
+          if (window.showToast) { showToast(msg, 'danger'); }
         }
       } catch (err) {
         console.warn('Lỗi ghi nhật ký sao lưu:', err);
+        if (window.showToast) { showToast('Lỗi kết nối khi sao lưu: ' + err.message, 'danger'); }
       }
-
-      if (window.showToast) { showToast('Đã sao lưu CSDL thành công: ' + filename, 'success'); }
     }
 
     function downloadBackup(file) {
-      if (window.showToast) { showToast('Đang tải file sao lưu: ' + file, 'info'); }
+      if (window.showToast) { showToast('Đang tải tệp sao lưu: ' + file, 'info'); }
+      window.location.href = '/api/admin/database/download?file=' + encodeURIComponent(file);
     }
 
-    function restoreBackup(file) {
-      if (confirm('CẢNH BÁO: Việc phục hồi cơ sở dữ liệu từ file ' + file + ' sẽ ghi đè toàn bộ dữ liệu hiện tại. Bạn có chắc chắn không?')) {
-        if (window.showToast) { showToast('Đã phục hồi dữ liệu từ bản sao lưu thành công', 'success'); }
+    async function restoreBackup(file) {
+      if (!confirm('CẢNH BÁO NGUY CƠ CAO:\n\nViệc phục hồi cơ sở dữ liệu từ file [' + file + '] sẽ thực thi đè lại cấu trúc và dữ liệu. Bạn có chắc chắn muốn tiến hành phục hồi?')) {
+        return;
+      }
+      if (window.showToast) { showToast('Đang phục hồi CSDL từ bản sao lưu: ' + file + '...', 'warning'); }
+      try {
+        const res = await fetch('/api/admin/database/restore', {
+          method: 'POST',
+          credentials: 'include',
+          headers: getAuthHeaders(true),
+          body: JSON.stringify({ filename: file })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          if (window.showToast) {
+            showToast(data.message || 'Phục hồi cơ sở dữ liệu thành công!', 'success');
+          } else {
+            alert(data.message || 'Phục hồi thành công!');
+          }
+          await Promise.all([loadDatabaseStatus(), loadBackupLogs(), loadAuditLogs()]);
+        } else {
+          const msg = data.message || 'Phục hồi cơ sở dữ liệu thất bại';
+          if (window.showToast) { showToast(msg, 'danger'); } else { alert('Lỗi: ' + msg); }
+        }
+      } catch (err) {
+        console.error('Lỗi khi phục hồi sao lưu:', err);
+        if (window.showToast) { showToast('Lỗi phục hồi: ' + err.message, 'danger'); }
       }
     }
 
@@ -381,6 +552,7 @@
     document.documentElement.setAttribute('data-theme', savedTheme);
 
     document.addEventListener('DOMContentLoaded', () => {
+      loadDatabaseStatus();
       loadAuditLogs();
       loadBackupLogs();
     });
