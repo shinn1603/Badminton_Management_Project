@@ -1,0 +1,116 @@
+{
+  "intents": [
+    {
+      "tag": "GREETING_RESET",
+      "patterns": [
+        "xin chào", "chào bot", "hello", "hi shop", "chào bạn", "alo", "ad ơi", "admin ơi", "chào admin",
+        "xin chao", "chao bot", "hi admin", "alo bot", "ad oi", "chao em", "cho mình hỏi", "cho e hoi",
+        "bắt đầu lại", "làm mới hội thoại", "reset", "xóa lịch sử", "bat dau lai", "lam moi", "quay lại từ đầu",
+        "chào trợ lý ảo", "bắt đầu", "start", "menu chính", "về trang chủ"
+      ],
+      "responses": [
+        "Xin chào bạn! Tôi là trợ lý ảo chính thức của Chuỗi Sân Cầu Lông UTE Sport. Tôi có thể giúp bạn tìm chi nhánh, tra cứu lịch sân trống và đặt sân giữ chỗ tức thì."
+      ]
+    },
+    {
+      "tag": "CONFIRM_BOOKING",
+      "patterns": [
+        "đặt sân", "tôi muốn đặt sân", "đặt sân cho tôi", "đặt đi bạn", "đặt luôn", "đồng ý đặt", "tiến hành đặt sân",
+        "dat san", "toi muon dat san", "dat san cho toi", "dat di", "dat luon", "dong y dat", "tien hanh dat",
+        "ok đặt sân", "ok dat san", "chốt sân này nha", "chot san", "giữ chỗ sân này", "giu cho", "book sân nhé",
+        "book san", "đặt giúp mình", "dat giup minh", "lấy sân này nhé", "xác nhận đặt sân", "xac nhan dat",
+        "đồng ý giữ chỗ", "dong y giu cho", "tạo đơn đặt sân", "tao don", "đặt ca này nha"
+      ],
+      "responses": [
+        "Hệ thống đã ghi nhận yêu cầu đặt sân và tiến hành tạo đơn giữ chỗ thời gian thực cho bạn."
+      ]
+    },
+    {
+      "tag": "CHECK_BOOKING",
+      "patterns": [
+        "kiểm tra đơn", "tra cứu đơn", "xem đơn của tôi", "kiểm tra mã đặt sân", "xem lại đơn", "đơn đặt chỗ của tôi",
+        "kiem tra don", "tra cuu don", "xem don cua toi", "kiem tra ma dat san", "xem lai don", "don dat cho",
+        "mã đơn", "ma don", "kiểm tra vé", "tra cuu ve", "xem vé điện tử", "đơn DS", "check đơn", "check ma don",
+        "tôi đã đặt sân thành công chưa", "toi da dat san chua", "tìm thông tin đơn", "xem lịch đặt của tôi"
+      ],
+      "responses": [
+        "Bạn vui lòng cung cấp mã đơn (ví dụ: DS001234) hoặc số điện thoại đặt sân để tôi tra cứu trạng thái đơn ngay lập tức."
+      ]
+    },
+    {
+      "tag": "CANCEL_BOOKING",
+      "patterns": [
+        "hủy sân", "tôi muốn hủy sân", "hủy đơn đặt sân", "hủy lịch chơi", "chính sách hủy sân", "hủy có được hoàn tiền không",
+        "huy san", "toi muon huy san", "huy don dat san", "huy lich choi", "chinh sach huy", "hoan tien coc",
+        "hủy ca chơi", "huy ca choi", "bận việc không đi được muốn hủy", "đổi ý muốn hủy", "hủy sân trước mấy tiếng",
+        "cách hủy sân", "cach huy san", "hoàn cọc khi hủy", "làm sao để hủy đặt sân"
+      ],
+      "responses": [
+        "Chính sách hủy sân UTE Sport: Bạn được phép hủy và hoàn lại 100% tiền cọc nếu thực hiện trước giờ chơi tối thiểu 12 tiếng. Nếu sát giờ chơi, tiền cọc sẽ không được hoàn lại."
+      ]
+    },
+    {
+      "tag": "FIND_BRANCH",
+      "patterns": [
+        "hệ thống có những chi nhánh nào", "chi nhánh ở đâu", "địa chỉ các chi nhánh", "sân ở đâu", "tìm chi nhánh gần nhất",
+        "he thong co nhung chi nhanh nao", "chi nhanh o dau", "dia chi san", "san o dau", "tim chi nhanh gan nhat",
+        "tôi ở Thủ Đức thì đi chi nhánh nào", "sân gần Hoàng Diệu 2", "chi nhánh Quận 9 ở đâu", "chi nhánh Bình Thạnh",
+        "toi o thu duc", "san gan hoang dieu 2", "chi nhanh quan 9", "chi nhanh binh thanh", "danh sách chi nhánh",
+        "có mấy cơ sở", "co may co so", "đường đi đến sân", "vị trí sân cầu lông", "chi nhánh nào gần tôi nhất"
+      ],
+      "responses": [
+        "Hệ thống UTE Sport hiện có 3 chi nhánh: CN01 tại Thủ Đức (Số 1 Võ Văn Ngân), CN02 tại Quận 9 (Lê Văn Việt), và CN03 tại Bình Thạnh (Điện Biên Phủ). Bạn đang ở khu vực nào để tôi gợi ý cơ sở gần nhất?"
+      ]
+    },
+    {
+      "tag": "PRICING_INFO",
+      "patterns": [
+        "giá thuê sân bao nhiêu", "bảng giá", "giá thuê 1 tiếng", "thuê sân bao nhiêu tiền", "bảng giá giờ cao điểm",
+        "gia thue san bao nhieu", "bang gia", "gia thue 1 tieng", "thue san bao nhieu tien", "gia gio cao diem",
+        "giá ban ngày", "giá ban đêm", "giá sân vip", "sinh viên có được giảm giá không", "khung giờ vàng",
+        "gia ban ngay", "gia buoi toi", "gia san yonex", "giam gia sinh vien", "thuê vợt bao nhiêu",
+        "tiền sân 2 tiếng hết bao nhiêu", "chi phí thuê sân", "bảng giá chi tiết"
+      ],
+      "responses": [
+        "Bảng giá UTE Sport: Khung giờ tiêu chuẩn (05:00 - 17:00) từ 80.000đ - 100.000đ/giờ; Khung giờ cao điểm (17:00 - 23:00) từ 120.000đ - 140.000đ/giờ (Sân VIP Yonex). Học sinh sinh viên UTE được giảm 10% khi xuất trình thẻ."
+      ]
+    },
+    {
+      "tag": "SEARCH_SLOTS",
+      "patterns": [
+        "hôm nay còn sân trống không", "tối nay có sân nào trống không", "sân trống lúc 18h", "còn sân lúc 19h không",
+        "hom nay con san trong khong", "toi nay co san nao trong khong", "san trong luc 18h", "con san luc 19h khong",
+        "check lịch trống ngày mai", "ngày mai còn sân lúc 20h không", "tìm sân từ 18h đến 20h", "có sân nào trống không",
+        "check lich trong", "ngay mai con san khong", "tim san trong", "khung giờ nào còn trống",
+        "kiểm tra sân trống", "xem lịch sân", "thứ 7 còn sân không", "chủ nhật có sân không"
+      ],
+      "responses": [
+        "Hệ thống đang kiểm tra danh sách sân trống theo thời gian thực tại các chi nhánh cho bạn."
+      ]
+    },
+    {
+      "tag": "OUT_OF_SCOPE_MATH",
+      "patterns": [
+        "giải phương trình", "giải bài toán", "tính 1 cộng 1 bằng mấy", "đạo hàm của x mũ 2", "tích phân",
+        "giai phuong trinh", "giai toan", "1 + 1 bằng mấy", "2x + 5 = 10", "tính diện tích hình tam giác",
+        "căn bậc hai của 16", "bài tập toán", "giải toán giúp tôi", "tính đạo hàm", "hàm số đồng biến",
+        "bài toán lớp 12", "đại số tuyến tính", "ma trận nghịch đảo", "sin cos tan"
+      ],
+      "responses": [
+        "Dạ tôi là trợ lý ảo hỗ trợ đặt sân tại Chuỗi Sân Cầu Lông UTE Sport, không có tính năng giải bài tập toán học! Bạn có muốn tra cứu giá sân, lịch trống hay đặt lịch chơi cầu lông không ạ?"
+      ]
+    },
+    {
+      "tag": "OUT_OF_SCOPE_GENERAL",
+      "patterns": [
+        "thời tiết hôm nay thế nào", "hôm nay trời có mưa không", "dạy tôi nấu ăn", "cách nấu bún bò huế",
+        "thoi tiet hom nay", "troi co mua khong", "day toi nau an", "kể chuyện cười đi", "hát một bài đi",
+        "viết thơ tình", "ai là tổng thống mỹ", "bạn có người yêu chưa", "ý nghĩa cuộc sống là gì",
+        "chiến tranh thế giới thứ 2", "chơi game cùng tôi", "kể chuyện ma", "bạn mấy tuổi rồi"
+      ],
+      "responses": [
+        "Dạ tôi là trợ lý ảo chuyên hỗ trợ dịch vụ tại Chuỗi Sân Cầu Lông UTE Sport. Tôi chưa được học để trò chuyện về chủ đề này. Tôi có thể hỗ trợ bạn đặt sân, kiểm tra bảng giá hoặc tìm chi nhánh gần nhất nhé!"
+      ]
+    }
+  ]
+}

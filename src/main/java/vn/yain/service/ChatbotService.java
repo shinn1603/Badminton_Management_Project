@@ -50,6 +50,9 @@ public class ChatbotService {
     @Autowired
     private PricingService pricingService;
 
+    @Autowired(required = false)
+    private IntentClassificationService intentClassifier;
+
     // Session Memory Store (sessionId -> ChatSessionContext)
     private final Map<String, ChatSessionContext> sessionStore = new ConcurrentHashMap<>();
 
@@ -138,10 +141,40 @@ public class ChatbotService {
         String text = rawInput.trim();
         String normalized = removeAccents(text.toLowerCase());
 
+        // 2. Machine Learning Intent Classification (TF-IDF + Character 3-Gram)
+        IntentClassificationService.PredictionResult mlResult = null;
+        if (intentClassifier != null) {
+            mlResult = intentClassifier.predict(text);
+        }
+        String mlTag = (mlResult != null) ? mlResult.getIntent() : "";
+
+        // Chặn sớm nếu người dùng hỏi ngoài luồng (Toán học, Thời tiết, Nấu ăn...)
+        if (mlResult != null && mlResult.isOutOfScope()) {
+            if ("OUT_OF_SCOPE_MATH".equals(mlTag)) {
+                return ChatMessageDto.builder()
+                        .sender("bot")
+                        .intent("OUT_OF_SCOPE_MATH")
+                        .text(mlResult.getDefaultResponse())
+                        .quickReplies(List.of("Bảng giá thuê sân", "Hôm nay có sân nào trống từ 18h đến 20h không?", "Hệ thống có những chi nhánh nào?"))
+                        .actionType("NONE")
+                        .timestamp(LocalDateTime.now())
+                        .build();
+            } else if ("OUT_OF_SCOPE_GENERAL".equals(mlTag)) {
+                return ChatMessageDto.builder()
+                        .sender("bot")
+                        .intent("OUT_OF_SCOPE_GENERAL")
+                        .text(mlResult.getDefaultResponse())
+                        .quickReplies(List.of("Bảng giá thuê sân", "Hệ thống có những chi nhánh nào?", "Tra cứu sân trống"))
+                        .actionType("NONE")
+                        .timestamp(LocalDateTime.now())
+                        .build();
+            }
+        }
+
         // =========================================================================
         // INTENT 0: BẮT ĐẦU LẠI / LÀM MỚI HỘI THOẠI
         // =========================================================================
-        if (matches(normalized, "bat dau lai", "lam moi", "xoa lich su", "reset", "chao bot", "hello", "xin chao")) {
+        if ("GREETING_RESET".equals(mlTag) || matches(normalized, "bat dau lai", "lam moi", "xoa lich su", "reset", "chao bot", "hello", "xin chao")) {
             ctx.reset();
             return ChatMessageDto.builder()
                     .sender("bot")
@@ -156,7 +189,7 @@ public class ChatbotService {
         // =========================================================================
         // INTENT 1: XÁC NHẬN ĐẶT SÂN ("ok dat san cho toi", "dat san di", "dong y dat")
         // =========================================================================
-        if (matches(normalized, "ok dat san", "dat san cho toi", "dat san di", "dat di", "dat luon", "dong y dat", "tien hanh dat", "dat cho toi", "dat giup toi", "xac nhan dat", "dong y giu cho")) {
+        if ("CONFIRM_BOOKING".equals(mlTag) || matches(normalized, "ok dat san", "dat san cho toi", "dat san di", "dat di", "dat luon", "dong y dat", "tien hanh dat", "dat cho toi", "dat giup toi", "xac nhan dat", "dong y giu cho")) {
             String bookingCode = bookingService.generateUniqueBookingCode();
             ctx.lastBookingCode = bookingCode;
 
@@ -231,7 +264,7 @@ public class ChatbotService {
                     .build();
         }
 
-        if (!normalized.contains("huy") && matches(normalized, "kiem tra don", "tra cuu don", "xem don", "don cua toi", "ma don", "thong tin don", "xem lai thong tin don", "xem lai don", "don dat san")) {
+        if (!normalized.contains("huy") && ("CHECK_BOOKING".equals(mlTag) || matches(normalized, "kiem tra don", "tra cuu don", "xem don", "don cua toi", "ma don", "thong tin don", "xem lai thong tin don", "xem lai don", "don dat san"))) {
             String targetCode = null;
             Pattern codePattern = Pattern.compile("(?:ds\\s*)?(\\d{6})", Pattern.CASE_INSENSITIVE);
             Matcher mCode = codePattern.matcher(normalized);
@@ -303,7 +336,7 @@ public class ChatbotService {
         // =========================================================================
         // INTENT 3: YÊU CẦU HỦY ĐẶT SÂN
         // =========================================================================
-        if (matches(normalized, "huy san", "huy don", "muon huy", "khong den duoc", "huy ca choi", "yeu cau huy")) {
+        if ("CANCEL_BOOKING".equals(mlTag) || matches(normalized, "huy san", "huy don", "muon huy", "khong den duoc", "huy ca choi", "yeu cau huy")) {
             String targetCode = null;
             Pattern codePattern = Pattern.compile("(?:ds\\s*)?(\\d{6})", Pattern.CASE_INSENSITIVE);
             Matcher mCode = codePattern.matcher(normalized);
@@ -607,7 +640,7 @@ public class ChatbotService {
         // =========================================================================
         // INTENT 8: HỎI CÁC CHI NHÁNH ("ban co chi nhanh nao", "he thong co may chi nhanh")
         // =========================================================================
-        if (matches(normalized, "chi nhanh nao", "cac chi nhanh", "danh sach chi nhanh", "co may chi nhanh", "co nhung co so nao", "he thong o dau")) {
+        if ("FIND_BRANCH".equals(mlTag) || matches(normalized, "chi nhanh nao", "cac chi nhanh", "danh sach chi nhanh", "co may chi nhanh", "co nhung co so nao", "he thong o dau")) {
             List<Branch> branches = branchRepository.findAll();
             StringBuilder sb = new StringBuilder("Hệ thống sân cầu lông UTE Sport hiện có các cơ sở thi đấu sau:\n\n");
             int idx = 1;
@@ -632,7 +665,7 @@ public class ChatbotService {
         // =========================================================================
         // INTENT 9: HỎI BẢNG GIÁ
         // =========================================================================
-        if (matches(normalized, "gia", "bang gia", "bao nhieu tien", "chi phi", "gio vang", "don gia")) {
+        if ("PRICING_INFO".equals(mlTag) || matches(normalized, "gia", "bang gia", "bao nhieu tien", "chi phi", "gio vang", "don gia")) {
             String pricingText =
                     "Biểu phí thuê sân cầu lông tiêu chuẩn tại UTE Sport:\n\n" +
                     "1. Khung giờ sáng (05:30 - 14:00): 80.000 đ/giờ\n" +
