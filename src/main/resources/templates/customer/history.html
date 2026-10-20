@@ -544,11 +544,29 @@
         <h2 style="font-size: 18px; font-weight: 800; color: var(--text-dark); margin: 0;">Đơn Đặt Sân Của Bạn</h2>
       </div>
 
-      <div class="pill-group">
-        <button class="pill-btn active" id="pillAll" onclick="filterHistory('all', this)">Tất Cả (<span id="cntAll">0</span>)</button>
-        <button class="pill-btn" id="pillUpcoming" onclick="filterHistory('upcoming', this)">Sắp Tới (<span id="cntUpcoming">0</span>)</button>
-        <button class="pill-btn" id="pillCompleted" onclick="filterHistory('completed', this)">Đã Chơi (<span id="cntCompleted">0</span>)</button>
-        <button class="pill-btn" id="pillCancelled" onclick="filterHistory('cancelled', this)">Đã Hủy (<span id="cntCancelled">0</span>)</button>
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <!-- Nhóm tab lọc theo trạng thái đơn -->
+        <div class="pill-group">
+          <button class="pill-btn active" id="pillAll" onclick="filterHistory('all', this)">Tất Cả (<span id="cntAll">0</span>)</button>
+          <button class="pill-btn" id="pillUpcoming" onclick="filterHistory('upcoming', this)">Sắp Tới (<span id="cntUpcoming">0</span>)</button>
+          <button class="pill-btn" id="pillCompleted" onclick="filterHistory('completed', this)">Đã Chơi (<span id="cntCompleted">0</span>)</button>
+          <button class="pill-btn" id="pillCancelled" onclick="filterHistory('cancelled', this)">Đã Hủy (<span id="cntCancelled">0</span>)</button>
+        </div>
+
+        <!-- Bộ lọc sắp xếp Mới nhất / Cũ nhất -->
+        <div class="sort-select-box" style="display: inline-flex; align-items: center; gap: 6px; background: var(--surface); padding: 5px 12px; border-radius: 9999px; border: 1px solid var(--border-subtle); box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+          <svg style="width: 14px; height: 14px; color: var(--text-muted); flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 16 4 4 4-4"></path>
+            <path d="M7 20V4"></path>
+            <path d="m21 8-4-4-4 4"></path>
+            <path d="M17 4v16"></path>
+          </svg>
+          <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); white-space: nowrap;">Sắp xếp:</span>
+          <select id="sortOrderSelect" onchange="changeSortOrder(this.value)" style="border: none; background: transparent; font-size: 12.5px; font-weight: 700; color: var(--text-dark); cursor: pointer; outline: none; padding: 2px 4px; font-family: inherit;">
+            <option value="newest" selected>Mới nhất</option>
+            <option value="oldest">Cũ nhất</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -663,7 +681,36 @@
   <script>
     let allBookingsData = [];
     let activeFilter = 'all';
+    let currentSortOrder = 'newest';
     let branchMap = {};
+
+    function sortBookings(list, order) {
+      if (!Array.isArray(list)) return [];
+      return [...list].sort((a, b) => {
+        // So sánh theo ngày chơi/ngày đặt
+        const dateA = a.bookingDate || '';
+        const dateB = b.bookingDate || '';
+        if (dateA !== dateB) {
+          return order === 'newest' ? dateB.localeCompare(dateA) : dateA.localeCompare(dateB);
+        }
+        // Nếu cùng ngày, so sánh theo ID đơn
+        const idA = Number(a.id || 0);
+        const idB = Number(b.id || 0);
+        if (idA !== idB) {
+          return order === 'newest' ? idB - idA : idA - idB;
+        }
+        // Nếu ID bằng nhau, so sánh theo giờ chơi
+        const slotA = a.timeSlot || '';
+        const slotB = b.timeSlot || '';
+        return order === 'newest' ? slotB.localeCompare(slotA) : slotA.localeCompare(slotB);
+      });
+    }
+
+    function changeSortOrder(order) {
+      currentSortOrder = order;
+      const sorted = sortBookings(allBookingsData, currentSortOrder);
+      renderBookingsList(sorted);
+    }
 
     async function loadBranchesMap() {
       try {
@@ -680,16 +727,34 @@
     function filterHistory(status, btn) {
       activeFilter = status;
       document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
+      const activeBtn = btn || document.getElementById(`pill${status.charAt(0).toUpperCase() + status.slice(1)}`);
+      if (activeBtn) activeBtn.classList.add('active');
 
       const cards = document.querySelectorAll('.booking-card');
+      let visibleCount = 0;
       cards.forEach(c => {
         if (status === 'all' || c.getAttribute('data-status') === status) {
           c.style.display = 'block';
+          visibleCount++;
         } else {
           c.style.display = 'none';
         }
       });
+
+      let emptyNotice = document.getElementById('tabEmptyNotice');
+      if (cards.length > 0 && visibleCount === 0) {
+        if (!emptyNotice) {
+          emptyNotice = document.createElement('div');
+          emptyNotice.id = 'tabEmptyNotice';
+          emptyNotice.style.cssText = 'text-align: center; padding: 36px 20px; background: var(--surface); border: 1px dashed var(--border-subtle); border-radius: 14px; margin-top: 10px; color: var(--text-muted); font-size: 13.5px;';
+          document.getElementById('bookingListContainer').appendChild(emptyNotice);
+        }
+        const tabName = status === 'upcoming' ? 'sắp tới' : (status === 'completed' ? 'đã hoàn thành' : 'đã hủy');
+        emptyNotice.innerHTML = `Bạn không có đơn đặt sân nào ở trạng thái <strong>${tabName}</strong>.`;
+        emptyNotice.style.display = 'block';
+      } else if (emptyNotice) {
+        emptyNotice.style.display = 'none';
+      }
     }
 
     // Auth Guard: Require login to view history
@@ -715,7 +780,8 @@
         if (res.ok) {
           const list = await res.json();
           allBookingsData = Array.isArray(list) ? list : [];
-          renderBookingsList(allBookingsData);
+          const sorted = sortBookings(allBookingsData, currentSortOrder);
+          renderBookingsList(sorted);
           return;
         }
       } catch (err) {
