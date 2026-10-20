@@ -36,7 +36,7 @@
     const container = document.createElement('div');
     container.id = 'ute-chatbot-root';
     container.innerHTML = `
-      <div id="ute-chatbot-toggle" title="Trợ lý ảo tư vấn và đặt sân">
+      <div id="ute-chatbot-toggle" title="Hỗ trợ & Đặt sân trực tuyến">
         <div class="chatbot-pulse-ring"></div>
         <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -54,10 +54,10 @@
               </svg>
             </div>
             <div>
-              <div class="chatbot-title">Trợ lý ảo UTE Sport</div>
+              <div class="chatbot-title">Hỗ trợ UTE Sport</div>
               <div class="chatbot-status">
                 <span class="chatbot-status-dot"></span>
-                <span>Tư vấn & Đặt sân tự động</span>
+                <span>Tư vấn & Đặt sân trực tuyến</span>
               </div>
             </div>
           </div>

@@ -179,12 +179,15 @@ public class UserService {
             throw new IllegalArgumentException("Họ và tên không được để trống!");
         }
 
-        if (userRepository.findByUsername(username.trim()).isPresent()) {
-            throw new IllegalArgumentException("Tên đăng nhập đã tồn tại trong hệ thống!");
-        }
-
         if (phone != null && !phone.trim().isEmpty() && userRepository.findByPhone(phone.trim()).isPresent()) {
             throw new IllegalArgumentException("Số điện thoại đã được đăng ký bởi tài khoản khác!");
+        }
+
+        if (userRepository.findByUsername(username.trim()).isPresent()) {
+            if (phone != null && username.trim().equals(phone.trim())) {
+                throw new IllegalArgumentException("Số điện thoại đã được đăng ký bởi tài khoản khác!");
+            }
+            throw new IllegalArgumentException("Tên đăng nhập đã tồn tại trong hệ thống!");
         }
 
         User newUser = new User();

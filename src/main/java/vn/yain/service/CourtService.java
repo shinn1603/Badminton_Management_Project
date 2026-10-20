@@ -75,6 +75,10 @@ public class CourtService {
         Court court = courtRepository.findByCourtCode(courtCode)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sân: " + courtCode));
 
+        if ("Bảo trì".equalsIgnoreCase(court.getStatus())) {
+            throw new IllegalStateException("Sân " + courtCode + " đang bảo trì, không thể giữ chỗ!");
+        }
+
         court.setStatus("Đang giữ chỗ");
         courtRepository.save(court);
 

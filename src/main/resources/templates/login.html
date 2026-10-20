@@ -233,39 +233,105 @@
     </div>
   </div>
 
-  <!-- FORGOT PASSWORD MODAL -->
-  <div id="forgotPasswordModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 99999; align-items: center; justify-content: center;">
-    <div style="background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 26px; max-width: 420px; width: 90%; box-shadow: 0 25px 50px rgba(0,0,0,0.3);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--text-dark);">Khôi Phục Mật Khẩu</h3>
-        <button type="button" onclick="closeForgotPasswordModal()" style="border: none; background: transparent; font-size: 18px; cursor: pointer; color: var(--text-muted);">✕</button>
+  <!-- FORGOT PASSWORD MODAL (CHUẨN 3 BƯỚC BẢO MẬT OTP) -->
+  <div id="forgotPasswordModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 99999; align-items: center; justify-content: center; padding: 16px;">
+    <div style="background: var(--surface, #ffffff); border: 1px solid var(--border-subtle, #e2e8f0); border-radius: 20px; padding: 26px; max-width: 420px; width: 100%; box-shadow: 0 25px 50px rgba(0,0,0,0.3); position: relative;">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--text-dark, #0f172a); display: flex; align-items: center; gap: 8px;">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2;"><path d="M21 2l-2 2m-1.5 1.5L14 9a6 6 0 1 0 4 4l3.5-3.5L21 8l-1.5-1.5L21 5l-2-2z"></path></svg>
+          <span>Khôi Phục Mật Khẩu</span>
+        </h3>
+        <button type="button" onclick="closeForgotPasswordModal()" style="border: none; background: #f1f5f9; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; color: var(--text-muted, #64748b); display: flex; align-items: center; justify-content: center;">
+          <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
-      <p style="font-size: 12.5px; color: var(--text-muted); margin: 0 0 16px;">
-        Nhập thông tin tài khoản, SĐT hoặc email đã đăng ký cùng mật khẩu mới để khôi phục quyền truy cập.
-      </p>
-      <div style="margin-bottom: 12px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-          <label style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin: 0;">Tài khoản / SĐT / Email</label>
-          <a href="javascript:void(0)" id="btnSendFpOtp" onclick="sendResetOtp()" style="font-size: 11.5px; color: var(--primary); text-decoration: none; font-weight: 600;">📩 Gửi OTP về Email</a>
+
+      <!-- Step Indicator Bar -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding: 10px 14px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+        <div id="fpStepDot1" style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: #059669;">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: #059669; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px;">1</span>
+          <span>Gửi OTP</span>
         </div>
-        <input type="text" id="fpIdentifier" class="form-control" placeholder="Nhập username, SĐT hoặc email" style="width: 100%; box-sizing: border-box;">
+        <div id="fpStepLine1" style="flex: 1; height: 2px; background: #e2e8f0; margin: 0 8px;"></div>
+        <div id="fpStepDot2" style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: #94a3b8;">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 11px;">2</span>
+          <span>Nhập OTP</span>
+        </div>
+        <div id="fpStepLine2" style="flex: 1; height: 2px; background: #e2e8f0; margin: 0 8px;"></div>
+        <div id="fpStepDot3" style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: #94a3b8;">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 11px;">3</span>
+          <span>Mật khẩu mới</span>
+        </div>
       </div>
-      <div id="otpFieldContainer" style="margin-bottom: 12px; display: none;">
-        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--primary);">Mã OTP (6 chữ số từ email)</label>
-        <input type="text" id="fpOtp" class="form-control" placeholder="Nhập mã 6 chữ số nhận từ email" style="width: 100%; box-sizing: border-box; letter-spacing: 2px; font-weight: 700; color: #047857;">
+
+      <!-- BƯỚC 1 -->
+      <div id="fpStep1">
+        <p style="font-size: 13px; color: var(--text-muted, #64748b); margin: 0 0 16px; line-height: 1.5;">
+          Nhập tài khoản, số điện thoại hoặc email. Hệ thống sẽ gửi mã OTP 6 chữ số qua email đã đăng ký.
+        </p>
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-dark, #1e293b); margin-bottom: 6px;">Tài khoản / SĐT / Email</label>
+          <input type="text" id="fpIdentifier" class="form-control" placeholder="Nhập username, SĐT hoặc email" style="width: 100%; height: 42px; border-radius: 10px; box-sizing: border-box;">
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn btn-outline" style="flex: 1; height: 42px; border-radius: 10px;" onclick="closeForgotPasswordModal()">Hủy</button>
+          <button type="button" class="btn btn-primary" id="btnSendFpOtp" style="flex: 1.5; height: 42px; border-radius: 10px;" onclick="sendResetOtp()">Gửi Mã OTP</button>
+        </div>
       </div>
-      <div style="margin-bottom: 12px;">
-        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Mật khẩu mới (tối thiểu 6 ký tự)</label>
-        <input type="password" id="fpNewPassword" class="form-control" placeholder="Nhập mật khẩu mới" style="width: 100%; box-sizing: border-box;">
+
+      <!-- BƯỚC 2 -->
+      <div id="fpStep2" style="display: none;">
+        <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px;">
+          <p style="font-size: 12.5px; color: #065f46; margin: 0; line-height: 1.5;">
+            Mã OTP 6 chữ số đã gửi đến: <strong id="fpMaskedEmailText" style="color: #047857;">email của bạn</strong>. Vui lòng kiểm tra hộp thư (cả thư rác/Spam).
+          </p>
+        </div>
+
+        <div style="margin-bottom: 14px; text-align: center;">
+          <label style="display: block; font-size: 13px; font-weight: 700; color: #047857; margin-bottom: 8px;">Nhập mã xác nhận OTP (6 chữ số)</label>
+          <input type="text" id="fpOtp" maxlength="6" class="form-control" placeholder="••••••" style="width: 100%; height: 48px; border-radius: 10px; border: 2px solid #10b981; font-size: 24px; font-weight: 800; letter-spacing: 10px; text-align: center; color: #065f46; background: #f0fdf4; box-sizing: border-box;" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length === 6) verifyResetOtp();">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 12px;">
+          <a href="javascript:void(0)" onclick="goToFpStep(1)" style="color: var(--text-muted, #64748b); text-decoration: none; font-weight: 600;">← Đổi thông tin</a>
+          <div id="fpResendWrap">
+            <span id="fpCountdownText" style="color: #94a3b8;">Gửi lại mã (<strong id="fpCountdownNum">60s</strong>)</span>
+            <a href="javascript:void(0)" id="fpResendLink" onclick="sendResetOtp(true)" style="display: none; color: #059669; font-weight: 700; text-decoration: none;">Gửi lại mã OTP</a>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn btn-outline" style="flex: 1; height: 42px; border-radius: 10px;" onclick="goToFpStep(1)">Quay lại</button>
+          <button type="button" class="btn btn-primary" id="btnVerifyFpOtp" style="flex: 1.5; height: 42px; border-radius: 10px;" onclick="verifyResetOtp()">Xác Thực OTP</button>
+        </div>
       </div>
-      <div style="margin-bottom: 18px;">
-        <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--text-muted);">Xác nhận mật khẩu mới</label>
-        <input type="password" id="fpConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu mới" style="width: 100%; box-sizing: border-box;">
+
+      <!-- BƯỚC 3 -->
+      <div id="fpStep3" style="display: none;">
+        <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke: #16a34a; fill: none; stroke-width: 2.5;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <p style="font-size: 12.5px; color: #15803d; margin: 0; font-weight: 600;">
+            Xác thực OTP thành công! Vui lòng đặt mật khẩu mới.
+          </p>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-dark, #1e293b);">Mật khẩu mới (tối thiểu 6 ký tự)</label>
+          <input type="password" id="fpNewPassword" class="form-control" placeholder="Nhập mật khẩu mới" style="width: 100%; height: 42px; border-radius: 10px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 22px;">
+          <label style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-dark, #1e293b);">Xác nhận mật khẩu mới</label>
+          <input type="password" id="fpConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu mới" style="width: 100%; height: 42px; border-radius: 10px; box-sizing: border-box;">
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn btn-outline" style="flex: 1; height: 42px; border-radius: 10px;" onclick="closeForgotPasswordModal()">Hủy</button>
+          <button type="button" class="btn btn-primary" id="btnConfirmReset" style="flex: 1.5; height: 42px; border-radius: 10px;" onclick="submitResetPassword()">Lưu Mật Khẩu Mới</button>
+        </div>
       </div>
-      <div style="display: flex; gap: 10px;">
-        <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeForgotPasswordModal()">Hủy</button>
-        <button type="button" class="btn btn-primary" id="btnConfirmReset" style="flex: 1.5;" onclick="submitResetPassword()">Đặt Lại Mật Khẩu</button>
-      </div>
+
     </div>
   </div>
 
@@ -345,48 +411,187 @@
       }, 3000);
     }
 
+    let fpTimer = null;
+    let fpCountdown = 60;
+
     function openForgotPasswordModal() {
       const modal = document.getElementById('forgotPasswordModal');
       if (modal) modal.style.display = 'flex';
       const userVal = document.getElementById('usernameInput')?.value.trim();
       if (userVal) document.getElementById('fpIdentifier').value = userVal;
+      goToFpStep(1);
+      document.getElementById('fpOtp').value = '';
+      document.getElementById('fpNewPassword').value = '';
+      document.getElementById('fpConfirmPassword').value = '';
+      clearInterval(fpTimer);
     }
 
     function closeForgotPasswordModal() {
       const modal = document.getElementById('forgotPasswordModal');
       if (modal) modal.style.display = 'none';
+      clearInterval(fpTimer);
+    }
+
+    function goToFpStep(step) {
+      document.getElementById('fpStep1').style.display = step === 1 ? 'block' : 'none';
+      document.getElementById('fpStep2').style.display = step === 2 ? 'block' : 'none';
+      document.getElementById('fpStep3').style.display = step === 3 ? 'block' : 'none';
+
+      const dot1 = document.getElementById('fpStepDot1');
+      const dot2 = document.getElementById('fpStepDot2');
+      const dot3 = document.getElementById('fpStepDot3');
+      const line1 = document.getElementById('fpStepLine1');
+      const line2 = document.getElementById('fpStepLine2');
+
+      if (step === 1) {
+        dot1.style.color = '#059669';
+        dot1.querySelector('span').style.background = '#059669';
+        dot1.querySelector('span').style.color = '#fff';
+        dot2.style.color = '#94a3b8';
+        dot2.querySelector('span').style.background = '#e2e8f0';
+        dot2.querySelector('span').style.color = '#64748b';
+        dot3.style.color = '#94a3b8';
+        dot3.querySelector('span').style.background = '#e2e8f0';
+        dot3.querySelector('span').style.color = '#64748b';
+        line1.style.background = '#e2e8f0';
+        line2.style.background = '#e2e8f0';
+        document.getElementById('fpIdentifier').focus();
+      } else if (step === 2) {
+        dot1.style.color = '#059669';
+        dot1.querySelector('span').style.background = '#059669';
+        dot2.style.color = '#059669';
+        dot2.querySelector('span').style.background = '#059669';
+        dot2.querySelector('span').style.color = '#fff';
+        dot3.style.color = '#94a3b8';
+        dot3.querySelector('span').style.background = '#e2e8f0';
+        line1.style.background = '#059669';
+        line2.style.background = '#e2e8f0';
+        setTimeout(() => document.getElementById('fpOtp').focus(), 100);
+      } else if (step === 3) {
+        dot1.style.color = '#059669';
+        dot2.style.color = '#059669';
+        dot3.style.color = '#059669';
+        dot3.querySelector('span').style.background = '#059669';
+        dot3.querySelector('span').style.color = '#fff';
+        line1.style.background = '#059669';
+        line2.style.background = '#059669';
+        setTimeout(() => document.getElementById('fpNewPassword').focus(), 100);
+      }
+    }
+
+    async function sendResetOtp(isResend = false) {
+      const identifier = document.getElementById('fpIdentifier').value.trim();
+      if (!identifier) {
+        showToast('Vui lòng nhập tài khoản, SĐT hoặc email trước khi yêu cầu mã OTP!', 'warning');
+        document.getElementById('fpIdentifier').focus();
+        return;
+      }
+      const btn = isResend ? document.getElementById('fpResendLink') : document.getElementById('btnSendFpOtp');
+      const originalText = btn.innerText;
+      btn.innerText = 'Đang gửi...';
+      if (!isResend) btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          if (data.email) {
+            document.getElementById('fpMaskedEmailText').innerText = data.email;
+          }
+          goToFpStep(2);
+          startFpCountdown();
+        } else {
+          showToast(data.message || 'Không thể gửi mã OTP!', 'error');
+        }
+      } catch (e) {
+        showToast('Lỗi kết nối khi gửi email OTP!', 'error');
+      } finally {
+        btn.innerText = originalText;
+        if (!isResend) btn.disabled = false;
+      }
+    }
+
+    function startFpCountdown() {
+      clearInterval(fpTimer);
+      fpCountdown = 60;
+      document.getElementById('fpCountdownText').style.display = 'inline';
+      document.getElementById('fpResendLink').style.display = 'none';
+      document.getElementById('fpCountdownNum').innerText = fpCountdown + 's';
+
+      fpTimer = setInterval(() => {
+        fpCountdown--;
+        document.getElementById('fpCountdownNum').innerText = fpCountdown + 's';
+        if (fpCountdown <= 0) {
+          clearInterval(fpTimer);
+          document.getElementById('fpCountdownText').style.display = 'none';
+          document.getElementById('fpResendLink').style.display = 'inline';
+        }
+      }, 1000);
+    }
+
+    async function verifyResetOtp() {
+      const identifier = document.getElementById('fpIdentifier').value.trim();
+      const otp = document.getElementById('fpOtp').value.trim();
+
+      if (!otp || otp.length !== 6) {
+        showToast('Vui lòng nhập đúng 6 chữ số mã OTP!', 'warning');
+        document.getElementById('fpOtp').focus();
+        return;
+      }
+
+      const btn = document.getElementById('btnVerifyFpOtp');
+      btn.disabled = true;
+      btn.innerText = 'Đang kiểm tra...';
+
+      try {
+        const res = await fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier, otp })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message || 'Xác thực OTP thành công!', 'success');
+          clearInterval(fpTimer);
+          goToFpStep(3);
+        } else {
+          showToast(data.message || 'Mã OTP không chính xác!', 'error');
+          document.getElementById('fpOtp').focus();
+          document.getElementById('fpOtp').select();
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối khi xác thực OTP!', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Xác Thực OTP';
+      }
     }
 
     async function submitResetPassword() {
       const identifier = document.getElementById('fpIdentifier').value.trim();
       const newPass = document.getElementById('fpNewPassword').value;
       const confirmPass = document.getElementById('fpConfirmPassword').value;
+      const otp = document.getElementById('fpOtp').value.trim();
       const btn = document.getElementById('btnConfirmReset');
 
-      if (!identifier) {
-        showToast('Vui lòng nhập tên tài khoản, số điện thoại hoặc email!', 'warning');
-        return;
-      }
       if (!newPass || newPass.length < 6) {
         showToast('Mật khẩu mới phải có tối thiểu 6 ký tự!', 'warning');
+        document.getElementById('fpNewPassword').focus();
         return;
       }
       if (newPass !== confirmPass) {
         showToast('Xác nhận mật khẩu mới không trùng khớp!', 'warning');
-        return;
-      }
-
-      const otp = document.getElementById('fpOtp') ? document.getElementById('fpOtp').value.trim() : '';
-      if (!otp) {
-        showToast('Vui lòng bấm "Gửi OTP về Email" và nhập mã OTP 6 chữ số!', 'warning');
-        const otpContainer = document.getElementById('otpFieldContainer');
-        if (otpContainer) otpContainer.style.display = 'block';
-        if (document.getElementById('fpOtp')) document.getElementById('fpOtp').focus();
+        document.getElementById('fpConfirmPassword').focus();
         return;
       }
 
       btn.disabled = true;
-      btn.innerText = 'Đang xử lý...';
+      btn.innerText = 'Đang lưu mật khẩu...';
 
       try {
         const res = await fetch('/api/auth/reset-password', {
@@ -408,39 +613,7 @@
         showToast('Lỗi mạng khi kết nối máy chủ!', 'error');
       } finally {
         btn.disabled = false;
-        btn.innerText = 'Đặt Lại Mật Khẩu';
-      }
-    }
-
-    async function sendResetOtp() {
-      const identifier = document.getElementById('fpIdentifier').value.trim();
-      if (!identifier) {
-        showToast('Vui lòng nhập tài khoản, SĐT hoặc email trước khi yêu cầu mã OTP!', 'warning');
-        document.getElementById('fpIdentifier').focus();
-        return;
-      }
-      const btn = document.getElementById('btnSendFpOtp');
-      btn.innerText = 'Đang gửi...';
-      try {
-        const res = await fetch('/api/auth/forgot-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ identifier })
-        });
-        const data = await res.json();
-        if (data.success) {
-          showToast(data.message, 'success');
-          const otpContainer = document.getElementById('otpFieldContainer');
-          if (otpContainer) otpContainer.style.display = 'block';
-          btn.innerText = 'Gửi lại OTP';
-          document.getElementById('fpOtp').focus();
-        } else {
-          showToast(data.message || 'Không thể gửi mã OTP!', 'error');
-          btn.innerText = '📩 Gửi OTP về Email';
-        }
-      } catch (e) {
-        showToast('Lỗi kết nối khi gửi email OTP!', 'error');
-        btn.innerText = '📩 Gửi OTP về Email';
+        btn.innerText = 'Lưu Mật Khẩu Mới';
       }
     }
 

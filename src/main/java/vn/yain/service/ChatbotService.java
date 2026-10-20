@@ -75,7 +75,7 @@ public class ChatbotService {
         public String branchCode = "CN01";
         public String branchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
         public String courtCode = "CL01";
-        public String courtName = "Sân 1 (VIP Yonex)";
+        public String courtName = "Sân 1 (VIP)";
         public LocalDate date = LocalDate.now();
         public String timeSlot = "18:00 - 20:00";
         public int durationHours = 2;
@@ -99,7 +99,7 @@ public class ChatbotService {
             branchCode = "CN01";
             branchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
             courtCode = "CL01";
-            courtName = "Sân 1 (VIP Yonex)";
+            courtName = "Sân 1 (VIP)";
             date = LocalDate.now();
             timeSlot = "18:00 - 20:00";
             durationHours = 2;
@@ -168,7 +168,7 @@ public class ChatbotService {
         if (rawInput == null || rawInput.trim().isEmpty()) {
             return ChatMessageDto.builder()
                     .sender("bot")
-                    .text("Xin chào bạn. Tôi là trợ lý ảo chính thức của Hệ thống Sân Cầu Lông UTE Sport. Tôi có thể hỗ trợ bạn tìm chi nhánh gần nhất, tra cứu sân trống theo khung giờ cụ thể, kiểm tra thông tin đơn đặt sân, hướng dẫn hủy sân và tự động đặt sân giữ chỗ cho bạn ngay trong cuộc trò chuyện này. Bạn cần tôi hỗ trợ điều gì?")
+                    .text("Xin chào bạn! Tôi là tư vấn viên hỗ trợ trực tuyến của Hệ thống Sân Cầu Lông UTE Sport. Tôi có thể hỗ trợ bạn tìm chi nhánh gần nhất, tra cứu sân trống theo khung giờ cụ thể, kiểm tra thông tin đơn đặt sân, hướng dẫn hủy sân và tự động đặt sân giữ chỗ cho bạn ngay trong cuộc trò chuyện này. Bạn cần tôi hỗ trợ điều gì?")
                     .quickReplies(List.of("Hệ thống có những chi nhánh nào?", "Tôi ở đường Hoàng Diệu 2 thì chi nhánh nào gần tôi?", "Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân"))
                     .actionType("NONE")
                     .timestamp(LocalDateTime.now())
@@ -396,7 +396,7 @@ public class ChatbotService {
                     .intent("FAQ_AUTO_LOCK_EXPLAIN")
                     .text("Cơ chế **Tự Khóa Sân** tại UTE Sport hoạt động như sau:\n\n" +
                           "1. **Tạm khóa giữ chỗ 10 phút**: Khi bạn chọn sân và xác nhận đặt, hệ thống sẽ tạm giữ sân ngay lập tức (trạng thái 'Đang giữ chỗ'), ngăn khách khác đặt trùng.\n" +
-                          "2. **Thanh toán VietQR**: Trợ lý ảo tạo sẵn mã VietQR kèm tiền cọc 30% và mã đơn ca chơi.\n" +
+                          "2. **Thanh toán VietQR**: Hệ thống tạo sẵn mã VietQR kèm tiền cọc 30% và mã đơn ca chơi.\n" +
                           "3. **Khóa sân cố định chính thức**: Sau khi bạn chuyển khoản cọc và bấm 'Xác nhận đã chuyển khoản cọc', sân sẽ được khóa cố định chính thức (trạng thái 'Đang sử dụng') và đơn được ghi nhận ngay vào [Lịch Sử Đặt Sân](/customer/history) của tài khoản bạn.\n" +
                           "4. **Nhận sân**: Bạn chỉ cần đến quầy lễ tân đúng giờ để nhận sân thi đấu.\n\n" +
                           "Bạn có muốn đặt và tự khóa sân ngay bây giờ không?")

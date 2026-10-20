@@ -857,6 +857,25 @@
           const list = await res.json();
           allTournaments = Array.isArray(list) ? list : [];
           renderTournaments(allTournaments);
+
+          // Focus / highlight selected tournament if ?code= is present in URL
+          try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetCode = urlParams.get('code');
+            if (targetCode) {
+              setTimeout(() => {
+                const el = document.getElementById(`card-${targetCode}`);
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  el.style.border = '2px solid var(--cust-primary)';
+                  el.style.boxShadow = '0 0 25px rgba(16, 185, 129, 0.45)';
+                  el.style.transition = 'all 0.4s ease';
+                }
+              }, 250);
+            }
+          } catch (e) {
+            console.warn('Lỗi đọc tham số URL giải đấu:', e);
+          }
         } else {
           document.getElementById('tournamentsContainer').innerHTML = `
             <div style="background: var(--cust-surface); border: 1px solid var(--cust-border); border-radius: 12px; padding: 36px 20px; text-align: center; color: var(--cust-text-muted);">

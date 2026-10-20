@@ -705,25 +705,73 @@
 
     /* TOURNAMENT PROMO BANNER */
     .tournament-showcase-card {
-      background: linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(4, 20, 16, 0.98) 100%), url('/images/badminton_arena_hero.jpg') center/cover;
+      background: linear-gradient(135deg, rgba(6, 78, 59, 0.95) 0%, rgba(15, 23, 42, 0.97) 100%), url('/images/badminton_arena_hero.jpg') center/cover;
       background-blend-mode: overlay;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: 18px;
-      padding: 34px 38px;
-      color: #ffffff;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 20px;
+      padding: 36px 40px;
+      color: #ffffff !important;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 30px;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.15);
+      gap: 32px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
       margin-bottom: 32px;
       flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
     }
-    .tournament-info-col h3 {
-      font-size: 26px;
-      font-weight: 900;
-      margin: 8px 0;
-      letter-spacing: -0.5px;
+    .tournament-showcase-card::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      right: -15%;
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .tournament-info-col {
+      flex: 1;
+      min-width: 320px;
+      position: relative;
+      z-index: 2;
+    }
+    .tournament-showcase-card h3,
+    .tournament-info-col h3,
+    #showcaseTournName {
+      color: #ffffff !important;
+      font-size: 26px !important;
+      font-weight: 900 !important;
+      margin: 10px 0 !important;
+      letter-spacing: -0.4px !important;
+      line-height: 1.35 !important;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7) !important;
+    }
+    .tournament-showcase-card p,
+    .tournament-info-col p,
+    #showcaseTournDesc {
+      color: #cbd5e1 !important;
+      font-size: 14px !important;
+      line-height: 1.65 !important;
+      margin: 0 !important;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+    }
+    .tournament-showcase-card strong {
+      color: #94a3b8 !important;
+      font-weight: 600 !important;
+    }
+    #showcaseTournDate {
+      color: #f8fafc !important;
+      font-weight: 700 !important;
+    }
+    #showcaseTournPrize {
+      color: #fbbf24 !important;
+      font-weight: 800 !important;
+    }
+    #showcaseTournFee {
+      color: #34d399 !important;
+      font-weight: 800 !important;
     }
 
     /* AMENITIES GRID */
@@ -897,6 +945,34 @@
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 12px;
+    }
+    .modal-addons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .modal-addon-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 12px;
+      background: var(--surface-subtle);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      user-select: none;
+    }
+    .modal-addon-item:hover {
+      border-color: var(--primary);
+      background: rgba(16, 185, 129, 0.04);
+    }
+    .modal-addon-item.selected {
+      border-color: var(--primary);
+      background: rgba(16, 185, 129, 0.08);
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.12);
     }
     @media (max-width: 640px) {
       .slot-modal-overlay {
@@ -1289,10 +1365,10 @@
                 <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; color: var(--primary);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                 Loại Sân
               </label>
-              <select id="heroCourtType" class="finder-select">
+              <select id="heroCourtType" class="finder-select" onchange="filterCourtsByType(this.value)">
                 <option value="all" selected>Tất cả loại sân</option>
-                <option value="vip">Sân VIP Yonex (120k/h)</option>
-                <option value="standard">Sân Tiêu Chuẩn Enlio (80k - 90k/h)</option>
+                <option value="vip">Sân VIP (120k/h)</option>
+                <option value="standard">Sân Thường (80k - 90k/h)</option>
               </select>
             </div>
           </div>
@@ -1335,15 +1411,15 @@
         </div>
       </div>
 
-      <div class="dash-kpi-card">
+      <div class="dash-kpi-card" id="kpiTournamentCard" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onclick="handleTournamentCardClick()" title="Nhấp để xem chi tiết & đăng ký giải đấu">
         <div class="dash-kpi-top">
-          <span class="dash-kpi-label">Giải Đấu Mùa Thu</span>
-          <span class="dash-kpi-badge badge-blue">UTE Cup 2026</span>
+          <span class="dash-kpi-label" id="kpiTournLabel">Giải Đấu Sắp Tới</span>
+          <span class="dash-kpi-badge badge-blue" id="kpiTournBadge">UTE Cup 2026</span>
         </div>
-        <div class="dash-kpi-value">25.000.000 đ</div>
-        <div class="dash-kpi-caption">
+        <div class="dash-kpi-value" id="kpiTournPrize">25.000.000 đ</div>
+        <div class="dash-kpi-caption" id="kpiTournCaption">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px; color: #3b82f6;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-          <span>Tổng giải thưởng • 32 cặp</span>
+          <span id="kpiTournSub">Tổng giải thưởng • 32 cặp</span>
         </div>
       </div>
 
@@ -1507,24 +1583,32 @@
 
       <!-- PANE 3: TOURNAMENT SHOWCASE -->
       <div id="tab-tournament" class="tab-pane" style="display: none;">
-        <div class="tournament-showcase-card">
+        <div class="tournament-showcase-card" id="showcaseTournCard">
           <div class="tournament-info-col">
-            <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
-              GIẢI ĐẤU MÙA THU 2026
-            </span>
-            <h3>Giải Cầu Lông Đôi Nam Nữ UTE Open 2026</h3>
-            <p style="color: #cbd5e1; max-width: 650px; font-size: 13.5px; line-height: 1.6;">
-              32 cặp vận động viên phong trào tranh tài tại Sân VIP Chi nhánh Thủ Đức. Thể thức loại trực tiếp 3 set 21 điểm.
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
+              <span class="badge" id="showcaseTournBadge" style="background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.5); padding: 5px 12px; border-radius: 20px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+                GIẢI ĐẤU ĐANG MỞ
+              </span>
+              <span id="showcaseTournBranchBadge" style="background: rgba(255, 255, 255, 0.12); color: #e2e8f0; border: 1px solid rgba(255, 255, 255, 0.2); padding: 5px 12px; border-radius: 20px; font-size: 11.5px; font-weight: 700;">
+                Chi nhánh Thủ Đức
+              </span>
+            </div>
+            <h3 id="showcaseTournName" style="color: #ffffff !important; font-size: 26px; font-weight: 900; margin: 8px 0 10px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.7);">
+              Giải Cầu Lông Doanh Nghiệp & Sinh Viên Cúp Thủ Đức 2026
+            </h3>
+            <p id="showcaseTournDesc" style="color: #cbd5e1 !important; max-width: 680px; font-size: 14px; line-height: 1.6; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">
+              Giải đấu phong trào kết nối các doanh nghiệp và cựu sinh viên đam mê cầu lông. Thể thức loại trực tiếp chuẩn BWF.
             </p>
-            <div style="display: flex; gap: 24px; margin-top: 14px; font-size: 13px;">
-              <div><strong>Khai mạc:</strong> 15/10/2026</div>
-              <div><strong>Giải Nhất:</strong> 12.000.000 đ + Cúp</div>
-              <div><strong>Lệ phí:</strong> 300.000 đ / cặp</div>
+            <div id="showcaseTournMeta" style="display: flex; gap: 24px; margin-top: 16px; font-size: 13.5px; flex-wrap: wrap;">
+              <div><strong>Khai mạc:</strong> <span id="showcaseTournDate" style="color: #ffffff; font-weight: 700;">25/10/2026</span></div>
+              <div><strong>Tổng giải thưởng:</strong> <span id="showcaseTournPrize" style="color: #fbbf24; font-weight: 800;">15.000.000 đ + Cúp</span></div>
+              <div><strong>Lệ phí:</strong> <span id="showcaseTournFee" style="color: #34d399; font-weight: 800;">250.000 đ / cặp</span></div>
             </div>
           </div>
-          <div>
-            <a href="/customer/tournaments" class="btn btn-primary" style="padding: 14px 28px; font-size: 14px; font-weight: 700; border-radius: 10px; box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);">
-              Chi Tiết & Đăng Ký
+          <div style="flex-shrink: 0; position: relative; z-index: 2;">
+            <a id="showcaseTournBtn" href="/customer/tournaments?code=GD02" class="btn btn-primary" style="padding: 14px 28px; font-size: 14.5px; font-weight: 700; border-radius: 12px; box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45); display: inline-flex; align-items: center; gap: 8px;">
+              <span>Chi Tiết & Đăng Ký</span>
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.5;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </a>
           </div>
         </div>
@@ -1703,6 +1787,21 @@
             </div>
           </div>
 
+          <!-- ADD-ON SERVICES SECTION (DỊCH VỤ & TIỆN ÍCH ĐI KÈM) -->
+          <div style="background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <label style="font-size: 12px; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 6px; margin: 0;">
+                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--primary);"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <span>Dịch Vụ & Tiện Ích Đi Kèm (Tùy chọn):</span>
+              </label>
+              <span id="modalAddonCountBadge" style="font-size: 11px; padding: 2px 8px; border-radius: 6px; background: var(--surface-subtle); color: var(--text-muted); font-weight: 600;">Chưa chọn</span>
+            </div>
+
+            <div id="modalAddonsContainer" class="modal-addons-grid">
+              <!-- Dynamically populated by loadModalAddons() -->
+            </div>
+          </div>
+
           <!-- PROMO / VOUCHER SECTION -->
           <div style="background: var(--surface); border: 1px dashed rgba(16, 185, 129, 0.45); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
@@ -1774,6 +1873,10 @@
         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
           <span style="color: var(--text-muted);">Mã đơn đặt sân:</span>
           <strong id="vqBookingCode" style="color: var(--primary); font-family: monospace; font-size: 14px;">DS000000</strong>
+        </div>
+        <div id="vqAddonRow" style="display: none; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color: var(--text-muted);">Dịch vụ đi kèm:</span>
+          <strong id="vqAddonText" style="color: var(--primary); font-size: 12px; text-align: right; max-width: 250px;">--</strong>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
           <span style="color: var(--text-muted);">Số tiền cọc:</span>
@@ -1903,6 +2006,8 @@
         loadMatrixSchedule();
       } else if (tabId === 'tab-pricing') {
         loadBranchPricing(curBranch);
+      } else if (tabId === 'tab-tournament') {
+        loadNearestTournament(curBranch);
       }
     }
 
@@ -1920,6 +2025,7 @@
       try { localStorage.setItem('customer_selected_branch', branchCode); } catch (e) {}
 
       loadBranchCourts(branchCode);
+      loadNearestTournament(branchCode);
       const matrixTab = document.getElementById('tab-matrix');
       if (matrixTab && matrixTab.style.display === 'block') {
         loadMatrixSchedule();
@@ -1927,6 +2033,115 @@
       const pricingTab = document.getElementById('tab-pricing');
       if (pricingTab && pricingTab.style.display === 'block') {
         loadBranchPricing(branchCode);
+      }
+    }
+
+    let currentNearestTournament = null;
+
+    // Load nearest tournament dynamically from SQL Server Database
+    async function loadNearestTournament(branchCode) {
+      try {
+        const bCode = branchCode || (document.getElementById('dashBranchPicker') ? document.getElementById('dashBranchPicker').value : '');
+        const query = bCode && bCode !== 'ALL' ? `?branchCode=${encodeURIComponent(bCode)}` : '';
+        const res = await fetch(`/api/tournaments/nearest${query}`);
+        if (!res.ok) return;
+        const t = await res.json();
+        if (!t || t.empty) return;
+        currentNearestTournament = t;
+
+        // 1. Update KPI Card
+        const labelEl = document.getElementById('kpiTournLabel');
+        if (labelEl) labelEl.textContent = t.label || 'Giải Đấu Sắp Tới';
+
+        const badgeEl = document.getElementById('kpiTournBadge');
+        if (badgeEl) {
+          badgeEl.textContent = t.badgeText || t.tournamentCode || 'UTE Cup';
+          if (t.status === 'Đang mở đăng ký') {
+            badgeEl.className = 'dash-kpi-badge badge-green';
+          } else if (t.status === 'Đang diễn ra') {
+            badgeEl.className = 'dash-kpi-badge badge-amber';
+          } else {
+            badgeEl.className = 'dash-kpi-badge badge-blue';
+          }
+        }
+
+        const prizeEl = document.getElementById('kpiTournPrize');
+        if (prizeEl) {
+          prizeEl.textContent = t.totalPrizeFormatted || '20.000.000 đ';
+        }
+
+        const subEl = document.getElementById('kpiTournSub');
+        if (subEl) {
+          const max = t.maxParticipants || 32;
+          const cur = t.currentParticipants || 0;
+          if (cur > 0) {
+            subEl.textContent = `Tổng giải thưởng • ${cur}/${max} cặp`;
+          } else {
+            subEl.textContent = `Tổng giải thưởng • ${max} cặp`;
+          }
+        }
+
+        // 2. Update Tab 3 Showcase Card
+        const scBadge = document.getElementById('showcaseTournBadge');
+        if (scBadge) {
+          scBadge.textContent = `${(t.category || 'GIẢI ĐẤU').toUpperCase()} • ${(t.status || 'ĐANG MỞ').toUpperCase()}`;
+          if (t.status === 'Đang mở đăng ký') {
+            scBadge.style.background = 'rgba(16, 185, 129, 0.25)';
+            scBadge.style.color = '#34d399';
+            scBadge.style.borderColor = 'rgba(16, 185, 129, 0.5)';
+          } else if (t.status === 'Đang diễn ra') {
+            scBadge.style.background = 'rgba(245, 158, 11, 0.25)';
+            scBadge.style.color = '#fbbf24';
+            scBadge.style.borderColor = 'rgba(245, 158, 11, 0.5)';
+          } else {
+            scBadge.style.background = 'rgba(59, 130, 246, 0.25)';
+            scBadge.style.color = '#60a5fa';
+            scBadge.style.borderColor = 'rgba(59, 130, 246, 0.5)';
+          }
+        }
+
+        const scBranchBadge = document.getElementById('showcaseTournBranchBadge');
+        if (scBranchBadge) {
+          scBranchBadge.textContent = t.branchName || ('Chi nhánh ' + (t.branchCode || ''));
+        }
+
+        const scName = document.getElementById('showcaseTournName');
+        if (scName) {
+          scName.textContent = t.tournamentName || 'Giải Cầu Lông UTE Sport';
+          scName.style.color = '#ffffff';
+          scName.style.textShadow = '0 2px 10px rgba(0, 0, 0, 0.7)';
+        }
+
+        const scDesc = document.getElementById('showcaseTournDesc');
+        if (scDesc) {
+          const branchTxt = t.branchName ? `Địa điểm: ${t.branchName}. ` : '';
+          scDesc.textContent = `${branchTxt}${t.rules || 'Quy mô thi đấu phong trào chuẩn quốc tế BWF.'}`;
+          scDesc.style.color = '#cbd5e1';
+        }
+
+        const scDate = document.getElementById('showcaseTournDate');
+        if (scDate) scDate.textContent = t.startDateFormatted || 'Sắp diễn ra';
+
+        const scPrize = document.getElementById('showcaseTournPrize');
+        if (scPrize) scPrize.textContent = `${t.totalPrizeFormatted || '15.000.000 đ'} + Cúp`;
+
+        const scFee = document.getElementById('showcaseTournFee');
+        if (scFee) scFee.textContent = t.entryFeeFormatted ? `${t.entryFeeFormatted} / cặp` : 'Miễn phí';
+
+        const scBtn = document.getElementById('showcaseTournBtn');
+        if (scBtn) {
+          scBtn.href = `/customer/tournaments?code=${encodeURIComponent(t.tournamentCode || '')}`;
+        }
+      } catch (err) {
+        console.warn('Lỗi tải thông tin giải đấu gần nhất:', err);
+      }
+    }
+
+    function handleTournamentCardClick() {
+      if (currentNearestTournament && currentNearestTournament.tournamentCode) {
+        window.location.href = `/customer/tournaments?code=${encodeURIComponent(currentNearestTournament.tournamentCode)}`;
+      } else {
+        window.location.href = '/customer/tournaments';
       }
     }
 
@@ -2101,11 +2316,11 @@
           const availableCount = TIME_SLOTS.filter(slot => !courtBookings.some(b => isSlotOverlapping(slot, b.timeSlot))).length;
 
           html += `
-            <div class="court-display-card" data-branch="${c.branchCode}" data-code="${c.courtCode}" style="${isMaintenance ? 'opacity: 0.88; border-color: rgba(245, 158, 11, 0.4);' : ''}">
+            <div class="court-display-card" data-branch="${c.branchCode}" data-code="${c.courtCode}" data-vip="${isVip ? 'vip' : 'standard'}" style="${isMaintenance ? 'opacity: 0.88; border-color: rgba(245, 158, 11, 0.4);' : ''}">
               <div class="court-card-thumb-wrap">
                 <img src="${c.imageUrl || '/images/badminton-court.jpg'}" alt="${c.courtName}">
                 <span class="court-thumb-badge ${isVip ? 'badge-vip' : 'badge-standard'}">
-                  ${isVip ? 'Sân VIP Yonex' : 'Sân Chuẩn Enlio'}
+                  ${isVip ? 'Sân VIP' : 'Sân Thường'}
                 </span>
                 <div class="court-status-indicator">
                   ${isMaintenance 
@@ -2119,7 +2334,7 @@
                   <div class="court-mat-type">Mã: ${c.courtCode}</div>
                 </div>
                 <div class="court-amenities-tags">
-                  <span class="amenity-tag">${isVip ? 'Thảm Yonex BWF' : 'Thảm Enlio BWF'}</span>
+                  <span class="amenity-tag">${isVip ? 'Thảm VIP BWF' : 'Thảm Tiêu Chuẩn BWF'}</span>
                   <span class="amenity-tag">Đèn LED 500 Lux</span>
                 </div>
                 <div class="court-price-row">
@@ -2215,6 +2430,131 @@
       }
     }
 
+    // Add-on Services Data & Handler for Instant Booking Modal
+    const DEFAULT_ADDONS = [
+      { id: 'racket', name: 'Thuê Vợt Yonex Astrox', price: 20000, desc: 'Căng sẵn 10.5kg, quấn cán mới' },
+      { id: 'shuttle', name: 'Ống Cầu Yonex Aerosensa (3 quả)', price: 45000, desc: 'Tốc độ 77, độ bền & chuẩn BWF' },
+      { id: 'revive', name: 'Nước Bù Khoáng Revive Chanh Muối (500ml)', price: 15000, desc: 'Bổ sung khoáng chất & điện giải' },
+      { id: 'pocari', name: 'Nước Điện Giải Pocari Sweat (500ml)', price: 18000, desc: 'Bù nước & ion tức thì khi vận động' },
+      { id: 'shoes', name: 'Thuê Giày Cầu Lông Chuyên Dụng', price: 30000, desc: 'Đế kếp chống trơn trượt, đủ size' },
+      { id: 'grip', name: 'Quấn Cán Vợt VS Chống Trượt', price: 15000, desc: 'Hút ẩm mồ hôi tối ưu, êm ái' }
+    ];
+
+    async function loadModalAddons(branchCode) {
+      const container = document.getElementById('modalAddonsContainer');
+      if (!container) return;
+
+      let items = [...DEFAULT_ADDONS];
+      try {
+        const res = await fetch(`/api/products?branchCode=${encodeURIComponent(branchCode || 'CN01')}`);
+        if (res.ok) {
+          const prods = await res.json();
+          if (Array.isArray(prods) && prods.length > 0) {
+            prods.forEach(p => {
+              const pName = p.productName || '';
+              const pPrice = Number(p.retailPrice || p.price || 0);
+              if (pPrice > 0 && !items.some(it => it.name.toLowerCase() === pName.toLowerCase())) {
+                if (p.category === 'Nước giải khát' || p.category === 'Phụ kiện' || p.category === 'Cầu lông') {
+                  items.push({
+                    id: 'prod_' + (p.productCode || p.id),
+                    name: pName,
+                    price: pPrice,
+                    desc: `${p.category || 'Sản phẩm'} • ${p.unit || 'Món'}`
+                  });
+                }
+              }
+            });
+          }
+        }
+      } catch (e) {
+        console.warn('Lỗi tải danh mục phụ kiện chi nhánh:', e);
+      }
+
+      container.innerHTML = items.slice(0, 6).map(it => `
+        <div class="modal-addon-item" id="label_addon_${it.id}">
+          <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; flex: 1; cursor: pointer;" onclick="toggleModalAddon('${it.id}')">
+            <input type="checkbox" class="modal-addon-cb" id="addon_${it.id}" data-name="${escapeHtml(it.name)}" value="${it.price}" onchange="onModalAddonChanged(this)" onclick="event.stopPropagation();" style="width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0;">
+            <div style="min-width: 0;">
+              <div style="font-weight: 700; font-size: 12px; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(it.name)}</div>
+              <div style="font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(it.desc)}</div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;" onclick="event.stopPropagation();">
+            <div style="display: inline-flex; align-items: center; gap: 3px; background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 1px 3px;">
+              <button type="button" onclick="changeModalAddonQty('${it.id}', -1, event)" style="width: 20px; height: 20px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 13px; line-height: 1; color: var(--text-dark); display: flex; align-items: center; justify-content: center;">-</button>
+              <span id="modal_qty_${it.id}" style="min-width: 18px; text-align: center; font-weight: 700; font-size: 11.5px; color: var(--text-dark);">1</span>
+              <button type="button" onclick="changeModalAddonQty('${it.id}', 1, event)" style="width: 20px; height: 20px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 13px; line-height: 1; color: var(--text-dark); display: flex; align-items: center; justify-content: center;">+</button>
+            </div>
+            <strong style="color: var(--primary); font-size: 12px; white-space: nowrap;" id="modal_price_${it.id}">+${it.price.toLocaleString('vi-VN')} đ</strong>
+          </div>
+        </div>
+      `).join('');
+
+      onModalAddonChanged();
+    }
+
+    function toggleModalAddon(id) {
+      const cb = document.getElementById(`addon_${id}`);
+      if (!cb) return;
+      cb.checked = !cb.checked;
+      onModalAddonChanged(cb);
+    }
+
+    function changeModalAddonQty(id, delta, event) {
+      if (event) event.stopPropagation();
+      const cb = document.getElementById(`addon_${id}`);
+      const qtyEl = document.getElementById(`modal_qty_${id}`);
+      const priceEl = document.getElementById(`modal_price_${id}`);
+      const parent = document.getElementById(`label_addon_${id}`);
+      if (!cb || !qtyEl) return;
+
+      let curQty = parseInt(qtyEl.textContent) || 1;
+      let newQty = curQty + delta;
+
+      if (!cb.checked) {
+        cb.checked = true;
+        if (parent) parent.classList.add('selected');
+        newQty = Math.max(1, delta > 0 ? 1 : 1);
+      } else {
+        if (newQty < 1) {
+          cb.checked = false;
+          if (parent) parent.classList.remove('selected');
+          newQty = 1;
+        }
+      }
+
+      qtyEl.textContent = newQty;
+      const unitPrice = Number(cb.value) || 0;
+      if (priceEl) {
+        const total = unitPrice * (cb.checked ? newQty : 1);
+        priceEl.textContent = `+${total.toLocaleString('vi-VN')} đ`;
+      }
+      onModalAddonChanged(cb);
+    }
+
+    function onModalAddonChanged(changedCb) {
+      document.querySelectorAll('.modal-addon-cb').forEach(cb => {
+        const parent = cb.closest('.modal-addon-item');
+        const id = cb.id.replace('addon_', '');
+        const qtyEl = document.getElementById(`modal_qty_${id}`);
+        const priceEl = document.getElementById(`modal_price_${id}`);
+        const unitPrice = Number(cb.value) || 0;
+        const qty = Math.max(1, parseInt(qtyEl ? qtyEl.textContent : 1) || 1);
+
+        if (parent) {
+          if (cb.checked) {
+            parent.classList.add('selected');
+            if (priceEl) priceEl.textContent = `+${(unitPrice * qty).toLocaleString('vi-VN')} đ`;
+          } else {
+            parent.classList.remove('selected');
+            if (qtyEl) qtyEl.textContent = '1';
+            if (priceEl) priceEl.textContent = `+${unitPrice.toLocaleString('vi-VN')} đ`;
+          }
+        }
+      });
+      updateModalSelectedSummary();
+    }
+
     // Modal Control: Open Court Time Grid
     function openCourtTimeGridModal(courtCode, courtName, rate, branchCode, preselectedSlot = null, preselectedDate = null, courtStatus = '') {
       if (courtStatus === 'Bảo trì') {
@@ -2268,6 +2608,7 @@
         }
       }
 
+      loadModalAddons(currentModalCourt.branchCode);
       resetModalSummary();
       const modal = document.getElementById('courtTimeGridModal');
       if (modal) modal.classList.add('active');
@@ -2339,7 +2680,11 @@
         return;
       }
 
-      const orderAmount = modalSelectedSlots.reduce((sum, s) => sum + s.price, 0);
+      let addonTotal = 0;
+      document.querySelectorAll('.modal-addon-cb:checked').forEach(cb => {
+        addonTotal += Number(cb.value) || 0;
+      });
+      const orderAmount = modalSelectedSlots.reduce((sum, s) => sum + s.price, 0) + addonTotal;
 
       try {
         const res = await fetch('/api/promotions/apply', {
@@ -2522,16 +2867,42 @@
       const btnLock = document.getElementById('btnConfirmLockSlot');
       const dateStr = document.getElementById('modalBookingDate')?.value || '';
 
+      // 1. Calculate Addon Total with Quantity
+      let addonTotal = 0;
+      const selectedAddonNames = [];
+      document.querySelectorAll('.modal-addon-cb:checked').forEach(cb => {
+        const id = cb.id.replace('addon_', '');
+        const qtyEl = document.getElementById(`modal_qty_${id}`);
+        const qty = Math.max(1, parseInt(qtyEl ? qtyEl.textContent : 1) || 1);
+        const val = (Number(cb.value) || 0) * qty;
+        addonTotal += val;
+        selectedAddonNames.push(`${cb.dataset.name || cb.id} (x${qty})`);
+      });
+
+      const addonBadge = document.getElementById('modalAddonCountBadge');
+      if (addonBadge) {
+        if (selectedAddonNames.length > 0) {
+          addonBadge.textContent = `${selectedAddonNames.length} dịch vụ (+${addonTotal.toLocaleString('vi-VN')} đ)`;
+          addonBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+          addonBadge.style.color = '#059669';
+        } else {
+          addonBadge.textContent = 'Chưa chọn';
+          addonBadge.style.background = 'var(--surface-subtle)';
+          addonBadge.style.color = 'var(--text-muted)';
+        }
+      }
+
       if (!modalSelectedSlots || modalSelectedSlots.length === 0) {
         if (summaryEl) summaryEl.innerHTML = '<span style="font-size: 13.5px; color: var(--text-muted); font-weight: 500;">Vui lòng chọn 1 hoặc nhiều khung giờ phía trên</span>';
-        if (depositEl) depositEl.innerText = '0 đ';
-        if (totalEl) totalEl.innerText = '(Tổng giá thuê: 0 đ)';
+        if (depositEl) depositEl.innerText = addonTotal > 0 ? `${Math.round(addonTotal * 0.3).toLocaleString('vi-VN')} đ` : '0 đ';
+        if (totalEl) totalEl.innerText = addonTotal > 0 ? `(Dịch vụ: ${addonTotal.toLocaleString('vi-VN')} đ • Chọn giờ để đặt)` : '(Tổng thanh toán: 0 đ)';
         if (discountLine) discountLine.style.display = 'none';
         if (btnLock) btnLock.disabled = true;
         return;
       }
 
       const totalRental = modalSelectedSlots.reduce((sum, s) => sum + s.price, 0);
+      const orderSubtotal = totalRental + addonTotal;
       const count = modalSelectedSlots.length;
 
       // Merge consecutive slots cleanly (e.g. 18:00 - 19:00 + 19:00 - 20:00 -> 18:00 - 20:00)
@@ -2554,9 +2925,9 @@
       let discount = 0;
       if (modalAppliedPromo) {
         if (modalAppliedPromo.discountType && modalAppliedPromo.discountType.includes('%')) {
-          discount = Math.round(totalRental * (modalAppliedPromo.discountValue / 100));
+          discount = Math.round(orderSubtotal * (modalAppliedPromo.discountValue / 100));
         } else if (modalAppliedPromo.discountAmount) {
-          discount = Math.min(modalAppliedPromo.discountAmount, totalRental);
+          discount = Math.min(modalAppliedPromo.discountAmount, orderSubtotal);
         }
       }
 
@@ -2569,7 +2940,7 @@
         if (discountLine) discountLine.style.display = 'none';
       }
 
-      const finalTotal = Math.max(0, totalRental - discount);
+      const finalTotal = Math.max(0, orderSubtotal - discount);
       const finalDeposit = Math.round(finalTotal * 0.3);
       const remaining70 = finalTotal - finalDeposit;
 
@@ -2577,10 +2948,14 @@
         depositEl.innerText = `${finalDeposit.toLocaleString('vi-VN')} đ`;
       }
       if (totalEl) {
+        let breakdown = `Sân: ${totalRental.toLocaleString('vi-VN')} đ`;
+        if (addonTotal > 0) {
+          breakdown += ` + Dịch vụ: ${addonTotal.toLocaleString('vi-VN')} đ`;
+        }
         if (discount > 0) {
-          totalEl.innerHTML = `Tạm tính: <span style="text-decoration: line-through;">${totalRental.toLocaleString('vi-VN')} đ</span> &rarr; <strong>${finalTotal.toLocaleString('vi-VN')} đ</strong> • Còn lại: ${remaining70.toLocaleString('vi-VN')} đ`;
+          totalEl.innerHTML = `Tạm tính: <span style="text-decoration: line-through;">${orderSubtotal.toLocaleString('vi-VN')} đ</span> &rarr; <strong>${finalTotal.toLocaleString('vi-VN')} đ</strong> • Còn lại tại quầy: ${remaining70.toLocaleString('vi-VN')} đ`;
         } else {
-          totalEl.innerHTML = `Tổng giá thuê: <strong>${totalRental.toLocaleString('vi-VN')} đ</strong> (${count} tiếng) • Còn lại: ${remaining70.toLocaleString('vi-VN')} đ`;
+          totalEl.innerHTML = `${breakdown} = <strong>${finalTotal.toLocaleString('vi-VN')} đ</strong> • Còn lại tại quầy: ${remaining70.toLocaleString('vi-VN')} đ`;
         }
       }
 
@@ -2596,6 +2971,11 @@
           pill.className = 'slot-status-pill pill-free';
           pill.innerText = 'Trống';
         }
+      });
+      document.querySelectorAll('.modal-addon-cb').forEach(cb => {
+        cb.checked = false;
+        const parent = cb.closest('.modal-addon-item');
+        if (parent) parent.classList.remove('selected');
       });
       updateModalSelectedSummary();
     }
@@ -2640,16 +3020,39 @@
       const mergedTimeSlot = mergeContinuousTimeSlots(modalSelectedSlots.map(s => s.timeSlot));
       const totalRental = modalSelectedSlots.reduce((sum, s) => sum + s.price, 0);
 
+      // Collect selected addons with Quantity
+      let addonTotal = 0;
+      const selectedAddonNames = [];
+      document.querySelectorAll('.modal-addon-cb:checked').forEach(cb => {
+        const id = cb.id.replace('addon_', '');
+        const qtyEl = document.getElementById(`modal_qty_${id}`);
+        const qty = Math.max(1, parseInt(qtyEl ? qtyEl.textContent : 1) || 1);
+        const val = (Number(cb.value) || 0) * qty;
+        addonTotal += val;
+        selectedAddonNames.push(`${cb.dataset.name || cb.id} (x${qty})`);
+      });
+
+      const orderSubtotal = totalRental + addonTotal;
+
       let discount = 0;
       if (modalAppliedPromo) {
         if (modalAppliedPromo.discountType && modalAppliedPromo.discountType.includes('%')) {
-          discount = Math.round(totalRental * (modalAppliedPromo.discountValue / 100));
+          discount = Math.round(orderSubtotal * (modalAppliedPromo.discountValue / 100));
         } else if (modalAppliedPromo.discountAmount) {
-          discount = Math.min(modalAppliedPromo.discountAmount, totalRental);
+          discount = Math.min(modalAppliedPromo.discountAmount, orderSubtotal);
         }
       }
-      const finalRental = Math.max(0, totalRental - discount);
+      const finalRental = Math.max(0, orderSubtotal - discount);
       const finalDeposit = Math.round(finalRental * 0.3);
+
+      let noteParts = [];
+      if (selectedAddonNames.length > 0) {
+        noteParts.push('Dịch vụ đi kèm: ' + selectedAddonNames.join(', '));
+      }
+      if (modalAppliedPromo) {
+        noteParts.push(`Áp dụng mã ${modalAppliedPromo.promoCode} (-${discount.toLocaleString('vi-VN')} đ)`);
+      }
+      const noteStr = noteParts.join(' | ');
 
       try {
         const payload = {
@@ -2659,9 +3062,10 @@
           timeSlot: mergedTimeSlot,
           totalPrice: finalRental,
           depositAmount: finalDeposit,
+          addonAmount: addonTotal,
           discountAmount: discount,
           promoCode: modalAppliedPromo ? modalAppliedPromo.promoCode : null,
-          notes: modalAppliedPromo ? `Áp dụng mã ${modalAppliedPromo.promoCode} (-${discount.toLocaleString('vi-VN')} đ)` : '',
+          notes: noteStr,
           customerName: custName,
           customerPhone: custPhone,
           customerEmail: custEmail
@@ -2698,6 +3102,19 @@
     function openVietQrModal(data) {
       document.getElementById('vqBookingCode').innerText = data.bookingCode;
       document.getElementById('vqDepositAmount').innerText = (data.depositAmount || 0).toLocaleString('vi-VN') + ' đ';
+
+      const vqAddonRow = document.getElementById('vqAddonRow');
+      const vqAddonText = document.getElementById('vqAddonText');
+      if (vqAddonRow && vqAddonText) {
+        if (data.notes && data.notes.includes('Dịch vụ đi kèm:')) {
+          const match = data.notes.match(/Dịch vụ đi kèm:([^|]+)/);
+          const txt = match ? match[1].trim() : data.notes;
+          vqAddonText.innerText = txt;
+          vqAddonRow.style.display = 'flex';
+        } else {
+          vqAddonRow.style.display = 'none';
+        }
+      }
       document.getElementById('vqBankName').innerText = data.bankName || 'MBBank';
       document.getElementById('vqAccountNo').innerText = data.accountNo || '0903123456';
       document.getElementById('vqContent').innerText = `CK ${data.bookingCode}`;
@@ -2854,7 +3271,22 @@
 
       loadBranchCourts(activeBranch);
       loadBranchPricing(activeBranch);
+      loadNearestTournament(activeBranch);
     });
+
+    function filterCourtsByType(type) {
+      const selectedType = type || (document.getElementById('heroCourtType') ? document.getElementById('heroCourtType').value : 'all');
+      document.querySelectorAll('.court-display-card').forEach(card => {
+        const isVipCard = card.getAttribute('data-vip') === 'vip';
+        if (selectedType === 'vip') {
+          card.style.display = isVipCard ? 'block' : 'none';
+        } else if (selectedType === 'standard') {
+          card.style.display = !isVipCard ? 'block' : 'none';
+        } else {
+          card.style.display = 'block';
+        }
+      });
+    }
 
     function handleQuickSearch(e) {
       e.preventDefault();
@@ -2863,16 +3295,19 @@
       const time = document.getElementById('heroTimeSelect').value;
       const type = document.getElementById('heroCourtType').value;
 
-      showToast(`Đang mở lưới giờ cho chi nhánh ${branch}...`, 'info');
-      // Switch to matrix tab directly on home page
+      showToast(`Đang tìm kiếm sân cho chi nhánh ${branch}...`, 'info');
       const dashSelect = document.getElementById('dashBranchPicker');
       if (dashSelect) dashSelect.value = branch;
       onDashBranchChanged(branch);
       const matrixDate = document.getElementById('matrixViewDate');
       if (matrixDate && date) matrixDate.value = date;
 
-      const matrixTabBtn = document.querySelectorAll('.dash-tab-btn')[1];
-      if (matrixTabBtn) switchCustomerTab('tab-matrix', matrixTabBtn);
+      setTimeout(() => {
+        filterCourtsByType(type);
+      }, 300);
+
+      const courtTabBtn = document.querySelectorAll('.dash-tab-btn')[0];
+      if (courtTabBtn) switchCustomerTab('tab-courts', courtTabBtn);
 
       const sectionCard = document.querySelector('.dash-section-card');
       if (sectionCard) sectionCard.scrollIntoView({ behavior: 'smooth', block: 'start' });

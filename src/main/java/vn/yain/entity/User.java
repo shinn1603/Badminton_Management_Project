@@ -37,7 +37,7 @@ public class User {
     @Column(name = "staff_code", length = 20)
     private String staffCode;
 
-    @Column(name = "branch_code", length = 20)
+    @Column(name = "branch_code", length = 100)
     private String branchCode;
 
     @Column(length = 30)

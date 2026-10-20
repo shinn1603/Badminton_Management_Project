@@ -48,3 +48,5 @@ scratch_*.*
 .env.*
 *.env
 !*.env.example
+
+*.zip

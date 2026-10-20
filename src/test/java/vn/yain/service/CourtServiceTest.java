@@ -126,6 +126,24 @@ class CourtServiceTest {
     }
 
     @Test
+    @DisplayName("XL-02-BT: Khong cho phep giu cho hoac dat san khi san dang bao tri")
+    void testHoldCourtForBooking_Failed_WhenMaintenance() {
+        Court court = new Court();
+        court.setCourtCode("CL02");
+        court.setBranchCode("CN01");
+        court.setStatus("Bảo trì");
+
+        when(courtRepository.findByCourtCode("CL02")).thenReturn(Optional.of(court));
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> {
+            courtService.holdCourtForBooking("CL02", "CN01", "18:00 - 19:00", "Nguyen Van A");
+        });
+
+        assertTrue(ex.getMessage().contains("đang bảo trì"));
+        verify(courtRepository, never()).save(court);
+    }
+
+    @Test
     @DisplayName("Them moi san thi dau thanh cong")
     void testSaveCourt_Create() {
         Court newCourt = new Court();
@@ -161,7 +179,7 @@ class CourtServiceTest {
         Court payload = new Court();
         payload.setCourtCode("CL01");
         payload.setCourtName("Sân 1 VIP Thảm Mới");
-        payload.setCourtType("VIP Yonex");
+        payload.setCourtType("Sân VIP");
         payload.setHourlyRate(new BigDecimal("130000"));
         payload.setStatus("Bảo trì");
 

@@ -59,4 +59,30 @@ public class EmailServiceTest {
         String cleaned = raw.trim().replace(" ", "");
         assertEquals("abcdefghijklmnop", cleaned);
     }
+
+    @Test
+    @DisplayName("Email 05: Kiểm tra cấu hình Port 465 (Direct SSL) không có socketFactory.class và bật TLS")
+    void testPort465Properties() {
+        org.springframework.mail.javamail.JavaMailSender sender = emailService.getDynamicMailSender("smtp.gmail.com", 465, "tho8189@gmail.com", "dummy_pass");
+        assertNotNull(sender);
+        assertTrue(sender instanceof org.springframework.mail.javamail.JavaMailSenderImpl);
+        java.util.Properties props = ((org.springframework.mail.javamail.JavaMailSenderImpl) sender).getJavaMailProperties();
+        assertEquals("true", props.getProperty("mail.smtp.ssl.enable"));
+        assertEquals("false", props.getProperty("mail.smtp.starttls.enable"));
+        assertEquals("*", props.getProperty("mail.smtp.ssl.trust"));
+        assertNull(props.getProperty("mail.smtp.socketFactory.class"));
+    }
+
+    @Test
+    @DisplayName("Email 06: Kiểm tra cấu hình Port 587 (STARTTLS)")
+    void testPort587Properties() {
+        org.springframework.mail.javamail.JavaMailSender sender = emailService.getDynamicMailSender("smtp.gmail.com", 587, "tho8189@gmail.com", "dummy_pass");
+        assertNotNull(sender);
+        assertTrue(sender instanceof org.springframework.mail.javamail.JavaMailSenderImpl);
+        java.util.Properties props = ((org.springframework.mail.javamail.JavaMailSenderImpl) sender).getJavaMailProperties();
+        assertEquals("false", props.getProperty("mail.smtp.ssl.enable"));
+        assertEquals("true", props.getProperty("mail.smtp.starttls.enable"));
+        assertEquals("true", props.getProperty("mail.smtp.starttls.required"));
+        assertEquals("*", props.getProperty("mail.smtp.ssl.trust"));
+    }
 }

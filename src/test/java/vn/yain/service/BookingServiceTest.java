@@ -140,6 +140,31 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("XL-04-BT: Check-in thanh cong khi san dang bao tri va giu nguyen trang thai Bao tri cua san")
+    void testCheckIn_Success_WhenCourtUnderMaintenance_PreservesMaintenanceStatus() {
+        Booking booking = new Booking();
+        booking.setBookingCode("DS_MAINT_IN");
+        booking.setCourtCode("CL03");
+        booking.setStatus("Đã cọc 30%");
+
+        Court court = new Court();
+        court.setCourtCode("CL03");
+        court.setStatus("Bảo trì");
+
+        when(bookingRepository.findByBookingCode("DS_MAINT_IN")).thenReturn(Optional.of(booking));
+        when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(courtRepository.findByCourtCode("CL03")).thenReturn(Optional.of(court));
+
+        Booking checkedIn = bookingService.checkIn("DS_MAINT_IN");
+
+        assertNotNull(checkedIn);
+        assertEquals("Đang sử dụng", checkedIn.getStatus());
+        assertEquals("Bảo trì", court.getStatus());
+        verify(courtRepository, never()).save(court);
+        verify(courtService, never()).updateCourtStatus("CL03", "Đang sử dụng");
+    }
+
+    @Test
     @DisplayName("XL-07: Check-out quyet toan hoa don, khau tru tien coc va giai phong san ve Trang thai Trong")
     void testCheckOut_Success() {
         Booking booking = new Booking();
@@ -178,6 +203,34 @@ class BookingServiceTest {
         assertEquals("Hoàn thành", booking.getStatus());
         assertNotNull(booking.getCheckOutTime());
         verify(courtService, times(1)).updateCourtStatus("CL04", "Trống");
+    }
+
+    @Test
+    @DisplayName("XL-07-BT: Check-out thanh cong khi san dang bao tri va khong reset san ve Trang thai Trong")
+    void testCheckOut_Success_WhenCourtUnderMaintenance_PreservesMaintenanceStatus() {
+        Booking booking = new Booking();
+        booking.setBookingCode("DS_MAINT_OUT");
+        booking.setCourtCode("CL04");
+        booking.setStatus("Đang sử dụng");
+        booking.setTotalPrice(new BigDecimal("100000"));
+        booking.setDepositAmount(new BigDecimal("30000"));
+
+        Court court = new Court();
+        court.setCourtCode("CL04");
+        court.setStatus("Bảo trì");
+
+        when(bookingRepository.findByBookingCode("DS_MAINT_OUT")).thenReturn(Optional.of(booking));
+        when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(invoiceRepository.save(any(Invoice.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(courtRepository.findByCourtCode("CL04")).thenReturn(Optional.of(court));
+
+        Invoice invoice = bookingService.checkOut("DS_MAINT_OUT", BigDecimal.ZERO, BigDecimal.ZERO, "Tiền mặt", "NVQ01");
+
+        assertNotNull(invoice);
+        assertEquals("Hoàn thành", booking.getStatus());
+        assertEquals("Bảo trì", court.getStatus());
+        verify(courtRepository, never()).save(court);
+        verify(courtService, never()).updateCourtStatus("CL04", "Trống");
     }
 
     @Test

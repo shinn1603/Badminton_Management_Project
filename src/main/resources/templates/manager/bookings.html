@@ -558,14 +558,14 @@
               <div class="form-group">
                 <label class="form-label">Sân</label>
                 <select id="fCourtName" class="form-control" onchange="calculateFormPrice()">
-                  <option value="CL01" data-rate="90000">CL01 - Sân 1 (Thảm tiêu chuẩn • 90.000đ/h)</option>
-                  <option value="CL02" data-rate="90000" selected>CL02 - Sân 2 (Thảm tiêu chuẩn • 90.000đ/h)</option>
-                  <option value="CL03" data-rate="90000">CL03 - Sân 3 (Thảm cao su • 90.000đ/h)</option>
-                  <option value="CL04" data-rate="90000">CL04 - Sân 4 (Thảm Silicon • 90.000đ/h)</option>
-                  <option value="CL05" data-rate="120000">CL05 - Sân 5 (VIP Yonex Quốc Tế • 120.000đ/h)</option>
-                  <option value="CL06" data-rate="90000">CL06 - Sân 6 (Thảm tiêu chuẩn • 90.000đ/h)</option>
-                  <option value="CL07" data-rate="90000">CL07 - Sân 7 (Thảm tiêu chuẩn • 90.000đ/h)</option>
-                  <option value="CL08" data-rate="120000">CL08 - Sân 8 (VIP Yonex Quốc Tế • 120.000đ/h)</option>
+                  <option value="CL01" data-rate="90000">CL01 - Sân 1 (Sân Thường • 90.000đ/h)</option>
+                  <option value="CL02" data-rate="90000" selected>CL02 - Sân 2 (Sân Thường • 90.000đ/h)</option>
+                  <option value="CL03" data-rate="90000">CL03 - Sân 3 (Sân Thường • 90.000đ/h)</option>
+                  <option value="CL04" data-rate="90000">CL04 - Sân 4 (Sân Thường • 90.000đ/h)</option>
+                  <option value="CL05" data-rate="120000">CL05 - Sân 5 (Sân VIP • 120.000đ/h)</option>
+                  <option value="CL06" data-rate="90000">CL06 - Sân 6 (Sân Thường • 90.000đ/h)</option>
+                  <option value="CL07" data-rate="90000">CL07 - Sân 7 (Sân Thường • 90.000đ/h)</option>
+                  <option value="CL08" data-rate="120000">CL08 - Sân 8 (Sân VIP • 120.000đ/h)</option>
                 </select>
               </div>
 
@@ -1060,7 +1060,7 @@
       if (token) headers['Authorization'] = 'Bearer ' + token;
 
       try {
-        const res = await fetch(`/api/bookings/?branchCode=CN01${encodeURIComponent(code)}/cancel`, {
+        const res = await fetch(`/api/bookings/${encodeURIComponent(code)}/cancel`, {
           method: 'POST',
           headers: headers,
           body: JSON.stringify({ reason: 'Quản lý chi nhánh hủy đơn' })

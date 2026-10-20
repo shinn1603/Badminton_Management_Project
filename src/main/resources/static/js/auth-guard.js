@@ -120,8 +120,9 @@
       user.role = 'MANAGER';
       user.fullName = 'Trần Phúc Bảo';
       user.roleTitle = 'Quản lý chi nhánh';
-      user.branchCode = 'CN01';
-      user.branchName = 'CN Thủ Đức';
+      const activeBr = localStorage.getItem('utesport_active_branch') || 'CN01';
+      user.branchCode = activeBr;
+      user.branchName = localStorage.getItem('utesport_active_branch_name') || (activeBr === 'CN02' ? 'Chi nhánh 2 - Bình Thạnh' : 'Chi nhánh 1 - Thủ Đức');
     } else if (user.username === 'admin') {
       user.role = 'ADMIN';
       user.fullName = 'Trần Biểu Hương';
@@ -329,35 +330,8 @@
         }
       }
 
-      // Strict branch-level isolation:
-      // ONLY apply to branch staff (MANAGER, POS, STAFF). CUSTOMER, DIRECTOR, and ADMIN are never restricted.
-      const isInternalBranchStaff = currentUser && currentUser.role !== 'CUSTOMER' && currentUser.role !== 'DIRECTOR' && currentUser.role !== 'ADMIN' && (currentUser.role === 'MANAGER' || currentUser.role === 'POS' || currentUser.role === 'STAFF');
-      if (isInternalBranchStaff) {
-        const assignedBranch = currentUser.branchCode || 'CN01';
-        const assignedBranchName = currentUser.branchName || 'CN Thủ Đức';
-        localStorage.setItem('manager_active_branch', assignedBranch);
-
-        document.querySelectorAll('select#branchFilterSelect, select#dashboardBranchSelect').forEach(sel => {
-          sel.innerHTML = `<option value="${assignedBranch}" selected>${assignedBranch} - ${assignedBranchName} (Chi nhánh quản lý)</option>`;
-          sel.value = assignedBranch;
-          sel.disabled = true;
-          sel.style.cursor = 'not-allowed';
-          sel.style.opacity = '0.9';
-          sel.title = 'Phân quyền: Bạn chỉ có quyền quản lý và theo dõi chi nhánh được phân công (' + assignedBranch + ')';
-
-          const badge = sel.closest('.branch-select-badge');
-          if (badge) {
-            badge.style.cursor = 'default';
-            badge.title = 'Phân quyền chi nhánh: ' + assignedBranchName;
-          }
-        });
-
-        document.querySelectorAll('select#inpItemBranch, select#inpStaffBranch, select#receiptBranchCode').forEach(sel => {
-          sel.value = assignedBranch;
-          sel.disabled = true;
-          sel.style.cursor = 'not-allowed';
-        });
-      }
+      // Khởi tạo bộ chọn / chuyển đổi chi nhánh thông minh cho Quản lý & Thu ngân
+      initBranchSwitcherUI();
     }
 
     // Globally synchronize Customer Nav User Area across all customer pages
@@ -622,6 +596,270 @@
     return response;
   };
 
+  // ========================================================
+  // BỘ CHUYỂN ĐỔI CHI NHÁNH TỰ ĐỘNG CHO QUẢN LÝ / GIÁM ĐỐC
+  // ========================================================
+  let myAccessibleBranches = [];
+
+  async function fetchUserBranches() {
+    if (myAccessibleBranches && myAccessibleBranches.length > 0) return myAccessibleBranches;
+    try {
+      let token = localStorage.getItem('jwt_token') || '';
+      if (!token && typeof document !== 'undefined' && document.cookie) {
+        const match = document.cookie.match(/(?:^|;\s*)jwt_token=([^;]+)/);
+        if (match) token = match[1];
+      }
+      const headers = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+
+      const res = await fetch('/api/user/my-branches', { headers, credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.branches && data.branches.length > 0) {
+          myAccessibleBranches = data.branches;
+          return myAccessibleBranches;
+        }
+      }
+    } catch (e) {
+      console.warn('Lỗi tải danh sách chi nhánh phụ trách:', e);
+    }
+
+    // Default fallback cho quản lý (mặc định phụ trách CN01 và CN02 theo phân công)
+    myAccessibleBranches = [
+      { branchCode: 'CN01', branchName: 'Chi nhánh 1 - Sân Cầu Lông Thủ Đức', address: 'Số 01 Võ Văn Ngân, TP. Thủ Đức' },
+      { branchCode: 'CN02', branchName: 'Chi nhánh 2 - Sân Cầu Lông Bình Thạnh', address: 'Số 234 Điện Biên Phủ, Bình Thạnh' }
+    ];
+    return myAccessibleBranches;
+  }
+
+  async function initBranchSwitcherUI() {
+    const badges = document.querySelectorAll('.branch-select-badge');
+    if (!badges || badges.length === 0) return;
+
+    const branches = await fetchUserBranches();
+    let activeBranch = localStorage.getItem('utesport_active_branch');
+    if (!activeBranch || !branches.some(b => b.branchCode === activeBranch)) {
+      activeBranch = (currentUser && currentUser.branchCode && currentUser.branchCode !== 'ALL' && branches.some(b => b.branchCode === currentUser.branchCode))
+        ? currentUser.branchCode : (branches[0] ? branches[0].branchCode : 'CN01');
+      localStorage.setItem('utesport_active_branch', activeBranch);
+    }
+    localStorage.setItem('manager_active_branch', activeBranch);
+
+    const activeObj = branches.find(b => b.branchCode === activeBranch) || branches[0];
+    const activeName = activeObj ? activeObj.branchName : ('Chi nhánh ' + activeBranch);
+    localStorage.setItem('utesport_active_branch_name', activeName);
+
+    // Đồng bộ lại các select chi nhánh trên trang (nếu có)
+    document.querySelectorAll('select#branchFilterSelect, select#dashboardBranchSelect').forEach(sel => {
+      let optHtml = '';
+      branches.forEach(b => {
+        const selAttr = (b.branchCode === activeBranch) ? 'selected' : '';
+        optHtml += `<option value="${b.branchCode}" ${selAttr}>${b.branchCode} - ${b.branchName}</option>`;
+      });
+      sel.innerHTML = optHtml;
+      sel.value = activeBranch;
+      sel.disabled = false;
+      sel.style.cursor = 'pointer';
+      sel.style.opacity = '1';
+      sel.onchange = function() {
+        switchBranch(this.value);
+      };
+    });
+
+    document.querySelectorAll('select#inpItemBranch, select#inpStaffBranch, select#receiptBranchCode, select#inpProposalBranch').forEach(sel => {
+      if (sel) {
+        sel.value = activeBranch;
+      }
+    });
+
+    badges.forEach(badge => {
+      badge.removeAttribute('onclick');
+      badge.style.position = 'relative';
+      badge.style.display = 'inline-flex';
+      badge.style.alignItems = 'center';
+      badge.style.cursor = 'pointer';
+      badge.style.userSelect = 'none';
+
+      badge.innerHTML = `
+        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; color: var(--primary); flex-shrink: 0;">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        </svg>
+        <span class="branch-badge-label" style="font-weight: 600; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          ${escapeHtml(activeName)}
+        </span>
+        <span class="badge badge-primary" style="font-size: 10px; padding: 1.5px 6px; font-weight: 700; border-radius: 4px; margin-left: 2px;">
+          ${escapeHtml(activeBranch)}
+        </span>
+        <svg class="svg-icon branch-chevron-arrow" viewBox="0 0 24 24" style="width: 13px; height: 13px; color: var(--text-muted); transition: transform 0.2s; margin-left: 3px; flex-shrink: 0;">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      `;
+
+      // Tạo menu popover dropdown
+      const parentWrap = badge.parentElement;
+      if (parentWrap) parentWrap.style.position = 'relative';
+
+      let oldMenu = parentWrap ? parentWrap.querySelector('.branch-dropdown-popover') : null;
+      if (oldMenu) oldMenu.remove();
+
+      const menu = document.createElement('div');
+      menu.className = 'branch-dropdown-popover';
+      menu.style.cssText = `
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        min-width: 340px;
+        max-width: 400px;
+        background: var(--surface, #ffffff);
+        border: 1px solid var(--border-subtle, #e2e8f0);
+        border-radius: 12px;
+        box-shadow: 0 14px 35px -5px rgba(0,0,0,0.18), 0 6px 12px -3px rgba(0,0,0,0.08);
+        padding: 8px 0;
+        z-index: 999999;
+        display: none;
+      `;
+
+      let itemsHtml = `
+        <div style="padding: 6px 16px 8px 16px; border-bottom: 1px solid var(--border-subtle, #e2e8f0); display: flex; align-items: center; justify-content: space-between;">
+          <div style="font-size: 11px; font-weight: 800; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.5px;">
+            Chi nhánh phụ trách (${branches.length})
+          </div>
+          <span style="font-size: 11px; color: var(--primary); font-weight: 600;">1-Click chuyển</span>
+        </div>
+        <div style="max-height: 260px; overflow-y: auto; padding: 4px 0;">
+      `;
+
+      branches.forEach(b => {
+        const isCurrent = (b.branchCode === activeBranch);
+        const activeBg = isCurrent ? 'background: rgba(16, 185, 129, 0.08);' : '';
+        const borderStyle = isCurrent ? 'border-left: 3px solid var(--primary);' : 'border-left: 3px solid transparent;';
+
+        itemsHtml += `
+          <div class="branch-popover-item" data-code="${b.branchCode}" style="padding: 10px 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; transition: background 0.15s; ${activeBg} ${borderStyle}">
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
+                <span class="badge ${isCurrent ? 'badge-primary' : 'badge-outline'}" style="font-size: 10.5px; padding: 1.5px 6px; font-weight: 700;">
+                  ${b.branchCode}
+                </span>
+                <strong style="font-size: 13px; color: var(--text-dark, #0f172a); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  ${escapeHtml(b.branchName)}
+                </strong>
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-muted, #64748b); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center;">
+                <svg viewBox="0 0 24 24" style="width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2; margin-right: 4px; flex-shrink: 0;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>${escapeHtml(b.address || 'Hệ thống sân cầu lông UTE Sport')}</span>
+              </div>
+            </div>
+            ${isCurrent ? `
+              <span style="color: var(--primary); font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; background: rgba(16, 185, 129, 0.15); padding: 2px 8px; border-radius: 999px;">
+                <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.5;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Đang chọn</span>
+              </span>
+            ` : `
+              <span class="btn btn-outline" style="font-size: 11px; padding: 3px 8px; flex-shrink: 0; border-color: var(--border-subtle);">
+                Chuyển
+              </span>
+            `}
+          </div>
+        `;
+      });
+
+      itemsHtml += `
+        </div>
+        <div style="padding: 8px 16px 4px 16px; border-top: 1px solid var(--border-subtle, #e2e8f0); background: var(--surface-subtle, #f8fafc); border-radius: 0 0 12px 12px;">
+          <div style="font-size: 11px; color: var(--text-muted, #64748b); line-height: 1.4;">
+            Đổi chi nhánh để cập nhật Lưới sân, Đơn đặt, Kho hàng, Báo cáo & Nhân sự cho cơ sở được chọn.
+          </div>
+        </div>
+      `;
+
+      menu.innerHTML = itemsHtml;
+      if (parentWrap) parentWrap.appendChild(menu);
+
+      // Toggle click
+      badge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = menu.style.display === 'block';
+        document.querySelectorAll('.branch-dropdown-popover').forEach(m => m.style.display = 'none');
+        document.querySelectorAll('.branch-chevron-arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+
+        if (!isOpen) {
+          menu.style.display = 'block';
+          const arr = badge.querySelector('.branch-chevron-arrow');
+          if (arr) arr.style.transform = 'rotate(180deg)';
+        }
+      });
+
+      // Item click
+      menu.querySelectorAll('.branch-popover-item').forEach(item => {
+        item.addEventListener('mouseenter', () => {
+          if (!item.style.background.includes('185, 129')) {
+            item.style.background = 'var(--surface-subtle, #f1f5f9)';
+          }
+        });
+        item.addEventListener('mouseleave', () => {
+          if (!item.style.borderLeft.includes('var(--primary)')) {
+            item.style.background = '';
+          }
+        });
+
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const targetCode = item.getAttribute('data-code');
+          switchBranch(targetCode);
+        });
+      });
+    });
+
+    // Close on click outside
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.branch-dropdown-popover').forEach(m => m.style.display = 'none');
+      document.querySelectorAll('.branch-chevron-arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+    });
+  }
+
+  function switchBranch(targetCode) {
+    if (!targetCode) return;
+    const branches = myAccessibleBranches || [];
+    const targetObj = branches.find(b => b.branchCode === targetCode);
+    const targetName = targetObj ? targetObj.branchName : ('Chi nhánh ' + targetCode);
+
+    localStorage.setItem('utesport_active_branch', targetCode);
+    localStorage.setItem('manager_active_branch', targetCode);
+    localStorage.setItem('utesport_active_branch_name', targetName);
+
+    if (currentUser) {
+      currentUser.branchCode = targetCode;
+      currentUser.branchName = targetName;
+      localStorage.setItem('utesport_user', JSON.stringify(currentUser));
+    }
+
+    try {
+      fetch('/api/user/active-branch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ branchCode: targetCode })
+      });
+    } catch (e) {}
+
+    if (typeof showToast === 'function') {
+      showToast(`Đã chuyển sang [${targetName}]! Đang tải lại dữ liệu...`, 'success');
+    }
+
+    // Sync pos grid filter if present
+    const bFilter = document.getElementById('branchFilter');
+    if (bFilter) bFilter.value = targetCode;
+
+    window.dispatchEvent(new CustomEvent('utesport:branch-changed', {
+      detail: { branchCode: targetCode, branchName: targetName }
+    }));
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 350);
+  }
+
+
   // Expose global helper for testing or role switching
   window.RBAC = {
     getCurrentUser: () => currentUser,
@@ -640,6 +878,8 @@
         window.location.reload();
       }
     },
+    switchBranch: switchBranch,
+    getActiveBranch: () => localStorage.getItem('utesport_active_branch') || (currentUser ? currentUser.branchCode : 'CN01'),
     switchRole: function (roleName) {
       console.warn('Direct role mutation via navigation is disabled. Authenticated session is preserved.');
     }

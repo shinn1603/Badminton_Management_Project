@@ -203,14 +203,16 @@
                 <div class="form-group">
                   <label class="form-label" style="font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
                     <span>Mật khẩu ứng dụng Google (16 ký tự App Password) *</span>
-                    <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: #2563eb; font-size: 11.5px; text-decoration: none; font-weight: 600;">🔗 Tạo mã tại Google &rarr;</a>
+                    <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: #2563eb; font-size: 11.5px; text-decoration: none; font-weight: 600;">Tạo mã tại Google &rarr;</a>
                   </label>
                   <div style="position: relative; display: flex; align-items: center;">
                     <input type="password" class="form-control" id="cfgMailPassword" placeholder="Nhập mã 16 ký tự (vd: abcd efgh ijkl mnop)" style="padding-right: 42px; letter-spacing: 1px; font-family: monospace;">
-                    <button type="button" onclick="toggleMailPassVisibility()" style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 15px;" title="Hiện/Ẩn mật khẩu">👁️</button>
+                    <button type="button" onclick="toggleMailPassVisibility()" style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; padding: 4px;" title="Hiện/Ẩn mật khẩu">
+                      <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
                   </div>
                   <div style="font-size: 11.5px; color: #dc2626; margin-top: 5px; line-height: 1.4;">
-                    ⚠️ <strong>Lưu ý quan trọng:</strong> KHÔNG dùng mật khẩu đăng nhập Gmail thông thường (Google sẽ chặn 100%). Bắt buộc phải dùng <strong>Mật khẩu ứng dụng (App Password)</strong>.
+                    <strong>Lưu ý quan trọng:</strong> Không dùng mật khẩu đăng nhập Gmail thông thường (Google sẽ chặn kết nối). Bắt buộc phải dùng <strong>Mật khẩu ứng dụng (App Password)</strong>.
                   </div>
                 </div>
 
@@ -219,9 +221,12 @@
                     <label class="form-label">Tên hiển thị người gửi</label>
                     <input type="text" class="form-control" id="cfgMailFromName" value="UTE Sport Badminton Arena">
                   </div>
-                  <div class="form-group" style="flex: 1;">
+                  <div class="form-group" style="flex: 1.2;">
                     <label class="form-label">Cổng SMTP</label>
-                    <input type="number" class="form-control" id="cfgMailPort" value="587">
+                    <select class="form-control" id="cfgMailPort" style="font-weight: 600;">
+                      <option value="587">587 (TLS / STARTTLS)</option>
+                      <option value="465">465 (SSL - Khuyên dùng nếu 587 lỗi)</option>
+                    </select>
                   </div>
                 </div>
                 <input type="hidden" id="cfgMailHost" value="smtp.gmail.com">
@@ -231,23 +236,27 @@
               <div>
                 <!-- Hộp hướng dẫn 3 bước -->
                 <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; font-size: 12.5px; color: #334155; line-height: 1.6;">
-                  <strong style="color: #0f172a; display: block; margin-bottom: 6px; font-size: 13px;">📋 3 bước lấy Mật khẩu ứng dụng Google (1 phút):</strong>
+                  <strong style="color: #0f172a; display: block; margin-bottom: 6px; font-size: 13px;">3 bước lấy Mật khẩu ứng dụng Google:</strong>
                   1. Đăng nhập tài khoản Google & bật <strong>Xác minh 2 bước</strong>.<br>
                   2. Mở liên kết: <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: #2563eb; font-weight: 600; text-decoration: underline;">myaccount.google.com/apppasswords</a>.<br>
-                  3. Đặt tên <em>"UTESport"</em> &rarr; Bấm <strong>Tạo</strong> &rarr; Copy 16 chữ cái dán vào ô bên trái.<br>
+                  3. Đặt tên <em>"UTESport"</em> &rarr; Bấm <strong>Tạo</strong> &rarr; Sao chép 16 chữ cái dán vào ô bên trái.<br>
                   <span style="color: #b45309; font-size: 11.5px; display: block; margin-top: 6px; background: #fef3c7; padding: 6px 10px; border-radius: 6px;">
-                    💡 <em>Nếu bạn vừa đổi mật khẩu chính của Gmail, Google đã tự động hủy tất cả Mật khẩu ứng dụng cũ. Bạn chỉ cần tạo mã mới là được!</em>
+                    <em>Lưu ý: Nếu bạn vừa đổi mật khẩu chính của Gmail, Google sẽ tự động hủy tất cả Mật khẩu ứng dụng cũ. Bạn chỉ cần tạo mã mới là được.</em>
                   </span>
                 </div>
 
                 <!-- Khung test gửi email trực tiếp -->
                 <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px 16px;">
-                  <div style="font-weight: 700; font-size: 13px; color: #1e40af; margin-bottom: 6px;">🧪 Kiểm Tra Kết Nối & Gửi Thử Email</div>
+                  <div style="font-weight: 700; font-size: 13px; color: #1e40af; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                    <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; stroke: #1e40af; fill: none; stroke-width: 2;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    <span>Kiểm Tra Kết Nối & Gửi Thử Email</span>
+                  </div>
                   <div style="font-size: 11.5px; color: #3b82f6; margin-bottom: 10px;">Nhập email người nhận để gửi thư kiểm tra kết nối thực tế tới Google SMTP</div>
                   <div style="display: flex; gap: 8px;">
                     <input type="email" class="form-control" id="cfgTestMailRecipient" placeholder="Nhập email nhận thử (vd: tho8189@gmail.com)..." style="flex: 1; font-size: 12.5px;">
-                    <button type="button" class="btn btn-primary" id="btnTestMail" onclick="sendTestEmail()" style="white-space: nowrap; font-size: 12.5px; padding: 7px 16px; background: #2563eb; border-color: #2563eb;">
-                      <span>📩 Gửi Thử Ngay</span>
+                    <button type="button" class="btn btn-primary" id="btnTestMail" onclick="sendTestEmail()" style="white-space: nowrap; font-size: 12.5px; padding: 7px 16px; background: #2563eb; border-color: #2563eb; display: inline-flex; align-items: center; gap: 5px;">
+                      <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                      <span>Gửi Thử Ngay</span>
                     </button>
                   </div>
                   <div id="testMailResult" style="margin-top: 10px; font-size: 12px; display: none;"></div>
@@ -404,6 +413,12 @@
 
     async function sendTestEmail() {
       const recipient = document.getElementById('cfgTestMailRecipient').value.trim();
+      const mailUser = (document.getElementById('cfgMailUsername').value || '').trim();
+      const mailPass = (document.getElementById('cfgMailPassword').value || '').trim().replace(/\s+/g, '');
+      const mailPort = (document.getElementById('cfgMailPort').value || '587').trim();
+      const mailHost = (document.getElementById('cfgMailHost').value || 'smtp.gmail.com').trim();
+      const mailFromName = (document.getElementById('cfgMailFromName').value || 'UTE Sport Badminton Arena').trim();
+
       const btn = document.getElementById('btnTestMail');
       const resBox = document.getElementById('testMailResult');
 
@@ -413,13 +428,22 @@
         return;
       }
 
-      // Lưu trước các thông số vừa nhập vào CSDL
-      await saveSettings();
+      if (!mailPass) {
+        if (window.showToast) showToast('Vui lòng nhập Mật khẩu ứng dụng 16 ký tự của Google!', 'warning');
+        document.getElementById('cfgMailPassword').focus();
+        return;
+      }
+
+      // Lưu trước các thông số vừa nhập vào CSDL nền
+      saveSettings().catch(e => console.warn('Lưu ngầm cấu hình:', e));
 
       btn.disabled = true;
-      btn.innerHTML = '<span>⏳ Đang gửi thử...</span>';
+      btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;"><svg class="spin-icon" style="animation: spin 1s linear infinite;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Đang gửi thử...</span>';
       resBox.style.display = 'block';
-      resBox.innerHTML = '<div style="color: #2563eb; padding: 10px; background: #dbeafe; border-radius: 6px; font-weight: 500;">Đang kết nối tới máy chủ Google SMTP và gửi thư thử nghiệm... Vui lòng đợi trong giây lát!</div>';
+      resBox.innerHTML = `<div style="display:flex;align-items:center;gap:8px;color: #2563eb; padding: 12px; background: #dbeafe; border-radius: 6px; font-weight: 500;">
+        <svg class="spin-icon" style="animation: spin 1s linear infinite; flex-shrink: 0;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+        <span>Đang kết nối tới máy chủ Google SMTP (<strong>${mailHost}:${mailPort}</strong>) và gửi thư thử nghiệm... Vui lòng đợi trong giây lát!</span>
+      </div>`;
 
       try {
         let token = localStorage.getItem('jwt_token');
@@ -433,29 +457,53 @@
         const res = await fetch('/api/admin/mail/test', {
           method: 'POST',
           headers: headers,
-          body: JSON.stringify({ recipient: recipient })
+          body: JSON.stringify({
+            recipient: recipient,
+            username: mailUser,
+            password: mailPass,
+            port: mailPort,
+            host: mailHost,
+            fromName: mailFromName
+          })
         });
         const data = await res.json();
 
         if (res.ok && data.success) {
-          resBox.innerHTML = `<div style="color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 12px 14px; border-radius: 6px; line-height: 1.5;">
-            <strong>🎉 THÀNH CÔNG RỰC RỠ!</strong><br>${data.message}
+          if (data.message && data.message.includes('465')) {
+            document.getElementById('cfgMailPort').value = '465';
+          } else if (data.message && data.message.includes('587')) {
+            document.getElementById('cfgMailPort').value = '587';
+          }
+          resBox.innerHTML = `<div style="color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 14px 16px; border-radius: 6px; line-height: 1.6;">
+            <div style="font-size: 13.5px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke: #059669; fill: none; stroke-width: 2.5;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>KẾT NỐI THÀNH CÔNG:</span>
+            </div>
+            ${data.message}
           </div>`;
           if (window.showToast) showToast('Kết nối Google SMTP thành công!', 'success');
         } else {
           const rawMsg = data.message || 'Lỗi không xác định khi kết nối SMTP';
-          resBox.innerHTML = `<div style="color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; padding: 12px 14px; border-radius: 6px; line-height: 1.5; white-space: pre-line;">
-            <strong>❌ GỬI THƯ THẤT BẠI:</strong>\n${rawMsg}
+          resBox.innerHTML = `<div style="color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; padding: 14px 16px; border-radius: 6px; line-height: 1.6; white-space: pre-line;">
+            <div style="font-size: 13.5px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke: #dc2626; fill: none; stroke-width: 2.5;"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+              <span>GỬI THƯ THẤT BẠI:</span>
+            </div>
+            ${rawMsg}
           </div>`;
           if (window.showToast) showToast('Lỗi gửi email kiểm tra!', 'error');
         }
       } catch (err) {
-        resBox.innerHTML = `<div style="color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; padding: 12px 14px; border-radius: 6px;">
-          <strong>❌ LỖI KẾT NỐI:</strong> ${err.message || 'Không thể kết nối máy chủ.'}
+        resBox.innerHTML = `<div style="color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; padding: 14px 16px; border-radius: 6px;">
+          <div style="font-size: 13.5px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke: #dc2626; fill: none; stroke-width: 2.5;"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            <span>LỖI KẾT NỐI:</span>
+          </div>
+          ${err.message || 'Không thể kết nối máy chủ.'}
         </div>`;
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '<span>📩 Gửi Thử Ngay</span>';
+        btn.innerHTML = `<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg><span>Gửi Thử Ngay</span>`;
       }
     }
 

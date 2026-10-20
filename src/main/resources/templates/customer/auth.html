@@ -573,8 +573,11 @@
 
             <div class="form-row">
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="regPhone">Số điện thoại *</label>
-                <input type="tel" id="regPhone" class="form-control" placeholder="09xxxxxxx" required pattern="^(0[3|5|7|8|9])[0-9]{8}$" title="Vui lòng nhập số điện thoại Việt Nam gồm 10 chữ số">
+                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                  <label class="form-label" for="regPhone" style="margin: 0;">Số điện thoại *</label>
+                  <span style="font-size: 11px; color: var(--cust-teal, #059669); font-weight: 700;">(Tài khoản đăng nhập)</span>
+                </div>
+                <input type="tel" id="regPhone" class="form-control" placeholder="09xxxxxxx" required pattern="^(0[3|5|7|8|9])[0-9]{8}$" title="Vui lòng nhập số điện thoại Việt Nam gồm 10 chữ số" style="margin-top: 4px;">
               </div>
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label" for="regBirth">Ngày sinh</label>
@@ -614,39 +617,116 @@
     </div>
   </div>
 
-  <!-- FORGOT PASSWORD MODAL FOR CUSTOMERS -->
-  <div id="customerForgotModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(5px); z-index: 99999; align-items: center; justify-content: center;">
-    <div style="background: var(--cust-surface); border: 1px solid var(--cust-border); border-radius: 20px; padding: 28px; max-width: 440px; width: 90%; box-shadow: 0 25px 50px rgba(0,0,0,0.35);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h3 style="margin: 0; font-size: 19px; font-weight: 800; color: var(--cust-text-dark);">Khôi Phục Mật Khẩu Hội Viên</h3>
-        <button type="button" onclick="closeCustomerForgotModal()" style="border: none; background: transparent; font-size: 18px; cursor: pointer; color: var(--cust-text-muted);">✕</button>
+  <!-- FORGOT PASSWORD MODAL FOR CUSTOMERS (CHUẨN 3 BƯỚC BẢO MẬT OTP) -->
+  <div id="customerForgotModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(5px); z-index: 99999; align-items: center; justify-content: center; padding: 16px;">
+    <div style="background: #ffffff; border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 24px; padding: 28px; max-width: 440px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); position: relative;">
+      
+      <!-- Modal Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="margin: 0; font-size: 19px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2;"><path d="M21 2l-2 2m-1.5 1.5L14 9a6 6 0 1 0 4 4l3.5-3.5L21 8l-1.5-1.5L21 5l-2-2z"></path></svg>
+          <span>Khôi Phục Mật Khẩu Hội Viên</span>
+        </h3>
+        <button type="button" onclick="closeCustomerForgotModal()" style="border: none; background: #f1f5f9; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: #64748b; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+          <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.2;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
-      <p style="font-size: 12.5px; color: var(--cust-text-muted); margin: 0 0 16px;">
-        Vui lòng nhập số điện thoại hoặc email đăng ký và mật khẩu mới để thiết lập lại mật khẩu.
-      </p>
-      <div class="form-group" style="margin-bottom: 12px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-          <label class="form-label" style="margin: 0;">Số điện thoại hoặc Email</label>
-          <a href="javascript:void(0)" id="btnCustSendOtp" onclick="sendCustomerForgotOtp()" style="font-size: 11.5px; color: var(--cust-teal); text-decoration: none; font-weight: 700;">📩 Gửi OTP về Email</a>
+
+      <!-- Step Indicator Bar -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding: 10px 14px; background: #f8fafc; border-radius: 14px; border: 1px solid #e2e8f0;">
+        <div id="custStepDot1" style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: #059669;">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: #059669; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px;">1</span>
+          <span>Gửi OTP</span>
         </div>
-        <input type="text" id="cfIdentifier" class="form-control" placeholder="0901234567 hoặc email" style="width: 100%; box-sizing: border-box;">
+        <div id="custStepLine1" style="flex: 1; height: 2px; background: #e2e8f0; margin: 0 8px;"></div>
+        <div id="custStepDot2" style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: #94a3b8;">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 11px;">2</span>
+          <span>Nhập OTP</span>
+        </div>
+        <div id="custStepLine2" style="flex: 1; height: 2px; background: #e2e8f0; margin: 0 8px;"></div>
+        <div id="custStepDot3" style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: #94a3b8;">
+          <span style="width: 20px; height: 20px; border-radius: 50%; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 11px;">3</span>
+          <span>Mật khẩu mới</span>
+        </div>
       </div>
-      <div id="custOtpContainer" class="form-group" style="margin-bottom: 12px; display: none;">
-        <label class="form-label" style="color: var(--cust-teal);">Mã OTP (6 chữ số từ email)</label>
-        <input type="text" id="cfOtp" class="form-control" placeholder="Nhập mã 6 chữ số nhận từ email" style="width: 100%; box-sizing: border-box; letter-spacing: 2px; font-weight: 700; color: #047857;">
+
+      <!-- BƯỚC 1: NHẬP SĐT / EMAIL ĐỂ NHẬN OTP -->
+      <div id="custForgotStep1">
+        <p style="font-size: 13px; color: #475569; margin: 0 0 16px; line-height: 1.5;">
+          Vui lòng nhập số điện thoại hoặc email tài khoản của bạn. Hệ thống sẽ gửi mã xác thực OTP 6 chữ số đến email đã đăng ký.
+        </p>
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label class="form-label" style="font-weight: 700; font-size: 12.5px; color: #1e293b; margin-bottom: 6px; display: block;">Số điện thoại hoặc Email</label>
+          <input type="text" id="cfIdentifier" class="form-control" placeholder="0901234567 hoặc email của bạn" style="width: 100%; height: 44px; border-radius: 12px; border: 1.5px solid #cbd5e1; padding: 0 14px; font-size: 14px; box-sizing: border-box;">
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn btn-outline" style="flex: 1; height: 44px; border-radius: 12px; font-weight: 600;" onclick="closeCustomerForgotModal()">Hủy</button>
+          <button type="button" class="btn btn-primary" id="btnCustSendOtp" style="flex: 1.5; height: 44px; border-radius: 12px; font-weight: 700; background: #059669; border-color: #059669; color: #fff;" onclick="sendCustomerForgotOtp()">Gửi Mã OTP</button>
+        </div>
       </div>
-      <div class="form-group" style="margin-bottom: 12px;">
-        <label class="form-label">Mật khẩu mới (tối thiểu 6 ký tự)</label>
-        <input type="password" id="cfNewPassword" class="form-control" placeholder="Nhập mật khẩu mới" style="width: 100%; box-sizing: border-box;">
+
+      <!-- BƯỚC 2: NHẬP & XÁC THỰC MÃ OTP -->
+      <div id="custForgotStep2" style="display: none;">
+        <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 12px 14px; margin-bottom: 16px;">
+          <p style="font-size: 12.5px; color: #065f46; margin: 0; line-height: 1.5;">
+            Mã OTP gồm 6 chữ số đã được gửi đến: <strong id="cfMaskedEmailText" style="color: #047857;">email của bạn</strong>. Vui lòng kiểm tra hộp thư (cả thư rác/Spam).
+          </p>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px; text-align: center;">
+          <label class="form-label" style="font-weight: 700; font-size: 13px; color: #047857; margin-bottom: 8px; display: block;">Nhập mã xác nhận OTP (6 chữ số)</label>
+          <input type="text" id="cfOtp" maxlength="6" class="form-control" placeholder="••••••" style="width: 100%; height: 50px; border-radius: 12px; border: 2px solid #10b981; padding: 0; font-size: 26px; font-weight: 800; letter-spacing: 10px; text-align: center; color: #065f46; background: #f0fdf4; box-sizing: border-box;" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length === 6) verifyCustomerForgotOtp();">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 12px;">
+          <a href="javascript:void(0)" onclick="goToCustomerForgotStep(1)" style="color: #64748b; text-decoration: none; font-weight: 600;">← Đổi SĐT / Email</a>
+          <div id="cfResendWrap">
+            <span id="cfCountdownText" style="color: #94a3b8;">Gửi lại mã (<strong id="cfCountdownNum">60s</strong>)</span>
+            <a href="javascript:void(0)" id="cfResendLink" onclick="sendCustomerForgotOtp(true)" style="display: none; color: #059669; font-weight: 700; text-decoration: none;">Gửi lại mã OTP</a>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn btn-outline" style="flex: 1; height: 44px; border-radius: 12px; font-weight: 600;" onclick="goToCustomerForgotStep(1)">Quay lại</button>
+          <button type="button" class="btn btn-primary" id="btnCustVerifyOtp" style="flex: 1.5; height: 44px; border-radius: 12px; font-weight: 700; background: #059669; border-color: #059669; color: #fff;" onclick="verifyCustomerForgotOtp()">Xác Thực OTP</button>
+        </div>
       </div>
-      <div class="form-group" style="margin-bottom: 20px;">
-        <label class="form-label">Xác nhận mật khẩu mới</label>
-        <input type="password" id="cfConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu mới" style="width: 100%; box-sizing: border-box;">
+
+      <!-- BƯỚC 3: THIẾT LẬP MẬT KHẨU MỚI (CHỈ MỞ KHI OTP HỢP LỆ) -->
+      <div id="custForgotStep3" style="display: none;">
+        <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke: #16a34a; fill: none; stroke-width: 2.5;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <p style="font-size: 12.5px; color: #15803d; margin: 0; font-weight: 600;">
+            Xác thực OTP thành công! Vui lòng thiết lập mật khẩu mới.
+          </p>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" style="font-weight: 600; font-size: 12.5px; color: #1e293b; margin-bottom: 6px; display: block;">Mật khẩu mới (tối thiểu 6 ký tự)</label>
+          <div style="position: relative;">
+            <input type="password" id="cfNewPassword" class="form-control" placeholder="Nhập mật khẩu mới" style="width: 100%; height: 44px; border-radius: 12px; border: 1.5px solid #cbd5e1; padding: 0 40px 0 14px; font-size: 14px; box-sizing: border-box;">
+            <button type="button" onclick="toggleForgotPassVisibility('cfNewPassword', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; color: #94a3b8; padding: 0; display: flex; align-items: center;">
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 22px;">
+          <label class="form-label" style="font-weight: 600; font-size: 12.5px; color: #1e293b; margin-bottom: 6px; display: block;">Xác nhận mật khẩu mới</label>
+          <div style="position: relative;">
+            <input type="password" id="cfConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu mới" style="width: 100%; height: 44px; border-radius: 12px; border: 1.5px solid #cbd5e1; padding: 0 40px 0 14px; font-size: 14px; box-sizing: border-box;">
+            <button type="button" onclick="toggleForgotPassVisibility('cfConfirmPassword', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; color: #94a3b8; padding: 0; display: flex; align-items: center;">
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn btn-outline" style="flex: 1; height: 44px; border-radius: 12px; font-weight: 600;" onclick="closeCustomerForgotModal()">Hủy</button>
+          <button type="button" class="btn btn-primary" id="btnCustomerReset" style="flex: 1.5; height: 44px; border-radius: 12px; font-weight: 700; background: #059669; border-color: #059669; color: #fff;" onclick="submitCustomerResetPassword()">Lưu Mật Khẩu Mới</button>
+        </div>
       </div>
-      <div style="display: flex; gap: 10px;">
-        <button type="button" class="btn btn-outline" style="flex: 1; height: 42px; border-radius: 10px;" onclick="closeCustomerForgotModal()">Hủy</button>
-        <button type="button" class="btn btn-primary" id="btnCustomerReset" style="flex: 1.5; height: 42px; border-radius: 10px;" onclick="submitCustomerResetPassword()">Xác Nhận Đổi</button>
-      </div>
+
     </div>
   </div>
 
@@ -689,12 +769,12 @@
         el.style.background = 'rgba(16, 185, 129, 0.12)';
         el.style.border = '1px solid rgba(16, 185, 129, 0.35)';
         el.style.color = '#10b981';
-        el.innerHTML = `<span>✔</span> <span>${message}</span>`;
+        el.innerHTML = `<svg viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke: #10b981; fill: none; stroke-width: 2.5; flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg> <span>${message}</span>`;
       } else {
         el.style.background = 'rgba(239, 68, 68, 0.12)';
         el.style.border = '1px solid rgba(239, 68, 68, 0.35)';
         el.style.color = '#ef4444';
-        el.innerHTML = `<span>✖</span> <span>${message}</span>`;
+        el.innerHTML = `<svg viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke: #ef4444; fill: none; stroke-width: 2.5; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> <span>${message}</span>`;
       }
     }
 
@@ -860,7 +940,14 @@
             window.location.href = targetUrl;
           }, 1000);
         } else {
-          showToast(data.message || 'Đăng ký không thành công.', false);
+          const msg = data.message || 'Đăng ký không thành công.';
+          if (msg.includes('Số điện thoại') || msg.includes('đăng ký')) {
+            showToast(msg + ' Bấm tab "Đăng Nhập" để vào tài khoản.', 'warning');
+            const loginPhone = document.getElementById('loginPhone');
+            if (loginPhone) loginPhone.value = phone;
+          } else {
+            showToast(msg, 'error');
+          }
         }
       } catch (err) {
         console.error('Lỗi khi gọi API đăng ký:', err);
@@ -872,48 +959,189 @@
       showToast('Tính năng đăng nhập qua ' + provider + ' OAuth 2.0 đang kết nối chứng thực. Vui lòng đăng nhập bằng SĐT/mật khẩu hoặc đăng ký tài khoản!', 'warning');
     }
 
+    let custForgotTimer = null;
+    let custForgotCountdown = 60;
+
     function openCustomerForgotModal() {
       const modal = document.getElementById('customerForgotModal');
       if (modal) modal.style.display = 'flex';
       const phoneVal = document.getElementById('loginPhone')?.value.trim();
       if (phoneVal) document.getElementById('cfIdentifier').value = phoneVal;
+      goToCustomerForgotStep(1);
+      document.getElementById('cfOtp').value = '';
+      document.getElementById('cfNewPassword').value = '';
+      document.getElementById('cfConfirmPassword').value = '';
+      clearInterval(custForgotTimer);
     }
 
     function closeCustomerForgotModal() {
       const modal = document.getElementById('customerForgotModal');
       if (modal) modal.style.display = 'none';
+      clearInterval(custForgotTimer);
+    }
+
+    function goToCustomerForgotStep(step) {
+      document.getElementById('custForgotStep1').style.display = step === 1 ? 'block' : 'none';
+      document.getElementById('custForgotStep2').style.display = step === 2 ? 'block' : 'none';
+      document.getElementById('custForgotStep3').style.display = step === 3 ? 'block' : 'none';
+
+      // Update dots & lines
+      const dot1 = document.getElementById('custStepDot1');
+      const dot2 = document.getElementById('custStepDot2');
+      const dot3 = document.getElementById('custStepDot3');
+      const line1 = document.getElementById('custStepLine1');
+      const line2 = document.getElementById('custStepLine2');
+
+      if (step === 1) {
+        dot1.style.color = '#059669';
+        dot1.querySelector('span').style.background = '#059669';
+        dot1.querySelector('span').style.color = '#fff';
+        dot2.style.color = '#94a3b8';
+        dot2.querySelector('span').style.background = '#e2e8f0';
+        dot2.querySelector('span').style.color = '#64748b';
+        dot3.style.color = '#94a3b8';
+        dot3.querySelector('span').style.background = '#e2e8f0';
+        dot3.querySelector('span').style.color = '#64748b';
+        line1.style.background = '#e2e8f0';
+        line2.style.background = '#e2e8f0';
+        document.getElementById('cfIdentifier').focus();
+      } else if (step === 2) {
+        dot1.style.color = '#059669';
+        dot1.querySelector('span').style.background = '#059669';
+        dot2.style.color = '#059669';
+        dot2.querySelector('span').style.background = '#059669';
+        dot2.querySelector('span').style.color = '#fff';
+        dot3.style.color = '#94a3b8';
+        dot3.querySelector('span').style.background = '#e2e8f0';
+        line1.style.background = '#059669';
+        line2.style.background = '#e2e8f0';
+        setTimeout(() => document.getElementById('cfOtp').focus(), 100);
+      } else if (step === 3) {
+        dot1.style.color = '#059669';
+        dot2.style.color = '#059669';
+        dot3.style.color = '#059669';
+        dot3.querySelector('span').style.background = '#059669';
+        dot3.querySelector('span').style.color = '#fff';
+        line1.style.background = '#059669';
+        line2.style.background = '#059669';
+        setTimeout(() => document.getElementById('cfNewPassword').focus(), 100);
+      }
+    }
+
+    async function sendCustomerForgotOtp(isResend = false) {
+      const identifier = document.getElementById('cfIdentifier').value.trim();
+      if (!identifier) {
+        showToast('Vui lòng nhập số điện thoại hoặc email!', 'warning');
+        document.getElementById('cfIdentifier').focus();
+        return;
+      }
+
+      const btn = isResend ? document.getElementById('cfResendLink') : document.getElementById('btnCustSendOtp');
+      const originalText = btn.innerText;
+      btn.innerText = 'Đang gửi OTP...';
+      if (!isResend) btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+          if (data.email) {
+            document.getElementById('cfMaskedEmailText').innerText = data.email;
+          }
+          goToCustomerForgotStep(2);
+          startCustomerOtpCountdown();
+        } else {
+          showToast(data.message || 'Không thể gửi mã OTP!', 'error');
+        }
+      } catch (e) {
+        showToast('Lỗi kết nối máy chủ khi gửi OTP!', 'error');
+      } finally {
+        btn.innerText = originalText;
+        if (!isResend) btn.disabled = false;
+      }
+    }
+
+    function startCustomerOtpCountdown() {
+      clearInterval(custForgotTimer);
+      custForgotCountdown = 60;
+      document.getElementById('cfCountdownText').style.display = 'inline';
+      document.getElementById('cfResendLink').style.display = 'none';
+      document.getElementById('cfCountdownNum').innerText = custForgotCountdown + 's';
+
+      custForgotTimer = setInterval(() => {
+        custForgotCountdown--;
+        document.getElementById('cfCountdownNum').innerText = custForgotCountdown + 's';
+        if (custForgotCountdown <= 0) {
+          clearInterval(custForgotTimer);
+          document.getElementById('cfCountdownText').style.display = 'none';
+          document.getElementById('cfResendLink').style.display = 'inline';
+        }
+      }, 1000);
+    }
+
+    async function verifyCustomerForgotOtp() {
+      const identifier = document.getElementById('cfIdentifier').value.trim();
+      const otp = document.getElementById('cfOtp').value.trim();
+
+      if (!otp || otp.length !== 6) {
+        showToast('Vui lòng nhập đúng 6 chữ số mã OTP!', 'warning');
+        document.getElementById('cfOtp').focus();
+        return;
+      }
+
+      const btn = document.getElementById('btnCustVerifyOtp');
+      btn.disabled = true;
+      btn.innerText = 'Đang kiểm tra...';
+
+      try {
+        const res = await fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier, otp })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message || 'Xác thực OTP thành công!', 'success');
+          clearInterval(custForgotTimer);
+          goToCustomerForgotStep(3);
+        } else {
+          showToast(data.message || 'Mã OTP không chính xác!', 'error');
+          document.getElementById('cfOtp').focus();
+          document.getElementById('cfOtp').select();
+        }
+      } catch (err) {
+        showToast('Lỗi kết nối khi xác thực OTP!', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Xác Thực OTP';
+      }
     }
 
     async function submitCustomerResetPassword() {
       const identifier = document.getElementById('cfIdentifier').value.trim();
       const newPass = document.getElementById('cfNewPassword').value;
       const confirmPass = document.getElementById('cfConfirmPassword').value;
+      const otp = document.getElementById('cfOtp').value.trim();
       const btn = document.getElementById('btnCustomerReset');
 
-      if (!identifier) {
-        showToast('Vui lòng nhập số điện thoại hoặc email!', 'warning');
-        return;
-      }
       if (!newPass || newPass.length < 6) {
         showToast('Mật khẩu mới phải có tối thiểu 6 ký tự!', 'warning');
+        document.getElementById('cfNewPassword').focus();
         return;
       }
       if (newPass !== confirmPass) {
         showToast('Xác nhận mật khẩu mới không trùng khớp!', 'warning');
-        return;
-      }
-
-      const otp = document.getElementById('cfOtp') ? document.getElementById('cfOtp').value.trim() : '';
-      if (!otp) {
-        showToast('Vui lòng bấm "Gửi OTP về Email" và nhập mã OTP 6 chữ số!', 'warning');
-        const otpContainer = document.getElementById('custOtpContainer');
-        if (otpContainer) otpContainer.style.display = 'block';
-        if (document.getElementById('cfOtp')) document.getElementById('cfOtp').focus();
+        document.getElementById('cfConfirmPassword').focus();
         return;
       }
 
       btn.disabled = true;
-      btn.innerText = 'Đang xử lý...';
+      btn.innerText = 'Đang lưu mật khẩu...';
 
       try {
         const res = await fetch('/api/auth/reset-password', {
@@ -928,6 +1156,8 @@
           document.getElementById('loginPhone').value = identifier;
           document.getElementById('loginPassword').value = newPass;
           document.getElementById('loginPassword').focus();
+          // Auto switch to login tab if on register
+          switchAuthTab('login');
         } else {
           showToast(data.message || 'Không thể đặt lại mật khẩu!', 'error');
         }
@@ -935,39 +1165,18 @@
         showToast('Lỗi mạng khi kết nối máy chủ!', 'error');
       } finally {
         btn.disabled = false;
-        btn.innerText = 'Xác Nhận Đổi';
+        btn.innerText = 'Lưu Mật Khẩu Mới';
       }
     }
 
-    async function sendCustomerForgotOtp() {
-      const identifier = document.getElementById('cfIdentifier').value.trim();
-      if (!identifier) {
-        showToast('Vui lòng nhập số điện thoại hoặc email trước khi gửi mã OTP!', 'warning');
-        document.getElementById('cfIdentifier').focus();
-        return;
-      }
-      const btn = document.getElementById('btnCustSendOtp');
-      btn.innerText = 'Đang gửi...';
-      try {
-        const res = await fetch('/api/auth/forgot-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ identifier })
-        });
-        const data = await res.json();
-        if (data.success) {
-          showToast(data.message, 'success');
-          const otpContainer = document.getElementById('custOtpContainer');
-          if (otpContainer) otpContainer.style.display = 'block';
-          btn.innerText = 'Gửi lại OTP';
-          document.getElementById('cfOtp').focus();
-        } else {
-          showToast(data.message || 'Không thể gửi mã OTP!', 'error');
-          btn.innerText = '📩 Gửi OTP về Email';
-        }
-      } catch (e) {
-        showToast('Lỗi kết nối khi gửi email OTP!', 'error');
-        btn.innerText = '📩 Gửi OTP về Email';
+    function toggleForgotPassVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '<svg viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+      } else {
+        input.type = 'password';
+        btn.innerHTML = '<svg viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
       }
     }
   </script>

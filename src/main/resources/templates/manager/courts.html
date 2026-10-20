@@ -497,7 +497,7 @@
       const user = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
         || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser())
         || {};
-      let b = user.branchCode || 'CN01';
+      let b = localStorage.getItem('utesport_active_branch') || user.branchCode || 'CN01';
       if (b === 'ALL') b = 'CN01';
       return b;
     }
@@ -518,12 +518,12 @@
     }
 
     const fallbackCourts = [
-      { courtCode: 'CL01', branchCode: 'CN01', courtName: 'Sân cầu lông 1 (VIP Yonex)', courtType: 'Cầu lông VIP', hourlyRate: 120000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL01', branchCode: 'CN01', courtName: 'Sân cầu lông 1 (VIP)', courtType: 'Cầu lông VIP', hourlyRate: 120000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' },
       { courtCode: 'CL02', branchCode: 'CN01', courtName: 'Sân cầu lông 2', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Đang sử dụng', imageUrl: '/images/badminton-court.jpg' },
       { courtCode: 'CL03', branchCode: 'CN01', courtName: 'Sân cầu lông 3', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' },
       { courtCode: 'CL04', branchCode: 'CN01', courtName: 'Sân cầu lông 4', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' },
       { courtCode: 'CL05', branchCode: 'CN01', courtName: 'Sân cầu lông 5', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Đang sử dụng', imageUrl: '/images/badminton-court.jpg' },
-      { courtCode: 'CL06', branchCode: 'CN01', courtName: 'Sân cầu lông 6 (VIP Yonex)', courtType: 'Cầu lông VIP', hourlyRate: 120000, status: 'Bảo trì', imageUrl: '/images/badminton-court.jpg' },
+      { courtCode: 'CL06', branchCode: 'CN01', courtName: 'Sân cầu lông 6 (VIP)', courtType: 'Cầu lông VIP', hourlyRate: 120000, status: 'Bảo trì', imageUrl: '/images/badminton-court.jpg' },
       { courtCode: 'CL07', branchCode: 'CN01', courtName: 'Sân cầu lông 7', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' },
       { courtCode: 'CL08', branchCode: 'CN01', courtName: 'Sân cầu lông 8', courtType: 'Cầu lông tiêu chuẩn', hourlyRate: 90000, status: 'Trống', imageUrl: '/images/badminton-court.jpg' }
     ];
@@ -582,7 +582,7 @@
         else if (c.status === 'Đang giữ chỗ') badgeClass = 'badge-purple';
 
         const isVip = (c.courtType || '').toLowerCase().includes('vip');
-        const matType = isVip ? 'PVC Yonex Quốc Tế' : 'PVC Enlio 4.5mm';
+        const matType = isVip ? 'Thảm VIP BWF' : 'Thảm Tiêu Chuẩn BWF';
         const rateFormatted = Number(c.hourlyRate || 90000).toLocaleString('vi-VN') + ' đ/h';
         const imgSrc = c.imageUrl || '/images/badminton-court.jpg';
         const safeName = (c.courtName || ('Sân ' + c.courtCode)).replace(/'/g, "\\'");

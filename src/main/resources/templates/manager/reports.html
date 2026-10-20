@@ -605,7 +605,8 @@
 
         const from = document.getElementById('reportFromDate')?.value || '';
         const to = document.getElementById('reportToDate')?.value || '';
-        let url = `/api/manager/reports?branchCode=CN01&period=${encodeURIComponent(currentPeriodType)}`;
+        const activeBranch = localStorage.getItem('utesport_active_branch') || 'CN01';
+        let url = `/api/manager/reports?branchCode=${encodeURIComponent(activeBranch)}&period=${encodeURIComponent(currentPeriodType)}`;
         if (currentPeriodType === 'custom' && from && to) {
           url += `&fromDate=${encodeURIComponent(from)}&toDate=${encodeURIComponent(to)}`;
         }

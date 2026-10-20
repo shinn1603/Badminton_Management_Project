@@ -79,13 +79,13 @@ public class SecurityConfig {
                 .requestMatchers("/", "/login", "/logout", "/error").permitAll()
                 .requestMatchers("/customer/**", "/pos/**", "/manager/**", "/director/**", "/admin/**").permitAll()
                 // Allow public auth, webhooks, and websocket endpoints
-                .requestMatchers("/api/auth/**", "/api/health", "/ws/**", "/ws-court/**", "/webhook/**", "/api/webhook/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/health", "/api/user/**", "/ws/**", "/ws-court/**", "/webhook/**", "/api/webhook/**").permitAll()
                 .requestMatchers("/api/chatbot/**", "/api/upload/**").permitAll()
                 // Public customer booking, courts and catalog lookups
                 .requestMatchers("/api/courts", "/api/courts/**").permitAll()
                 .requestMatchers("/api/products", "/api/products/**").permitAll()
                 .requestMatchers("/api/equipment", "/api/equipment/**").permitAll()
-                .requestMatchers("/api/inventory", "/api/inventory/**").permitAll()
+                .requestMatchers("/api/inventory", "/api/inventory/**", "/api/suppliers", "/api/suppliers/**").permitAll()
                 .requestMatchers("/api/staff", "/api/staff/**").permitAll()
                 .requestMatchers("/api/shifts", "/api/shifts/**").permitAll()
                 .requestMatchers("/api/pricing/**", "/api/promotions/**").permitAll()

@@ -109,7 +109,8 @@ public class WarehouseService {
         List<StockProductDetail> savedDetails = new ArrayList<>();
 
         for (Map<String, Object> item : items) {
-            String productCode = item.get("productCode") != null ? item.get("productCode").toString().trim() : "";
+            Object pCodeObj = item.get("productCode") != null ? item.get("productCode") : item.get("itemCode");
+            String productCode = pCodeObj != null ? pCodeObj.toString().trim() : "";
             if (productCode.isEmpty()) {
                 throw new IllegalArgumentException("Mã sản phẩm không được để trống!");
             }
@@ -309,6 +310,6 @@ public class WarehouseService {
         if (branchCode != null && !branchCode.trim().isEmpty() && !"ALL".equalsIgnoreCase(branchCode.trim())) {
             return stockReceiptRepository.findByBranchCodeOrderByReceiptDateDesc(branchCode.trim());
         }
-        return stockReceiptRepository.findAll();
+        return stockReceiptRepository.findAllByOrderByReceiptDateDesc();
     }
 }

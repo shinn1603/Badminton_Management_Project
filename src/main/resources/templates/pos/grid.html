@@ -270,10 +270,10 @@
         <div class="form-group" style="margin-bottom: 12px;">
           <label class="form-label">Chọn Sân</label>
           <select id="bookingCourtSelect" class="form-control" onchange="recalculatePrice()">
-            <option value="Sân 01 (VIP Yonex)" data-price="120000">Sân 01 (VIP Yonex) - 120.000 đ/h</option>
-            <option value="Sân 02 (VIP Yonex)" data-price="120000">Sân 02 (VIP Yonex) - 120.000 đ/h</option>
-            <option value="Sân 03 (Thảm Enlio)" data-price="90000">Sân 03 (Thảm Enlio) - 90.000 đ/h</option>
-            <option value="Sân 04 (Thảm Enlio)" data-price="90000">Sân 04 (Thảm Enlio) - 90.000 đ/h</option>
+            <option value="Sân 01 (VIP)" data-price="120000">Sân 01 (VIP) - 120.000 đ/h</option>
+            <option value="Sân 02 (VIP)" data-price="120000">Sân 02 (VIP) - 120.000 đ/h</option>
+            <option value="Sân 03 (Thường)" data-price="90000">Sân 03 (Thường) - 90.000 đ/h</option>
+            <option value="Sân 04 (Thường)" data-price="90000">Sân 04 (Thường) - 90.000 đ/h</option>
             <option value="Sân 05 (Tiêu chuẩn)" data-price="90000">Sân 05 (Tiêu chuẩn) - 90.000 đ/h</option>
             <option value="Sân 06 (Tiêu chuẩn)" data-price="90000">Sân 06 (Tiêu chuẩn) - 90.000 đ/h</option>
           </select>
@@ -344,31 +344,83 @@
 
   <!-- MODAL CHI TIẾT ĐƠN (CHECK-IN) (MH-NVQ04) -->
   <div class="modal-overlay" id="detailBookingModal">
-    <div class="modal-container" style="max-width: 450px;">
-      <div class="modal-header">
-        <h3 class="modal-title">Chi tiết đặt sân (Check-in)</h3>
+    <div class="modal-container" style="max-width: 600px; width: 95vw; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-xl);">
+      <div class="modal-header" style="padding: 16px 22px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <h3 class="modal-title" style="margin: 0; font-size: 16px; font-weight: 700;">Chi tiết đặt sân (Check-in)</h3>
+          <span class="badge badge-primary" id="detailBookingCode" style="font-size: 11.5px; padding: 3px 8px; font-weight: 700;">DS0101</span>
+        </div>
         <button class="modal-close-btn" onclick="closeDetailModal()">✕</button>
       </div>
-      <div class="modal-body" style="font-size: 14px; line-height: 1.8;">
-        <p><strong>Khách hàng:</strong> <span id="detailCustomer" style="color: var(--text-dark); font-weight: 700;"></span></p>
-        <p><strong>Số điện thoại:</strong> <span id="detailPhone" style="color: var(--text-muted);"></span></p>
-        <p><strong>Sân & Giờ:</strong> <span id="detailCourt" style="color: var(--primary); font-weight: 700;"></span> | <span id="detailTime"></span></p>
-        <p style="display: flex; align-items: center; gap: 8px;"><strong>Trạng thái:</strong> <span id="detailStatusBadge" class="slot-badge-status badge-booked"></span></p>
+      <div class="modal-body" style="padding: 18px 22px; font-size: 13.5px;">
+        <!-- THÔNG TIN KHÁCH HÀNG & SÂN -->
+        <div style="background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; line-height: 1.6;">
+            <div>
+              <span style="color: var(--text-muted); font-size: 12px; display: block;">Khách hàng:</span>
+              <strong id="detailCustomer" style="color: var(--text-dark); font-size: 14px;"></strong>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 12px; display: block;">Số điện thoại:</span>
+              <strong id="detailPhone" style="color: var(--text-dark); font-size: 14px;"></strong>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 12px; display: block;">Sân thi đấu:</span>
+              <strong id="detailCourt" style="color: var(--primary); font-size: 14px;"></strong>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 12px; display: block;">Khung giờ:</span>
+              <strong id="detailTime" style="color: var(--text-dark); font-size: 14px;"></strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- THÔNG TIN TÀI CHÍNH & TIỀN CỌC -->
+        <div style="background: var(--surface); border: 1px dashed var(--border-subtle); border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <span style="color: var(--text-muted); font-size: 12px;">Tổng tiền sân:</span>
+            <strong id="detailCourtPrice" style="display: block; font-size: 13.5px; color: var(--text-dark);">0 đ</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); font-size: 12px;">Đã đặt cọc (30%):</span>
+            <strong id="detailDepositPrice" style="display: block; font-size: 13.5px; color: var(--primary);">0 đ</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); font-size: 12px;">Còn thu khi trả sân:</span>
+            <strong id="detailRemainPrice" style="display: block; font-size: 13.5px; color: #dc2626;">0 đ</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); font-size: 12px; display: block;">Trạng thái:</span>
+            <span id="detailStatusBadge" class="slot-badge-status badge-booked"></span>
+          </div>
+        </div>
+
+        <!-- Cảnh báo sân đang bảo trì kèm gợi ý 1-Click chuyển sân -->
+        <div id="detailMaintenanceAlert" style="display: none; margin-top: 10px; padding: 10px 14px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px;">
+          <div style="display: flex; align-items: flex-start; gap: 8px;">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; color: #b45309; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <div style="font-size: 13px; color: #b45309; line-height: 1.5;">
+              <strong>Sân này đang ở chế độ BẢO TRÌ kỹ thuật!</strong><br>
+              Khách đã cọc từ trước vẫn có thể <b>Nhận sân (Check-in)</b> bình thường, hoặc bạn có thể chuyển nhanh sang sân trống khác bên dưới.
+            </div>
+          </div>
+          <div id="quickTransferSuggestion" style="margin-top: 8px; display: none;"></div>
+        </div>
       </div>
-      <div class="modal-footer" style="display: flex; justify-content: space-between;">
+      <div class="modal-footer" style="padding: 14px 22px; background: var(--surface-subtle); border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
         <button class="btn btn-outline" onclick="closeDetailModal()">Đóng</button>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn btn-outline" style="border-color: #ef4444; color: #ef4444;" onclick="cancelBookingFromModal()">Hủy đặt sân</button>
-          <button class="btn btn-outline" style="border-color: #3b82f6; color: #2563eb;" onclick="openTransferModal()">
-            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;">
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button class="btn btn-outline" style="border-color: #ef4444; color: #ef4444; padding: 7px 12px;" onclick="cancelBookingFromModal()">Hủy đặt sân</button>
+          <button class="btn btn-outline" style="border-color: #2563eb; color: #2563eb; padding: 7px 12px; display: inline-flex; align-items: center; gap: 4px;" onclick="openTransferModal()">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
               <polyline points="16 3 21 3 21 8"></polyline>
               <line x1="4" y1="20" x2="21" y2="3"></line>
               <polyline points="21 16 21 21 16 21"></polyline>
               <line x1="15" y1="15" x2="21" y2="21"></line>
             </svg>
-            Chuyển sân
+            <span>Chuyển sân</span>
           </button>
-          <button class="btn btn-primary" onclick="checkInBooking()">Nhận sân (Check-in)</button>
+          <button class="btn btn-primary" onclick="checkInBooking()" style="white-space: nowrap; padding: 7px 16px;">Nhận sân (Check-in)</button>
         </div>
       </div>
     </div>
@@ -408,7 +460,7 @@
         <div class="form-group" style="margin-bottom: 12px;">
           <label class="form-label">Chọn sân chuyển đến (*)</label>
           <select id="transferTargetCourtSelect" class="form-control" onchange="calculateTransferDiff()">
-            <option value="CL01" data-price="120000">Sân cầu lông 1 (VIP Yonex) - 120.000 đ/h</option>
+            <option value="CL01" data-price="120000">Sân cầu lông 1 (VIP) - 120.000 đ/h</option>
             <option value="CL02" data-price="90000">Sân cầu lông 2 (Tiêu chuẩn) - 90.000 đ/h</option>
             <option value="CL03" data-price="90000">Sân cầu lông 3 (Tiêu chuẩn) - 90.000 đ/h</option>
             <option value="CL04" data-price="90000">Sân cầu lông 4 (Tiêu chuẩn) - 90.000 đ/h</option>
@@ -518,7 +570,7 @@
           <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 160px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-shrink: 0;">
               <label class="form-label" style="font-weight: 700; margin: 0; font-size: 12.5px;">Chi Tiết Dịch Vụ Đã Thêm:</label>
-              <span style="font-size: 11px; color: var(--text-muted);">Bấm ✕ để bớt số lượng hoặc xóa món</span>
+              <span style="font-size: 11px; color: var(--text-muted);">Bấm nút xóa để giảm số lượng hoặc bỏ món</span>
             </div>
             <div style="flex: 1; overflow-y: auto; overflow-x: hidden; border: 1px solid var(--border-subtle); border-radius: 8px; background: var(--surface);">
               <table style="width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed;">

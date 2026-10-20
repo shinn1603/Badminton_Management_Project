@@ -8,7 +8,7 @@ let appData = {};
 const initialUrlBranch = (typeof window !== 'undefined' && window.location.search)
   ? new URLSearchParams(window.location.search).get('branchCode')
   : null;
-let currentBranch = initialUrlBranch || 'CN01';
+let currentBranch = initialUrlBranch || localStorage.getItem('utesport_active_branch') || 'CN01';
 let currentDateStr = '';
 let activeSlotCell = null;
 let posItems = [];
@@ -80,10 +80,10 @@ const timeSlots = [
 ];
 
 const fallbackCourts = [
-  { courtCode: 'CL01', courtName: 'Sân 01 (VIP Yonex)', courtType: 'VIP Yonex', hourlyRate: 120000, branchCode: 'CN01' },
-  { courtCode: 'CL02', courtName: 'Sân 02 (VIP Yonex)', courtType: 'VIP Yonex', hourlyRate: 120000, branchCode: 'CN01' },
-  { courtCode: 'CL03', courtName: 'Sân 03 (Thảm Enlio)', courtType: 'Tiêu chuẩn', hourlyRate: 90000, branchCode: 'CN01' },
-  { courtCode: 'CL04', courtName: 'Sân 04 (Thảm Enlio)', courtType: 'Tiêu chuẩn', hourlyRate: 90000, branchCode: 'CN01' },
+  { courtCode: 'CL01', courtName: 'Sân 01 (VIP)', courtType: 'Sân VIP', hourlyRate: 120000, branchCode: 'CN01' },
+  { courtCode: 'CL02', courtName: 'Sân 02 (VIP)', courtType: 'Sân VIP', hourlyRate: 120000, branchCode: 'CN01' },
+  { courtCode: 'CL03', courtName: 'Sân 03 (Thường)', courtType: 'Sân Thường', hourlyRate: 90000, branchCode: 'CN01' },
+  { courtCode: 'CL04', courtName: 'Sân 04 (Thường)', courtType: 'Sân Thường', hourlyRate: 90000, branchCode: 'CN01' },
   { courtCode: 'CL05', courtName: 'Sân 05 (Tiêu chuẩn)', courtType: 'Tiêu chuẩn', hourlyRate: 90000, branchCode: 'CN01' },
   { courtCode: 'CL06', courtName: 'Sân 06 (Tiêu chuẩn)', courtType: 'Tiêu chuẩn', hourlyRate: 90000, branchCode: 'CN01' },
   { courtCode: 'CL07', courtName: 'Sân 07 (Tiêu chuẩn)', courtType: 'Tiêu chuẩn', hourlyRate: 90000, branchCode: 'CN01' },
@@ -240,7 +240,7 @@ async function renderGridForDate(dateStr) {
         <td class="matrix-td-court">
           <div class="court-info">
             <span class="court-name">${court.courtName} ${isCourtMaintenance ? '<span class="badge badge-amber" style="font-size: 10px; margin-left: 4px;">Bảo trì</span>' : ''}</span>
-            <span class="court-type" style="${isCourtMaintenance ? 'color: #d97706; font-weight: 600;' : ''}">${isCourtMaintenance ? 'Đang bảo trì kỹ thuật' : (isVip ? 'VIP • Thảm Yonex BWF' : (isEnlio ? 'Tiêu chuẩn • Thảm Enlio' : 'Tiêu chuẩn • Thảm Taraflex'))}</span>
+            <span class="court-type" style="${isCourtMaintenance ? 'color: #d97706; font-weight: 600;' : ''}">${isCourtMaintenance ? 'Đang bảo trì kỹ thuật' : (isVip ? 'VIP • Thảm VIP BWF' : 'Thường • Thảm Tiêu Chuẩn BWF')}</span>
           </div>
         </td>`;
 
@@ -258,18 +258,7 @@ async function renderGridForDate(dateStr) {
       });
 
       let cellData;
-      if (isCourtMaintenance) {
-        cellData = {
-          state: 'maintenance',
-          code: '',
-          customer: '',
-          phone: '',
-          price: defaultPrice,
-          deposit: 0,
-          rawStatus: 'Bảo trì',
-          posItems: []
-        };
-      } else if (matchedBooking) {
+      if (matchedBooking) {
         let state = 'booked';
         const st = (matchedBooking.status || '').toLowerCase();
         if (st.includes('đang sử dụng') || st.includes('đang chơi') || st === 'in-use') {
@@ -297,7 +286,20 @@ async function renderGridForDate(dateStr) {
           price: bPrice,
           deposit: bDeposit,
           rawStatus: matchedBooking.status,
-          posItems: [...storedItems]
+          posItems: [...storedItems],
+          isCourtMaintenance: isCourtMaintenance
+        };
+      } else if (isCourtMaintenance) {
+        cellData = {
+          state: 'maintenance',
+          code: '',
+          customer: '',
+          phone: '',
+          price: defaultPrice,
+          deposit: 0,
+          rawStatus: 'Bảo trì',
+          posItems: [],
+          isCourtMaintenance: true
         };
       } else {
         cellData = {
@@ -308,7 +310,8 @@ async function renderGridForDate(dateStr) {
           price: defaultPrice,
           deposit: Math.round(defaultPrice * 0.3),
           rawStatus: 'Trống',
-          posItems: []
+          posItems: [],
+          isCourtMaintenance: false
         };
       }
 
@@ -317,9 +320,9 @@ async function renderGridForDate(dateStr) {
       rowHtml += `<td class="matrix-slot-cell">`;
       if (cellData.state === 'maintenance') {
         rowHtml += `
-          <div class="slot-inner state-maintenance" style="background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.4); color: #d97706; cursor: not-allowed; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 48px; border-radius: 6px; padding: 4px;" onclick="alert('Sân ${court.courtName} đang trong quá trình bảo trì kỹ thuật, tạm dừng nhận đặt!')">
+          <div class="slot-inner state-maintenance" style="background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.4); color: #d97706; cursor: not-allowed; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 48px; border-radius: 6px; padding: 4px;" onclick="alert('Sân ${court.courtName} đang trong quá trình bảo trì kỹ thuật, tạm dừng nhận đặt mới!')">
             <span class="slot-title" style="font-weight: 700; font-size: 11px; color: #d97706;">Bảo trì</span>
-            <span style="font-size: 10px; color: #b45309; opacity: 0.85;">Tạm khóa</span>
+            <span style="font-size: 10px; color: #b45309; opacity: 0.85;">Tạm khóa đặt</span>
           </div>`;
       } else if (cellData.state === 'available') {
         if (dateStr < todayStr) {
@@ -342,17 +345,26 @@ async function renderGridForDate(dateStr) {
         const badgeClass = isPending ? 'badge-warning' : 'badge-booked';
         const badgeStyle = isPending ? 'background: rgba(245, 158, 11, 0.15); color: #d97706; border-color: rgba(245, 158, 11, 0.3);' : '';
         const badgeText = cellData.rawStatus || 'Đã cọc 30%';
+        const maintBadge = cellData.isCourtMaintenance ? `
+          <span style="background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 4px; margin-top: 2px;">Bảo trì</span>
+        ` : '';
+        const maintBorder = cellData.isCourtMaintenance ? 'border: 1px dashed #f59e0b; background: rgba(245, 158, 11, 0.04);' : '';
 
         rowHtml += `
-          <div class="slot-inner state-booked" data-code="${cellData.code}" data-price="${cellData.price}" data-deposit="${cellData.deposit}" data-customer="${cellData.customer}" data-phone="${cellData.phone}" data-court="${court.courtName}" data-court-code="${court.courtCode}" data-time="${timeSlot}" onclick="openDetailModal(this, '${cellData.code}', '${court.courtName}', '${timeSlot}', '${cellData.customer}', '${cellData.phone}', '${badgeText}', ${cellData.price}, ${cellData.deposit})">
+          <div class="slot-inner state-booked" style="${maintBorder}" data-code="${cellData.code}" data-price="${cellData.price}" data-deposit="${cellData.deposit}" data-customer="${cellData.customer}" data-phone="${cellData.phone}" data-court="${court.courtName}" data-court-code="${court.courtCode}" data-time="${timeSlot}" data-maintenance="${cellData.isCourtMaintenance ? 'true' : 'false'}" onclick="openDetailModal(this, '${cellData.code}', '${court.courtName}', '${timeSlot}', '${cellData.customer}', '${cellData.phone}', '${badgeText}', ${cellData.price}, ${cellData.deposit}, ${cellData.isCourtMaintenance ? 'true' : 'false'})">
             <span class="slot-title">${cellData.customer}</span>
             <span class="slot-badge-status ${badgeClass}" style="${badgeStyle}">${badgeText}</span>
+            ${maintBadge}
           </div>`;
       } else if (cellData.state === 'in-use') {
+        const maintBadge = cellData.isCourtMaintenance ? `
+          <span style="background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 4px; margin-top: 2px;">Bảo trì</span>
+        ` : '';
         rowHtml += `
           <div class="slot-inner state-in-use" data-code="${cellData.code}" data-price="${cellData.price}" data-deposit="${cellData.deposit}" data-customer="${cellData.customer}" data-phone="${cellData.phone}" data-court="${court.courtName}" data-court-code="${court.courtCode}" data-time="${timeSlot}" onclick="openCheckoutModal(this)">
             <span class="slot-title">${cellData.customer}</span>
             <span class="slot-badge-status badge-in-use">Đang chơi</span>
+            ${maintBadge}
           </div>`;
       } else if (cellData.state === 'completed') {
         rowHtml += `
@@ -770,7 +782,7 @@ async function submitBookingForm() {
 }
 
 // DETAIL MODAL & CHECK-IN
-function openDetailModal(element, code, court, time, customer, phone, status, price, deposit = 0) {
+function openDetailModal(element, code, court, time, customer, phone, status, price, deposit = 0, isMaint = false) {
   activeSlotCell = element;
   activeSlotCell.dataset.code = code || 'DS0102';
   activeSlotCell.dataset.price = price;
@@ -779,13 +791,116 @@ function openDetailModal(element, code, court, time, customer, phone, status, pr
   activeSlotCell.dataset.phone = phone;
   activeSlotCell.dataset.court = court;
   activeSlotCell.dataset.time = time;
+  const isMaintenanceCourt = (isMaint === true || isMaint === 'true' || (element && element.dataset.maintenance === 'true'));
+  activeSlotCell.dataset.maintenance = isMaintenanceCourt ? 'true' : 'false';
 
   document.getElementById('detailCourt').textContent = court;
   document.getElementById('detailTime').textContent = time;
   document.getElementById('detailCustomer').textContent = customer;
   document.getElementById('detailPhone').textContent = phone;
   document.getElementById('detailStatusBadge').textContent = status;
+
+  const codeEl = document.getElementById('detailBookingCode');
+  if (codeEl) codeEl.textContent = code || 'DS0102';
+  const priceVal = Number(price) || 0;
+  const depVal = Number(deposit) || Math.round(priceVal * 0.3);
+  const remainVal = Math.max(0, priceVal - depVal);
+  const priceEl = document.getElementById('detailCourtPrice');
+  if (priceEl) priceEl.textContent = priceVal.toLocaleString('vi-VN') + ' đ';
+  const depEl = document.getElementById('detailDepositPrice');
+  if (depEl) depEl.textContent = depVal.toLocaleString('vi-VN') + ' đ';
+  const remainEl = document.getElementById('detailRemainPrice');
+  if (remainEl) remainEl.textContent = remainVal.toLocaleString('vi-VN') + ' đ';
+
+  // Xử lý cảnh báo Sân Bảo Trì và Gợi ý Chuyển sân 1-Click
+  const maintAlert = document.getElementById('detailMaintenanceAlert');
+  const suggestionBox = document.getElementById('quickTransferSuggestion');
+  if (maintAlert) {
+    if (isMaintenanceCourt) {
+      maintAlert.style.display = 'block';
+      const currentCourtCode = activeSlotCell.dataset.courtCode;
+      const altCourt = findAlternativeAvailableCourt(currentCourtCode, time);
+      if (altCourt && suggestionBox) {
+        suggestionBox.style.display = 'block';
+        suggestionBox.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; padding: 8px 10px; background: #ffffff; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.4);">
+            <div style="font-size: 12px; color: #1e293b;">
+              Gợi ý: <strong>${altCourt.courtName}</strong> đang trống giờ này.
+            </div>
+            <button type="button" class="btn btn-sm" style="padding: 5px 12px; font-size: 11.5px; font-weight: 600; background: #2563eb; border: none; border-radius: 4px; color: #ffffff; white-space: nowrap; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" onclick="quickOneClickTransfer('${altCourt.courtCode}', '${altCourt.courtName}', '${time}')">
+              <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.2;"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path></svg>
+              <span>Chuyển sang ${altCourt.courtCode}</span>
+            </button>
+          </div>
+        `;
+      } else if (suggestionBox) {
+        suggestionBox.style.display = 'block';
+        suggestionBox.innerHTML = `
+          <div style="font-size: 11.5px; color: #b45309; margin-top: 4px; font-style: italic;">
+            (Hiện không có sân trống khác cùng khung giờ này, khách có thể tiếp tục nhận sân nếu bảo trì nhẹ).
+          </div>
+        `;
+      }
+    } else {
+      maintAlert.style.display = 'none';
+      if (suggestionBox) suggestionBox.style.display = 'none';
+    }
+  }
+
   document.getElementById('detailBookingModal').classList.add('active');
+}
+
+function findAlternativeAvailableCourt(sourceCourtCode, timeSlot) {
+  if (!realCourts || !appData[currentBranch] || !appData[currentBranch][currentDateStr]) return null;
+  const otherCourts = realCourts.filter(c => c.courtCode !== sourceCourtCode && c.status !== 'Bảo trì');
+  for (let c of otherCourts) {
+    const slotMap = appData[currentBranch][currentDateStr][c.courtCode];
+    if (slotMap && slotMap[timeSlot] && slotMap[timeSlot].state === 'available') {
+      return c;
+    }
+  }
+  return null;
+}
+
+async function quickOneClickTransfer(targetCourtCode, targetCourtName, timeSlot) {
+  if (!activeSlotCell) return;
+  const bCode = activeSlotCell.dataset.code;
+  if (!bCode) return;
+
+  if (!confirm(`Xác nhận chuyển nhanh đơn [${bCode}] sang [${targetCourtName}]?`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/bookings/${bCode}/transfer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        targetCourtCode: targetCourtCode,
+        newTimeSlot: timeSlot
+      })
+    });
+    const data = await res.json();
+    if (data.success || res.ok) {
+      if (typeof showToast === 'function') {
+        showToast(`Đã chuyển đơn [${bCode}] sang [${targetCourtName}] thành công!`, 'success');
+      }
+      closeDetailModal();
+      await renderGridForDate(currentDateStr);
+    } else {
+      if (typeof showToast === 'function') {
+        showToast(data.message || 'Lỗi chuyển sân', 'error');
+      } else {
+        alert(data.message || 'Lỗi chuyển sân');
+      }
+    }
+  } catch (err) {
+    if (typeof showToast === 'function') {
+      showToast('Lỗi kết nối chuyển sân: ' + err.message, 'error');
+    } else {
+      alert('Lỗi kết nối chuyển sân: ' + err.message);
+    }
+  }
 }
 
 async function checkInBooking() {

@@ -230,13 +230,13 @@
           <div class="hero-banner">
             <div class="hero-banner-content">
               <h1 class="hero-title">Dashboard Quản Lý Sân Cầu Lông - UTE Sport</h1>
-              <p class="hero-subtitle">Vận hành thảm Yonex BWF & Enlio tiêu chuẩn quốc tế — Quản lý đặt sân tối ưu</p>
+              <p class="hero-subtitle">Vận hành hệ thống sân VIP & Sân Thường tiêu chuẩn BWF — Quản lý đặt sân tối ưu</p>
               <div class="hero-badges-wrap">
                 <span class="hero-badge-pill">
                   <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: #10b981;">
                     <circle cx="12" cy="12" r="10"></circle>
                   </svg>
-                  Thảm Yonex BWF tiêu chuẩn
+                  Thảm VIP & Tiêu Chuẩn BWF
                 </span>
                 <span class="hero-badge-pill">
                   <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: #10b981;">
@@ -470,7 +470,7 @@
                     </div>
                     <div class="court-thumb-body">
                       <div class="court-thumb-title">Sân Cầu Lông 3</div>
-                      <div class="court-thumb-meta">Thảm Enlio tiêu chuẩn • 06:00 - 22:00</div>
+                      <div class="court-thumb-meta">Thảm Tiêu chuẩn • 06:00 - 22:00</div>
                     </div>
                   </div>
 
@@ -482,7 +482,7 @@
                     </div>
                     <div class="court-thumb-body">
                       <div class="court-thumb-title">Sân Cầu Lông 4 (VIP)</div>
-                      <div class="court-thumb-meta">Thảm Yonex BWF • Hoàn thành 14:00</div>
+                      <div class="court-thumb-meta">Thảm VIP • Hoàn thành 14:00</div>
                     </div>
                   </div>
                 </div>
@@ -792,7 +792,7 @@
         customerName: cust,
         customerPhone: phone,
         courtCode: court,
-        branchCode: 'CN01',
+        branchCode: localStorage.getItem('utesport_active_branch') || 'CN01',
         bookingDate: document.getElementById('mBookingDate').value || new Date().toISOString().split('T')[0],
         timeSlot: '08:00 - 10:00',
         totalPrice: parseInt(document.getElementById('mTotalDisplay').value.replace(/\D/g, '')) || 180000,
@@ -1070,10 +1070,10 @@
       donutChartInstance = new Chart(ctxDonut, {
         type: 'doughnut',
         data: {
-          labels: labels || ['Thảm VIP Yonex (48%)', 'Thảm Tiêu chuẩn Enlio (32%)', 'Thảm Quốc Tế (20%)'],
+          labels: labels || ['Sân VIP (55%)', 'Sân Thường (45%)'],
           datasets: [{
-            data: data || [48, 32, 20],
-            backgroundColor: ['#10b981', '#3b82f6', '#f59e0b'],
+            data: data || [55, 45],
+            backgroundColor: ['#8b5cf6', '#10b981'],
             borderWidth: 0,
             hoverOffset: 6
           }]
@@ -1162,7 +1162,8 @@
         const headers = { 'Accept': 'application/json' };
         if (token) headers['Authorization'] = 'Bearer ' + token;
 
-        const res = await fetch(`/api/manager/stats?branchCode=CN01&days=${days}`, { headers });
+        const activeBranch = localStorage.getItem('utesport_active_branch') || (window.AuthGuard && window.AuthGuard.getActiveBranch ? window.AuthGuard.getActiveBranch() : 'CN01');
+        const res = await fetch(`/api/manager/stats?branchCode=${encodeURIComponent(activeBranch)}&days=${days}`, { headers });
         if (res.ok) {
           const data = await res.json();
           if (data) {

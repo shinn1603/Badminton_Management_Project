@@ -172,8 +172,10 @@ public class BookingService {
 
         // Update court status and broadcast
         courtRepository.findByCourtCode(booking.getCourtCode()).ifPresent(court -> {
-            court.setStatus("Đã đặt trước");
-            courtRepository.save(court);
+            if (!"Bảo trì".equalsIgnoreCase(court.getStatus())) {
+                court.setStatus("Đã đặt trước");
+                courtRepository.save(court);
+            }
         });
 
         broadcastBookingEvent(BookingNotificationDto.builder()
@@ -259,7 +261,7 @@ public class BookingService {
     public synchronized Map<String, Object> lockSlotBooking(Map<String, Object> payload) {
         String courtCode = (String) payload.get("courtCode");
         String branchCode = (String) payload.get("branchCode");
-        String dateStr = (String) payload.get("date");
+        String dateStr = (String) (payload.get("date") != null ? payload.get("date") : payload.get("bookingDate"));
         String timeSlot = (String) payload.get("timeSlot");
         String customerName = (String) payload.getOrDefault("customerName", "Khách đặt trực tuyến");
         String customerPhone = (String) payload.getOrDefault("customerPhone", "0903123456");
@@ -450,6 +452,7 @@ public class BookingService {
         resp.put("bankName", bName);
         resp.put("accountNo", accNo);
         resp.put("accountName", accName);
+        resp.put("notes", booking.getNotes());
 
         return resp;
     }
@@ -475,7 +478,11 @@ public class BookingService {
 
         // Khóa cố định sân trên hệ thống và hủy bỏ bộ đếm tạm giữ chỗ 10 phút
         if (updated.getCourtCode() != null) {
-            courtService.updateCourtStatus(updated.getCourtCode(), "Đang sử dụng");
+            courtRepository.findByCourtCode(updated.getCourtCode()).ifPresent(c -> {
+                if (!"Bảo trì".equalsIgnoreCase(c.getStatus())) {
+                    courtService.updateCourtStatus(updated.getCourtCode(), "Đang sử dụng");
+                }
+            });
         }
 
         // Tự động liên kết mã khách hàng & tích lũy điểm thưởng thành viên
@@ -574,9 +581,11 @@ public class BookingService {
         Booking updated = bookingRepository.save(booking);
 
         courtRepository.findByCourtCode(booking.getCourtCode()).ifPresent(court -> {
-            court.setStatus("Đang sử dụng");
-            courtRepository.save(court);
-            courtService.updateCourtStatus(court.getCourtCode(), "Đang sử dụng");
+            if (!"Bảo trì".equalsIgnoreCase(court.getStatus())) {
+                court.setStatus("Đang sử dụng");
+                courtRepository.save(court);
+                courtService.updateCourtStatus(court.getCourtCode(), "Đang sử dụng");
+            }
         });
 
         broadcastBookingEvent(BookingNotificationDto.builder()
@@ -636,9 +645,13 @@ public class BookingService {
 
         Invoice savedInvoice = invoiceRepository.save(invoice);
 
-        // Reset court status to "Trống"
+        // Reset court status to "Trống" nếu không đang bảo trì
         courtRepository.findByCourtCode(booking.getCourtCode()).ifPresent(court -> {
-            courtService.updateCourtStatus(court.getCourtCode(), "Trống");
+            if (!"Bảo trì".equalsIgnoreCase(court.getStatus())) {
+                court.setStatus("Trống");
+                courtRepository.save(court);
+                courtService.updateCourtStatus(court.getCourtCode(), "Trống");
+            }
         });
 
         broadcastBookingEvent(BookingNotificationDto.builder()
@@ -674,7 +687,11 @@ public class BookingService {
         Booking saved = bookingRepository.save(booking);
 
         courtRepository.findByCourtCode(booking.getCourtCode()).ifPresent(court -> {
-            courtService.updateCourtStatus(court.getCourtCode(), "Trống");
+            if (!"Bảo trì".equalsIgnoreCase(court.getStatus())) {
+                court.setStatus("Trống");
+                courtRepository.save(court);
+                courtService.updateCourtStatus(court.getCourtCode(), "Trống");
+            }
         });
 
         // Ghi AuditLog hủy đặt sân
@@ -756,9 +773,11 @@ public class BookingService {
 
         // Update court statuses and broadcast
         courtRepository.findByCourtCode(oldCourtCode).ifPresent(c -> {
-            c.setStatus("Trống");
-            courtRepository.save(c);
-            courtService.updateCourtStatus(oldCourtCode, "Trống");
+            if (!"Bảo trì".equalsIgnoreCase(c.getStatus())) {
+                c.setStatus("Trống");
+                courtRepository.save(c);
+                courtService.updateCourtStatus(oldCourtCode, "Trống");
+            }
         });
 
         String newCourtStatus = "Đang sử dụng".equalsIgnoreCase(booking.getStatus()) ? "Đang sử dụng" : "Đã đặt trước";

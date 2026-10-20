@@ -534,30 +534,30 @@ INSERT INTO branches (branch_code, branch_name, address, phone, operating_hours,
 -- 5.2 DỮ LIỆU SÂN CẦU LÔNG (courts)
 INSERT INTO courts (court_code, branch_code, court_name, court_type, hourly_rate, status, image_url) VALUES
 -- Chi nhánh 1 - Thủ Đức
-('CL01', 'CN01', N'Sân cầu lông 1 (VIP Yonex)', N'Cầu lông VIP', 120000, N'Trống', '/images/badminton-court.jpg'),
+('CL01', 'CN01', N'Sân cầu lông 1 (VIP)', N'Cầu lông VIP', 120000, N'Trống', '/images/badminton-court.jpg'),
 ('CL02', 'CN01', N'Sân cầu lông 2', N'Cầu lông tiêu chuẩn', 90000, N'Đang sử dụng', '/images/badminton-court.jpg'),
 ('CL03', 'CN01', N'Sân cầu lông 3', N'Cầu lông tiêu chuẩn', 90000, N'Trống', '/images/badminton-court.jpg'),
 ('CL04', 'CN01', N'Sân cầu lông 4', N'Cầu lông tiêu chuẩn', 90000, N'Trống', '/images/badminton-court.jpg'),
 ('CL05', 'CN01', N'Sân cầu lông 5', N'Cầu lông tiêu chuẩn', 90000, N'Đang sử dụng', '/images/badminton-court.jpg'),
-('CL06', 'CN01', N'Sân cầu lông 6 (VIP Yonex)', N'Cầu lông VIP', 120000, N'Bảo trì', '/images/badminton-court.jpg'),
+('CL06', 'CN01', N'Sân cầu lông 6 (VIP)', N'Cầu lông VIP', 120000, N'Bảo trì', '/images/badminton-court.jpg'),
 ('CL07', 'CN01', N'Sân cầu lông 7', N'Cầu lông tiêu chuẩn', 90000, N'Trống', '/images/badminton-court.jpg'),
 ('CL08', 'CN01', N'Sân cầu lông 8', N'Cầu lông tiêu chuẩn', 90000, N'Trống', '/images/badminton-court.jpg'),
 -- Chi nhánh 2 - Bình Thạnh
-('BT01', 'CN02', N'Sân BT 1 (VIP Victor)', N'Cầu lông VIP', 120000, N'Đang sử dụng', '/images/badminton-court.jpg'),
+('BT01', 'CN02', N'Sân BT 1 (VIP)', N'Cầu lông VIP', 120000, N'Đang sử dụng', '/images/badminton-court.jpg'),
 ('BT02', 'CN02', N'Sân BT 2', N'Cầu lông tiêu chuẩn', 90000, N'Trống', '/images/badminton-court.jpg'),
 ('BT03', 'CN02', N'Sân BT 3', N'Cầu lông tiêu chuẩn', 90000, N'Trống', '/images/badminton-court.jpg'),
 ('BT04', 'CN02', N'Sân BT 4', N'Cầu lông tiêu chuẩn', 90000, N'Đang sử dụng', '/images/badminton-court.jpg'),
 ('BT05', 'CN02', N'Sân BT 5', N'Cầu lông tiêu chuẩn', 90000, N'Trống', '/images/badminton-court.jpg'),
 ('BT06', 'CN02', N'Sân BT 6 (VIP)', N'Cầu lông VIP', 120000, N'Trống', '/images/badminton-court.jpg'),
 -- Chi nhánh 3 - Quận 9
-('Q901', 'CN03', N'Sân Q9 1 (VIP Lining)', N'Cầu lông VIP', 120000, N'Trống', '/images/badminton-court.jpg'),
+('Q901', 'CN03', N'Sân Q9 1 (VIP)', N'Cầu lông VIP', 120000, N'Trống', '/images/badminton-court.jpg'),
 ('Q902', 'CN03', N'Sân Q9 2', N'Cầu lông tiêu chuẩn', 90000, N'Đang sử dụng', '/images/badminton-court.jpg'),
 ('Q903', 'CN03', N'Sân Q9 3', N'Cầu lông tiêu chuẩn', 90000, N'Trống', '/images/badminton-court.jpg'),
 ('Q904', 'CN03', N'Sân Q9 4', N'Cầu lông tiêu chuẩn', 90000, N'Trống', '/images/badminton-court.jpg'),
 ('Q905', 'CN03', N'Sân Q9 5', N'Cầu lông tiêu chuẩn', 90000, N'Trống', '/images/badminton-court.jpg'),
 ('Q906', 'CN03', N'Sân Q9 6', N'Cầu lông tiêu chuẩn', 90000, N'Trống', '/images/badminton-court.jpg'),
 -- Chi nhánh 4 - Gò Vấp
-('GV01', 'CN04', N'Sân GV 1 (VIP Yonex)', N'Cầu lông VIP', 120000, N'Trống', '/images/badminton-court.jpg'),
+('GV01', 'CN04', N'Sân GV 1 (VIP)', N'Cầu lông VIP', 120000, N'Trống', '/images/badminton-court.jpg'),
 ('GV02', 'CN04', N'Sân GV 2', N'Cầu lông tiêu chuẩn', 90000, N'Đang sử dụng', '/images/badminton-court.jpg'),
 ('GV03', 'CN04', N'Sân GV 3', N'Cầu lông tiêu chuẩn', 90000, N'Trống', '/images/badminton-court.jpg'),
 ('GV04', 'CN04', N'Sân GV 4', N'Cầu lông tiêu chuẩn', 90000, N'Trống', '/images/badminton-court.jpg'),
@@ -725,7 +725,9 @@ INSERT INTO users (username, password, full_name, email, phone, role, staff_code
 INSERT INTO tournaments (tournament_code, branch_code, tournament_name, category, start_date, end_date, rules, max_participants, current_participants, entry_fee, total_prize, status) VALUES
 ('GD01', 'CN01', N'Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026', N'Đôi nam nữ', '2026-10-10 08:00:00', '2026-10-12 18:00:00', N'Thi đấu theo thể thức loại trực tiếp 3 hiệp 21 điểm theo luật BWF. Mỗi VĐV chỉ được đăng ký 1 nội dung.', 32, 24, 300000, 20000000, N'Đã hoàn thành'),
 ('GD02', 'CN01', N'Giải Cầu Lông Doanh Nghiệp & Sinh Viên Cúp Thủ Đức 2026', N'Tổng hợp nhiều nội dung', '2026-10-25 08:00:00', '2026-10-26 17:00:00', N'Giải đấu phong trào kết nối các doanh nghiệp và cựu sinh viên đam mê cầu lông.', 24, 0, 250000, 15000000, N'Sắp mở đăng ký'),
-('GD03', 'CN02', N'Giải Đơn Nam Bình Thạnh Mở Rộng 2026', N'Đơn nam', '2026-11-05 08:00:00', '2026-11-06 18:00:00', N'Giải đơn nam các CLB phong trào khu vực Bình Thạnh - Phú Nhuận.', 16, 0, 200000, 10000000, N'Sắp mở đăng ký');
+('GD03', 'CN02', N'Giải Đơn Nam Bình Thạnh Mở Rộng 2026', N'Đơn nam', '2026-11-05 08:00:00', '2026-11-06 18:00:00', N'Giải đơn nam các CLB phong trào khu vực Bình Thạnh - Phú Nhuận.', 16, 0, 200000, 10000000, N'Sắp mở đăng ký'),
+('GD04', 'CN03', N'Giải Đôi Nam Nữ Trẻ Quận 9 Mở Rộng 2026', N'Đôi nam nữ', '2026-11-12 08:00:00', '2026-11-13 18:00:00', N'Giải đấu phong trào dành cho thanh niên và sinh viên khu vực TP Thủ Đức - Quận 9.', 24, 4, 250000, 20000000, N'Sắp mở đăng ký'),
+('GD05', 'CN04', N'Giải Cầu Lông Giao Lưu Các CLB Gò Vấp 2026', N'Đôi nam', '2026-11-20 08:00:00', '2026-11-21 18:00:00', N'Sân chơi kết nối giao lưu giữa các câu lạc bộ cầu lông khu vực Gò Vấp - Tân Bình.', 20, 6, 200000, 18000000, N'Sắp mở đăng ký');
 
 -- 5.15 DỮ LIỆU ĐĂNG KÝ THAM GIA GIẢI ĐẤU (tournament_registrations)
 INSERT INTO tournament_registrations (tournament_code, customer_code, team_name, category, phone, status) VALUES

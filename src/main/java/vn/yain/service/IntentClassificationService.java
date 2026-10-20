@@ -177,7 +177,7 @@ public class IntentClassificationService {
     public PredictionResult predict(String userInput) {
         if (userInput == null || userInput.trim().isEmpty() || vocabulary.isEmpty()) {
             return new PredictionResult("UNKNOWN", 0.0, true,
-                    "Dạ tôi là trợ lý ảo hỗ trợ tại Chuỗi Sân Cầu Lông UTE Sport. Bạn có cần tôi giúp đặt sân hoặc xem bảng giá không ạ?");
+                    "Dạ tôi là nhân viên tư vấn trực tuyến tại Chuỗi Sân Cầu Lông UTE Sport. Bạn có cần tôi giúp đặt sân hoặc xem bảng giá không ạ?");
         }
 
         List<String> features = extractFeatures(userInput);
@@ -201,11 +201,11 @@ public class IntentClassificationService {
         String response;
         if (bestIntent.equals("OUT_OF_SCOPE_MATH")) {
             response = defaultResponses.getOrDefault("OUT_OF_SCOPE_MATH",
-                    "Dạ tôi là bot hỗ trợ đặt sân cầu lông, không có tính năng giải toán đâu bạn ơi!");
+                    "Dạ tôi hỗ trợ chuyên về dịch vụ đặt sân cầu lông, không có tính năng giải toán đâu bạn ơi!");
             isOutOfScope = true;
         } else if (bestIntent.equals("OUT_OF_SCOPE_GENERAL") || (highestScore < CONFIDENCE_THRESHOLD)) {
             response = defaultResponses.getOrDefault("OUT_OF_SCOPE_GENERAL",
-                    "Dạ tôi là trợ lý ảo chuyên hỗ trợ dịch vụ tại Chuỗi Sân Cầu Lông UTE Sport. Tôi chưa hiểu yêu cầu ngoài lề này. Bạn có thể hỏi về giá sân, lịch trống hoặc cách đặt chỗ nhé!");
+                    "Dạ tôi là bộ phận tư vấn dịch vụ tại Chuỗi Sân Cầu Lông UTE Sport. Tôi chưa hiểu yêu cầu ngoài lề này. Bạn có thể hỏi về giá sân, lịch trống hoặc cách đặt chỗ nhé!");
             isOutOfScope = true;
         } else {
             response = defaultResponses.getOrDefault(bestIntent, "Tôi đã hiểu yêu cầu của bạn.");

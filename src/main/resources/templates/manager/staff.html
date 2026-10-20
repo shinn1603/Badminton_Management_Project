@@ -658,7 +658,8 @@
       const curUser = (window.AuthGuard && window.AuthGuard.getCurrentUser && window.AuthGuard.getCurrentUser())
         || (window.RBAC && window.RBAC.getCurrentUser && window.RBAC.getCurrentUser())
         || {};
-      return curUser.branchCode && curUser.branchCode !== 'ALL' ? curUser.branchCode : 'CN01';
+      const saved = localStorage.getItem('utesport_active_branch');
+      return saved || (curUser.branchCode && curUser.branchCode !== 'ALL' ? curUser.branchCode : 'CN01');
     }
 
     // Dynamic current week dates from system date

@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface StockReceiptRepository extends JpaRepository<StockReceipt, Long> {
     Optional<StockReceipt> findByReceiptCode(String receiptCode);
     List<StockReceipt> findByBranchCodeOrderByReceiptDateDesc(String branchCode);
+    List<StockReceipt> findAllByOrderByReceiptDateDesc();
 }
