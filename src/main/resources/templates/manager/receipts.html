@@ -739,7 +739,7 @@
 
                   <tr>
 
-                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">Đang tải danh sách phiếu nhập kho...</td>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">Đang tải danh sách phiếu nhập kho...</td>
 
                   </tr>
 
@@ -1031,6 +1031,11 @@
 
 
 
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
     let allLoadedReceipts = [];
 
     async function loadReceiptHistory() {
@@ -1047,9 +1052,16 @@
         if (res.ok) {
           allLoadedReceipts = await res.json();
           renderReceiptHistoryTable(allLoadedReceipts);
+        } else {
+          if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 18px;">Chưa có phiếu nhập kho nào</td></tr>';
+          }
         }
       } catch (err) {
         console.error('Lỗi tải phiếu nhập:', err);
+        if (tbody) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 18px;">Không thể tải dữ liệu phiếu nhập kho</td></tr>';
+        }
       }
     }
 
@@ -1083,6 +1095,89 @@
 
     function filterReceiptHistoryTable() {
       loadReceiptHistory();
+    }
+
+    async function submitReceipt(e) {
+      if (e) e.preventDefault();
+      const supplierSelect = document.getElementById('supplierSelect');
+      const supplierName = supplierSelect ? supplierSelect.value.trim() : '';
+      const receiptDate = document.getElementById('receiptDate')?.value || '';
+      const bFilter = document.getElementById('receiptHistoryBranchFilter');
+      const branchCode = (bFilter && bFilter.value !== 'ALL') ? bFilter.value : 'CN01';
+
+      if (!supplierName) {
+        showToast('Vui lòng chọn nhà cung cấp / đối tác!', 'warning');
+        return;
+      }
+
+      const rows = document.querySelectorAll('#receiptItemsContainer .receipt-item-row');
+      const items = [];
+      rows.forEach(r => {
+        const prodSelect = r.querySelector('.receipt-item-product');
+        const qtyInp = r.querySelector('.receipt-item-qty') || r.querySelectorAll('input')[0];
+        const priceInp = r.querySelector('.receipt-item-price') || r.querySelectorAll('input')[1];
+        const prodCode = prodSelect ? prodSelect.value.trim() : '';
+        const qty = qtyInp ? (Number(qtyInp.value) || 0) : 0;
+        const price = priceInp ? (Number(priceInp.value) || 0) : 0;
+        if (prodCode && qty > 0) {
+          items.push({ productCode: prodCode, quantity: qty, price: price });
+        }
+      });
+
+      if (items.length === 0) {
+        showToast('Vui lòng nhập ít nhất 1 mặt hàng với số lượng lớn hơn 0!', 'warning');
+        return;
+      }
+
+      const submitBtn = document.querySelector('#receiptForm button[type="submit"]');
+      const origText = submitBtn ? submitBtn.innerHTML : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Đang nhập hàng vào kho...</span>';
+      }
+
+      try {
+        const token = localStorage.getItem('jwt_token') || '';
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/inventory/receipts', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({
+            supplierName: supplierName,
+            receiptDate: receiptDate,
+            branchCode: branchCode,
+            items: items
+          })
+        });
+
+        const data = await res.json();
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = origText;
+        }
+
+        if (res.ok && data.success) {
+          showToast(data.message || 'Đã nhập kho thành công!', 'success');
+          const container = document.getElementById('receiptItemsContainer');
+          if (container) {
+            container.innerHTML = '';
+            addReceiptRow('P01', 50);
+            addReceiptRow('P05', 20);
+          }
+          await loadReceiptHistory();
+        } else {
+          showToast(data.message || 'Không thể tạo phiếu nhập kho!', 'error');
+        }
+      } catch (err) {
+        console.error('Lỗi nhập kho:', err);
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = origText;
+        }
+        showToast('Lỗi kết nối khi gửi phiếu nhập kho: ' + err.message, 'error');
+      }
     }
 
     

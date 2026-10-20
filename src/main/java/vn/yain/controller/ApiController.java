@@ -4054,7 +4054,7 @@ public class ApiController {
 
 
 
-        @GetMapping("/user/my-branches")
+    @GetMapping("/user/my-branches")
     public ResponseEntity<?> getMyBranches(
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String branchCode) {
@@ -4893,7 +4893,7 @@ public class ApiController {
 
 
 
-    @PostMapping("/inventory/intake")
+    @PostMapping({"/inventory/intake", "/inventory/receipts"})
 
     public ResponseEntity<?> createStockIntake(@RequestBody Map<String, Object> payload) {
 

@@ -46,6 +46,14 @@
   window.addEventListener('orientationchange', checkDevice);
 })();
 
+// Global XSS Sanitizer Helper
+window.escapeHtml = function (str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/[&<>"']/g, function (m) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+  });
+};
+
 // 0.1. Auto-load RBAC Role Guard & User Sync
 (function () {
   if (!window.RBAC && !document.querySelector('script[src*="auth-guard.js"]')) {
