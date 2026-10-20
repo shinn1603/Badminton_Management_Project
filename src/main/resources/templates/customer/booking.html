@@ -2,7 +2,10 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Đặt Sân Cầu Lông Trực Tuyến - UTE Badminton</title>
   <link rel="stylesheet" href="/css/main.css">
   <style>
@@ -702,14 +705,9 @@
       .section-card { width: 100% !important; max-width: 100% !important; padding: 14px 12px !important; box-sizing: border-box !important; }
       .booking-hero-box { display: none !important; }
       .order-summary-panel { position: static; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
-      .cust-nav-menu { display: none; }
-      .cust-footer-dark { width: 100% !important; max-width: 100vw !important; box-sizing: border-box !important; }
-      .cust-footer-inner { grid-template-columns: 1fr !important; gap: 16px !important; }
-      .cust-footer-inner > div:nth-child(2),
-      .cust-footer-inner > div:nth-child(3),
-      .cust-footer-inner > div:nth-child(4) { display: none !important; }
-      .cust-footer-inner > div:first-child p { display: none !important; }
-      .footer-bottom-bar > div:last-child { display: none !important; }
+      .cust-nav-menu { display: none !important; }
+      .cust-hamburger-btn { display: none !important; }
+      .cust-footer-dark { display: none !important; }
 
       .stepper-banner {
         padding: 10px 12px;
@@ -733,8 +731,19 @@
       }
       .branch-date-grid select,
       .branch-date-grid input {
-        height: 46px;
-        font-size: 14px;
+        height: 48px !important;
+        font-size: 15px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .court-badge-bwf {
+        font-size: 11px !important;
+        padding: 3px 8px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
       }
       .slots-picker-grid {
         grid-template-columns: repeat(3, 1fr) !important;
