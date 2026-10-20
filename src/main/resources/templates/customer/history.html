@@ -293,7 +293,36 @@
     .star-btn.active { color: #f59e0b; }
 
     @media (max-width: 768px) {
-      .b-card-body { grid-template-columns: 1fr; }
+      .b-card-body {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 14px 16px;
+      }
+      .b-actions {
+        flex-direction: row;
+        width: 100%;
+        gap: 8px;
+      }
+      .b-actions .btn {
+        flex: 1;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        touch-action: manipulation;
+      }
+      .page-title-box {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+      .ticket-modal-card {
+        width: 92vw;
+        max-width: 360px;
+        margin: auto;
+      }
     }
   
     /* LUXURY TOP NAVBAR & FOOTER STYLES */

@@ -3125,11 +3125,17 @@ body.has-mobile-nav {
     grid-template-columns: 1fr !important;
   }
   .slots-picker-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 6px !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+  }
+  @media (max-width: 340px) {
+    .slots-picker-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
   }
   .booking-slot-cell {
     padding: 8px 4px !important;
+    touch-action: manipulation;
   }
   .slot-cell-time {
     font-size: 12px !important;
@@ -3467,6 +3473,52 @@ body.has-mobile-nav {
 
   .pricing-table-clean {
     min-width: 480px !important;
+  }
+
+  /* Universal Customer Mobile Touch Optimizations */
+  button, select, input, .court-chip-btn, .booking-slot-cell, .mob-nav-item, .time-filter-pill, .pill-btn {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pill-group {
+    display: flex !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    padding-bottom: 4px !important;
+    gap: 6px !important;
+  }
+  .pill-group::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .pill-btn {
+    flex-shrink: 0 !important;
+    padding: 7px 14px !important;
+    font-size: 12px !important;
+  }
+
+  /* Prevent Mobile Safari / Android auto-zoom and jarring page shifts on form focus */
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  input[type="password"],
+  input[type="date"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Page container bottom clearance for mobile nav & floating action bars */
+  body.has-mobile-nav,
+  .has-mobile-nav .booking-wrapper,
+  .has-mobile-nav .history-container,
+  .has-mobile-nav .profile-layout,
+  .has-mobile-nav .tour-container,
+  .has-mobile-nav .payment-wrapper {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 8px)) !important;
   }
 }
 

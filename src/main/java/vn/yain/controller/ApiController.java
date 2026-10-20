@@ -3877,19 +3877,90 @@ public class ApiController {
 
 
     @GetMapping("/suppliers")
-
     public List<Supplier> getSuppliers() {
-
+        seedDefaultSuppliersIfEmpty();
         List<Supplier> list = supplierRepository.findAllByOrderBySupplierCodeAsc();
-
         if (list == null || list.isEmpty()) {
-
             return supplierRepository.findAll();
-
         }
-
         return list;
+    }
 
+    private synchronized void seedDefaultSuppliersIfEmpty() {
+        try {
+            if (supplierRepository.findBySupplierCode("NCC01").isEmpty() && supplierRepository.findBySupplierName("Đại lý Nước giải khát Tuấn Anh").isEmpty()) {
+                supplierRepository.save(Supplier.builder()
+                    .supplierCode("NCC01")
+                    .supplierName("Đại lý Nước giải khát Tuấn Anh")
+                    .contactPerson("Nguyễn Tuấn Anh")
+                    .phone("0908112233")
+                    .email("tuananh.beverage@gmail.com")
+                    .address("125 Kha Vạn Cân, Phường Linh Tây, TP. Thủ Đức")
+                    .category("Nước giải khát")
+                    .status("Đang hợp tác")
+                    .notes("Đại lý phân phối cấp 1 nước Revive, Pocari, Aquafina, Bò Húc")
+                    .createdAt(LocalDateTime.now())
+                    .build());
+            }
+            if (supplierRepository.findBySupplierCode("NCC02").isEmpty() && supplierRepository.findBySupplierName("Công ty TNHH Thể Thao Yonex Việt Nam").isEmpty()) {
+                supplierRepository.save(Supplier.builder()
+                    .supplierCode("NCC02")
+                    .supplierName("Công ty TNHH Thể Thao Yonex Việt Nam")
+                    .contactPerson("Lê Minh Hoàng")
+                    .phone("0918223344")
+                    .email("contact@yonex.com.vn")
+                    .address("Số 45 Lê Duẩn, Bến Nghé, Quận 1, TP.HCM")
+                    .category("Dụng cụ & Trang phục")
+                    .status("Đang hợp tác")
+                    .notes("Nhà phân phối độc quyền thiết bị cầu lông Yonex, vợt thi đấu, giày và túi")
+                    .createdAt(LocalDateTime.now())
+                    .build());
+            }
+            if (supplierRepository.findBySupplierCode("NCC03").isEmpty() && supplierRepository.findBySupplierName("Công ty Cầu Lông Thành Công").isEmpty()) {
+                supplierRepository.save(Supplier.builder()
+                    .supplierCode("NCC03")
+                    .supplierName("Công ty Cầu Lông Thành Công")
+                    .contactPerson("Trần Thành Công")
+                    .phone("0938334455")
+                    .email("thanhcong.badminton@gmail.com")
+                    .address("78 Cộng Hòa, Phường 4, Tân Bình, TP.HCM")
+                    .category("Cầu lông & Vợt")
+                    .status("Đang hợp tác")
+                    .notes("Cung cấp quả cầu lông Thành Công 77, Hải Yến và dịch vụ đan vợt thể thao")
+                    .createdAt(LocalDateTime.now())
+                    .build());
+            }
+            if (supplierRepository.findBySupplierCode("NCC04").isEmpty() && supplierRepository.findBySupplierName("Đại lý Phụ Kiện Thể Thao VS").isEmpty()) {
+                supplierRepository.save(Supplier.builder()
+                    .supplierCode("NCC04")
+                    .supplierName("Đại lý Phụ Kiện Thể Thao VS")
+                    .contactPerson("Phạm Văn Sơn")
+                    .phone("0948445566")
+                    .email("vssport.accessories@gmail.com")
+                    .address("210 Hoàng Văn Thụ, Phường 9, Phú Nhuận, TP.HCM")
+                    .category("Phụ kiện")
+                    .status("Đang hợp tác")
+                    .notes("Quấn cán vợt VS, vớ thi đấu, băng cổ tay, bao vợt và phụ kiện sân cầu")
+                    .createdAt(LocalDateTime.now())
+                    .build());
+            }
+            if (supplierRepository.findBySupplierCode("NCC05").isEmpty() && supplierRepository.findBySupplierName("Tổng kho Dinh Dưỡng Thể Thao ProFit").isEmpty()) {
+                supplierRepository.save(Supplier.builder()
+                    .supplierCode("NCC05")
+                    .supplierName("Tổng kho Dinh Dưỡng Thể Thao ProFit")
+                    .contactPerson("Võ Thị Bích")
+                    .phone("0968556677")
+                    .email("profit.nutrition@gmail.com")
+                    .address("15 Nguyễn Hữu Thọ, Tân Hưng, Quận 7, TP.HCM")
+                    .category("Thực phẩm bổ sung")
+                    .status("Đang hợp tác")
+                    .notes("Cung cấp gel năng lượng, bột điện giải OTE, bánh protein và thanh năng lượng")
+                    .createdAt(LocalDateTime.now())
+                    .build());
+            }
+        } catch (Exception e) {
+            log.warn("Không thể tự động khởi tạo nhà cung cấp mặc định: {}", e.getMessage());
+        }
     }
 
 

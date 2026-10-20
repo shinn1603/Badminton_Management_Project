@@ -225,7 +225,14 @@
     }
 
     @media (max-width: 860px) {
-      .payment-wrapper { grid-template-columns: 1fr; }
+      .payment-wrapper {
+        grid-template-columns: 1fr;
+        padding: 12px !important;
+      }
+      .qr-frame img {
+        max-width: 240px;
+        height: auto;
+      }
     }
   
     /* LUXURY TOP NAVBAR & FOOTER STYLES */

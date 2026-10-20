@@ -539,6 +539,155 @@
       gap: 40px;
       margin-bottom: 40px;
     }
+    /* STEPPER PROGRESS BAR (RESPONSIVE) */
+    .stepper-banner {
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    }
+    .stepper-track {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
+    }
+    .stepper-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .step-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--surface-subtle);
+      border: 1.5px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+    }
+    .step-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .stepper-line {
+      flex: 1;
+      height: 2px;
+      background: var(--border-subtle);
+      margin: 0 10px;
+      min-width: 14px;
+      transition: background 0.2s ease;
+    }
+    .stepper-step.active .step-circle,
+    .stepper-step.completed .step-circle {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    }
+    .stepper-step.active .step-title,
+    .stepper-step.completed .step-title {
+      color: var(--primary);
+    }
+    .stepper-line.completed {
+      background: var(--primary);
+    }
+
+    /* BRANCH & DATE GRID */
+    .branch-date-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 16px;
+    }
+
+    /* COURT BADGE */
+    .court-badge-bwf {
+      font-size: 11px;
+      color: var(--primary);
+      font-weight: 700;
+      background: var(--primary-light);
+      padding: 3px 8px;
+      border-radius: 9999px;
+      border: 1px solid var(--primary-border);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* SLOT LEGEND STRIP */
+    .slot-legend-strip {
+      font-size: 11.5px;
+      color: var(--cust-text-muted);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .legend-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .legend-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+    }
+
+    /* TIME SLOT FILTER STRIP */
+    .time-slot-filter-strip {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .time-slot-filter-strip::-webkit-scrollbar {
+      display: none;
+    }
+    .time-filter-pill {
+      padding: 6px 12px;
+      border-radius: 9999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      font-family: inherit;
+      touch-action: manipulation;
+    }
+    .time-filter-pill:active {
+      transform: scale(0.96);
+    }
+    .time-filter-pill.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.28);
+    }
+
+    /* MOBILE STICKY FLOATING BAR */
+    .mobile-booking-floating-bar {
+      display: none;
+    }
+
     @media (max-width: 1100px) { .cust-footer-inner { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 768px) {
       html, body {
@@ -548,8 +697,8 @@
         position: relative !important;
       }
       .cust-navbar { width: 100% !important; max-width: 100vw !important; box-sizing: border-box !important; }
-      .cust-nav-inner { width: 100% !important; max-width: 100% !important; padding: 0 12px !important; box-sizing: border-box !important; }
-      .booking-wrapper { width: 100% !important; max-width: 100vw !important; grid-template-columns: 1fr !important; padding: 12px !important; box-sizing: border-box !important; }
+      .cust-nav-inner { width: 100% !important; max-width: 100% !important; padding: 0 12px !important; height: 58px !important; box-sizing: border-box !important; }
+      .booking-wrapper { width: 100% !important; max-width: 100vw !important; grid-template-columns: 1fr !important; padding: 12px !important; padding-bottom: 150px !important; box-sizing: border-box !important; }
       .section-card { width: 100% !important; max-width: 100% !important; padding: 14px 12px !important; box-sizing: border-box !important; }
       .booking-hero-box { display: none !important; }
       .order-summary-panel { position: static; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
@@ -561,6 +710,162 @@
       .cust-footer-inner > div:nth-child(4) { display: none !important; }
       .cust-footer-inner > div:first-child p { display: none !important; }
       .footer-bottom-bar > div:last-child { display: none !important; }
+
+      .stepper-banner {
+        padding: 10px 12px;
+        margin-bottom: 14px;
+      }
+      .step-circle {
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+      }
+      .step-title {
+        font-size: 11px;
+      }
+      .stepper-line {
+        margin: 0 4px;
+        min-width: 8px;
+      }
+      .branch-date-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .branch-date-grid select,
+      .branch-date-grid input {
+        height: 46px;
+        font-size: 14px;
+      }
+      .slots-picker-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
+      }
+      .booking-slot-cell {
+        padding: 10px 4px !important;
+        border-radius: 10px !important;
+        min-height: 56px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        touch-action: manipulation;
+      }
+      .booking-slot-cell:active:not(.booked) {
+        transform: scale(0.96);
+      }
+      .slot-cell-time {
+        font-size: 12px !important;
+        font-weight: 800;
+      }
+      .slot-cell-tag {
+        font-size: 10px !important;
+        margin-top: 2px;
+      }
+
+      .court-select-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+      .court-chip-btn {
+        padding: 14px 16px !important;
+        border-radius: 12px !important;
+        touch-action: manipulation;
+      }
+
+      /* Mobile Sticky Bar Display */
+      .mobile-booking-floating-bar {
+        display: flex;
+        position: fixed;
+        bottom: calc(58px + env(safe-area-inset-bottom, 8px));
+        left: 0;
+        right: 0;
+        background: var(--surface);
+        border-top: 1px solid var(--border-subtle);
+        padding: 10px 16px;
+        z-index: 9998;
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      [data-theme="dark"] .mobile-booking-floating-bar {
+        background: rgba(15, 23, 42, 0.95);
+        border-top-color: rgba(255, 255, 255, 0.1);
+      }
+      .mob-bar-details {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .mob-bar-court-tag {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .mob-bar-price-row {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+      }
+      .mob-bar-price {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--primary);
+      }
+      .mob-bar-deposit {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+      .mob-bar-action-btn {
+        padding: 10px 18px !important;
+        border-radius: 10px !important;
+        font-size: 13.5px !important;
+        font-weight: 700 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        height: 42px !important;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #ffffff !important;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
+        touch-action: manipulation;
+      }
+      .mob-bar-action-btn:active {
+        transform: scale(0.96);
+      }
+      .mob-bar-action-btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      #ute-chatbot-toggle {
+        bottom: calc(125px + env(safe-area-inset-bottom, 8px)) !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .step-title {
+        display: none;
+      }
+      .step-circle {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+      }
+      .stepper-line {
+        margin: 0 8px;
+      }
     }
     .footer-col-title {
       font-size: 14px;
@@ -682,19 +987,28 @@
   <main class="booking-wrapper">
     <!-- LEFT COLUMN: SELECTION CONTROLS -->
     <div>
-      <!-- Step Guide Banner -->
-      <div class="step-guide-banner" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border-subtle); margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-dark); flex-wrap: wrap;">
-          <span style="color: var(--primary);">1. Chi nhánh & Ngày</span>
-          <span style="color: var(--text-muted);">→</span>
-          <span style="color: var(--primary);">2. Chọn sân</span>
-          <span style="color: var(--text-muted);">→</span>
-          <span style="color: var(--primary);">3. Chọn giờ</span>
-          <span style="color: var(--text-muted);">→</span>
-          <span style="color: var(--primary);">4. Xác nhận</span>
-        </div>
-        <div style="font-size: 11.5px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--primary-border); white-space: nowrap;">
-          Hỗ trợ 24/7
+      <!-- STEPPER PROGRESS BAR (MODERN MOBILE & DESKTOP) -->
+      <div class="stepper-banner">
+        <div class="stepper-track">
+          <div class="stepper-step active" id="stepIndicator1">
+            <div class="step-circle">1</div>
+            <div class="step-title">Chi nhánh</div>
+          </div>
+          <div class="stepper-line" id="stepLine1"></div>
+          <div class="stepper-step" id="stepIndicator2">
+            <div class="step-circle">2</div>
+            <div class="step-title">Chọn sân</div>
+          </div>
+          <div class="stepper-line" id="stepLine2"></div>
+          <div class="stepper-step" id="stepIndicator3">
+            <div class="step-circle">3</div>
+            <div class="step-title">Chọn giờ</div>
+          </div>
+          <div class="stepper-line" id="stepLine3"></div>
+          <div class="stepper-step" id="stepIndicator4">
+            <div class="step-circle">4</div>
+            <div class="step-title">Xác nhận</div>
+          </div>
         </div>
       </div>
 
@@ -705,7 +1019,7 @@
             <span>1. Chi Nhánh & Ngày Đặt</span>
           </div>
         </div>
-        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px;">
+        <div class="branch-date-grid">
           <div>
             <label class="form-label" style="font-size: 12px; font-weight: 700; margin-bottom: 6px; display: block;">Chi Nhánh</label>
             <select id="selBranch" class="form-control" onchange="onBranchChanged()">
@@ -725,7 +1039,7 @@
           <div class="card-step-title">
             <span>2. Chọn Sân</span>
           </div>
-          <span style="font-size: 11.5px; color: var(--primary); font-weight: 700;">Chuẩn BWF</span>
+          <span class="court-badge-bwf">Chuẩn BWF</span>
         </div>
         <div class="court-select-grid" id="courtsContainer">
           <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--text-muted);">
@@ -740,12 +1054,21 @@
           <div class="card-step-title">
             <span>3. Chọn Khung Giờ</span>
           </div>
-          <div style="font-size: 11.5px; color: var(--cust-text-muted); display: flex; gap: 12px; align-items: center;">
-            <span><span style="display:inline-block;width:9px;height:9px;background:var(--primary);border-radius:2px;"></span> Đang chọn</span>
-            <span><span style="display:inline-block;width:9px;height:9px;background:var(--surface-subtle);border:1px solid var(--border-subtle);border-radius:2px;"></span> Đã kín</span>
-            <span style="color: #d97706; font-weight: 700;">17h-21h: Cao điểm</span>
+          <div class="slot-legend-strip">
+            <span class="legend-chip"><span class="legend-dot" style="background: var(--primary);"></span> Đang chọn</span>
+            <span class="legend-chip"><span class="legend-dot" style="background: var(--surface-subtle); border: 1px solid var(--border-subtle);"></span> Đã kín</span>
+            <span class="legend-chip" style="color: #d97706; font-weight: 700;">17h-21h: Giờ vàng</span>
           </div>
         </div>
+
+        <!-- Quick Time Filter Strip on Mobile -->
+        <div class="time-slot-filter-strip">
+          <button type="button" class="time-filter-pill active" onclick="filterTimeSlots('all', this)">Tất cả (5h-23h)</button>
+          <button type="button" class="time-filter-pill" onclick="filterTimeSlots('morning', this)">Sáng (5h-12h)</button>
+          <button type="button" class="time-filter-pill" onclick="filterTimeSlots('afternoon', this)">Chiều (12h-17h)</button>
+          <button type="button" class="time-filter-pill" onclick="filterTimeSlots('evening', this)">Tối (17h-23h)</button>
+        </div>
+
         <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;" id="slotPickerNotice">
           Đang hiển thị lịch trống cho sân đã chọn...
         </div>
@@ -890,6 +1213,21 @@
       </div>
     </div>
   </main>
+
+  <!-- MOBILE FLOATING STICKY BOOKING ACTION BAR (Shows on phones) -->
+  <div class="mobile-booking-floating-bar" id="mobFloatingBookingBar">
+    <div class="mob-bar-details">
+      <div class="mob-bar-court-tag" id="mobFloatingCourt">Chưa chọn sân</div>
+      <div class="mob-bar-price-row">
+        <span class="mob-bar-price" id="mobFloatingPrice">0 đ</span>
+        <span class="mob-bar-deposit" id="mobFloatingDeposit">(Cọc 0 đ)</span>
+      </div>
+    </div>
+    <button type="button" class="mob-bar-action-btn" id="mobFloatingBtn" onclick="onMobFloatingCtaClick()" disabled>
+      <span>Đặt Sân</span>
+      <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+  </div>
 
   <!-- VIETQR DEPOSIT PAYMENT MODAL (APPEARS ONLY AFTER LOCKING) -->
   <div class="slot-modal-overlay" id="bookingVietqrModal">
@@ -1195,7 +1533,7 @@
 
           if (isBooked) {
             html += `
-              <div class="booking-slot-cell booked" title="Khung giờ này đã có người đặt trước">
+              <div class="booking-slot-cell booked" data-slot-hour="${startHour}" data-slot-time="${slot}" title="Khung giờ này đã có người đặt trước">
                 <div class="slot-cell-time">${slot}</div>
                 <div class="slot-cell-tag tag-booked">Đã Đặt</div>
               </div>
@@ -1203,7 +1541,7 @@
           } else {
             const isSelected = selectedSlots.some(s => s.time === slot) || (preselectedSlot && preselectedSlot === slot);
             html += `
-              <div class="booking-slot-cell ${isSelected ? 'selected' : ''}" id="slotEl_${startHour}" onclick="toggleSlotSelection('${slot}', ${rate}, this)">
+              <div class="booking-slot-cell ${isSelected ? 'selected' : ''}" id="slotEl_${startHour}" data-slot-hour="${startHour}" data-slot-time="${slot}" onclick="toggleSlotSelection('${slot}', ${rate}, this)">
                 ${isPeak ? '<span class="tag-peak">Giờ Vàng</span>' : ''}
                 <div class="slot-cell-time">${slot}</div>
                 <div class="slot-cell-tag tag-free">Trống • ${rate.toLocaleString()}đ</div>
@@ -1212,6 +1550,7 @@
           }
         });
         container.innerHTML = html;
+        applyCurrentSlotFilter();
 
         if (preselectedSlot && !selectedSlots.some(s => s.time === preselectedSlot)) {
           const startHour = parseInt(preselectedSlot.split(':')[0]);
@@ -1403,6 +1742,52 @@
       updateSummary();
     }
 
+    let currentSlotPeriodFilter = 'all';
+
+    function filterTimeSlots(period, btn) {
+      currentSlotPeriodFilter = period;
+      document.querySelectorAll('.time-filter-pill').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      const cells = document.querySelectorAll('.booking-slot-cell');
+      cells.forEach(cell => {
+        const hour = parseInt(cell.getAttribute('data-slot-hour') || '0', 10);
+        let match = true;
+        if (period === 'morning') match = (hour >= 5 && hour < 12);
+        else if (period === 'afternoon') match = (hour >= 12 && hour < 17);
+        else if (period === 'evening') match = (hour >= 17 && hour <= 23);
+        cell.style.display = match ? 'flex' : 'none';
+      });
+    }
+
+    function applyCurrentSlotFilter() {
+      const activeBtn = document.querySelector(`.time-filter-pill[onclick*="${currentSlotPeriodFilter}"]`);
+      if (activeBtn) filterTimeSlots(currentSlotPeriodFilter, activeBtn);
+    }
+
+    function onMobFloatingCtaClick() {
+      if (selectedSlots.length === 0) {
+        if (window.showToast) showToast('Vui lòng chọn ít nhất 1 khung giờ trước!', 'warning');
+        const container = document.getElementById('slotsContainer');
+        if (container) container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      const nameInp = document.getElementById('custNameInput');
+      const phoneInp = document.getElementById('custPhoneInput');
+      if (!nameInp || !phoneInp) {
+        executeBookingLock();
+        return;
+      }
+      if (!nameInp.value.trim() || !phoneInp.value.trim() || phoneInp.value.trim().length < 10) {
+        nameInp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (!nameInp.value.trim()) nameInp.focus();
+        else phoneInp.focus();
+        if (window.showToast) showToast('Vui lòng nhập họ tên và số điện thoại người đặt!', 'info');
+        return;
+      }
+      executeBookingLock();
+    }
+
     function updateSummary() {
       const dateVal = document.getElementById('selDate').value;
       if (dateVal) {
@@ -1413,6 +1798,21 @@
       const branchSel = document.getElementById('selBranch');
       document.getElementById('sumBranch').textContent = branchSel.options[branchSel.selectedIndex].text.split('(')[0];
 
+      // Stepper elements
+      const s1 = document.getElementById('stepIndicator1');
+      const s2 = document.getElementById('stepIndicator2');
+      const s3 = document.getElementById('stepIndicator3');
+      const s4 = document.getElementById('stepIndicator4');
+      const l1 = document.getElementById('stepLine1');
+      const l2 = document.getElementById('stepLine2');
+      const l3 = document.getElementById('stepLine3');
+
+      // Mobile floating bar elements
+      const mobCourt = document.getElementById('mobFloatingCourt');
+      const mobPrice = document.getElementById('mobFloatingPrice');
+      const mobDeposit = document.getElementById('mobFloatingDeposit');
+      const mobBtn = document.getElementById('mobFloatingBtn');
+
       if (selectedSlots.length === 0) {
         document.getElementById('sumSlots').textContent = 'Chưa chọn giờ';
         document.getElementById('sumCourtPrice').textContent = '0 đ';
@@ -1422,6 +1822,20 @@
         if (dLine) dLine.style.display = 'none';
         document.getElementById('depositRemainingText').textContent = 'Vui lòng chọn ít nhất 1 khung giờ.';
         document.getElementById('btnSubmitLockBooking').disabled = true;
+
+        if (s1) s1.className = 'stepper-step completed';
+        if (l1) l1.className = selectedCourt ? 'stepper-line completed' : 'stepper-line';
+        if (s2) s2.className = selectedCourt ? 'stepper-step completed' : 'stepper-step';
+        if (l2) l2.className = 'stepper-line';
+        if (s3) s3.className = selectedCourt ? 'stepper-step active' : 'stepper-step';
+        if (l3) l3.className = 'stepper-line';
+        if (s4) s4.className = 'stepper-step';
+
+        if (mobCourt) mobCourt.textContent = selectedCourt ? selectedCourt.courtName : 'Chưa chọn sân';
+        if (mobPrice) mobPrice.textContent = '0 đ';
+        if (mobDeposit) mobDeposit.textContent = '(Cọc 0 đ)';
+        if (mobBtn) mobBtn.disabled = true;
+
         return;
       }
 
@@ -1486,6 +1900,21 @@
       document.getElementById('depositRemainingText').textContent = `70% còn lại (${remaining70.toLocaleString('vi-VN')} đ) thanh toán tại quầy POS.`;
 
       document.getElementById('btnSubmitLockBooking').disabled = false;
+
+      // Update stepper for completed slot selection
+      if (s1) s1.className = 'stepper-step completed';
+      if (l1) l1.className = 'stepper-line completed';
+      if (s2) s2.className = 'stepper-step completed';
+      if (l2) l2.className = 'stepper-line completed';
+      if (s3) s3.className = 'stepper-step completed';
+      if (l3) l3.className = 'stepper-line completed';
+      if (s4) s4.className = 'stepper-step active';
+
+      // Update mobile floating bar
+      if (mobCourt) mobCourt.textContent = `${selectedCourt ? selectedCourt.courtName : 'Sân'} • ${selectedSlots.length} giờ`;
+      if (mobPrice) mobPrice.textContent = grandTotal.toLocaleString('vi-VN') + ' đ';
+      if (mobDeposit) mobDeposit.textContent = `(Cọc ${deposit30.toLocaleString('vi-VN')} đ)`;
+      if (mobBtn) mobBtn.disabled = false;
     }
 
     // Load active promotional vouchers from database for the selected branch
