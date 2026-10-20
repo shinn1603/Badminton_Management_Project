@@ -259,6 +259,8 @@
     const savedOpen = sessionStorage.getItem('chatbot_open') === 'true';
     if (savedOpen) {
       chatWin.classList.add('open');
+      toggleBtn.classList.add('chatbot-hidden');
+      if (container) container.classList.add('chatbot-open');
       isFirstOpen = false;
       if (msgList.children.length === 0) {
         sendMessage('');
@@ -270,6 +272,8 @@
       const isOpen = chatWin.classList.toggle('open');
       sessionStorage.setItem('chatbot_open', isOpen ? 'true' : 'false');
       if (isOpen) {
+        toggleBtn.classList.add('chatbot-hidden');
+        if (container) container.classList.add('chatbot-open');
         inputField.focus();
         if (isFirstOpen && msgList.children.length === 0) {
           isFirstOpen = false;
@@ -277,6 +281,9 @@
         }
         checkAndSuggestPendingBooking();
         checkExistingSupportTicket();
+      } else {
+        toggleBtn.classList.remove('chatbot-hidden');
+        if (container) container.classList.remove('chatbot-open');
       }
     }
 
@@ -360,6 +367,8 @@
     toggleBtn.addEventListener('click', toggleChat);
     closeBtn.addEventListener('click', () => {
       chatWin.classList.remove('open');
+      toggleBtn.classList.remove('chatbot-hidden');
+      if (container) container.classList.remove('chatbot-open');
       sessionStorage.setItem('chatbot_open', 'false');
     });
 
@@ -727,6 +736,10 @@
         const val = inputField.value.trim();
         if (val) sendMessage(val);
       }
+    });
+
+    inputField.addEventListener('focus', () => {
+      setTimeout(scrollToBottom, 320);
     });
   }
 

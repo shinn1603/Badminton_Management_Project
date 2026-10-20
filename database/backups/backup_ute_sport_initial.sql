@@ -1,6 +1,6 @@
 -- =====================================================================
 -- BẢN SAO LƯU TOÀN DIỆN HỆ THỐNG QUẢN LÝ SÂN CẦU LÔNG UTE SPORT
--- Thời gian xuất: 2026-10-20 22:30:01
+-- Thời gian xuất: 2026-10-20 23:14:01
 -- Người tạo: admin
 -- =====================================================================
 
@@ -611,7 +611,7 @@ GO
 
 
 -- -----------------------------------------------------
--- Dữ liệu bảng: customers (31 bản ghi)
+-- Dữ liệu bảng: customers (37 bản ghi)
 -- -----------------------------------------------------
 SET IDENTITY_INSERT customers ON;
 INSERT INTO customers (id, customer_code, full_name, phone, email, password, total_play_hours, reward_points, membership_tier, status, created_at, raw_password) VALUES
@@ -645,7 +645,13 @@ INSERT INTO customers (id, customer_code, full_name, phone, email, password, tot
 (58, N'KH93702', N'Lê Văn A', N'0977223106', NULL, N'123456', 0.0, 0, N'Đồng', N'Hoạt động', N'2026-10-20 20:24:49.353', NULL),
 (59, N'KH93554', N'Lê Văn A', N'0977647593', NULL, N'123456', 0.0, 0, N'Đồng', N'Hoạt động', N'2026-10-20 22:22:09.03', NULL),
 (60, N'KH67848', N'Lê Văn A', N'0977186896', NULL, N'123456', 0.0, 0, N'Đồng', N'Hoạt động', N'2026-10-20 22:26:49.32', NULL),
-(63, N'KH16044', N'Lê Văn A', N'0977640640', NULL, N'123456', 0.0, 0, N'Đồng', N'Hoạt động', N'2026-10-20 22:29:56.827', NULL);
+(63, N'KH16044', N'Lê Văn A', N'0977640640', NULL, N'123456', 0.0, 0, N'Đồng', N'Hoạt động', N'2026-10-20 22:29:56.827', NULL),
+(66, N'KH11173', N'Lê Văn A', N'0977753770', NULL, N'123456', 0.0, 0, N'Đồng', N'Hoạt động', N'2026-10-20 22:41:13.043', NULL),
+(67, N'KH59450', N'Lê Văn A', N'0977444137', NULL, N'123456', 0.0, 0, N'Đồng', N'Hoạt động', N'2026-10-20 22:49:18.887', NULL),
+(70, N'KH44659', N'Lê Văn A', N'0977497234', NULL, N'123456', 0.0, 0, N'Đồng', N'Hoạt động', N'2026-10-20 22:55:40.393', NULL),
+(73, N'KH28414', N'Lê Văn A', N'0977591867', NULL, N'123456', 0.0, 0, N'Đồng', N'Hoạt động', N'2026-10-20 23:00:40.76', NULL),
+(76, N'KH68192', N'Lê Văn A', N'0977274644', NULL, N'123456', 0.0, 0, N'Đồng', N'Hoạt động', N'2026-10-20 23:09:52.853', NULL),
+(79, N'KH43806', N'Lê Văn A', N'0977116919', NULL, N'123456', 0.0, 0, N'Đồng', N'Hoạt động', N'2026-10-20 23:13:56.997', NULL);
 SET IDENTITY_INSERT customers OFF;
 GO
 
@@ -712,8 +718,8 @@ GO
 -- -----------------------------------------------------
 SET IDENTITY_INSERT products ON;
 INSERT INTO products (id, product_code, branch_code, product_name, category, unit, unit_price, cost_price, stock_quantity, min_quantity) VALUES
-(1, N'P01', N'CN01', N'Nước bù khoáng Revive Chanh muối 500ml', N'Nước giải khát', N'Chai', 15000.00, 7695.82, 150, 20),
-(2, N'P02', N'CN01', N'Nước điện giải Pocari Sweat 500ml', N'Nước giải khát', N'Chai', 18000.00, 11500.00, 240, 20),
+(1, N'P01', N'CN01', N'Nước bù khoáng Revive Chanh muối 500ml', N'Nước giải khát', N'Chai', 15000.00, 7454.57, 150, 20),
+(2, N'P02', N'CN01', N'Nước điện giải Pocari Sweat 500ml', N'Nước giải khát', N'Chai', 18000.00, 11555.56, 270, 20),
 (3, N'P03', N'CN01', N'Nước suối tinh khiết Aquafina 500ml', N'Nước giải khát', N'Chai', 10000.00, 5000.00, 220, 30),
 (4, N'P04', N'CN01', N'Nước tăng lực Bò Húc Red Bull Thái', N'Nước giải khát', N'Lon', 20000.00, 12000.00, 95, 15),
 (5, N'P05', N'CN01', N'Ống Cầu Lông Hải Yến Đỏ (12 quả)', N'Cầu lông', N'Ống', 180000.00, 145000.00, 65, 10),
@@ -839,7 +845,7 @@ GO
 SET IDENTITY_INSERT tournaments ON;
 INSERT INTO tournaments (id, tournament_code, branch_code, tournament_name, start_date, end_date, rules, category, max_participants, current_participants, entry_fee, total_prize, status) VALUES
 (1, N'GD01', N'CN01', N'Giải Cầu Lông Đôi Nam Nữ Mùa Thu UTE Open 2026', N'2026-10-10 08:00:00.0', N'2026-12-31 23:59:59.0', N'Thi d?u theo th? th?c lo?i tr?c ti?p 3 hi?p 21 di?m theo lu?t BWF. M?i VÐV ch? du?c dang ký 1 n?i dung.', N'Đôi nam nữ', 32, 11, 300000.00, 20000000.00, N'Đang mở đăng ký'),
-(2, N'GD02', N'CN01', N'Giải Cầu Lông Doanh Nghiệp & Sinh Viên Cúp Thủ Đức 2026', N'2026-10-25 08:00:00.0', N'2026-10-26 17:00:00.0', N'Gi?i d?u phong trào k?t n?i các doanh nghi?p và c?u sinh viên dam mê c?u lông.', N'Tổng hợp nhiều nội dung', 24, 11, 250000.00, 15000000.00, N'Sắp mở đăng ký'),
+(2, N'GD02', N'CN01', N'Giải Cầu Lông Doanh Nghiệp & Sinh Viên Cúp Thủ Đức 2026', N'2026-10-25 08:00:00.0', N'2026-10-26 17:00:00.0', N'Gi?i d?u phong trào k?t n?i các doanh nghi?p và c?u sinh viên dam mê c?u lông.', N'Tổng hợp nhiều nội dung', 24, 16, 250000.00, 15000000.00, N'Sắp mở đăng ký'),
 (3, N'GD03', N'CN02', N'Giải Đơn Nam Bình Thạnh Mở Rộng 2026', N'2026-11-05 08:00:00.0', N'2026-11-06 18:00:00.0', N'Gi?i don nam các CLB phong trào khu v?c Bình Th?nh - Phú Nhu?n.', N'Đơn nam', 16, 0, 200000.00, 10000000.00, N'Sắp mở đăng ký');
 SET IDENTITY_INSERT tournaments OFF;
 GO
@@ -889,7 +895,7 @@ GO
 
 
 -- -----------------------------------------------------
--- Dữ liệu bảng: work_shifts (48 bản ghi)
+-- Dữ liệu bảng: work_shifts (59 bản ghi)
 -- -----------------------------------------------------
 SET IDENTITY_INSERT work_shifts ON;
 INSERT INTO work_shifts (id, shift_code, staff_code, branch_code, day_of_week, shift_type, duty, icon, shift_date, start_time, end_time, status) VALUES
@@ -940,13 +946,24 @@ INSERT INTO work_shifts (id, shift_code, staff_code, branch_code, day_of_week, s
 (45, N'BG1073214', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'22:22', N'Đã kết ca'),
 (46, N'BG374076', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'22:26', N'Đã kết ca'),
 (47, N'BG412489', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'22:26', N'Đã kết ca'),
-(48, N'BG633336', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'22:29', N'Đã kết ca');
+(48, N'BG633336', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'22:29', N'Đã kết ca'),
+(49, N'BG636969', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'22:30', N'Đã kết ca'),
+(50, N'BG498955', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'22:41', N'Đã kết ca'),
+(51, N'BG826237', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'22:49', N'Đã kết ca'),
+(52, N'BG792584', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'22:49', N'Đã kết ca'),
+(53, N'BG454449', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'22:55', N'Đã kết ca'),
+(54, N'BG923735', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'22:55', N'Đã kết ca'),
+(55, N'BG290323', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'23:00', N'Đã kết ca'),
+(56, N'BG753051', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'23:00', N'Đã kết ca'),
+(57, N'BG363618', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'23:09', N'Đã kết ca'),
+(58, N'BG1064712', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'23:10', N'Đã kết ca'),
+(59, N'BG247162', N'NS03', N'CN01', N'tue', N'handover', N'POS', N'POS', N'2026-10-20', N'06:00', N'23:13', N'Đã kết ca');
 SET IDENTITY_INSERT work_shifts OFF;
 GO
 
 
 -- -----------------------------------------------------
--- Dữ liệu bảng: stock_receipts (51 bản ghi)
+-- Dữ liệu bảng: stock_receipts (63 bản ghi)
 -- -----------------------------------------------------
 SET IDENTITY_INSERT stock_receipts ON;
 INSERT INTO stock_receipts (id, receipt_code, branch_code, staff_code, receipt_date, supplier_name, total_amount, notes) VALUES
@@ -1000,7 +1017,19 @@ INSERT INTO stock_receipts (id, receipt_code, branch_code, staff_code, receipt_d
 (87, N'PNK857377', N'CN01', N'NS03', N'2026-10-20 22:26:50.393', N'NCC Test TC42', 60000.00, N'Test auto allocate - Nước điện giải Pocari Sweat 500ml x5'),
 (88, N'PNK337108', N'CN01', N'NS03', N'2026-10-20 22:26:51.04', N'Công ty TNHH Thể Thao Động Lực', 80000.00, N'Nhập bổ sung nước giải khát TC41 - Nước bù khoáng Revive Chanh muối 500ml x10'),
 (92, N'PNK391110', N'CN01', N'NS03', N'2026-10-20 22:29:57.877', N'NCC Test TC42', 60000.00, N'Test auto allocate - Nước điện giải Pocari Sweat 500ml x5'),
-(93, N'PNK551825', N'CN01', N'NS03', N'2026-10-20 22:29:58.503', N'Công ty TNHH Thể Thao Động Lực', 80000.00, N'Nhập bổ sung nước giải khát TC41 - Nước bù khoáng Revive Chanh muối 500ml x10');
+(93, N'PNK551825', N'CN01', N'NS03', N'2026-10-20 22:29:58.503', N'Công ty TNHH Thể Thao Động Lực', 80000.00, N'Nhập bổ sung nước giải khát TC41 - Nước bù khoáng Revive Chanh muối 500ml x10'),
+(97, N'PNK635826', N'CN01', N'NS03', N'2026-10-20 22:41:14.26', N'NCC Test TC42', 60000.00, N'Test auto allocate - Nước điện giải Pocari Sweat 500ml x5'),
+(98, N'PNK735372', N'CN01', N'NS03', N'2026-10-20 22:41:15.087', N'Công ty TNHH Thể Thao Động Lực', 80000.00, N'Nhập bổ sung nước giải khát TC41 - Nước bù khoáng Revive Chanh muối 500ml x10'),
+(99, N'PNK216661', N'CN01', N'NS03', N'2026-10-20 22:49:19.94', N'NCC Test TC42', 60000.00, N'Test auto allocate - Nước điện giải Pocari Sweat 500ml x5'),
+(100, N'PNK241622', N'CN01', N'NS03', N'2026-10-20 22:49:20.537', N'Công ty TNHH Thể Thao Động Lực', 80000.00, N'Nhập bổ sung nước giải khát TC41 - Nước bù khoáng Revive Chanh muối 500ml x10'),
+(104, N'PNK293713', N'CN01', N'NS03', N'2026-10-20 22:55:41.49', N'NCC Test TC42', 60000.00, N'Test auto allocate - Nước điện giải Pocari Sweat 500ml x5'),
+(105, N'PNK334998', N'CN01', N'NS03', N'2026-10-20 22:55:42.067', N'Công ty TNHH Thể Thao Động Lực', 80000.00, N'Nhập bổ sung nước giải khát TC41 - Nước bù khoáng Revive Chanh muối 500ml x10'),
+(109, N'PNK910077', N'CN01', N'NS03', N'2026-10-20 23:00:41.79', N'NCC Test TC42', 60000.00, N'Test auto allocate - Nước điện giải Pocari Sweat 500ml x5'),
+(110, N'PNK484820', N'CN01', N'NS03', N'2026-10-20 23:00:42.41', N'Công ty TNHH Thể Thao Động Lực', 80000.00, N'Nhập bổ sung nước giải khát TC41 - Nước bù khoáng Revive Chanh muối 500ml x10'),
+(114, N'PNK250375', N'CN01', N'NS03', N'2026-10-20 23:09:54.127', N'NCC Test TC42', 60000.00, N'Test auto allocate - Nước điện giải Pocari Sweat 500ml x5'),
+(115, N'PNK424441', N'CN01', N'NS03', N'2026-10-20 23:09:54.893', N'Công ty TNHH Thể Thao Động Lực', 80000.00, N'Nhập bổ sung nước giải khát TC41 - Nước bù khoáng Revive Chanh muối 500ml x10'),
+(119, N'PNK966902', N'CN01', N'NS03', N'2026-10-20 23:13:58.01', N'NCC Test TC42', 60000.00, N'Test auto allocate - Nước điện giải Pocari Sweat 500ml x5'),
+(120, N'PNK944339', N'CN01', N'NS03', N'2026-10-20 23:13:58.613', N'Công ty TNHH Thể Thao Động Lực', 80000.00, N'Nhập bổ sung nước giải khát TC41 - Nước bù khoáng Revive Chanh muối 500ml x10');
 SET IDENTITY_INSERT stock_receipts OFF;
 GO
 
@@ -1017,7 +1046,7 @@ GO
 
 
 -- -----------------------------------------------------
--- Dữ liệu bảng: stock_product_details (52 bản ghi)
+-- Dữ liệu bảng: stock_product_details (64 bản ghi)
 -- -----------------------------------------------------
 SET IDENTITY_INSERT stock_product_details ON;
 INSERT INTO stock_product_details (id, receipt_code, product_code, quantity, import_price, total_amount) VALUES
@@ -1072,7 +1101,19 @@ INSERT INTO stock_product_details (id, receipt_code, product_code, quantity, imp
 (68, N'PNK857377', N'P02', 5, 12000.00, 60000.00),
 (69, N'PNK337108', N'P01', 10, 8000.00, 80000.00),
 (72, N'PNK391110', N'P02', 5, 12000.00, 60000.00),
-(73, N'PNK551825', N'P01', 10, 8000.00, 80000.00);
+(73, N'PNK551825', N'P01', 10, 8000.00, 80000.00),
+(76, N'PNK635826', N'P02', 5, 12000.00, 60000.00),
+(77, N'PNK735372', N'P01', 10, 8000.00, 80000.00),
+(78, N'PNK216661', N'P02', 5, 12000.00, 60000.00),
+(79, N'PNK241622', N'P01', 10, 8000.00, 80000.00),
+(82, N'PNK293713', N'P02', 5, 12000.00, 60000.00),
+(83, N'PNK334998', N'P01', 10, 8000.00, 80000.00),
+(86, N'PNK910077', N'P02', 5, 12000.00, 60000.00),
+(87, N'PNK484820', N'P01', 10, 8000.00, 80000.00),
+(90, N'PNK250375', N'P02', 5, 12000.00, 60000.00),
+(91, N'PNK424441', N'P01', 10, 8000.00, 80000.00),
+(94, N'PNK966902', N'P02', 5, 12000.00, 60000.00),
+(95, N'PNK944339', N'P01', 10, 8000.00, 80000.00);
 SET IDENTITY_INSERT stock_product_details OFF;
 GO
 
@@ -1117,7 +1158,7 @@ GO
 
 
 -- -----------------------------------------------------
--- Dữ liệu bảng: audit_logs (562 bản ghi)
+-- Dữ liệu bảng: audit_logs (726 bản ghi)
 -- -----------------------------------------------------
 SET IDENTITY_INSERT audit_logs ON;
 INSERT INTO audit_logs (log_id, username, action_type, action_time, details, ip_address, module, status, user_code) VALUES
@@ -1684,7 +1725,171 @@ INSERT INTO audit_logs (log_id, username, action_type, action_time, details, ip_
 (675, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:29:58.673', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Ðã d?t tru?c]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
 (676, N'admin', N'Đăng nhập thất bại', N'2026-10-20 22:29:58.747', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
 (677, N'tc12_user_1792510198799', N'Đăng nhập hệ thống', N'2026-10-20 22:29:58.937', N'Xác th?c tài kho?n [tc12_user_1792510198799] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
-(678, N'test_admin', N'Tải lên bản sao lưu', N'2026-10-20 22:30:01.783', N'T?i lên t?p sao luu test_unit_backup.sql (Dung lu?ng: 0.03 KB) t? máy tính', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL);
+(678, N'test_admin', N'Tải lên bản sao lưu', N'2026-10-20 22:30:01.783', N'T?i lên t?p sao luu test_unit_backup.sql (Dung lu?ng: 0.03 KB) t? máy tính', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(679, N'admin', N'Sao lưu cơ sở dữ liệu', N'2026-10-20 22:30:01.883', N'T?o b?n sao luu backup_ute_sport_initial.sql (Dung lu?ng: 241.87 KB, 936 b?n ghi) thành công', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(680, N'user_reset_1792510205846', N'Đăng nhập hệ thống', N'2026-10-20 22:30:05.993', N'Xác th?c tài kho?n [user_reset_1792510205846] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(681, N'director', N'Đăng nhập hệ thống', N'2026-10-20 22:30:06.18', N'Xác th?c tài kho?n [director] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(682, N'manager', N'Đăng nhập hệ thống', N'2026-10-20 22:30:06.243', N'Xác th?c tài kho?n [manager] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(683, N'pos', N'Đăng nhập hệ thống', N'2026-10-20 22:30:06.307', N'Xác th?c tài kho?n [pos] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(684, N'admin', N'Đăng nhập hệ thống', N'2026-10-20 22:30:06.37', N'Xác th?c tài kho?n [admin] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(685, N'customer', N'Đăng nhập hệ thống', N'2026-10-20 22:30:06.43', N'Xác th?c tài kho?n [customer] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(686, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:30:06.533', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðã d?t tru?c] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(687, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:30:06.597', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Ðã d?t tru?c] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(688, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:30:06.627', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(689, N'manager', N'Đăng nhập thất bại', N'2026-10-20 22:30:06.71', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(690, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:30:06.757', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [B?o trì]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(691, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:30:06.767', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [B?o trì] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(696, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:30:06.873', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(698, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:30:06.887', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(701, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:41:13.31', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Tr?ng] sang [Ðã d?t tru?c]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(703, N'director', N'Đăng nhập hệ thống', N'2026-10-20 22:41:13.843', N'Xác th?c tài kho?n [director] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(704, N'pos', N'Đăng nhập hệ thống', N'2026-10-20 22:41:13.967', N'Xác th?c tài kho?n [pos] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(705, N'admin', N'Sao lưu cơ sở dữ liệu', N'2026-10-20 22:41:14.187', N'T?o b?n sao luu backup_tc50_test_1792510874088.sql (Dung lu?ng: 246.20 KB, 957 b?n ghi) thành công', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(706, N'admin', N'Đăng nhập hệ thống', N'2026-10-20 22:41:14.39', N'Xác th?c tài kho?n [admin] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(707, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:41:14.563', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(708, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:41:14.58', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(709, N'manager', N'Đăng nhập hệ thống', N'2026-10-20 22:41:14.917', N'Xác th?c tài kho?n [manager] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(710, N'customer', N'Đăng nhập hệ thống', N'2026-10-20 22:41:15.013', N'Xác th?c tài kho?n [customer] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(711, N'non_existent_user_xyz', N'Đăng nhập thất bại', N'2026-10-20 22:41:15.06', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(712, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:41:15.133', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(713, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:41:15.297', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Ðã d?t tru?c]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(714, N'admin', N'Đăng nhập thất bại', N'2026-10-20 22:41:15.383', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(715, N'tc12_user_1792510875465', N'Đăng nhập hệ thống', N'2026-10-20 22:41:15.613', N'Xác th?c tài kho?n [tc12_user_1792510875465] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(716, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:49:19.037', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðã d?t tru?c] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(718, N'director', N'Đăng nhập hệ thống', N'2026-10-20 22:49:19.463', N'Xác th?c tài kho?n [director] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(719, N'pos', N'Đăng nhập hệ thống', N'2026-10-20 22:49:19.593', N'Xác th?c tài kho?n [pos] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(720, N'admin', N'Sao lưu cơ sở dữ liệu', N'2026-10-20 22:49:19.873', N'T?o b?n sao luu backup_tc50_test_1792511359756.sql (Dung lu?ng: 250.06 KB, 977 b?n ghi) thành công', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(721, N'admin', N'Đăng nhập hệ thống', N'2026-10-20 22:49:20.047', N'Xác th?c tài kho?n [admin] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(722, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:49:20.14', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(723, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:49:20.15', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(724, N'manager', N'Đăng nhập hệ thống', N'2026-10-20 22:49:20.36', N'Xác th?c tài kho?n [manager] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(725, N'customer', N'Đăng nhập hệ thống', N'2026-10-20 22:49:20.477', N'Xác th?c tài kho?n [customer] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(726, N'non_existent_user_xyz', N'Đăng nhập thất bại', N'2026-10-20 22:49:20.517', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(727, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:49:20.593', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(728, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:49:20.717', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Ðã d?t tru?c]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(729, N'admin', N'Đăng nhập thất bại', N'2026-10-20 22:49:20.787', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(730, N'tc12_user_1792511360831', N'Đăng nhập hệ thống', N'2026-10-20 22:49:20.96', N'Xác th?c tài kho?n [tc12_user_1792511360831] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(731, N'test_admin', N'Tải lên bản sao lưu', N'2026-10-20 22:49:23.493', N'T?i lên t?p sao luu test_unit_backup.sql (Dung lu?ng: 0.03 KB) t? máy tính', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(732, N'admin', N'Sao lưu cơ sở dữ liệu', N'2026-10-20 22:49:23.58', N'T?o b?n sao luu backup_ute_sport_initial.sql (Dung lu?ng: 253.25 KB, 993 b?n ghi) thành công', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(733, N'user_reset_1792511367139', N'Đăng nhập hệ thống', N'2026-10-20 22:49:27.283', N'Xác th?c tài kho?n [user_reset_1792511367139] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(734, N'director', N'Đăng nhập hệ thống', N'2026-10-20 22:49:27.507', N'Xác th?c tài kho?n [director] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(735, N'manager', N'Đăng nhập hệ thống', N'2026-10-20 22:49:27.57', N'Xác th?c tài kho?n [manager] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(736, N'pos', N'Đăng nhập hệ thống', N'2026-10-20 22:49:27.633', N'Xác th?c tài kho?n [pos] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(737, N'admin', N'Đăng nhập hệ thống', N'2026-10-20 22:49:27.687', N'Xác th?c tài kho?n [admin] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(738, N'customer', N'Đăng nhập hệ thống', N'2026-10-20 22:49:27.743', N'Xác th?c tài kho?n [customer] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(739, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:49:27.827', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðã d?t tru?c] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(740, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:49:27.883', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Ðã d?t tru?c] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(741, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:49:27.91', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(742, N'manager', N'Đăng nhập thất bại', N'2026-10-20 22:49:27.99', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(743, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:49:28.12', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [B?o trì]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(744, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:49:28.123', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [B?o trì] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(749, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:49:28.22', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(751, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:49:28.23', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(754, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:55:40.567', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Tr?ng] sang [Ðã d?t tru?c]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(756, N'director', N'Đăng nhập hệ thống', N'2026-10-20 22:55:41.08', N'Xác th?c tài kho?n [director] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(757, N'pos', N'Đăng nhập hệ thống', N'2026-10-20 22:55:41.207', N'Xác th?c tài kho?n [pos] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(758, N'admin', N'Sao lưu cơ sở dữ liệu', N'2026-10-20 22:55:41.41', N'T?o b?n sao luu backup_tc50_test_1792511741315.sql (Dung lu?ng: 257.59 KB, 1014 b?n ghi) thành công', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(759, N'admin', N'Đăng nhập hệ thống', N'2026-10-20 22:55:41.59', N'Xác th?c tài kho?n [admin] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(760, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:55:41.67', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(761, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:55:41.683', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(762, N'manager', N'Đăng nhập hệ thống', N'2026-10-20 22:55:41.907', N'Xác th?c tài kho?n [manager] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(763, N'customer', N'Đăng nhập hệ thống', N'2026-10-20 22:55:42.007', N'Xác th?c tài kho?n [customer] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(764, N'non_existent_user_xyz', N'Đăng nhập thất bại', N'2026-10-20 22:55:42.043', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(765, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:55:42.11', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(766, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:55:42.257', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Ðã d?t tru?c]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(767, N'admin', N'Đăng nhập thất bại', N'2026-10-20 22:55:42.33', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(768, N'tc12_user_1792511742383', N'Đăng nhập hệ thống', N'2026-10-20 22:55:42.52', N'Xác th?c tài kho?n [tc12_user_1792511742383] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(769, N'test_admin', N'Tải lên bản sao lưu', N'2026-10-20 22:55:45.273', N'T?i lên t?p sao luu test_unit_backup.sql (Dung lu?ng: 0.03 KB) t? máy tính', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(770, N'admin', N'Sao lưu cơ sở dữ liệu', N'2026-10-20 22:55:45.37', N'T?o b?n sao luu backup_ute_sport_initial.sql (Dung lu?ng: 260.78 KB, 1030 b?n ghi) thành công', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(771, N'user_reset_1792511748968', N'Đăng nhập hệ thống', N'2026-10-20 22:55:49.11', N'Xác th?c tài kho?n [user_reset_1792511748968] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(772, N'director', N'Đăng nhập hệ thống', N'2026-10-20 22:55:49.327', N'Xác th?c tài kho?n [director] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(773, N'manager', N'Đăng nhập hệ thống', N'2026-10-20 22:55:49.387', N'Xác th?c tài kho?n [manager] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(774, N'pos', N'Đăng nhập hệ thống', N'2026-10-20 22:55:49.443', N'Xác th?c tài kho?n [pos] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(775, N'admin', N'Đăng nhập hệ thống', N'2026-10-20 22:55:49.5', N'Xác th?c tài kho?n [admin] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(776, N'customer', N'Đăng nhập hệ thống', N'2026-10-20 22:55:49.557', N'Xác th?c tài kho?n [customer] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(777, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:55:49.653', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðã d?t tru?c] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(778, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:55:49.71', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Ðã d?t tru?c] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(779, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:55:49.74', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(780, N'manager', N'Đăng nhập thất bại', N'2026-10-20 22:55:49.83', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(781, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:55:49.873', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [B?o trì]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(782, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:55:49.88', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [B?o trì] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(787, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:55:49.983', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(789, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 22:55:49.993', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(792, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:00:40.923', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Tr?ng] sang [Ðã d?t tru?c]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(794, N'director', N'Đăng nhập hệ thống', N'2026-10-20 23:00:41.387', N'Xác th?c tài kho?n [director] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(795, N'pos', N'Đăng nhập hệ thống', N'2026-10-20 23:00:41.51', N'Xác th?c tài kho?n [pos] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(796, N'admin', N'Sao lưu cơ sở dữ liệu', N'2026-10-20 23:00:41.707', N'T?o b?n sao luu backup_tc50_test_1792512041615.sql (Dung lu?ng: 265.11 KB, 1051 b?n ghi) thành công', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(797, N'admin', N'Đăng nhập hệ thống', N'2026-10-20 23:00:41.92', N'Xác th?c tài kho?n [admin] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(798, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:00:42.02', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(799, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:00:42.033', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(800, N'manager', N'Đăng nhập hệ thống', N'2026-10-20 23:00:42.253', N'Xác th?c tài kho?n [manager] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(801, N'customer', N'Đăng nhập hệ thống', N'2026-10-20 23:00:42.36', N'Xác th?c tài kho?n [customer] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(802, N'non_existent_user_xyz', N'Đăng nhập thất bại', N'2026-10-20 23:00:42.39', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(803, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:00:42.457', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(804, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:00:42.623', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Ðã d?t tru?c]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(805, N'admin', N'Đăng nhập thất bại', N'2026-10-20 23:00:42.7', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(806, N'tc12_user_1792512042752', N'Đăng nhập hệ thống', N'2026-10-20 23:00:42.883', N'Xác th?c tài kho?n [tc12_user_1792512042752] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(807, N'test_admin', N'Tải lên bản sao lưu', N'2026-10-20 23:00:45.717', N'T?i lên t?p sao luu test_unit_backup.sql (Dung lu?ng: 0.03 KB) t? máy tính', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(808, N'admin', N'Sao lưu cơ sở dữ liệu', N'2026-10-20 23:00:45.803', N'T?o b?n sao luu backup_ute_sport_initial.sql (Dung lu?ng: 268.30 KB, 1067 b?n ghi) thành công', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(809, N'user_reset_1792512049755', N'Đăng nhập hệ thống', N'2026-10-20 23:00:49.907', N'Xác th?c tài kho?n [user_reset_1792512049755] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(810, N'director', N'Đăng nhập hệ thống', N'2026-10-20 23:00:50.117', N'Xác th?c tài kho?n [director] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(811, N'manager', N'Đăng nhập hệ thống', N'2026-10-20 23:00:50.183', N'Xác th?c tài kho?n [manager] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(812, N'pos', N'Đăng nhập hệ thống', N'2026-10-20 23:00:50.25', N'Xác th?c tài kho?n [pos] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(813, N'admin', N'Đăng nhập hệ thống', N'2026-10-20 23:00:50.313', N'Xác th?c tài kho?n [admin] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(814, N'customer', N'Đăng nhập hệ thống', N'2026-10-20 23:00:50.373', N'Xác th?c tài kho?n [customer] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(815, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:00:50.453', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðã d?t tru?c] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(816, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:00:50.503', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Ðã d?t tru?c] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(817, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:00:50.55', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(818, N'manager', N'Đăng nhập thất bại', N'2026-10-20 23:00:50.637', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(819, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:00:50.68', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [B?o trì]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(820, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:00:50.683', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [B?o trì] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(825, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:00:50.773', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(827, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:00:50.78', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(830, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:09:53.07', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Tr?ng] sang [Ðã d?t tru?c]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(832, N'director', N'Đăng nhập hệ thống', N'2026-10-20 23:09:53.587', N'Xác th?c tài kho?n [director] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(833, N'pos', N'Đăng nhập hệ thống', N'2026-10-20 23:09:53.723', N'Xác th?c tài kho?n [pos] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(834, N'admin', N'Sao lưu cơ sở dữ liệu', N'2026-10-20 23:09:54.033', N'T?o b?n sao luu backup_tc50_test_1792512593875.sql (Dung lu?ng: 272.64 KB, 1088 b?n ghi) thành công', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(835, N'admin', N'Đăng nhập hệ thống', N'2026-10-20 23:09:54.24', N'Xác th?c tài kho?n [admin] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(836, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:09:54.373', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(837, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:09:54.39', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(838, N'manager', N'Đăng nhập hệ thống', N'2026-10-20 23:09:54.687', N'Xác th?c tài kho?n [manager] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(839, N'customer', N'Đăng nhập hệ thống', N'2026-10-20 23:09:54.827', N'Xác th?c tài kho?n [customer] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(840, N'non_existent_user_xyz', N'Đăng nhập thất bại', N'2026-10-20 23:09:54.87', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(841, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:09:54.967', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(842, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:09:55.163', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Ðã d?t tru?c]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(843, N'admin', N'Đăng nhập thất bại', N'2026-10-20 23:09:55.24', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(844, N'tc12_user_1792512595317', N'Đăng nhập hệ thống', N'2026-10-20 23:09:55.46', N'Xác th?c tài kho?n [tc12_user_1792512595317] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(845, N'test_admin', N'Tải lên bản sao lưu', N'2026-10-20 23:09:58.143', N'T?i lên t?p sao luu test_unit_backup.sql (Dung lu?ng: 0.03 KB) t? máy tính', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(846, N'admin', N'Sao lưu cơ sở dữ liệu', N'2026-10-20 23:09:58.3', N'T?o b?n sao luu backup_ute_sport_initial.sql (Dung lu?ng: 275.83 KB, 1104 b?n ghi) thành công', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(847, N'user_reset_1792512602072', N'Đăng nhập hệ thống', N'2026-10-20 23:10:02.233', N'Xác th?c tài kho?n [user_reset_1792512602072] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(848, N'director', N'Đăng nhập hệ thống', N'2026-10-20 23:10:02.47', N'Xác th?c tài kho?n [director] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(849, N'manager', N'Đăng nhập hệ thống', N'2026-10-20 23:10:02.53', N'Xác th?c tài kho?n [manager] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(850, N'pos', N'Đăng nhập hệ thống', N'2026-10-20 23:10:02.59', N'Xác th?c tài kho?n [pos] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(851, N'admin', N'Đăng nhập hệ thống', N'2026-10-20 23:10:02.65', N'Xác th?c tài kho?n [admin] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(852, N'customer', N'Đăng nhập hệ thống', N'2026-10-20 23:10:02.71', N'Xác th?c tài kho?n [customer] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(853, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:10:02.85', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðã d?t tru?c] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(854, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:10:02.907', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Ðã d?t tru?c] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(855, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:10:02.937', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(856, N'manager', N'Đăng nhập thất bại', N'2026-10-20 23:10:03.023', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(857, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:10:03.067', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [B?o trì]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(858, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:10:03.07', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [B?o trì] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(863, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:10:03.18', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(865, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:10:03.193', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(868, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:13:57.183', N'Sân [CL02 - Sân c?u lông 2] chuy?n t? [Tr?ng] sang [Ðã d?t tru?c]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(870, N'director', N'Đăng nhập hệ thống', N'2026-10-20 23:13:57.593', N'Xác th?c tài kho?n [director] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(871, N'pos', N'Đăng nhập hệ thống', N'2026-10-20 23:13:57.747', N'Xác th?c tài kho?n [pos] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(872, N'admin', N'Sao lưu cơ sở dữ liệu', N'2026-10-20 23:13:57.94', N'T?o b?n sao luu backup_tc50_test_1792512837844.sql (Dung lu?ng: 280.17 KB, 1125 b?n ghi) thành công', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL),
+(873, N'admin', N'Đăng nhập hệ thống', N'2026-10-20 23:13:58.117', N'Xác th?c tài kho?n [admin] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(874, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:13:58.213', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(875, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:13:58.223', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Tr?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(876, N'manager', N'Đăng nhập hệ thống', N'2026-10-20 23:13:58.443', N'Xác th?c tài kho?n [manager] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(877, N'customer', N'Đăng nhập hệ thống', N'2026-10-20 23:13:58.543', N'Xác th?c tài kho?n [customer] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(878, N'non_existent_user_xyz', N'Đăng nhập thất bại', N'2026-10-20 23:13:58.593', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(879, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:13:58.667', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Tr?ng] sang [Ðang s? d?ng]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(880, N'SYSTEM_COURT_MONITOR', N'Cập nhật trạng thái sân', N'2026-10-20 23:13:58.84', N'Sân [CL01 - Sân c?u lông 1 (VIP Yonex)] chuy?n t? [Ðang s? d?ng] sang [Ðã d?t tru?c]', N'127.0.0.1', N'Giám Sát Sân Bãi', N'Thành công', NULL),
+(881, N'admin', N'Đăng nhập thất bại', N'2026-10-20 23:13:58.92', N'Ðang nh?p không thành công: Tài kho?n ho?c m?t kh?u không chính xác!', N'127.0.0.1', N'An ninh & Đăng nhập', N'Cảnh báo', NULL),
+(882, N'tc12_user_1792512838975', N'Đăng nhập hệ thống', N'2026-10-20 23:13:59.12', N'Xác th?c tài kho?n [tc12_user_1792512838975] thành công qua c?ng b?o m?t', N'127.0.0.1', N'An ninh & Đăng nhập', N'Thành công', NULL),
+(883, N'test_admin', N'Tải lên bản sao lưu', N'2026-10-20 23:14:01.853', N'T?i lên t?p sao luu test_unit_backup.sql (Dung lu?ng: 0.03 KB) t? máy tính', N'127.0.0.1', N'Hệ thống sao lưu', N'Thành công', NULL);
 SET IDENTITY_INSERT audit_logs OFF;
 GO
 
