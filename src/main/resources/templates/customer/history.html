@@ -430,9 +430,40 @@
         max-width: 360px;
         margin: auto;
       }
+      #paymentModal .modal-card {
+        width: 95vw !important;
+        margin: 10px auto !important;
+        max-height: 94vh !important;
+      }
+      #paymentModal .modal-card > div:first-child {
+        padding: 14px 16px !important;
+      }
+      #paymentModal .modal-card > div:last-child {
+        padding: 16px 14px !important;
+      }
+      #paymentModal #payModalQrImg {
+        width: 175px !important;
+        height: 175px !important;
+      }
+      .btn-save-qr {
+        max-width: 100% !important;
+        padding: 11px 16px !important;
+      }
       .cust-footer-dark {
         display: none !important;
       }
+    }
+
+    .btn-save-qr {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-save-qr:hover {
+      background: #d1fae5 !important;
+      border-color: #059669 !important;
+      transform: translateY(-1px);
+    }
+    .btn-save-qr:active {
+      transform: scale(0.97);
     }
   
     /* LUXURY TOP NAVBAR & FOOTER STYLES */
@@ -841,11 +872,16 @@
 
       <div style="padding: 22px 24px; max-height: calc(85vh - 120px); overflow-y: auto;">
         <!-- QR Frame -->
-        <div style="text-align: center; margin-bottom: 18px;">
+        <div style="text-align: center; margin-bottom: 16px;">
           <div style="display: inline-block; padding: 12px; background: #ffffff; border: 2px solid var(--primary, #10b981); border-radius: 14px; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15);">
             <img id="payModalQrImg" src="/images/vietqr-bank.png" onerror="this.src='https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=30000&addInfo=CK%20DAT%20SAN&accountName=UTE%20BADMINTON%20CLUB'" alt="Mã VietQR Chuyển Khoản" style="width: 190px; height: 190px; object-fit: contain; display: block; margin: 0 auto;">
           </div>
-          <div style="font-size: 11px; font-weight: 700; color: var(--primary, #10b981); margin-top: 6px; letter-spacing: 0.5px;">QUÉT BẰNG APP NGÂN HÀNG HOẶC VÍ ĐIỆN TỬ</div>
+          <div style="font-size: 11px; font-weight: 700; color: var(--primary, #10b981); margin: 6px 0 10px; letter-spacing: 0.5px;">QUÉT BẰNG APP NGÂN HÀNG HOẶC VÍ ĐIỆN TỬ</div>
+          <button type="button" class="btn-save-qr" onclick="savePayModalQrImage()" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; max-width: 260px; padding: 10px 16px; border-radius: 12px; background: #ecfdf5; border: 1.5px solid #10b981; color: #047857; font-weight: 700; font-size: 13.5px; cursor: pointer; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.12); transition: all 0.2s;">
+            <svg viewBox="0 0 24 24" style="width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2.2;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Lưu Ảnh QR Về Máy</span>
+          </button>
+          <div style="font-size: 11.5px; color: var(--cust-text-muted, #64748b); margin-top: 5px;">Mở App Ngân Hàng chọn <em>"Quét QR từ thư viện ảnh"</em> để chuyển tiền nhanh</div>
         </div>
 
         <!-- Bank Info Table -->
@@ -1432,6 +1468,38 @@
       const modal = document.getElementById('paymentModal');
       if (modal) modal.classList.remove('open');
       activePaymentModalBooking = null;
+    }
+
+    async function savePayModalQrImage() {
+      const img = document.getElementById('payModalQrImg');
+      const code = activePaymentModalBooking ? activePaymentModalBooking.bookingCode : (document.getElementById('payModalCode').textContent || 'DATSAN');
+      const url = img ? img.src : null;
+      if (!url) {
+        showToast('Không tìm thấy hình ảnh mã QR!', 'error');
+        return;
+      }
+      const btn = document.querySelector('#paymentModal .btn-save-qr');
+      const origText = btn ? btn.innerHTML : '';
+      if (btn) btn.innerHTML = '<span style="font-size: 12px;">Đang tải ảnh...</span>';
+
+      try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `VietQR-${code}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
+        showToast('Đã lưu mã QR vào máy! Mở app ngân hàng chọn "Quét QR từ ảnh" để thanh toán.', 'success');
+      } catch (err) {
+        window.open(url, '_blank');
+        showToast('Đã mở ảnh mã QR. Nhấn giữ ảnh rồi chọn "Lưu hình ảnh" nhé!', 'info');
+      } finally {
+        if (btn) btn.innerHTML = origText;
+      }
     }
 
     async function confirmDepositInModal() {

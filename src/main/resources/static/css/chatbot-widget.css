@@ -414,6 +414,26 @@ body.chatbot-open #ute-chatbot-toggle {
   filter: brightness(1.08);
 }
 
+.chat-save-qr-btn {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.chat-save-qr-btn:hover {
+  background: #d1fae5 !important;
+  border-color: #059669 !important;
+  transform: translateY(-1px);
+}
+.chat-save-qr-btn:active {
+  transform: scale(0.97);
+}
+[data-theme="dark"] .chat-save-qr-btn {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+  border-color: #10b981 !important;
+}
+[data-theme="dark"] .chat-save-qr-btn:hover {
+  background: rgba(16, 185, 129, 0.25) !important;
+}
+
 /* Structured Card: Lookup Result */
 .chat-lookup-card {
   margin-top: 10px;

@@ -602,6 +602,11 @@
               </div>
             </div>
 
+            <button type="button" class="chat-save-qr-btn" data-qr-url="${p.qrUrl}" data-code="${escapeHtml(p.bookingCode)}" style="display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; padding: 9px 12px; margin: 8px 0 10px; border-radius: 8px; background: #ecfdf5; border: 1.5px solid #10b981; color: #047857; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Lưu Ảnh QR Về Máy Để Chuyển Khoản</span>
+            </button>
+
             <button type="button" class="chat-pay-btn-submit" id="btn-confirm-pay-${p.bookingCode}" data-code="${p.bookingCode}">
               Xác nhận đã chuyển khoản cọc
             </button>
@@ -640,6 +645,33 @@
         btn.addEventListener('click', function () {
           const query = this.getAttribute('data-query');
           sendMessage(query);
+        });
+      });
+
+      // Bind Save QR Button
+      bubble.querySelectorAll('.chat-save-qr-btn').forEach(btn => {
+        btn.addEventListener('click', async function () {
+          const qrUrl = this.getAttribute('data-qr-url');
+          const code = this.getAttribute('data-code') || 'DATSAN';
+          if (!qrUrl) return;
+          const orig = this.innerHTML;
+          this.innerHTML = '<span style="font-size: 11.5px;">Đang lưu ảnh...</span>';
+          try {
+            const res = await fetch(qrUrl);
+            const blob = await res.blob();
+            const bUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = bUrl;
+            a.download = `VietQR-${code}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(bUrl), 1500);
+          } catch (e) {
+            window.open(qrUrl, '_blank');
+          } finally {
+            this.innerHTML = orig;
+          }
         });
       });
 

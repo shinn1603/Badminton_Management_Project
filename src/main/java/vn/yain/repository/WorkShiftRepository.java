@@ -12,6 +12,7 @@ public interface WorkShiftRepository extends JpaRepository<WorkShift, Long> {
     Optional<WorkShift> findByShiftCode(String shiftCode);
     List<WorkShift> findByBranchCode(String branchCode);
     List<WorkShift> findByStaffCode(String staffCode);
+    List<WorkShift> findByBranchCodeAndDayOfWeekAndShiftType(String branchCode, String dayOfWeek, String shiftType);
     void deleteByStaffCode(String staffCode);
     void deleteByDayOfWeekAndShiftTypeAndStaffCode(String dayOfWeek, String shiftType, String staffCode);
     void deleteByBranchCode(String branchCode);
