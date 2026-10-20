@@ -483,6 +483,63 @@ public class ChatbotService {
         }
 
         // =========================================================================
+        // INTENT: YÊU CẦU HOÀN CỌC / HỖ TRỢ HOÀN TIỀN
+        // =========================================================================
+        if (matches(normalized, "hoan coc", "hoan tien", "nhan lai coc", "tra lai tien coc", "hoan lai tien", "cho hoan coc", "da hoan coc")) {
+            String targetCode = null;
+            Pattern codePattern = Pattern.compile("(?:ds\\s*)?(\\d{6})", Pattern.CASE_INSENSITIVE);
+            Matcher mCode = codePattern.matcher(normalized);
+            if (mCode.find()) {
+                targetCode = "DS" + mCode.group(1);
+            } else if (ctx.lastBookingCode != null) {
+                targetCode = ctx.lastBookingCode;
+            }
+
+            if (targetCode != null) {
+                Optional<Booking> optBooking = bookingRepository.findByBookingCode(targetCode);
+                if (optBooking.isPresent()) {
+                    Booking b = optBooking.get();
+                    if ("Chờ hoàn cọc".equalsIgnoreCase(b.getStatus())) {
+                        long dep = b.getDepositAmount() != null ? b.getDepositAmount().longValue() : 0L;
+                        return ChatMessageDto.builder()
+                                .sender("bot")
+                                .intent("REFUND_STATUS")
+                                .text(String.format(
+                                        "Đơn **%s** của bạn hiện đang ở trạng thái **Chờ hoàn cọc** với số tiền cọc: **%,d đ**.\n\n" +
+                                        "UTE Sport áp dụng hoàn 100%% cọc cho đơn hủy hợp lệ. Nhân viên kế toán / trực ban sẽ đối soát và giải ngân hoàn tiền cho bạn.\n\n" +
+                                        "Bạn vui lòng nhắn tin thông tin STK ngân hàng (Ngân hàng, Số tài khoản, Tên chủ thẻ) ngay tại đây hoặc bấm nút **'Gặp nhân viên tư vấn'** để được hỗ trợ chuyển khoản hoàn cọc ngay nhé!",
+                                        b.getBookingCode(), dep))
+                                .quickReplies(List.of("Gặp nhân viên tư vấn", "Xem Lịch Sử Đặt Sân", "Hotline: 1900 6868"))
+                                .actionType("NONE")
+                                .timestamp(LocalDateTime.now())
+                                .build();
+                    } else if ("Đã hoàn cọc".equalsIgnoreCase(b.getStatus())) {
+                        return ChatMessageDto.builder()
+                                .sender("bot")
+                                .intent("REFUND_DONE")
+                                .text(String.format("Đơn **%s** đã được bộ phận kế toán UTE Sport **hoàn tất chuyển khoản tiền cọc 100%%** thành công. Bạn vui lòng kiểm tra biến động số dư tài khoản nhé!", b.getBookingCode()))
+                                .quickReplies(List.of("Xem Lịch Sử Đặt Sân", "Bảng giá thuê sân"))
+                                .actionType("NONE")
+                                .timestamp(LocalDateTime.now())
+                                .build();
+                    }
+                }
+            }
+
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("REFUND_GUIDE")
+                    .text("Chính sách hoàn tiền cọc của Hệ thống Sân Cầu Lông UTE Sport:\n\n" +
+                            "• Hủy sân trước giờ thi đấu **từ 4 tiếng trở lên**: Hoàn 100% tiền cọc (Trạng thái đơn chuyển sang **Chờ hoàn cọc**).\n" +
+                            "• Hủy sân dưới 4 tiếng hoặc quá giờ: Không áp dụng hoàn cọc theo quy định.\n\n" +
+                            "Nếu bạn có đơn cần hoàn cọc, vui lòng gửi kèm mã đơn (ví dụ: 'Hoàn cọc đơn DS123456') hoặc bấm nút bên dưới để gặp nhân viên hỗ trợ trực tuyến.")
+                    .quickReplies(List.of("Gặp nhân viên tư vấn", "Xem Lịch Sử Đặt Sân", "Hotline: 1900 6868"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
         // INTENT: TIẾP TỤC THANH TOÁN / MỞ LẠI MÃ KHÓA SÂN & VIETQR
         // =========================================================================
         if (!normalized.contains("huy") && ("CONTINUE_PAYMENT".equals(mlTag) || matches(normalized,
@@ -729,17 +786,33 @@ public class ChatbotService {
 
                 try {
                     Booking cancelled = bookingService.cancelBooking(targetCode, "Khách yêu cầu hủy qua Chatbot");
-                    String reply = String.format(
-                            "Đơn đặt sân mã %s đã được hủy thành công.\n\n" +
-                            "Hệ thống đã tự động giải phóng %s tại %s để khách hàng khác có thể đặt.\n\n" +
-                            "Theo chính sách của UTE Sport, nếu ca chơi được hủy trước giờ bắt đầu trên 4 tiếng, 100%% số tiền cọc sẽ được hoàn lại vào tài khoản của quý khách.",
-                            targetCode, cancelled.getCourtCode(), cancelled.getBranchCode()
-                    );
+                    String reply;
+                    List<String> replies;
+                    if ("Chờ hoàn cọc".equalsIgnoreCase(cancelled.getStatus())) {
+                        reply = String.format(
+                                "Đơn đặt sân mã **%s** đã được hủy thành công.\n\n" +
+                                "Hệ thống đã tự động giải phóng %s tại %s để khách hàng khác có thể đặt.\n\n" +
+                                "Theo chính sách của UTE Sport, đơn của bạn đủ điều kiện **hoàn 100%% tiền cọc (%,d đ)**.\n" +
+                                "Trạng thái đơn hiện tại: **Chờ hoàn cọc**.\n\n" +
+                                "Bạn vui lòng bấm nút **'Gặp nhân viên'** bên dưới hoặc nhắn tin cung cấp Số tài khoản ngân hàng để nhân viên trực ban đối soát và chuyển khoản hoàn cọc cho bạn ngay nhé!",
+                                targetCode, cancelled.getCourtCode(), cancelled.getBranchCode(),
+                                cancelled.getDepositAmount() != null ? cancelled.getDepositAmount().longValue() : 0
+                        );
+                        replies = List.of("Gặp nhân viên tư vấn", "Xem Lịch Sử Đặt Sân", "Bảng giá thuê sân");
+                    } else {
+                        reply = String.format(
+                                "Đơn đặt sân mã %s đã được hủy thành công.\n\n" +
+                                "Hệ thống đã tự động giải phóng %s tại %s để khách hàng khác có thể đặt.\n\n" +
+                                "Lưu ý: Đơn hủy sát giờ thi đấu (< 4 tiếng) không áp dụng chính sách hoàn cọc.",
+                                targetCode, cancelled.getCourtCode(), cancelled.getBranchCode()
+                        );
+                        replies = List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Chi nhánh nào gần tôi?", "Bảng giá thuê sân");
+                    }
                     return ChatMessageDto.builder()
                             .sender("bot")
                             .intent("CANCEL_SUCCESS")
                             .text(reply)
-                            .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Chi nhánh nào gần tôi?", "Bảng giá thuê sân"))
+                            .quickReplies(replies)
                             .actionType("NONE")
                             .timestamp(LocalDateTime.now())
                             .build();

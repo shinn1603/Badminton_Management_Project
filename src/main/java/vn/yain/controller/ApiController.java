@@ -3340,6 +3340,17 @@ public class ApiController {
 
     }
 
+    @PostMapping("/bookings/{code}/confirm-refund")
+    public ResponseEntity<?> confirmRefundBooking(@PathVariable String code, @RequestBody(required = false) Map<String, String> payload) {
+        try {
+            String notes = payload != null ? payload.getOrDefault("notes", "Đã chuyển khoản hoàn tiền cọc") : "Đã chuyển khoản hoàn tiền cọc";
+            Booking updated = bookingService.confirmRefund(code, notes);
+            return ResponseEntity.ok(Map.of("success", true, "booking", updated));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", sanitizeErrorMessage(e)));
+        }
+    }
+
 
 
     // ==========================================

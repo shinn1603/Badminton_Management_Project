@@ -1739,10 +1739,23 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // React to realtime booking events from WebSocket
+  // React to realtime booking and court events from WebSocket
   window.addEventListener('badminton:booking-event', function(e) {
     if (currentDateStr) {
       renderGridForDate(currentDateStr);
     }
   });
+
+  window.addEventListener('badminton:court-event', function(e) {
+    if (currentDateStr) {
+      renderGridForDate(currentDateStr);
+    }
+  });
+
+  // Polling fallback every 5 seconds to ensure real-time consistency
+  setInterval(() => {
+    if (currentDateStr) {
+      renderGridForDate(currentDateStr);
+    }
+  }, 5000);
 });

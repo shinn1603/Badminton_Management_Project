@@ -29,6 +29,9 @@ class CourtServiceTest {
     private CourtRepository courtRepository;
 
     @Mock
+    private vn.yain.repository.BookingRepository bookingRepository;
+
+    @Mock
     private SimpMessagingTemplate messagingTemplate;
 
     @InjectMocks
@@ -62,7 +65,13 @@ class CourtServiceTest {
     @Test
     @DisplayName("Tra cuu toan bo san khi khong truyen branchCode")
     void testGetCourts_All() {
-        when(courtRepository.findAll()).thenReturn(Arrays.asList(new Court(), new Court(), new Court()));
+        Court c1 = new Court();
+        c1.setCourtCode("CL01");
+        Court c2 = new Court();
+        c2.setCourtCode("CL02");
+        Court c3 = new Court();
+        c3.setCourtCode("CL03");
+        when(courtRepository.findAll()).thenReturn(Arrays.asList(c1, c2, c3));
 
         List<Court> results = courtService.getCourts(null);
 
@@ -194,5 +203,72 @@ class CourtServiceTest {
         assertEquals(new BigDecimal("130000"), updated.getHourlyRate());
         assertEquals("Bảo trì", updated.getStatus());
         verify(courtRepository, times(1)).save(existing);
+    }
+
+    @Test
+    @DisplayName("Khách đánh xong (đơn từ hôm trước hoặc hết giờ): Sân tự động chuyển về Trống")
+    void testSyncCourtStatuses_FinishedBooking_BecomesAvailable() {
+        Court court = new Court();
+        court.setCourtCode("CL02");
+        court.setBranchCode("CN01");
+        court.setStatus("Đang sử dụng");
+
+        vn.yain.entity.Booking pastBooking = new vn.yain.entity.Booking();
+        pastBooking.setBookingCode("DS001");
+        pastBooking.setCourtCode("CL02");
+        pastBooking.setBookingDate(java.time.LocalDate.now(CourtService.VN_ZONE).minusDays(1)); // Đơn hôm qua
+        pastBooking.setTimeSlot("18:00 - 20:00");
+        pastBooking.setStatus("Đang sử dụng");
+
+        when(courtRepository.findAll()).thenReturn(List.of(court));
+        when(bookingRepository.findByCourtCode("CL02")).thenReturn(List.of(pastBooking));
+        when(bookingRepository.findByCourtCodeAndBookingDate(eq("CL02"), any(java.time.LocalDate.class)))
+                .thenReturn(List.of());
+        when(courtRepository.save(any(Court.class))).thenAnswer(i -> i.getArgument(0));
+
+        courtService.syncCourtStatusesWithCurrentBookings(List.of(court));
+
+        assertEquals("Trống", court.getStatus());
+        assertEquals("Hoàn thành", pastBooking.getStatus());
+        verify(courtRepository, atLeastOnce()).save(court);
+    }
+
+    @Test
+    @DisplayName("Sân bảo trì không bị ảnh hưởng bởi auto sync")
+    void testSyncCourtStatuses_MaintenanceCourt_StaysMaintenance() {
+        Court court = new Court();
+        court.setCourtCode("CL04");
+        court.setBranchCode("CN01");
+        court.setStatus("Bảo trì");
+
+        courtService.syncCourtStatusesWithCurrentBookings(List.of(court));
+
+        assertEquals("Bảo trì", court.getStatus());
+        verify(courtRepository, never()).save(court);
+    }
+
+    @Test
+    @DisplayName("Khi chuyển sân về Trống thủ công: Hoàn tất đơn đang sử dụng")
+    void testUpdateCourtStatus_ToAvailable_CompletesActiveBooking() {
+        Court court = new Court();
+        court.setCourtCode("CL01");
+        court.setStatus("Đang sử dụng");
+
+        vn.yain.entity.Booking activeBooking = new vn.yain.entity.Booking();
+        activeBooking.setBookingCode("DS002");
+        activeBooking.setCourtCode("CL01");
+        activeBooking.setBookingDate(java.time.LocalDate.now(CourtService.VN_ZONE));
+        activeBooking.setStatus("Đang sử dụng");
+
+        when(courtRepository.findByCourtCode("CL01")).thenReturn(Optional.of(court));
+        when(courtRepository.save(any(Court.class))).thenAnswer(i -> i.getArgument(0));
+        when(bookingRepository.findByCourtCodeAndBookingDate(eq("CL01"), any(java.time.LocalDate.class)))
+                .thenReturn(List.of(activeBooking));
+
+        Court result = courtService.updateCourtStatus("CL01", "Trống");
+
+        assertEquals("Trống", result.getStatus());
+        assertEquals("Hoàn thành", activeBooking.getStatus());
+        verify(bookingRepository, atLeastOnce()).save(activeBooking);
     }
 }

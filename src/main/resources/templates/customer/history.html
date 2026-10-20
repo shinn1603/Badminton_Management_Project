@@ -996,11 +996,50 @@
       });
     }
 
+    function parseBookingCreatedMs(createdAt) {
+      if (!createdAt) return Date.now();
+      if (Array.isArray(createdAt)) {
+        return new Date(createdAt[0], createdAt[1] - 1, createdAt[2], createdAt[3] || 0, createdAt[4] || 0, createdAt[5] || 0).getTime();
+      }
+      let str = String(createdAt).trim();
+      if (!str.includes('Z') && !str.match(/[+-]\d{2}:?\d{2}$/)) {
+        str += '+07:00';
+      }
+      let ms = new Date(str).getTime();
+      if (isNaN(ms)) {
+        ms = new Date(createdAt).getTime();
+      }
+      if (isNaN(ms)) return Date.now();
+
+      // If server ran in UTC and emitted timestamp ~7 hours behind local Vietnam time
+      const now = Date.now();
+      if (now - ms > 6 * 3600 * 1000 && now - ms < 8 * 3600 * 1000) {
+        ms += 7 * 3600 * 1000;
+      }
+      return ms;
+    }
+
     function formatCountdown(sec) {
       if (sec <= 0) return '00:00 (Hết hạn)';
       const m = Math.floor(sec / 60);
       const s = sec % 60;
       return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function openChatbotForRefund(bookingCode) {
+      const toggle = document.getElementById('ute-chatbot-toggle');
+      const win = document.getElementById('ute-chatbot-window');
+      const input = document.getElementById('chatbot-input-field');
+      const sendBtn = document.getElementById('chatbot-send-btn');
+      if (win && !win.classList.contains('open') && toggle) {
+        toggle.click();
+      }
+      setTimeout(() => {
+        if (input && sendBtn) {
+          input.value = `Tôi muốn nhận hoàn cọc cho đơn ${bookingCode}`;
+          sendBtn.click();
+        }
+      }, 350);
     }
 
     let pendingInterval = null;
@@ -1012,7 +1051,7 @@
           const code = wrap.getAttribute('data-code');
           const createdStr = wrap.getAttribute('data-created');
           if (!createdStr) return;
-          const createdMs = new Date(createdStr).getTime();
+          const createdMs = parseBookingCreatedMs(createdStr);
           const expiresAt = createdMs + 10 * 60 * 1000;
           const rem = Math.floor((expiresAt - Date.now()) / 1000);
           const textEl = document.getElementById(`timer-text-${code}`);
@@ -1029,8 +1068,9 @@
         });
 
         // 2. Update payment modal if open
-        if (activePaymentModalBooking && activePaymentModalBooking.createdAt) {
-          const createdMs = new Date(activePaymentModalBooking.createdAt).getTime();
+        if (activePaymentModalBooking) {
+          const cTime = activePaymentModalBooking.createdAt || activePaymentModalBooking.bookingDate;
+          const createdMs = parseBookingCreatedMs(cTime);
           const expiresAt = createdMs + 10 * 60 * 1000;
           const rem = Math.floor((expiresAt - Date.now()) / 1000);
           const timerEl = document.getElementById('payModalTimer');
@@ -1131,8 +1171,20 @@
         let badgeText = rawStatus;
 
         const isPendingDeposit = rawStatus.includes('Chờ cọc') || rawStatus.includes('Chờ thanh toán') || rawStatus.includes('Tạm khóa') || rawStatus.includes('giữ chỗ');
+        const isPendingRefund = rawStatus.includes('Chờ hoàn cọc') || rawStatus.includes('chờ hoàn cọc');
+        const isRefunded = rawStatus.includes('Đã hoàn cọc') || rawStatus.includes('đã hoàn cọc');
 
-        if (rawStatus.includes('hủy') || rawStatus.includes('Hủy')) {
+        if (isPendingRefund) {
+          category = 'cancelled';
+          badgeClass = 'badge-warning';
+          badgeText = 'Chờ Hoàn Cọc (Hỗ Trợ 24/7)';
+          cancelledCount++;
+        } else if (isRefunded) {
+          category = 'cancelled';
+          badgeClass = 'badge-blue';
+          badgeText = 'Đã Hoàn Cọc 100%';
+          cancelledCount++;
+        } else if (rawStatus.includes('hủy') || rawStatus.includes('Hủy')) {
           category = 'cancelled';
           badgeClass = 'badge-danger';
           badgeText = 'Đã Hủy';
@@ -1166,7 +1218,7 @@
         let isExpired = false;
         let remainingSec = 600;
         if (item.createdAt) {
-          const createdMs = new Date(item.createdAt).getTime();
+          const createdMs = parseBookingCreatedMs(item.createdAt);
           remainingSec = Math.floor((createdMs + 10 * 60 * 1000 - Date.now()) / 1000);
           if (remainingSec <= 0) isExpired = true;
         }
@@ -1236,6 +1288,19 @@
                   <a href="/customer/booking" class="btn btn-outline">
                     Đặt Lại
                   </a>
+                ` : isPendingRefund ? `
+                  <button type="button" class="btn btn-warning" onclick="openChatbotForRefund('${item.bookingCode}')" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; cursor: pointer;">
+                    <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <span>Nhắn Nhân Viên Hoàn Cọc</span>
+                  </button>
+                  <button type="button" class="btn btn-outline" onclick="copyText('${item.bookingCode}')" style="font-size: 12.5px;">
+                    Sao Chép Mã Đơn
+                  </button>
+                ` : isRefunded ? `
+                  <button type="button" class="btn btn-outline" disabled style="opacity: 0.9; border-color: #38bdf8; color: #0284c7; cursor: default; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <span>Đã Hoàn Cọc 100%</span>
+                  </button>
                 ` : `
                   <button type="button" class="btn btn-outline" disabled style="opacity: 0.6; cursor: not-allowed;">
                     Đã Hủy Hoàn Tất
@@ -1355,7 +1420,7 @@
       }
 
       if (b.createdAt) {
-        const createdMs = new Date(b.createdAt).getTime();
+        const createdMs = parseBookingCreatedMs(b.createdAt);
         const rem = Math.floor((createdMs + 10 * 60 * 1000 - Date.now()) / 1000);
         document.getElementById('payModalTimer').textContent = formatCountdown(rem);
       }

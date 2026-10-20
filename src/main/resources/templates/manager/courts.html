@@ -591,6 +591,17 @@
               <span style="display: inline-block; width: 7px; height: 7px; background: #f59e0b; border-radius: 50%; box-shadow: 0 0 6px #f59e0b;"></span>
               Đang có khách thi đấu
             </div>
+            <div style="margin-top: 8px; display: flex; gap: 8px;">
+              <button type="button" class="btn btn-outline" style="flex: 1; padding: 6px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${safeName}', '${safeType}', ${c.hourlyRate}, '${c.status}')">Chỉnh sửa</button>
+              <button type="button" class="btn btn-success" style="flex: 1; padding: 6px 8px; font-size: 11.5px; background: #059669; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;" onclick="quickUpdateStatus('${c.courtCode}', 'Trống')" title="Khách đánh xong, chuyển ngay về trạng thái Trống">Trả sân (Về trống)</button>
+            </div>
+          `;
+        } else if (c.status === 'Đã đặt trước') {
+          actionButtonsHtml = `
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
+              <button type="button" class="btn btn-outline" style="flex: 1; padding: 6px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${safeName}', '${safeType}', ${c.hourlyRate}, '${c.status}')">Chỉnh sửa</button>
+              <button type="button" class="btn btn-outline" style="flex: 1; padding: 6px 8px; font-size: 11.5px; border-color: #10b981; color: #10b981;" onclick="quickUpdateStatus('${c.courtCode}', 'Trống')" title="Chuyển về trạng thái Trống">Hủy đặt (Về trống)</button>
+            </div>
           `;
         } else if (c.status === 'Bảo trì') {
           actionButtonsHtml = `
@@ -674,6 +685,8 @@
             <td style="text-align: right;">
               <div style="display: inline-flex; gap: 6px; justify-content: flex-end;">
                 <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px;" onclick="openCourtModal('${c.courtCode}', '${safeName}', '${safeType}', ${c.hourlyRate}, '${c.status}')">Sửa</button>
+                ${c.status === 'Đang sử dụng' ? `<button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; border-color: #059669; color: #059669;" onclick="quickUpdateStatus('${c.courtCode}', 'Trống')" title="Khách đánh xong, trả về sân trống">Trả sân</button>` : ''}
+                ${c.status === 'Đã đặt trước' ? `<button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; border-color: #10b981; color: #10b981;" onclick="quickUpdateStatus('${c.courtCode}', 'Trống')" title="Chuyển về trạng thái Trống">Hủy đặt</button>` : ''}
                 ${c.status === 'Bảo trì' ? `<button class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; border-color: #10b981; color: #10b981;" onclick="quickUpdateStatus('${c.courtCode}', 'Trống')" title="Chuyển về trạng thái Trống">Hoàn tất</button>` : ''}
                 ${c.status === 'Trống' ? `<a href="/manager/bookings?court=${c.courtCode}" class="btn btn-primary" style="padding: 4px 8px; font-size: 11.5px; text-decoration: none;">Đặt sân</a>` : ''}
               </div>
@@ -829,9 +842,18 @@
       const savedTheme = localStorage.getItem('utesport_theme') || 'light';
       document.documentElement.setAttribute('data-theme', savedTheme);
       loadCourtsFromApi();
+
+      // Realtime auto-refresh polling every 3.5 seconds
+      setInterval(() => {
+        loadCourtsFromApi();
+      }, 3500);
     });
 
     window.addEventListener('badminton:court-event', () => {
+      loadCourtsFromApi();
+    });
+
+    window.addEventListener('badminton:booking-event', () => {
       loadCourtsFromApi();
     });
   </script>

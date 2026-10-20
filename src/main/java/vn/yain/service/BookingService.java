@@ -31,6 +31,8 @@ import java.util.regex.Pattern;
 @Transactional
 public class BookingService {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(BookingService.class);
+
     @Autowired
     private BookingRepository bookingRepository;
 
@@ -688,6 +690,11 @@ public class BookingService {
     /**
      * Cancel booking
      */
+    /**
+     * Hủy đặt sân & xử lý hoàn cọc:
+     * - Nếu đơn đã cọc tiền và hủy trước giờ đánh >= 4 tiếng -> Chuyển sang "Chờ hoàn cọc"
+     * - Nếu đơn chưa cọc tiền (Chờ cọc 30%) hoặc hủy sát giờ (< 4 tiếng) -> Chuyển sang "Đã hủy"
+     */
     public Booking cancelBooking(String bookingCode, String reason) {
         Booking booking = bookingRepository.findByBookingCode(bookingCode)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn: " + bookingCode));
@@ -695,12 +702,40 @@ public class BookingService {
         if ("Hoàn thành".equalsIgnoreCase(booking.getStatus())) {
             throw new IllegalStateException("Đơn đặt sân [" + bookingCode + "] đã hoàn thành, không thể hủy!");
         }
-        if ("Đã hủy".equalsIgnoreCase(booking.getStatus())) {
+        if ("Đã hủy".equalsIgnoreCase(booking.getStatus()) || "Đã hoàn cọc".equalsIgnoreCase(booking.getStatus())) {
             return booking;
         }
 
-        booking.setStatus("Đã hủy");
-        booking.setNotes((booking.getNotes() != null ? booking.getNotes() + " | " : "") + "Hủy: " + reason);
+        String curStatus = booking.getStatus() != null ? booking.getStatus() : "";
+        boolean isUnpaid = curStatus.contains("Chờ cọc");
+        boolean hasDeposit = booking.getDepositAmount() != null && booking.getDepositAmount().compareTo(BigDecimal.ZERO) > 0 && !isUnpaid;
+
+        // Tính thời gian trước giờ chơi (mặc định ngưỡng 4 tiếng theo chính sách)
+        boolean isEligibleForRefund = false;
+        try {
+            int startHour = 18;
+            if (booking.getTimeSlot() != null) {
+                Matcher m = Pattern.compile("(\\d{1,2}):00").matcher(booking.getTimeSlot());
+                if (m.find()) {
+                    startHour = Integer.parseInt(m.group(1));
+                }
+            }
+            LocalDate bDate = booking.getBookingDate() != null ? booking.getBookingDate() : LocalDate.now();
+            LocalDateTime matchStart = bDate.atTime(startHour, 0);
+            long hoursDiff = java.time.Duration.between(LocalDateTime.now(), matchStart).toHours();
+            isEligibleForRefund = hoursDiff >= 4;
+        } catch (Exception e) {
+            isEligibleForRefund = true;
+        }
+
+        String newStatus = "Đã hủy";
+        if (hasDeposit && isEligibleForRefund) {
+            booking.setNotes((booking.getNotes() != null ? booking.getNotes() + " | " : "") + "Hủy trước 4h, chờ hoàn cọc " + (booking.getDepositAmount() != null ? booking.getDepositAmount().longValue() : 0) + "đ: " + reason);
+        } else {
+            booking.setNotes((booking.getNotes() != null ? booking.getNotes() + " | " : "") + (hasDeposit ? "Hủy sát giờ (<4h, không hoàn cọc): " : "Hủy: ") + reason);
+        }
+
+        booking.setStatus(newStatus);
         Booking saved = bookingRepository.save(booking);
 
         courtRepository.findByCourtCode(booking.getCourtCode()).ifPresent(court -> {
@@ -714,14 +749,14 @@ public class BookingService {
         // Ghi AuditLog hủy đặt sân
         if (auditLogRepository != null) {
             try {
-                vn.yain.entity.AuditLog log = new vn.yain.entity.AuditLog();
-                log.setUsername(booking.getCustomerPhone() != null && !booking.getCustomerPhone().isBlank() ? booking.getCustomerPhone() : "Khách hàng");
-                log.setActionType("HỦY ĐẶT SÂN & THU HỒI CỌC");
-                log.setModule("Đặt sân & Thu ngân");
-                log.setStatus("Thành công");
-                log.setActionTime(LocalDateTime.now());
-                log.setDetails("Hủy đơn " + bookingCode + " (Sân " + booking.getCourtCode() + ", " + booking.getBookingDate() + " khung " + booking.getTimeSlot() + "). Tiền cọc: " + (booking.getDepositAmount() != null ? booking.getDepositAmount() : "0") + "đ. Lý do: " + reason);
-                auditLogRepository.save(log);
+                vn.yain.entity.AuditLog auditLogEntry = new vn.yain.entity.AuditLog();
+                auditLogEntry.setUsername(booking.getCustomerPhone() != null && !booking.getCustomerPhone().isBlank() ? booking.getCustomerPhone() : "Khách hàng");
+                auditLogEntry.setActionType("Chờ hoàn cọc".equalsIgnoreCase(newStatus) ? "HỦY ĐƠN & CHỜ HOÀN CỌC" : "HỦY ĐẶT SÂN & THU HỒI CỌC");
+                auditLogEntry.setModule("Đặt sân & Thu ngân");
+                auditLogEntry.setStatus("Thành công");
+                auditLogEntry.setActionTime(LocalDateTime.now());
+                auditLogEntry.setDetails("Hủy đơn " + bookingCode + " (Trạng thái mới: " + newStatus + ", Sân " + booking.getCourtCode() + ", " + booking.getBookingDate() + " khung " + booking.getTimeSlot() + "). Tiền cọc: " + (booking.getDepositAmount() != null ? booking.getDepositAmount() : "0") + "đ. Lý do: " + reason);
+                auditLogRepository.save(auditLogEntry);
             } catch (Exception ignored) {}
         }
 
@@ -732,9 +767,63 @@ public class BookingService {
                 .branchCode(saved.getBranchCode())
                 .customerName(saved.getCustomerName())
                 .status(saved.getStatus())
-                .message("Đã hủy đơn đặt sân [" + bookingCode + "]")
+                .message("Đã hủy đơn đặt sân [" + bookingCode + "] - Trạng thái: " + newStatus)
                 .timestamp(LocalDateTime.now())
                 .build());
+
+        if (emailService != null) {
+            try {
+                emailService.sendCancellationNotice(saved, reason);
+            } catch (Exception e) {
+                log.warn("[BOOKING] Không thể gửi email thông báo hủy/hoàn cọc cho đơn {}: {}", bookingCode, e.getMessage());
+            }
+        }
+
+        return saved;
+    }
+
+    /**
+     * Xác nhận đã hoàn cọc cho khách hàng (Dành cho Thu ngân / Quản lý)
+     */
+    public Booking confirmRefund(String bookingCode, String staffNotes) {
+        Booking booking = bookingRepository.findByBookingCode(bookingCode)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn: " + bookingCode));
+
+        booking.setStatus("Đã hoàn cọc");
+        booking.setNotes((booking.getNotes() != null ? booking.getNotes() + " | " : "") + "Đã hoàn cọc: " + (staffNotes != null ? staffNotes : "Chuyển khoản hoàn cọc thành công"));
+        Booking saved = bookingRepository.save(booking);
+
+        if (auditLogRepository != null) {
+            try {
+                vn.yain.entity.AuditLog auditLogEntry = new vn.yain.entity.AuditLog();
+                auditLogEntry.setUsername("Thu ngân");
+                auditLogEntry.setActionType("XÁC NHẬN HOÀN CỌC");
+                auditLogEntry.setModule("Đặt sân & Thu ngân");
+                auditLogEntry.setStatus("Thành công");
+                auditLogEntry.setActionTime(LocalDateTime.now());
+                auditLogEntry.setDetails("Xác nhận đã hoàn trả tiền cọc " + (booking.getDepositAmount() != null ? booking.getDepositAmount() : "0") + "đ cho đơn " + bookingCode + ". Ghi chú: " + staffNotes);
+                auditLogRepository.save(auditLogEntry);
+            } catch (Exception ignored) {}
+        }
+
+        broadcastBookingEvent(BookingNotificationDto.builder()
+                .eventType("BOOKING_REFUNDED")
+                .bookingCode(bookingCode)
+                .courtCode(saved.getCourtCode())
+                .branchCode(saved.getBranchCode())
+                .customerName(saved.getCustomerName())
+                .status(saved.getStatus())
+                .message("Đã hoàn trả tiền cọc đơn [" + bookingCode + "]")
+                .timestamp(LocalDateTime.now())
+                .build());
+
+        if (emailService != null) {
+            try {
+                emailService.sendRefundCompletedNotice(saved, staffNotes);
+            } catch (Exception e) {
+                log.warn("[BOOKING] Không thể gửi email thông báo hoàn cọc thành công cho đơn {}: {}", bookingCode, e.getMessage());
+            }
+        }
 
         return saved;
     }

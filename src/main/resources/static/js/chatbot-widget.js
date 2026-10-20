@@ -336,10 +336,32 @@
       } catch (e) {}
     }
 
+    function parseBookingCreatedMs(createdAt) {
+      if (!createdAt) return Date.now();
+      if (Array.isArray(createdAt)) {
+        return new Date(createdAt[0], createdAt[1] - 1, createdAt[2], createdAt[3] || 0, createdAt[4] || 0, createdAt[5] || 0).getTime();
+      }
+      let str = String(createdAt).trim();
+      if (!str.includes('Z') && !str.match(/[+-]\d{2}:?\d{2}$/)) {
+        str += '+07:00';
+      }
+      let ms = new Date(str).getTime();
+      if (isNaN(ms)) {
+        ms = new Date(createdAt).getTime();
+      }
+      if (isNaN(ms)) return Date.now();
+
+      const now = Date.now();
+      if (now - ms > 6 * 3600 * 1000 && now - ms < 8 * 3600 * 1000) {
+        ms += 7 * 3600 * 1000;
+      }
+      return ms;
+    }
+
     const activeChatTimers = {};
     function startChatPaymentTimer(bookingCode, createdAt) {
       if (activeChatTimers[bookingCode]) clearInterval(activeChatTimers[bookingCode]);
-      const createdMs = createdAt ? new Date(createdAt).getTime() : Date.now();
+      const createdMs = createdAt ? parseBookingCreatedMs(createdAt) : Date.now();
       const expiresAt = createdMs + 10 * 60 * 1000;
 
       const update = () => {

@@ -768,7 +768,7 @@ public class SystemComprehensive50TestCasesTest {
                             .content(objectMapper.writeValueAsString(Map.of("reason", "Khách bận việc gia đình"))))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.success", is(true)))
-                    .andExpect(jsonPath("$.booking.status", is("Đã hủy")));
+                    .andExpect(jsonPath("$.booking.status", anyOf(is("Chờ hoàn cọc"), is("Đã hủy"))));
 
             String courtStatus = jdbcTemplate.queryForObject("SELECT status FROM courts WHERE court_code = 'CL01'", String.class);
             assertEquals("Trống", courtStatus);

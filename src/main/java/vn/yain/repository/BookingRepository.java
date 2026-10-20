@@ -13,6 +13,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByBranchCodeOrderByBookingDateDesc(String branchCode);
     List<Booking> findAllByOrderByCreatedAtDesc();
     List<Booking> findByBranchCodeAndBookingDate(String branchCode, LocalDate bookingDate);
+    List<Booking> findByCourtCode(String courtCode);
     List<Booking> findByCourtCodeAndBookingDate(String courtCode, LocalDate bookingDate);
     List<Booking> findByCustomerPhone(String customerPhone);
     List<Booking> findByCustomerPhoneOrderByBookingDateDesc(String customerPhone);

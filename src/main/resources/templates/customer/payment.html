@@ -668,6 +668,29 @@
       }
     }, 1000);
 
+    function parseBookingCreatedMs(createdAt) {
+      if (!createdAt) return Date.now();
+      if (Array.isArray(createdAt)) {
+        return new Date(createdAt[0], createdAt[1] - 1, createdAt[2], createdAt[3] || 0, createdAt[4] || 0, createdAt[5] || 0).getTime();
+      }
+      let str = String(createdAt).trim();
+      if (!str.includes('Z') && !str.match(/[+-]\d{2}:?\d{2}$/)) {
+        str += '+07:00';
+      }
+      let ms = new Date(str).getTime();
+      if (isNaN(ms)) {
+        ms = new Date(createdAt).getTime();
+      }
+      if (isNaN(ms)) return Date.now();
+
+      // If server ran in UTC and emitted timestamp ~7 hours behind local Vietnam time
+      const now = Date.now();
+      if (now - ms > 6 * 3600 * 1000 && now - ms < 8 * 3600 * 1000) {
+        ms += 7 * 3600 * 1000;
+      }
+      return ms;
+    }
+
     async function loadBookingPaymentDetails() {
       const urlParams = new URLSearchParams(window.location.search);
       let code = urlParams.get('bookingCode') || urlParams.get('code');
@@ -747,7 +770,7 @@
 
         // Calculate countdown based on actual createdAt
         if (b.createdAt) {
-          const createdMs = new Date(b.createdAt).getTime();
+          const createdMs = parseBookingCreatedMs(b.createdAt);
           const expiresAt = createdMs + 10 * 60 * 1000;
           secondsLeft = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
         }

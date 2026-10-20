@@ -745,7 +745,212 @@ public class EmailService {
     }
 
     // =========================================================================
+    // 2.2 GỬI THÔNG BÁO HỦY ĐẶT SÂN & HƯỚNG DẪN HOÀN TIỀN CỌC
+    // =========================================================================
+
+    public void sendCancellationNotice(Booking booking, String reason) {
+        if (booking == null) return;
+
+        String toEmail = booking.getCustomerEmail();
+        if (toEmail == null || toEmail.isBlank() || !toEmail.contains("@")) {
+            if (booking.getCustomerCode() != null) {
+                Customer c = customerRepository.findByCustomerCode(booking.getCustomerCode()).orElse(null);
+                if (c != null && c.getEmail() != null && c.getEmail().contains("@")) {
+                    toEmail = c.getEmail();
+                }
+            }
+            if (toEmail == null || toEmail.isBlank()) {
+                if (booking.getCustomerPhone() != null) {
+                    User u = userRepository.findByPhone(booking.getCustomerPhone()).orElse(null);
+                    if (u != null && u.getEmail() != null && u.getEmail().contains("@")) {
+                        toEmail = u.getEmail();
+                    }
+                }
+            }
+        }
+
+        if (toEmail == null || toEmail.isBlank() || !toEmail.contains("@")) {
+            log.info("[EMAIL SERVICE] Đơn hủy [{}] không có email khách hàng, bỏ qua gửi mail.", booking.getBookingCode());
+            return;
+        }
+
+        boolean isWaitingRefund = "Chờ hoàn cọc".equalsIgnoreCase(booking.getStatus());
+        BigDecimal deposit = booking.getDepositAmount() != null ? booking.getDepositAmount() : BigDecimal.ZERO;
+        String dateStr = booking.getBookingDate() != null ? booking.getBookingDate().format(DATE_FMT) : "Hôm nay";
+
+        String subject = isWaitingRefund
+                ? "[UTE Sport] Hướng dẫn nhận hoàn tiền cọc 100% cho đơn: " + booking.getBookingCode()
+                : "[UTE Sport] Xác nhận hủy đơn đặt sân: " + booking.getBookingCode();
+
+        String html = String.format("""
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="UTF-8"></head>
+            <body style="font-family: 'Segoe UI', Arial, sans-serif; background-color: #f1f5f9; margin: 0; padding: 24px; color: #1e293b;">
+                <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+                    
+                    <!-- HEADER -->
+                    <div style="background: linear-gradient(135deg, #0f172a 0%%, #1e293b 100%%); padding: 24px; text-align: center; border-bottom: 3px solid %s;">
+                        <h1 style="color: #ffffff; margin: 0; font-size: 21px; font-weight: 800; letter-spacing: 0.5px;">UTE SPORT BADMINTON ARENA</h1>
+                        <p style="color: %s; font-weight: 700; margin: 6px 0 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                            %s
+                        </p>
+                    </div>
+
+                    <!-- BODY -->
+                    <div style="padding: 24px;">
+                        
+                        <!-- STATUS BADGE -->
+                        <div style="background: %s; border: 1px solid %s; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">MÃ ĐƠN HỦY</span><br>
+                                <strong style="font-size: 20px; color: #0f172a; letter-spacing: 1px;">%s</strong>
+                            </div>
+                            <div style="text-align: right;">
+                                <span style="display: inline-block; background: %s; color: #ffffff; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px;">
+                                    %s
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- DETAILS TABLE -->
+                        <table style="width: 100%%; border-collapse: collapse; font-size: 13.5px; margin-bottom: 20px;">
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 9px 0; color: #64748b; width: 40%%;">Khách hàng:</td>
+                                <td style="padding: 9px 0; font-weight: 600; color: #0f172a;">%s (%s)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 9px 0; color: #64748b;">Sân & Chi nhánh:</td>
+                                <td style="padding: 9px 0; font-weight: 600; color: #0f172a;">Sân %s (Cơ sở %s)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 9px 0; color: #64748b;">Thời gian đã đặt:</td>
+                                <td style="padding: 9px 0; font-weight: 600; color: #0f172a;">%s | %s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 9px 0; color: #64748b;">Số tiền cọc:</td>
+                                <td style="padding: 9px 0; font-weight: 800; color: %s;">%,d đ</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 9px 0; color: #64748b;">Lý do hủy:</td>
+                                <td style="padding: 9px 0; color: #475569; font-style: italic;">%s</td>
+                            </tr>
+                        </table>
+
+                        <!-- INSTRUCTION BOX -->
+                        %s
+
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div style="background: #f8fafc; padding: 18px 24px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b;">
+                        Hệ thống Sân Cầu Lông UTE Sport • Hotline hỗ trợ 24/7: <strong>1900 6868</strong> • <strong>028 3722 1223</strong><br>
+                        Email: cskh@utesport.vn • Website: https://utesport.vn
+                    </div>
+                </div>
+            </body>
+            </html>
+            """,
+            isWaitingRefund ? "#f59e0b" : "#ef4444",
+            isWaitingRefund ? "#f59e0b" : "#ef4444",
+            isWaitingRefund ? "HƯỚNG DẪN HOÀN TIỀN CỌC (REFUND)" : "XÁC NHẬN HỦY ĐẶT SÂN",
+            isWaitingRefund ? "#fffbeb" : "#fef2f2",
+            isWaitingRefund ? "#fde68a" : "#fecaca",
+            booking.getBookingCode(),
+            isWaitingRefund ? "#f59e0b" : "#ef4444",
+            isWaitingRefund ? "Chờ Hoàn Cọc 100%" : "Đã Hủy",
+            booking.getCustomerName() != null ? booking.getCustomerName() : "Quý khách",
+            booking.getCustomerPhone() != null ? booking.getCustomerPhone() : "",
+            booking.getCourtCode() != null ? booking.getCourtCode() : "",
+            booking.getBranchCode() != null ? booking.getBranchCode() : "",
+            dateStr,
+            booking.getTimeSlot() != null ? booking.getTimeSlot() : "",
+            isWaitingRefund ? "#047857" : "#64748b",
+            deposit.longValue(),
+            reason != null ? reason : "Khách yêu cầu hủy qua hệ thống",
+            isWaitingRefund
+                ? String.format("""
+                <div style="background: #f0fdf4; border: 1px dashed #10b981; border-radius: 12px; padding: 16px; margin-top: 15px;">
+                    <h3 style="margin: 0 0 8px; color: #047857; font-size: 14px;">BƯỚC TIẾP THEO ĐỂ NHẬN LẠI TIỀN CỌC:</h3>
+                    <p style="margin: 0 0 10px; font-size: 13px; line-height: 1.5; color: #15803d;">
+                        Do quý khách đã hủy trước giờ thi đấu trên 4 tiếng, quý khách được <strong>hoàn trả 100%% tiền cọc (%,d đ)</strong> theo chính sách bảo vệ quyền lợi hội viên UTE Sport.
+                    </p>
+                    <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #334155;">
+                        Quý khách vui lòng nhắn tin trực tiếp qua <strong>Chatbot trực tuyến trên website</strong> (hoặc phản hồi email này) kèm thông tin nhận tiền: <em>Tên ngân hàng, Số tài khoản, Tên chủ tài khoản</em> để nhân viên trực ban đối soát và chuyển khoản hoàn cọc ngay nhé!
+                    </p>
+                </div>
+                """, deposit.longValue())
+                : """
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-top: 15px; font-size: 13px; color: #64748b;">
+                    Đơn đặt sân đã được hủy và sân đã được giải phóng trên hệ thống. Cảm ơn quý khách đã tin tưởng dịch vụ của UTE Sport!
+                </div>
+                """
+        );
+
+        sendHtmlEmailAsync(toEmail, subject, html);
+    }
+
+    public void sendRefundCompletedNotice(Booking booking, String staffNotes) {
+        if (booking == null) return;
+
+        String toEmail = booking.getCustomerEmail();
+        if (toEmail == null || toEmail.isBlank() || !toEmail.contains("@")) {
+            if (booking.getCustomerCode() != null) {
+                Customer c = customerRepository.findByCustomerCode(booking.getCustomerCode()).orElse(null);
+                if (c != null && c.getEmail() != null && c.getEmail().contains("@")) {
+                    toEmail = c.getEmail();
+                }
+            }
+            if (toEmail == null || toEmail.isBlank()) {
+                if (booking.getCustomerPhone() != null) {
+                    User u = userRepository.findByPhone(booking.getCustomerPhone()).orElse(null);
+                    if (u != null && u.getEmail() != null && u.getEmail().contains("@")) {
+                        toEmail = u.getEmail();
+                    }
+                }
+            }
+        }
+
+        if (toEmail == null || toEmail.isBlank() || !toEmail.contains("@")) {
+            return;
+        }
+
+        BigDecimal deposit = booking.getDepositAmount() != null ? booking.getDepositAmount() : BigDecimal.ZERO;
+        String subject = "[UTE Sport] Hoàn tất hoàn tiền cọc cho đơn: " + booking.getBookingCode();
+        String html = String.format("""
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="UTF-8"></head>
+            <body style="font-family: 'Segoe UI', Arial, sans-serif; background-color: #f1f5f9; margin: 0; padding: 24px; color: #1e293b;">
+                <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+                    <div style="background: linear-gradient(135deg, #047857 0%%, #065f46 100%%); padding: 24px; text-align: center; border-bottom: 3px solid #10b981;">
+                        <h1 style="color: #ffffff; margin: 0; font-size: 21px; font-weight: 800;">UTE SPORT BADMINTON ARENA</h1>
+                        <p style="color: #a7f3d0; font-weight: 700; margin: 6px 0 0; font-size: 14px; text-transform: uppercase;">XÁC NHẬN ĐÃ HOÀN TRẢ TIỀN CỌC</p>
+                    </div>
+                    <div style="padding: 24px;">
+                        <p style="font-size: 14px; line-height: 1.6; color: #334155;">
+                            Kính gửi <strong>%s</strong>,<br><br>
+                            Bộ phận Kế toán UTE Sport xin thông báo đã hoàn tất lệnh chuyển khoản hoàn trả 100%% tiền cọc số tiền: <strong style="color: #047857; font-size: 16px;">%,d đ</strong> cho đơn đặt sân mã <strong>%s</strong>.<br><br>
+                            Ghi chú giao dịch: <em>%s</em>.<br><br>
+                            Quý khách vui lòng kiểm tra biến động số dư tài khoản ngân hàng. Rất mong được tiếp tục phục vụ quý khách vào các buổi tập luyện tiếp theo!
+                        </p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """,
+            booking.getCustomerName() != null ? booking.getCustomerName() : "Quý khách",
+            deposit.longValue(),
+            booking.getBookingCode(),
+            staffNotes != null ? staffNotes : "Chuyển khoản hoàn cọc thành công"
+        );
+
+        sendHtmlEmailAsync(toEmail, subject, html);
+    }
+
+    // =========================================================================
     // 3. GỬI PHIẾU XÁC NHẬN THAM GIA GIẢI ĐẤU (BM-KH03)
+    // =========================================================================
     // =========================================================================
 
     public void sendTournamentRegistration(Tournament tournament, TournamentRegistration reg, String targetEmail) {
