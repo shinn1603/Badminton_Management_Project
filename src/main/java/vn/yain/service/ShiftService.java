@@ -140,6 +140,9 @@ public class ShiftService {
             schedule.put(day, dayMap);
         }
 
+        Set<String> managerSlotEncountered = new HashSet<>();
+        List<WorkShift> duplicateShiftsToDelete = new ArrayList<>();
+
         for (WorkShift ws : shifts) {
             String day = ws.getDayOfWeek() != null ? ws.getDayOfWeek().toLowerCase() : "mon";
             String type = ws.getShiftType() != null ? ws.getShiftType().toLowerCase() : "morning";
@@ -150,11 +153,31 @@ public class ShiftService {
                 schedule.get(day).put(type, new ArrayList<>());
             }
 
+            String duty = recoverDuty(ws.getDuty(), ws.getStaffCode());
+            String icon = ws.getIcon() != null ? ws.getIcon() : "POS";
+
+            String slotKey = (ws.getBranchCode() != null ? ws.getBranchCode().trim() : "CN01") + "_" + day + "_" + type;
+            if (isManager(ws.getStaffCode(), duty, icon)) {
+                if (managerSlotEncountered.contains(slotKey)) {
+                    duplicateShiftsToDelete.add(ws);
+                    continue;
+                }
+                managerSlotEncountered.add(slotKey);
+            }
+
             Map<String, Object> item = new HashMap<>();
             item.put("staffId", ws.getStaffCode());
-            item.put("duty", recoverDuty(ws.getDuty(), ws.getStaffCode()));
-            item.put("icon", ws.getIcon() != null ? ws.getIcon() : "POS");
+            item.put("duty", duty);
+            item.put("icon", icon);
             schedule.get(day).get(type).add(item);
+        }
+
+        if (!duplicateShiftsToDelete.isEmpty()) {
+            try {
+                workShiftRepository.deleteAll(duplicateShiftsToDelete);
+            } catch (Exception e) {
+                // Ignore cleanup errors during read
+            }
         }
 
         Map<String, Object> response = new HashMap<>();
@@ -182,6 +205,31 @@ public class ShiftService {
         return duty.trim();
     }
 
+    public static boolean isManagerDuty(String duty, String icon) {
+        if ("MGR".equalsIgnoreCase(icon)) {
+            return true;
+        }
+        if (duty != null) {
+            String d = duty.trim().toLowerCase();
+            return d.contains("quản lý") || d.contains("quan ly") || d.contains("manager") || d.contains("qu?n l?");
+        }
+        return false;
+    }
+
+    public boolean isManager(String staffCode, String duty, String icon) {
+        if (isManagerDuty(duty, icon)) {
+            return true;
+        }
+        if (staffCode != null && !staffCode.trim().isEmpty()) {
+            Optional<Staff> s = staffRepository.findByStaffCode(staffCode.trim());
+            if (s.isPresent() && s.get().getPosition() != null) {
+                String pos = s.get().getPosition().toLowerCase();
+                return pos.contains("quản lý") || pos.contains("quan ly") || pos.contains("manager");
+            }
+        }
+        return false;
+    }
+
     public void assignShift(String day, String shift, String staffCode, String duty, String icon, String branchCode) {
         if (day == null || shift == null || staffCode == null) return;
         String d = day.trim().toLowerCase();
@@ -190,6 +238,23 @@ public class ShiftService {
         String br = (branchCode != null && !branchCode.trim().isEmpty()) ? branchCode.trim() : "CN01";
         String dt = recoverDuty(duty, st);
         String ic = (icon != null && !icon.trim().isEmpty()) ? icon.trim() : "POS";
+
+        // Ensure each shift has at most 1 manager
+        if (isManager(st, dt, ic)) {
+            List<WorkShift> existingShifts = workShiftRepository.findByBranchCodeAndDayOfWeekAndShiftType(br, d, s);
+            if (existingShifts != null) {
+                for (WorkShift existing : existingShifts) {
+                    if (!existing.getStaffCode().equalsIgnoreCase(st) && isManager(existing.getStaffCode(), existing.getDuty(), existing.getIcon())) {
+                        String managerName = existing.getStaffCode();
+                        Optional<Staff> sOpt = staffRepository.findByStaffCode(existing.getStaffCode());
+                        if (sOpt.isPresent() && sOpt.get().getFullName() != null) {
+                            managerName = sOpt.get().getFullName();
+                        }
+                        throw new IllegalArgumentException("Mỗi ca trực chỉ được bố trí tối đa 1 Quản lý! Ca này đã có Quản lý phụ trách (" + managerName + ").");
+                    }
+                }
+            }
+        }
 
         // Ensure staff exists in DB to prevent foreign key violation
         if (!staffRepository.existsByStaffCode(st)) {
@@ -246,12 +311,23 @@ public class ShiftService {
                     Object shiftListObj = dayShifts.get(shiftType);
                     if (shiftListObj instanceof List) {
                         List<?> list = (List<?>) shiftListObj;
+                        String managerInShift = null;
                         for (Object itemObj : list) {
                             if (itemObj instanceof Map) {
                                 Map<String, Object> item = (Map<String, Object>) itemObj;
                                 String staffId = (String) item.get("staffId");
-                                String duty = recoverDuty((String) item.getOrDefault("duty", "Trực"), staffId);
+                                if (staffId == null || staffId.trim().isEmpty()) continue;
+                                String staffCode = staffId.trim();
+                                String duty = recoverDuty((String) item.getOrDefault("duty", "Trực"), staffCode);
                                 String icon = (String) item.getOrDefault("icon", "POS");
+
+                                if (isManager(staffCode, duty, icon)) {
+                                    if (managerInShift != null && !managerInShift.equalsIgnoreCase(staffCode)) {
+                                        throw new IllegalArgumentException("Mỗi ca trực chỉ được bố trí tối đa 1 Quản lý! Ca trực ngày " + day + " (" + shiftType + ") đang có nhiều hơn 1 Quản lý.");
+                                    }
+                                    managerInShift = staffCode;
+                                }
+
                                 if (staffId != null && !staffId.trim().isEmpty()) {
                                     String shiftCode = "WS-" + br + "-" + day.toUpperCase() + "-" + (seq++);
                                     String itemStartTime = "night".equalsIgnoreCase(shiftType) ? "13:30" : "05:00";

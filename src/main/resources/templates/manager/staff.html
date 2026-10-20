@@ -575,6 +575,7 @@
             <option value="Kỹ thuật|TECH">Kỹ thuật & Mặt sân</option>
             <option value="Quản lý|MGR">Quản lý ca trực</option>
           </select>
+          <div id="shiftManagerHint" style="display: none; margin-top: 8px; font-size: 12px; line-height: 1.4; color: #b45309; background: #fffbeb; border: 1px solid #fef3c7; border-radius: 6px; padding: 6px 10px;"></div>
         </div>
       </div>
       <div class="modal-footer">
@@ -698,6 +699,24 @@
     }
     let staffList = cachedStaff || DEFAULT_STAFF_LIST;
 
+    function isManagerDuty(duty, icon) {
+      if (icon === 'MGR') return true;
+      if (!duty) return false;
+      const d = duty.toLowerCase();
+      return d.includes('quản lý') || d.includes('quan ly') || d.includes('manager');
+    }
+
+    function isManagerStaff(staffId) {
+      const staff = getStaffById(staffId);
+      if (!staff || !staff.role) return false;
+      const r = staff.role.toLowerCase();
+      return r.includes('quản lý') || r.includes('quan ly') || r.includes('manager');
+    }
+
+    function isSlotManager(staffId, duty, icon) {
+      return isManagerDuty(duty, icon) || isManagerStaff(staffId);
+    }
+
     let cachedSchedule = null;
     try {
       cachedSchedule = JSON.parse(localStorage.getItem('branch_shift_schedule'));
@@ -705,6 +724,29 @@
       if (scheduleStr.includes('NV-') || scheduleStr.includes('NS01')) {
         localStorage.removeItem('branch_shift_schedule');
         cachedSchedule = null;
+      } else if (cachedSchedule && typeof cachedSchedule === 'object') {
+        let changed = false;
+        DAYS_ORDER.forEach(d => {
+          ['morning', 'night'].forEach(s => {
+            if (Array.isArray(cachedSchedule[d]?.[s])) {
+              let hasMgr = false;
+              cachedSchedule[d][s] = cachedSchedule[d][s].filter(item => {
+                const isMgr = (item.duty && item.duty.includes('Quản lý')) || item.icon === 'MGR';
+                if (isMgr) {
+                  if (hasMgr) {
+                    changed = true;
+                    return false;
+                  }
+                  hasMgr = true;
+                }
+                return true;
+              });
+            }
+          });
+        });
+        if (changed) {
+          localStorage.setItem('branch_shift_schedule', JSON.stringify(cachedSchedule));
+        }
       }
     } catch (e) {
       cachedSchedule = null;
@@ -988,22 +1030,61 @@
         select.appendChild(opt);
       });
 
-      // Default duty based on selected staff
+      // Default duty based on selected staff & check manager limit
       updateDutyRecommendation();
       select.onchange = updateDutyRecommendation;
+      document.getElementById('inpShiftDay').onchange = updateDutyRecommendation;
+      document.getElementById('inpShiftType').onchange = updateDutyRecommendation;
 
       modal.classList.add('open');
     }
 
     function updateDutyRecommendation() {
+      const day = document.getElementById('inpShiftDay').value;
+      const shift = document.getElementById('inpShiftType').value;
       const staffId = document.getElementById('inpShiftStaffSelect').value;
       const staff = getStaffById(staffId);
       const dutySelect = document.getElementById('inpShiftStaffDuty');
+      const hintEl = document.getElementById('shiftManagerHint');
+
+      const currentCell = (shiftSchedule[day] && shiftSchedule[day][shift]) || [];
+      const existingManagerItem = currentCell.find(item => item.staffId !== staffId && isSlotManager(item.staffId, item.duty, item.icon));
+      const mgrOption = dutySelect ? dutySelect.querySelector('option[value="Quản lý|MGR"]') : null;
+
+      if (existingManagerItem) {
+        const exStaff = getStaffById(existingManagerItem.staffId);
+        const exName = exStaff ? (exStaff.shortName || exStaff.name) : existingManagerItem.staffId;
+        if (hintEl) {
+          hintEl.style.display = 'block';
+          hintEl.textContent = `Lưu ý: Ca trực này đã có Quản lý phụ trách (${exName}). Mỗi ca trực chỉ được bố trí tối đa 1 Quản lý!`;
+        }
+        if (mgrOption) {
+          mgrOption.disabled = true;
+        }
+        if (dutySelect && dutySelect.value === 'Quản lý|MGR') {
+          dutySelect.value = 'POS|POS';
+        }
+      } else {
+        if (hintEl) {
+          hintEl.style.display = 'none';
+          hintEl.textContent = '';
+        }
+        if (mgrOption) {
+          mgrOption.disabled = false;
+        }
+      }
+
       if (staff && dutySelect) {
         if (staff.role.includes('Thu ngân')) dutySelect.value = 'POS|POS';
         else if (staff.role.includes('Lễ tân')) dutySelect.value = 'Lễ tân|REC';
         else if (staff.role.includes('Kỹ thuật')) dutySelect.value = 'Kỹ thuật|TECH';
-        else if (staff.role.includes('Quản lý')) dutySelect.value = 'Quản lý|MGR';
+        else if (staff.role.includes('Quản lý')) {
+          if (!existingManagerItem) {
+            dutySelect.value = 'Quản lý|MGR';
+          } else {
+            dutySelect.value = 'POS|POS';
+          }
+        }
       }
     }
 
@@ -1032,6 +1113,18 @@
         return;
       }
 
+      // Check max 1 manager per shift rule
+      const isTargetManager = isSlotManager(staffId, duty, icon);
+      if (isTargetManager) {
+        const existingMgr = shiftSchedule[day][shift].find(item => item.staffId !== staffId && isSlotManager(item.staffId, item.duty, item.icon));
+        if (existingMgr) {
+          const exStaff = getStaffById(existingMgr.staffId);
+          const exName = exStaff ? (exStaff.shortName || exStaff.name) : existingMgr.staffId;
+          showToast(`Mỗi ca trực chỉ được bố trí tối đa 1 Quản lý! Ca này đã có Quản lý phụ trách (${exName}).`, 'warning');
+          return;
+        }
+      }
+
       try {
         const res = await fetch('/api/shifts/assign', {
           method: 'POST',
@@ -1051,6 +1144,10 @@
           const staff = getStaffById(staffId);
           const staffName = staff ? staff.name : staffId;
           showToast(`Đã phân công ${staffName} vào ca trực thành công!`, 'success');
+          return;
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          showToast(errData.message || 'Không thể phân công ca trực!', 'error');
           return;
         }
       } catch (err) {
@@ -1095,6 +1192,21 @@
     }
 
     async function saveShiftSchedule() {
+      // Validate that no shift has more than 1 manager
+      for (const day of DAYS_ORDER) {
+        for (const shift of ['morning', 'night']) {
+          const list = (shiftSchedule[day] && shiftSchedule[day][shift]) || [];
+          const managers = list.filter(item => isSlotManager(item.staffId, item.duty, item.icon));
+          if (managers.length > 1) {
+            const dayLabels = { mon: 'Thứ Hai', tue: 'Thứ Ba', wed: 'Thứ Tư', thu: 'Thứ Năm', fri: 'Thứ Sáu', sat: 'Thứ Bảy', sun: 'Chủ Nhật' };
+            const dayLabel = dayLabels[day] || day;
+            const shiftLabel = shift === 'morning' ? 'Ca Sáng' : 'Ca Tối';
+            showToast(`Lỗi phân ca: ${dayLabel} - ${shiftLabel} đang có ${managers.length} Quản lý! Mỗi ca chỉ được tối đa 1 Quản lý.`, 'warning');
+            return;
+          }
+        }
+      }
+
       saveState();
       const branchCode = getActiveBranchCode();
       try {
@@ -1105,6 +1217,10 @@
         });
         if (res.ok) {
           showToast('Đã lưu và đồng bộ lịch ca trực tuần lên hệ thống thành công!', 'success');
+          return;
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          showToast(errData.message || 'Không thể lưu lịch ca trực tuần!', 'error');
           return;
         }
       } catch (err) {

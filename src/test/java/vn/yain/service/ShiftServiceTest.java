@@ -150,4 +150,67 @@ class ShiftServiceTest {
         shiftService.removeShift("mon", "morning", "NV-02");
         verify(workShiftRepository, times(2)).deleteByDayOfWeekAndShiftTypeAndStaffCode("mon", "morning", "NV-02");
     }
+
+    @Test
+    @DisplayName("WorkShift: Khong cho phep 2 quan ly trong cung 1 ca truc")
+    void testAssignShift_CannotAssignTwoManagersToSameShift() {
+        WorkShift existingMgrShift = WorkShift.builder()
+                .shiftCode("WS-MON-MOR-NS02")
+                .staffCode("NS02")
+                .branchCode("CN01")
+                .dayOfWeek("mon")
+                .shiftType("morning")
+                .duty("Quản lý")
+                .icon("MGR")
+                .build();
+
+        Staff existingStaff = Staff.builder()
+                .staffCode("NS02")
+                .fullName("Trần Phúc Bảo")
+                .position("Quản lý chi nhánh")
+                .build();
+
+        when(workShiftRepository.findByBranchCodeAndDayOfWeekAndShiftType("CN01", "mon", "morning"))
+                .thenReturn(Collections.singletonList(existingMgrShift));
+        when(staffRepository.findByStaffCode("NS02")).thenReturn(Optional.of(existingStaff));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+            shiftService.assignShift("mon", "morning", "Test-QL", "Quản lý", "MGR", "CN01");
+        });
+
+        assertTrue(ex.getMessage().contains("Mỗi ca trực chỉ được bố trí tối đa 1 Quản lý"));
+    }
+
+    @Test
+    @DisplayName("WorkShift: Cho phep phan cong Quan ly khi ca chua co quan ly nao")
+    void testAssignShift_AllowManagerWhenNoExistingManager() {
+        when(workShiftRepository.findByBranchCodeAndDayOfWeekAndShiftType("CN01", "mon", "morning"))
+                .thenReturn(Collections.emptyList());
+
+        assertDoesNotThrow(() -> {
+            shiftService.assignShift("mon", "morning", "NS02", "Quản lý", "MGR", "CN01");
+        });
+
+        verify(workShiftRepository, atLeastOnce()).save(any(WorkShift.class));
+    }
+
+    @Test
+    @DisplayName("WorkShift: Tu choi luu lich tuan neu co ca bi trung 2 quan ly")
+    void testSaveWeeklySchedule_RejectsMultipleManagersInSameShift() {
+        Map<String, Object> scheduleMap = new HashMap<>();
+        Map<String, Object> monday = new HashMap<>();
+        List<Map<String, Object>> morningShifts = List.of(
+                Map.of("staffId", "NS02", "duty", "Quản lý", "icon", "MGR"),
+                Map.of("staffId", "Test-QL", "duty", "Quản lý", "icon", "MGR")
+        );
+        monday.put("morning", morningShifts);
+        monday.put("night", Collections.emptyList());
+        scheduleMap.put("mon", monday);
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+            shiftService.saveWeeklySchedule(scheduleMap, "CN01");
+        });
+
+        assertTrue(ex.getMessage().contains("Mỗi ca trực chỉ được bố trí tối đa 1 Quản lý"));
+    }
 }
