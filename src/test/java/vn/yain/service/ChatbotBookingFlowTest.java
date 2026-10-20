@@ -148,4 +148,40 @@ public class ChatbotBookingFlowTest {
         assertTrue(reply.getText().contains("Nguyễn Văn Nam"));
         assertTrue(reply.getText().contains("0912345678"));
     }
+
+    @Test
+    void testReopenPendingPayment_WhenClosedAndRequestedAgain() {
+        String session = "test_reopen_sess";
+        
+        // Tạo booking giả lập trong database ở trạng thái "Chờ cọc 30%"
+        vn.yain.entity.Booking pendingBooking = new vn.yain.entity.Booking();
+        pendingBooking.setBookingCode("DS888999");
+        pendingBooking.setCourtCode("CL01");
+        pendingBooking.setBranchCode("CN01");
+        pendingBooking.setTimeSlot("18:00 - 20:00");
+        pendingBooking.setCustomerName("Lê Văn Thành");
+        pendingBooking.setCustomerPhone("0933445566");
+        pendingBooking.setStatus("Chờ cọc 30%");
+        pendingBooking.setTotalPrice(new BigDecimal("300000"));
+        pendingBooking.setDepositAmount(new BigDecimal("90000"));
+        pendingBooking.setCreatedAt(java.time.LocalDateTime.now());
+
+        when(bookingRepository.findByBookingCode("DS888999")).thenReturn(Optional.of(pendingBooking));
+        when(bookingService.getBankBin()).thenReturn("970422");
+        when(bookingService.getAccountNo()).thenReturn("0903123456");
+        when(bookingService.getAccountName()).thenReturn("UTE BADMINTON CLUB");
+        when(bookingService.getBankName()).thenReturn("MBBank (Ngân hàng Quân Đội)");
+
+        // Khách hàng hỏi tiếp tục thanh toán đơn DS888999
+        ChatMessageDto reopenReply = chatbotService.processMessage("Tôi muốn tiếp tục thanh toán đơn DS888999", session);
+
+        assertNotNull(reopenReply);
+        assertEquals("OPEN_PAYMENT", reopenReply.getActionType(), "Phải mở lại giao diện thanh toán & VietQR");
+        assertNotNull(reopenReply.getPaymentData());
+        assertEquals("DS888999", reopenReply.getPaymentData().get("bookingCode"));
+        assertNotNull(reopenReply.getPaymentData().get("createdAt"), "Phải có thời gian tạo để hiển thị đồng hồ đếm ngược");
+        assertTrue(reopenReply.getText().contains("Hệ thống đã mở lại"));
+        assertTrue(reopenReply.getText().contains("DS888999"));
+        assertTrue(reopenReply.getText().contains("Lịch Sử Đặt Sân"));
+    }
 }

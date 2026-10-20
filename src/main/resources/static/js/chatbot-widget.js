@@ -125,7 +125,85 @@
           isFirstOpen = false;
           sendMessage('');
         }
+        checkAndSuggestPendingBooking();
       }
+    }
+
+    function checkAndSuggestPendingBooking() {
+      try {
+        const last = JSON.parse(localStorage.getItem('ute_last_pending_booking') || 'null');
+        if (!last || !last.bookingCode || !last.createdAt) return;
+        const createdMs = new Date(last.createdAt).getTime();
+        const rem = Math.floor((createdMs + 10 * 60 * 1000 - Date.now()) / 1000);
+        if (rem > 0) {
+          const existingBanner = document.getElementById('chat-pending-banner');
+          if (!existingBanner) {
+            const m = Math.floor(rem / 60);
+            const s = rem % 60;
+            const timeStr = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            const banner = document.createElement('div');
+            banner.id = 'chat-pending-banner';
+            banner.style.cssText = 'background: #fef3c7; border: 1px solid #fde68a; border-radius: 10px; padding: 10px 12px; margin: 8px 12px; font-size: 12px; color: #92400e; display: flex; align-items: center; justify-content: space-between; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);';
+            banner.innerHTML = `
+              <div>
+                <strong>Bạn có đơn giữ chỗ ${escapeHtml(last.bookingCode)}</strong>
+                <div style="font-size: 11px; color: #b45309;">Thời gian còn lại: <strong id="chat-banner-timer">${timeStr}</strong></div>
+              </div>
+              <button type="button" style="padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 6px; white-space: nowrap; background: #059669; border: none; color: #fff; cursor: pointer;">
+                Thanh Toán Ngay
+              </button>
+            `;
+            banner.querySelector('button').addEventListener('click', () => {
+              banner.remove();
+              sendMessage(`tiếp tục thanh toán đơn ${last.bookingCode}`);
+            });
+            msgList.parentNode.insertBefore(banner, msgList);
+
+            const bannerInterval = setInterval(() => {
+              const currentRem = Math.floor((createdMs + 10 * 60 * 1000 - Date.now()) / 1000);
+              const timerTxt = document.getElementById('chat-banner-timer');
+              if (currentRem <= 0) {
+                clearInterval(bannerInterval);
+                if (timerTxt) timerTxt.textContent = '00:00 (Hết hạn)';
+              } else if (timerTxt) {
+                const bm = Math.floor(currentRem / 60);
+                const bs = currentRem % 60;
+                timerTxt.textContent = `${String(bm).padStart(2, '0')}:${String(bs).padStart(2, '0')}`;
+              } else {
+                clearInterval(bannerInterval);
+              }
+            }, 1000);
+          }
+        }
+      } catch (e) {}
+    }
+
+    const activeChatTimers = {};
+    function startChatPaymentTimer(bookingCode, createdAt) {
+      if (activeChatTimers[bookingCode]) clearInterval(activeChatTimers[bookingCode]);
+      const createdMs = createdAt ? new Date(createdAt).getTime() : Date.now();
+      const expiresAt = createdMs + 10 * 60 * 1000;
+
+      const update = () => {
+        const rem = Math.floor((expiresAt - Date.now()) / 1000);
+        const timerValEl = document.getElementById(`chat-timer-val-${bookingCode}`);
+        if (!timerValEl) {
+          clearInterval(activeChatTimers[bookingCode]);
+          return;
+        }
+        if (rem <= 0) {
+          clearInterval(activeChatTimers[bookingCode]);
+          timerValEl.textContent = '00:00 (Hết hạn)';
+          timerValEl.style.color = '#dc2626';
+        } else {
+          const m = Math.floor(rem / 60);
+          const s = rem % 60;
+          timerValEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+      };
+
+      update();
+      activeChatTimers[bookingCode] = setInterval(update, 1000);
     }
 
     toggleBtn.addEventListener('click', toggleChat);
@@ -160,7 +238,7 @@
       showTypingIndicator();
 
       // Retrieve logged-in user and token if available
-      const token = localStorage.getItem('utesport_token');
+      const token = localStorage.getItem('jwt_token') || localStorage.getItem('utesport_token');
       let user = null;
       try {
         user = JSON.parse(localStorage.getItem('utesport_user') || 'null');
@@ -238,6 +316,20 @@
       // Render Embedded Payment Box if action is OPEN_PAYMENT
       if (data.actionType === 'OPEN_PAYMENT' && data.paymentData) {
         const p = data.paymentData;
+
+        // Save pending booking code into localStorage so history page can reopen it
+        try {
+          let pending = JSON.parse(localStorage.getItem('ute_pending_bookings') || '[]');
+          if (!pending.includes(p.bookingCode)) {
+            pending.unshift(p.bookingCode);
+            localStorage.setItem('ute_pending_bookings', JSON.stringify(pending.slice(0, 10)));
+          }
+          localStorage.setItem('ute_last_pending_booking', JSON.stringify({
+            bookingCode: p.bookingCode,
+            createdAt: p.createdAt || new Date().toISOString()
+          }));
+        } catch (e) {}
+
         html += `
           <div class="chat-payment-card">
             <div class="chat-pay-header" style="display: flex; align-items: center; justify-content: space-between;">
@@ -249,6 +341,14 @@
               <div style="font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Mã Khóa Sân Của Bạn</div>
               <div style="font-size: 20px; font-weight: 800; color: #047857; letter-spacing: 1.5px; margin: 3px 0;">${escapeHtml(p.bookingCode || '')}</div>
               <div style="font-size: 11px; color: #059669;">Đang tạm khóa giữ chỗ thời gian thực trên hệ thống</div>
+            </div>
+
+            <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); border-radius: 8px; padding: 7px 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 11.5px; color: #047857; display: flex; align-items: center; gap: 5px; font-weight: 600;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Giữ chỗ còn lại:
+              </span>
+              <strong id="chat-timer-val-${p.bookingCode}" style="font-size: 13.5px; font-family: monospace; color: #b45309; font-weight: 800;">10:00</strong>
             </div>
 
             <div class="chat-pay-row"><span>Sân thi đấu:</span><span class="chat-pay-val">${escapeHtml(p.courtName || '')}</span></div>
@@ -272,8 +372,17 @@
             <button type="button" class="chat-pay-btn-submit" id="btn-confirm-pay-${p.bookingCode}" data-code="${p.bookingCode}">
               Xác nhận đã chuyển khoản cọc
             </button>
+
+            <a href="/customer/history" class="chat-pay-btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; margin-top: 8px; border-radius: 8px; background: #ecfdf5; border: 1px solid #10b981; color: #047857; font-size: 12px; font-weight: 700; text-decoration: none;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span>Mở Trong Lịch Sử & Tiếp Tục Thanh Toán</span>
+            </a>
           </div>
         `;
+
+        setTimeout(() => {
+          startChatPaymentTimer(p.bookingCode, p.createdAt);
+        }, 50);
       }
 
       // Action Link
@@ -310,7 +419,7 @@
             confBtn.disabled = true;
             confBtn.innerText = 'Đang kiểm tra giao dịch...';
 
-            const token = localStorage.getItem('utesport_token');
+            const token = localStorage.getItem('jwt_token') || localStorage.getItem('utesport_token');
             let user = null;
             try {
               user = JSON.parse(localStorage.getItem('utesport_user') || 'null');
@@ -338,6 +447,16 @@
               if (payRes.ok) {
                 confBtn.innerText = 'Đã thanh toán cọc thành công';
                 confBtn.style.background = '#059669';
+
+                try {
+                  let pending = JSON.parse(localStorage.getItem('ute_pending_bookings') || '[]');
+                  pending = pending.filter(c => c !== bCode);
+                  localStorage.setItem('ute_pending_bookings', JSON.stringify(pending));
+                  localStorage.removeItem('ute_last_pending_booking');
+                  const banner = document.getElementById('chat-pending-banner');
+                  if (banner) banner.remove();
+                } catch (e) {}
+
                 appendMessage('bot', `Hệ thống đã nhận được tiền cọc 30% cho mã đơn **${bCode}**. Sân của bạn đã được khóa cố định chính thức và đơn được lưu vào [Lịch Sử Đặt Sân](/customer/history). Bạn vui lòng đến trước 10 phút để nhận sân tại quầy lễ tân.`);
               } else {
                 confBtn.disabled = false;

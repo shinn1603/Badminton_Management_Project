@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Đặt Sân Cầu Lông Trực Tuyến - UTE Badminton</title>
-  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/main.css?v=20261020_2300">
   <style>
     :root {
       --cust-bg: var(--bg-page);
@@ -381,11 +381,56 @@
       justify-content: space-between;
       padding: 12px 14px;
       border: 1.5px solid var(--cust-border);
-      border-radius: 10px;
+      border-radius: 12px;
       margin-bottom: 10px;
       cursor: pointer;
       transition: all 0.18s ease;
-      gap: 14px;
+      gap: 12px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .addon-left-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .addon-checkbox {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .addon-text {
+      min-width: 0;
+      flex: 1;
+    }
+    .addon-name {
+      font-weight: 700;
+      font-size: 13.5px;
+      color: var(--cust-text-main);
+      line-height: 1.3;
+    }
+    .addon-sub {
+      font-size: 11.5px;
+      color: var(--cust-text-muted);
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+    .addon-action-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .addon-price-box {
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 13.5px;
+      white-space: nowrap;
+      text-align: right;
     }
     .addon-item:hover {
       background: var(--surface-subtle);
@@ -741,64 +786,81 @@
         box-sizing: border-box !important;
       }
 
-      /* COMPACT STEP 2: HORIZONTAL SWIPEABLE COURTS CAROUSEL (SAVES 600PX OF HEIGHT!) */
+      /* COMPACT STEP 2: RESPONSIVE 2-COLUMN COURT GRID (ALL 8 COURTS VISIBLE AT ONCE) */
       .court-badge-bwf {
         font-size: 10px !important;
         padding: 2px 6px !important;
       }
       .court-select-grid {
-        display: flex !important;
-        flex-direction: row !important;
-        overflow-x: auto !important;
-        white-space: nowrap !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         gap: 8px !important;
-        padding: 4px 2px 8px 2px !important;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: visible !important;
+        white-space: normal !important;
+        padding: 0 !important;
       }
       .court-chip-btn {
-        flex: 0 0 118px !important;
-        min-width: 118px !important;
-        max-width: 128px !important;
-        padding: 6px 8px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        flex: none !important;
+        padding: 8px 10px !important;
         border-radius: 10px !important;
-        scroll-snap-align: start;
-        text-align: center !important;
+        text-align: left !important;
         box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
       }
       .court-chip-btn .chip-name {
-        font-size: 12px !important;
-        font-weight: 700 !important;
+        font-size: 12.5px !important;
+        font-weight: 800 !important;
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
       }
       .court-chip-btn .chip-desc {
-        font-size: 10px !important;
+        font-size: 10.5px !important;
+        color: var(--cust-text-muted) !important;
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
       }
       .court-chip-btn .chip-rate {
-        font-size: 11px !important;
+        font-size: 11.5px !important;
         font-weight: 800 !important;
+        color: var(--primary) !important;
         margin-top: 2px !important;
       }
 
-      /* COMPACT STEP 3: TIME SLOTS IN 2 COLUMNS (NO HORIZONTAL OVERFLOW ON PHONES) */
+      /* COMPACT STEP 3: 4-COLUMN TIME FILTER STRIP & 2-COLUMN SLOTS */
       .time-slot-filter-strip {
-        gap: 6px !important;
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 5px !important;
         margin-bottom: 8px !important;
-        display: flex !important;
-        overflow-x: auto !important;
-        white-space: nowrap !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: visible !important;
+        white-space: normal !important;
+        padding-bottom: 0 !important;
       }
       .time-filter-pill {
-        padding: 4px 10px !important;
+        padding: 6px 2px !important;
         font-size: 11px !important;
-        height: 28px !important;
-        border-radius: 9999px !important;
-        flex-shrink: 0 !important;
+        font-weight: 700 !important;
+        height: 32px !important;
+        border-radius: 8px !important;
+        text-align: center !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        white-space: nowrap !important;
       }
       .slot-legend-strip {
         display: none !important;
@@ -848,10 +910,10 @@
         right: 4px !important;
       }
 
-      /* COMPACT ADDONS (PRICES AND STEPPERS NEVER OVERFLOW) */
+      /* COMPACT STEP 4: ADDONS (NEVER CLIPPED, PRICE & STEPPERS ALWAYS VISIBLE) */
       .addon-item {
-        padding: 8px 10px !important;
-        margin-bottom: 6px !important;
+        padding: 10px 12px !important;
+        margin-bottom: 8px !important;
         border-radius: 10px !important;
         display: flex !important;
         align-items: center !important;
@@ -860,28 +922,65 @@
         width: 100% !important;
         box-sizing: border-box !important;
       }
-      .addon-item > div:first-child {
-        flex: 1 1 auto !important;
-        min-width: 0 !important;
+      .addon-left-info {
         display: flex !important;
         align-items: center !important;
         gap: 8px !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
       }
-      .addon-item > strong {
-        flex: 0 0 auto !important;
-        white-space: nowrap !important;
-        font-size: 11.5px !important;
-        font-weight: 800 !important;
+      .addon-name {
+        font-size: 12.5px !important;
+        font-weight: 700 !important;
+        color: var(--cust-text-main) !important;
+        line-height: 1.3 !important;
       }
-      .addon-item > div:last-child:not(:first-child) {
-        flex: 0 0 auto !important;
+      .addon-sub {
+        font-size: 10.5px !important;
+        color: var(--cust-text-muted) !important;
+        line-height: 1.2 !important;
+      }
+      .addon-action-group {
         display: flex !important;
         flex-direction: column !important;
         align-items: flex-end !important;
-        gap: 3px !important;
+        gap: 4px !important;
+        flex: 0 0 auto !important;
+        min-width: 70px !important;
+      }
+      .addon-price-box {
+        font-size: 12px !important;
+        font-weight: 800 !important;
+        color: var(--primary) !important;
+        white-space: nowrap !important;
+        text-align: right !important;
+      }
+      .addon-stepper {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 2px !important;
+        padding: 1px 3px !important;
+        border-radius: 6px !important;
+        background: var(--surface) !important;
+        border: 1px solid var(--cust-border) !important;
+      }
+      .addon-stepper-btn {
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 13px !important;
+        border-radius: 4px !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+      .addon-stepper-qty {
+        min-width: 18px !important;
+        font-size: 12px !important;
+        text-align: center !important;
       }
 
-      /* STREAMLINED ORDER SUMMARY PANEL (ELIMINATES DUPLICATE BUTTON & SAVES SPACE) */
+      /* STREAMLINED ORDER SUMMARY PANEL */
       .order-summary-panel {
         position: static !important;
         width: 100% !important;
@@ -1266,10 +1365,10 @@
 
         <!-- Quick Time Filter Strip on Mobile -->
         <div class="time-slot-filter-strip">
-          <button type="button" class="time-filter-pill active" onclick="filterTimeSlots('all', this)">Tất cả (5h-23h)</button>
-          <button type="button" class="time-filter-pill" onclick="filterTimeSlots('morning', this)">Sáng (5h-12h)</button>
-          <button type="button" class="time-filter-pill" onclick="filterTimeSlots('afternoon', this)">Chiều (12h-17h)</button>
-          <button type="button" class="time-filter-pill" onclick="filterTimeSlots('evening', this)">Tối (17h-23h)</button>
+          <button type="button" class="time-filter-pill active" onclick="filterTimeSlots('all', this)" title="Toàn bộ khung giờ (5h-23h)">Tất cả</button>
+          <button type="button" class="time-filter-pill" onclick="filterTimeSlots('morning', this)" title="Khung giờ sáng (5h-12h)">Sáng</button>
+          <button type="button" class="time-filter-pill" onclick="filterTimeSlots('afternoon', this)" title="Khung giờ chiều (12h-17h)">Chiều</button>
+          <button type="button" class="time-filter-pill" onclick="filterTimeSlots('evening', this)" title="Khung giờ tối (17h-23h)">Tối</button>
         </div>
 
         <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;" id="slotPickerNotice">
@@ -1356,34 +1455,58 @@
           <span style="font-size: 11.5px; color: var(--cust-text-muted);">Thanh toán cùng tiền sân</span>
         </div>
         <div id="addonsContainer">
-          <label class="addon-item">
-            <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;"><input type="checkbox" class="addon-checkbox" id="addonRacket" data-name="Thuê Vợt Yonex Astrox" value="20000" onchange="updateSummary()" style="width: 17px; height: 17px; accent-color: var(--primary);">
-              <div>
-                <div style="font-weight: 700; font-size: 13px; color: var(--cust-text-main);">Thuê Vợt Yonex Astrox</div>
-                <div style="font-size: 11.5px; color: var(--cust-text-muted);">Căng sẵn 10.5kg, kèm quấn cán mới</div>
+          <label class="addon-item" id="item_addonRacket" onclick="toggleAddonItem('addonRacket')">
+            <div class="addon-left-info">
+              <input type="checkbox" class="addon-checkbox" id="addonRacket" data-name="Thuê Vợt Yonex Astrox" value="20000" data-unit="/ cây" onchange="onAddonCheckboxChange('addonRacket', this.checked)" onclick="event.stopPropagation();">
+              <div class="addon-text">
+                <div class="addon-name">Thuê Vợt Yonex Astrox</div>
+                <div class="addon-sub">Căng sẵn 10.5kg, kèm quấn cán mới</div>
               </div>
             </div>
-            <strong style="color: var(--primary); font-size: 12.5px;">+20.000 đ / cây</strong>
+            <div class="addon-action-group" onclick="event.stopPropagation();">
+              <div class="addon-price-box" id="price_addonRacket">+20.000 đ</div>
+              <div class="addon-stepper" id="stepper_addonRacket">
+                <button type="button" class="addon-stepper-btn" onclick="changeAddonQty('addonRacket', -1)">-</button>
+                <span class="addon-stepper-qty" id="qty_addonRacket">1</span>
+                <button type="button" class="addon-stepper-btn" onclick="changeAddonQty('addonRacket', 1)">+</button>
+              </div>
+            </div>
           </label>
 
-          <label class="addon-item">
-            <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;"><input type="checkbox" class="addon-checkbox" id="addonShuttle" data-name="Ống Cầu Yonex Aerosensa (3 quả)" value="45000" onchange="updateSummary()" style="width: 17px; height: 17px; accent-color: var(--primary);">
-              <div>
-                <div style="font-weight: 700; font-size: 13px; color: var(--cust-text-main);">Ống Cầu Yonex Aerosensa (3 quả)</div>
-                <div style="font-size: 11.5px; color: var(--cust-text-muted);">Tốc độ 77, độ bền và quỹ đạo chuẩn BWF</div>
+          <label class="addon-item" id="item_addonShuttle" onclick="toggleAddonItem('addonShuttle')">
+            <div class="addon-left-info">
+              <input type="checkbox" class="addon-checkbox" id="addonShuttle" data-name="Ống Cầu Yonex Aerosensa (3 quả)" value="45000" data-unit="/ ống" onchange="onAddonCheckboxChange('addonShuttle', this.checked)" onclick="event.stopPropagation();">
+              <div class="addon-text">
+                <div class="addon-name">Ống Cầu Yonex Aerosensa (3 quả)</div>
+                <div class="addon-sub">Tốc độ 77, độ bền và quỹ đạo chuẩn BWF</div>
               </div>
             </div>
-            <strong style="color: var(--primary); font-size: 12.5px;">+45.000 đ / ống</strong>
+            <div class="addon-action-group" onclick="event.stopPropagation();">
+              <div class="addon-price-box" id="price_addonShuttle">+45.000 đ</div>
+              <div class="addon-stepper" id="stepper_addonShuttle">
+                <button type="button" class="addon-stepper-btn" onclick="changeAddonQty('addonShuttle', -1)">-</button>
+                <span class="addon-stepper-qty" id="qty_addonShuttle">1</span>
+                <button type="button" class="addon-stepper-btn" onclick="changeAddonQty('addonShuttle', 1)">+</button>
+              </div>
+            </div>
           </label>
 
-          <label class="addon-item">
-            <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;"><input type="checkbox" class="addon-checkbox" id="addonDrink" data-name="Combo 2 Chai Pocari Sweat 500ml" value="30000" onchange="updateSummary()" style="width: 17px; height: 17px; accent-color: var(--primary);">
-              <div>
-                <div style="font-weight: 700; font-size: 13px; color: var(--cust-text-main);">Combo 2 Chai Pocari Sweat 500ml</div>
-                <div style="font-size: 11.5px; color: var(--cust-text-muted);">Bổ sung ion khoáng chất khi vận động</div>
+          <label class="addon-item" id="item_addonDrink" onclick="toggleAddonItem('addonDrink')">
+            <div class="addon-left-info">
+              <input type="checkbox" class="addon-checkbox" id="addonDrink" data-name="Combo 2 Chai Pocari Sweat 500ml" value="30000" data-unit="/ combo" onchange="onAddonCheckboxChange('addonDrink', this.checked)" onclick="event.stopPropagation();">
+              <div class="addon-text">
+                <div class="addon-name">Combo 2 Chai Pocari Sweat 500ml</div>
+                <div class="addon-sub">Bổ sung ion khoáng chất khi vận động</div>
               </div>
             </div>
-            <strong style="color: var(--primary); font-size: 12.5px;">+30.000 đ / combo</strong>
+            <div class="addon-action-group" onclick="event.stopPropagation();">
+              <div class="addon-price-box" id="price_addonDrink">+30.000 đ</div>
+              <div class="addon-stepper" id="stepper_addonDrink">
+                <button type="button" class="addon-stepper-btn" onclick="changeAddonQty('addonDrink', -1)">-</button>
+                <span class="addon-stepper-qty" id="qty_addonDrink">1</span>
+                <button type="button" class="addon-stepper-btn" onclick="changeAddonQty('addonDrink', 1)">+</button>
+              </div>
+            </div>
           </label>
         </div>
       </div>
@@ -1613,7 +1736,7 @@
     </div>
   </footer>
 
-  <script src="/js/global-hub.js"></script>
+  <script src="/js/global-hub.js?v=20261020_2300"></script>
   <script src="/js/auth-guard.js"></script>
   <script>
     const TIME_SLOTS = [
@@ -1976,22 +2099,19 @@
         items.forEach(it => {
           html += `
             <div class="addon-item" id="item_${it.id}" onclick="toggleAddonItem('${it.id}')">
-              <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
-                <input type="checkbox" class="addon-checkbox" id="${it.id}" data-name="${escapeHtml(it.name)}" value="${it.price}" data-unit="${escapeHtml(it.unit)}" onchange="onAddonCheckboxChange('${it.id}', this.checked)" onclick="event.stopPropagation();" style="width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0;">
-                <div style="min-width: 0;">
-                  <div style="font-weight: 700; font-size: 13.5px; color: var(--cust-text-main);">${escapeHtml(it.name)}</div>
-                  <div style="font-size: 12px; color: var(--cust-text-muted);">${escapeHtml(it.sub)}</div>
+              <div class="addon-left-info">
+                <input type="checkbox" class="addon-checkbox" id="${it.id}" data-name="${escapeHtml(it.name)}" value="${it.price}" data-unit="${escapeHtml(it.unit)}" onchange="onAddonCheckboxChange('${it.id}', this.checked)" onclick="event.stopPropagation();">
+                <div class="addon-text">
+                  <div class="addon-name">${escapeHtml(it.name)}</div>
+                  <div class="addon-sub">${escapeHtml(it.sub)}</div>
                 </div>
               </div>
-              <div style="display: flex; align-items: center; gap: 14px; flex-shrink: 0;" onclick="event.stopPropagation();">
+              <div class="addon-action-group" onclick="event.stopPropagation();">
+                <div class="addon-price-box" id="price_${it.id}">+${it.price.toLocaleString('vi-VN')} đ</div>
                 <div class="addon-stepper" id="stepper_${it.id}">
                   <button type="button" class="addon-stepper-btn" onclick="changeAddonQty('${it.id}', -1)" title="Giảm số lượng">-</button>
                   <span class="addon-stepper-qty" id="qty_${it.id}">1</span>
                   <button type="button" class="addon-stepper-btn" onclick="changeAddonQty('${it.id}', 1)" title="Tăng số lượng">+</button>
-                </div>
-                <div style="text-align: right; min-width: 105px;">
-                  <div style="color: var(--primary); font-weight: 800; font-size: 13.5px;" id="price_${it.id}">+${it.price.toLocaleString('vi-VN')} đ</div>
-                  <div style="font-size: 11px; color: var(--cust-text-muted);" id="subprice_${it.id}">${it.unit}</div>
                 </div>
               </div>
             </div>
@@ -2467,15 +2587,34 @@
         qrImg.src = data.qrUrl || `https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=${data.depositAmount}&addInfo=CK%20${data.bookingCode}&accountName=UTE%20BADMINTON%20CLUB`;
       }
 
-      startBookingTimer(600);
+      // Save pending booking code into localStorage so history page & chatbot can reopen it
+      try {
+        let pending = JSON.parse(localStorage.getItem('ute_pending_bookings') || '[]');
+        if (!pending.includes(data.bookingCode)) {
+          pending.unshift(data.bookingCode);
+          localStorage.setItem('ute_pending_bookings', JSON.stringify(pending.slice(0, 10)));
+        }
+      } catch (e) {}
+
+      let remainingSec = 600;
+      if (data.createdAt) {
+        const createdMs = new Date(data.createdAt).getTime();
+        remainingSec = Math.max(0, Math.floor((createdMs + 10 * 60 * 1000 - Date.now()) / 1000));
+      }
+      startBookingTimer(remainingSec);
+
       const modal = document.getElementById('bookingVietqrModal');
       if (modal) modal.classList.add('active');
     }
 
     function closeBookingVietQrModal() {
+      const code = document.getElementById('bkgBookingCode').innerText;
       if (modalTimerInterval) clearInterval(modalTimerInterval);
       const modal = document.getElementById('bookingVietqrModal');
       if (modal) modal.classList.remove('active');
+      if (code && code !== 'DS000000') {
+        showToast(`Đơn ${code} đang được tạm khóa 10 phút và đã được lưu vào Lịch Sử Đặt Sân. Bạn có thể mở lại để thanh toán bất cứ lúc nào!`, 'info');
+      }
     }
 
     function startBookingTimer(seconds) {
@@ -2527,6 +2666,11 @@
 
         if (data.success || res.ok) {
           showToast(`Thanh toán thành công đơn ${bookingCode}!`, 'success');
+          try {
+            let pending = JSON.parse(localStorage.getItem('ute_pending_bookings') || '[]');
+            pending = pending.filter(c => c !== bookingCode);
+            localStorage.setItem('ute_pending_bookings', JSON.stringify(pending));
+          } catch (e) {}
           closeBookingVietQrModal();
           setTimeout(() => {
             if (confirm('Đặt sân và thanh toán thành công! Bạn có muốn xem lịch sử đặt sân không?')) {

@@ -745,6 +745,24 @@
         currentDepositAmount = deposit;
         const remaining = Math.max(0, total - deposit);
 
+        // Calculate countdown based on actual createdAt
+        if (b.createdAt) {
+          const createdMs = new Date(b.createdAt).getTime();
+          const expiresAt = createdMs + 10 * 60 * 1000;
+          secondsLeft = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
+        }
+
+        // Keep in pending bookings history if pending deposit
+        if (b.status && (b.status.includes('Chờ cọc') || b.status.includes('Chờ thanh toán'))) {
+          try {
+            let pending = JSON.parse(localStorage.getItem('ute_pending_bookings') || '[]');
+            if (!pending.includes(b.bookingCode)) {
+              pending.unshift(b.bookingCode);
+              localStorage.setItem('ute_pending_bookings', JSON.stringify(pending.slice(0, 10)));
+            }
+          } catch(e) {}
+        }
+
         document.getElementById('invCode').textContent = b.bookingCode;
         document.getElementById('invCustomer').textContent = b.customerName || 'Khách hàng';
         document.getElementById('invPhone').textContent = b.customerPhone || '---';
@@ -849,6 +867,11 @@
         const data = await res.json();
         if (res.ok && (data.success || data.booking)) {
           showToast(`Đã ghi nhận tiền cọc thành công cho đơn ${currentBookingCode} trong Database!`, 'success');
+          try {
+            let pending = JSON.parse(localStorage.getItem('ute_pending_bookings') || '[]');
+            pending = pending.filter(c => c !== currentBookingCode);
+            localStorage.setItem('ute_pending_bookings', JSON.stringify(pending));
+          } catch (e) {}
           document.getElementById('successModal').classList.add('open');
         } else {
           showToast(data.message || 'Xác nhận tiền cọc thất bại, vui lòng thử lại!', 'error');
