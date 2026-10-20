@@ -158,7 +158,7 @@ public class DashboardController {
 
     @GetMapping("/manager/receipts")
     public String managerReceipts() {
-        return "manager/receipts";
+        return "redirect:/manager/inventory?tab=receipt";
     }
 
     @GetMapping("/manager/staff")
