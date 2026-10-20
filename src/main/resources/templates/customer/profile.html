@@ -427,6 +427,72 @@
       gap: 12px;
     }
 
+    /* Modal OTP Xem Mật Khẩu (Đảm bảo hiển thị 100%, không bị nuốt bởi modal-overlay) */
+    #viewPasswordOtpModal {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 999999 !important;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(6, 32, 25, 0.75) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      padding: 16px !important;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #viewPasswordOtpModal.active,
+    #viewPasswordOtpModal.open {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+    #viewPasswordOtpModal .modal-card {
+      background: var(--surface, #ffffff);
+      border: 1px solid var(--border-subtle, #e2e8f0);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      transform: scale(0.96) translateY(8px);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #viewPasswordOtpModal.active .modal-card,
+    #viewPasswordOtpModal.open .modal-card {
+      transform: scale(1) translateY(0);
+    }
+    [data-theme="dark"] #viewPasswordOtpModal .modal-card {
+      background: #0f172a !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+      color: #f1f5f9 !important;
+    }
+    [data-theme="dark"] #viewPasswordOtpModal .otp-modal-header {
+      background: #1e293b !important;
+      border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    [data-theme="dark"] #viewPasswordOtpModal h3 {
+      color: #f1f5f9 !important;
+    }
+    [data-theme="dark"] #viewPasswordOtpModal p {
+      color: #94a3b8 !important;
+    }
+    [data-theme="dark"] #viewPasswordOtpModal label {
+      color: #cbd5e1 !important;
+    }
+    [data-theme="dark"] #viewPasswordOtpInput {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+      color: #ffffff !important;
+    }
+    [data-theme="dark"] #viewPasswordOtpModal .btn-cancel-modal {
+      background: #1e293b !important;
+      border-color: #334155 !important;
+      color: #cbd5e1 !important;
+    }
+
   </style>
 </head>
 <body>
@@ -931,12 +997,7 @@
         if (text) text.textContent = 'Xem mật khẩu';
 
         if (res.ok && data.success) {
-          document.getElementById('otpMaskedEmail').textContent = data.maskedEmail || 'hộp thư của bạn';
-          document.getElementById('viewPasswordOtpInput').value = '';
-          document.getElementById('otpErrorMsg').style.display = 'none';
-          document.getElementById('viewPasswordOtpModal').style.display = 'flex';
-          setTimeout(() => document.getElementById('viewPasswordOtpInput').focus(), 150);
-          if (window.showToast) showToast(data.message, 'info');
+          openViewPasswordOtpModal(data.maskedEmail, data.message);
         } else {
           if (window.showToast) showToast(data.message || 'Không thể gửi mã OTP!', 'error');
           else alert(data.message || 'Không thể gửi mã OTP!');
@@ -949,10 +1010,48 @@
       }
     }
 
+    function openViewPasswordOtpModal(maskedEmail, message) {
+      const modal = document.getElementById('viewPasswordOtpModal');
+      if (!modal) return;
+
+      const emailEl = document.getElementById('otpMaskedEmail');
+      if (emailEl) emailEl.textContent = maskedEmail || 'hộp thư của bạn';
+
+      const otpInp = document.getElementById('viewPasswordOtpInput');
+      if (otpInp) otpInp.value = '';
+
+      const errBox = document.getElementById('otpErrorMsg');
+      if (errBox) errBox.style.display = 'none';
+
+      // Explicitly set flex, opacity, and pointer-events
+      modal.style.display = 'flex';
+      modal.style.opacity = '1';
+      modal.style.pointerEvents = 'auto';
+      modal.classList.add('active', 'open');
+
+      setTimeout(() => {
+        if (otpInp) {
+          otpInp.focus();
+          otpInp.select();
+        }
+      }, 150);
+
+      if (message && window.showToast) showToast(message, 'info');
+    }
+
     function closeViewPasswordOtpModal() {
-      document.getElementById('viewPasswordOtpModal').style.display = 'none';
-      document.getElementById('viewPasswordOtpInput').value = '';
-      document.getElementById('otpErrorMsg').style.display = 'none';
+      const modal = document.getElementById('viewPasswordOtpModal');
+      if (!modal) return;
+      modal.classList.remove('active', 'open');
+      modal.style.opacity = '0';
+      modal.style.pointerEvents = 'none';
+      setTimeout(() => {
+        modal.style.display = 'none';
+        const otpInp = document.getElementById('viewPasswordOtpInput');
+        if (otpInp) otpInp.value = '';
+        const errBox = document.getElementById('otpErrorMsg');
+        if (errBox) errBox.style.display = 'none';
+      }, 200);
     }
 
     async function resendViewPasswordOtp() {
@@ -1094,11 +1193,11 @@
   </script>
 
   <!-- Modal Xác Thực OTP Xem Mật Khẩu -->
-  <div class="modal-overlay" id="viewPasswordOtpModal" style="display: none; position: fixed; inset: 0; background: rgba(6, 32, 25, 0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
-    <div class="modal-card" style="background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; width: 100%; max-width: 440px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08); overflow: hidden;">
+  <div class="modal-overlay" id="viewPasswordOtpModal" onclick="if(event.target === this) closeViewPasswordOtpModal()">
+    <div class="modal-card">
       
       <!-- Modal Header -->
-      <div style="padding: 18px 24px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; background: #fafafa;">
+      <div class="otp-modal-header" style="padding: 18px 24px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; background: #fafafa;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(5, 150, 105, 0.12); color: #059669; display: flex; align-items: center; justify-content: center;">
             <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2;">
@@ -1156,7 +1255,7 @@
         </div>
 
         <div style="display: flex; gap: 10px;">
-          <button type="button" onclick="closeViewPasswordOtpModal()" style="flex: 1; height: 42px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#ffffff'">
+          <button type="button" class="btn-cancel-modal" onclick="closeViewPasswordOtpModal()" style="flex: 1; height: 42px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#ffffff'">
             Hủy bỏ
           </button>
           <button type="button" id="btnConfirmViewPasswordOtp" onclick="confirmViewPasswordOtp()" style="flex: 2; height: 42px; border: none; background: #059669; color: #ffffff; font-weight: 700; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 6px -1px rgba(5,150,105,0.25); transition: background 0.15s;" onmouseover="this.style.background='#047857'" onmouseout="this.style.background='#059669'">
