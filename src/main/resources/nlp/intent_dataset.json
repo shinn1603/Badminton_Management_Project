@@ -21,10 +21,49 @@
         "book san", "đặt giúp mình", "dat giup minh", "lấy sân này nhé", "xác nhận đặt sân", "xac nhan dat",
         "đồng ý giữ chỗ", "dong y giu cho", "tạo đơn đặt sân", "tao don", "đặt ca này nha", "lấy sân này đi",
         "khoá sân", "khoa san", "tự khoá sân", "tu khoa san", "chức năng tự khoá sân", "khoá sân giữ chỗ",
-        "tự động khoá sân", "đặt và khoá sân", "khoá sân cho tôi", "khoá sân này"
+        "tự động khoá sân", "đặt và khoá sân", "khoá sân cho tôi", "khoá sân này", "chốt ca chơi",
+        "xác nhận thông tin", "xac nhan thong tin", "ok dat luon", "chốt đơn này", "chot don", "lấy mã khóa sân"
       ],
       "responses": [
-        "Hệ thống đã ghi nhận yêu cầu đặt sân và tiến hành tạo đơn giữ chỗ thời gian thực cho bạn."
+        "Hệ thống đã ghi nhận yêu cầu đặt sân và tiến hành kiểm tra đầy đủ thông tin khách hàng trước khi xuất mã khóa sân giữ chỗ."
+      ]
+    },
+    {
+      "tag": "REQUEST_LOCK_CODE",
+      "patterns": [
+        "hiện mã khoá sân giùm", "hien ma khoa san gium", "cho hiện mã khoá sân", "cho hien ma khoa san",
+        "cho xin mã khoá sân", "mã khoá sân", "ma khoa san", "xuất mã khoá sân", "xuat ma khoa san",
+        "lấy mã khoá sân", "lay ma khoa san", "mã giữ chỗ", "ma giu cho", "khoá sân giùm tôi",
+        "khoa san gium toi", "khoá sân giúp tôi", "cho mã khoá sân", "xác nhận và xuất mã khoá sân",
+        "xác nhận khoá sân", "chốt khoá sân"
+      ],
+      "responses": [
+        "Hệ thống sẽ kích hoạt tính năng tự khóa sân và xuất mã khóa sân giữ chỗ ngay khi đã có đủ thông tin đặt sân của bạn."
+      ]
+    },
+    {
+      "tag": "SELECT_ADDONS",
+      "patterns": [
+        "không lấy thêm gì", "khong lay them gi", "không cần gì thêm", "khong can gi them", "không chọn thêm",
+        "khong chon them", "chỉ thuê sân thôi", "chi thue san thoi", "không có", "khong co", "không cần phụ kiện",
+        "thuê thêm 2 vợt", "thue them 2 vot", "thuê vợt thi đấu", "thuê giày", "thue giay", "mua 1 ống cầu",
+        "mua ong cau", "mua nước", "mua nuoc", "thêm 2 chai nước revive", "thêm pocari", "đan cước vợt",
+        "không lấy phụ kiện", "chỉ thuê sân", "chi thue san", "thôi khỏi", "đủ rồi", "du roi"
+      ],
+      "responses": [
+        "Tôi đã ghi nhận lựa chọn về dịch vụ và phụ kiện đi kèm cho ca chơi của bạn."
+      ]
+    },
+    {
+      "tag": "PROVIDE_CUSTOMER_INFO",
+      "patterns": [
+        "tôi tên là", "toi ten la", "mình tên là", "minh ten la", "tên tôi là", "ten toi la",
+        "tên mình là", "ten minh la", "em tên là", "em ten la", "tôi tên", "toi ten", "mình tên",
+        "minh ten", "số điện thoại của tôi là", "so dien thoai cua toi la", "sdt của tôi",
+        "sdt cua toi", "sđt là", "sdt la", "số điện thoại là"
+      ],
+      "responses": [
+        "Tôi đã ghi nhận thông tin liên hệ của bạn để phục vụ cho đơn đặt và khóa sân giữ chỗ."
       ]
     },
     {
@@ -35,7 +74,7 @@
         "check lịch trống ngày mai", "ngày mai còn sân lúc 20h không", "tìm sân từ 18h đến 20h", "có sân nào trống không",
         "check lich trong", "ngay mai con san khong", "tim san trong", "khung giờ nào còn trống",
         "kiểm tra sân trống", "xem lịch sân", "thứ 7 còn sân không", "chủ nhật có sân không", "sân trống chiều nay",
-        "gio nao con trong", "sân nào còn trống", "xem gio trong"
+        "gio nao con trong", "sân nào còn trống", "xem gio trong", "sân trống", "san trong"
       ],
       "responses": [
         "Hệ thống đang kiểm tra danh sách sân trống theo thời gian thực tại các chi nhánh cho bạn."
@@ -51,7 +90,7 @@
         "tiền sân 2 tiếng hết bao nhiêu", "chi phí thuê sân", "bảng giá chi tiết", "phụ thu cuối tuần bao nhiêu"
       ],
       "responses": [
-        "Biểu phí thuê sân tiêu chuẩn tại UTE Sport:\n• Khung giờ tiêu chuẩn (05:30 - 17:00): 80.000đ - 100.000đ/giờ\n• Khung Giờ Vàng (17:00 - 21:00): 140.000đ/giờ (Thảm Yonex BWF cao cấp)\n• Khung giờ muộn (21:00 - 22:30): 90.000đ/giờ\n• Cuối tuần (T7, CN): Phụ thu 15.000đ/giờ. Sinh viên UTE được giảm 10% khi xuất trình thẻ sinh viên."
+        "Biểu phí thuê sân tiêu chuẩn tại UTE Sport:\n• Khung giờ sáng (05:30 - 14:00): 80.000đ/giờ\n• Khung giờ chiều (14:00 - 17:00): 100.000đ/giờ\n• Khung Giờ Vàng (17:00 - 21:00): 140.000đ/giờ (Thảm Yonex BWF cao cấp)\n• Khung giờ muộn (21:00 - 22:30): 90.000đ/giờ\n• Cuối tuần (T7, CN): Phụ thu 15.000đ/giờ. Sinh viên UTE được giảm 10% khi xuất trình thẻ sinh viên."
       ]
     },
     {
@@ -61,10 +100,11 @@
         "he thong co nhung chi nhanh nao", "chi nhanh o dau", "dia chi san", "san o dau", "tim chi nhanh gan nhat",
         "tôi ở Thủ Đức thì đi chi nhánh nào", "sân gần Hoàng Diệu 2", "chi nhánh Quận 9 ở đâu", "chi nhánh Bình Thạnh",
         "toi o thu duc", "san gan hoang dieu 2", "chi nhanh quan 9", "chi nhanh binh thanh", "danh sách chi nhánh",
-        "có mấy cơ sở", "co may co so", "đường đi đến sân", "vị trí sân cầu lông", "chi nhánh nào gần tôi nhất"
+        "có mấy cơ sở", "co may co so", "đường đi đến sân", "vị trí sân cầu lông", "chi nhánh nào gần tôi nhất",
+        "chi nhánh gò vấp ở đâu", "chi nhanh go vap", "cơ sở quang trung"
       ],
       "responses": [
-        "Hệ thống UTE Sport hiện có các cơ sở:\n• CN01 (Thủ Đức): Số 1 Võ Văn Ngân, TP. Thủ Đức (Cạnh ĐH Sư Phạm Kỹ Thuật)\n• CN02 (Bình Thạnh): Số 234 Điện Biên Phủ, P. 25, Q. Bình Thạnh (Gần ngã tư Hàng Xanh)\n• CN03 (Quận 9): Số 70 Đỗ Xuân Hợp, P. Phước Long B, TP. Thủ Đức (Gần Khu Công Nghệ Cao)\nMở cửa từ 05:30 đến 22:30 mỗi ngày."
+        "Hệ thống UTE Sport hiện có các cơ sở:\n• CN01 (Thủ Đức): Số 1 Võ Văn Ngân, TP. Thủ Đức (Cạnh ĐH Sư Phạm Kỹ Thuật)\n• CN02 (Bình Thạnh): Số 234 Điện Biên Phủ, P. 25, Q. Bình Thạnh (Gần ngã tư Hàng Xanh)\n• CN03 (Quận 9): Số 70 Đỗ Xuân Hợp, P. Phước Long B, TP. Thủ Đức (Gần Khu Công Nghệ Cao)\n• CN04 (Gò Vấp): Số 18 Quang Trung, P. 10, Q. Gò Vấp\nMở cửa từ 05:30 đến 22:30 mỗi ngày."
       ]
     },
     {
@@ -102,7 +142,7 @@
         "sân có quầy nước không", "tiện ích sân", "sân có khán đài không", "khán đài xem đấu"
       ],
       "responses": [
-        "Cơ sở vật chất & Tiện ích tại Chuỗi Sân UTE Sport:\n• Mặt sân: 100% thảm Yonex & Enlio dày 5.0mm đạt chuẩn thi đấu quốc tế BWF, độ bám cao chống trơn trượt và giảm chấn khớp gối.\n• Ánh sáng & Không gian: Hệ thống đèn LED rọi chống lóa cao cấp, trần cao 9.5m thông thoáng, quạt công nghiệp mát mẻ.\n• Tiện ích đi kèm: Bãi đỗ ô tô và xe máy rộng rãi có bảo vệ 24/7, phòng tắm nóng lạnh & phòng thay đồ miễn phí, Wifi tốc độ cao phủ kín sân."
+        "Cơ sở vật chất & Tiện ích tại Chuỗi Sân UTE Sport:\n• Mặt sân: 100% thảm Yonex & Enlio dày 5.0mm đạt chuẩn thi đấu quốc tế BWF, độ bám cao chống trơn trượt và giảm chấn khớp gối.\n• Ánh sáng & Không gian: Hệ thống đèn LED rọi chống lóa cao cấp 500 Lux, trần cao 9.5m thông thoáng, quạt công nghiệp mát mẻ.\n• Tiện ích đi kèm: Bãi đỗ ô tô và xe máy rộng rãi MIỄN PHÍ có bảo vệ 24/7, phòng tắm nóng lạnh Ariston & phòng thay đồ miễn phí, Wifi tốc độ cao phủ kín sân."
       ]
     },
     {
@@ -114,7 +154,7 @@
         "dịch vụ đi kèm", "dich vu di kem", "mua quả cầu", "thuê dụng cụ", "thue dung cu", "phụ kiện cầu lông"
       ],
       "responses": [
-        "Dịch vụ & Thiết bị thể thao tại quầy lễ tân UTE Sport:\n• Cho thuê vợt thi đấu: Yonex Astrox, Victor Thruster (50.000đ/ca).\n• Cho thuê giày chuyên dụng đế kếp: Đủ size từ 37 - 44 (20.000đ/đôi).\n• Bán quả cầu lông chính hãng: Cầu Yonex AS-40, VinaStar, Thành Công 77 (bán theo ống hoặc lẻ quả).\n• Dịch vụ đan vợt điện tử: Cước Yonex BG65 (120k), BG66 Ultimax (160k).\n• Quầy F&B: Đầy đủ Revive, Pocari Sweat, Aquafina, RedBull, Nước điện giải mát lạnh."
+        "Dịch vụ & Thiết bị thể thao tại quầy lễ tân UTE Sport:\n• Cho thuê vợt thi đấu: Yonex Astrox 88D/100ZZ (50.000đ/ca), Vợt phổ thông (30.000đ/ca).\n• Cho thuê giày chuyên dụng đế kếp: Đủ size từ 36 - 44 (20.000đ/đôi).\n• Bán quả cầu lông chính hãng: Cầu Yonex AS-40, VinaStar, Thành Công 77 (bán theo ống 12 quả hoặc lẻ từng quả).\n• Dịch vụ đan vợt điện tử: Cước Yonex BG65 (120k), BG66 Ultimax (160k).\n• Quầy F&B: Đầy đủ Revive (15k), Pocari Sweat (18k), Aquafina (10k), RedBull (20k), Nước dừa đóng lon mát lạnh."
       ]
     },
     {

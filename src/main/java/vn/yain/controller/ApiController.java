@@ -2649,13 +2649,78 @@ public class ApiController {
 
 
     @GetMapping("/courts")
+    public List<Court> getCourts(@RequestParam(required = false) String branchCode,
+                                 @RequestParam(required = false) String branch) {
+        String code = (branchCode != null && !branchCode.isBlank()) ? branchCode : branch;
+        String effectiveBranch = resolveEffectiveBranchCode(code);
+        List<Court> courts = courtService.getCourts(effectiveBranch);
+        if (courts == null || courts.isEmpty()) {
+            courts = ensureCourtsSeededForBranch(effectiveBranch);
+        }
+        return courts;
+    }
 
-    public List<Court> getCourts(@RequestParam(required = false) String branchCode) {
-
-        String effectiveBranch = resolveEffectiveBranchCode(branchCode);
-
-        return courtService.getCourts(effectiveBranch);
-
+    private synchronized List<Court> ensureCourtsSeededForBranch(String branchCode) {
+        String targetBranch = (branchCode != null && !branchCode.isBlank()) ? branchCode.trim().toUpperCase() : "CN01";
+        List<Court> existing = courtRepository.findByBranchCode(targetBranch);
+        if (existing != null && !existing.isEmpty()) {
+            return existing;
+        }
+        List<Court> toSave = new ArrayList<>();
+        if ("CN02".equalsIgnoreCase(targetBranch)) {
+            for (int i = 1; i <= 6; i++) {
+                boolean isVip = (i == 1 || i == 6);
+                Court c = new Court();
+                c.setCourtCode("BT0" + i);
+                c.setBranchCode("CN02");
+                c.setCourtName("Sân BT " + i + (isVip ? " (VIP)" : ""));
+                c.setCourtType(isVip ? "Cầu lông VIP" : "Cầu lông tiêu chuẩn");
+                c.setHourlyRate(isVip ? new BigDecimal("120000") : new BigDecimal("90000"));
+                c.setStatus("Trống");
+                c.setImageUrl("/images/badminton-court.jpg");
+                toSave.add(c);
+            }
+        } else if ("CN03".equalsIgnoreCase(targetBranch)) {
+            for (int i = 1; i <= 6; i++) {
+                boolean isVip = (i == 1);
+                Court c = new Court();
+                c.setCourtCode("Q90" + i);
+                c.setBranchCode("CN03");
+                c.setCourtName("Sân Q9 " + i + (isVip ? " (VIP)" : ""));
+                c.setCourtType(isVip ? "Cầu lông VIP" : "Cầu lông tiêu chuẩn");
+                c.setHourlyRate(isVip ? new BigDecimal("120000") : new BigDecimal("90000"));
+                c.setStatus("Trống");
+                c.setImageUrl("/images/badminton-court.jpg");
+                toSave.add(c);
+            }
+        } else if ("CN04".equalsIgnoreCase(targetBranch)) {
+            for (int i = 1; i <= 6; i++) {
+                boolean isVip = (i == 1);
+                Court c = new Court();
+                c.setCourtCode("GV0" + i);
+                c.setBranchCode("CN04");
+                c.setCourtName("Sân GV " + i + (isVip ? " (VIP)" : ""));
+                c.setCourtType(isVip ? "Cầu lông VIP" : "Cầu lông tiêu chuẩn");
+                c.setHourlyRate(isVip ? new BigDecimal("120000") : new BigDecimal("90000"));
+                c.setStatus("Trống");
+                c.setImageUrl("/images/badminton-court.jpg");
+                toSave.add(c);
+            }
+        } else {
+            for (int i = 1; i <= 8; i++) {
+                boolean isVip = (i == 1 || i == 6);
+                Court c = new Court();
+                c.setCourtCode("CL0" + i);
+                c.setBranchCode("CN01");
+                c.setCourtName("Sân cầu lông " + i + (isVip ? " (VIP)" : ""));
+                c.setCourtType(isVip ? "Cầu lông VIP" : "Cầu lông tiêu chuẩn");
+                c.setHourlyRate(isVip ? new BigDecimal("120000") : new BigDecimal("90000"));
+                c.setStatus(i == 6 ? "Bảo trì" : "Trống");
+                c.setImageUrl("/images/badminton-court.jpg");
+                toSave.add(c);
+            }
+        }
+        return courtRepository.saveAll(toSave);
     }
 
 
@@ -3343,105 +3408,62 @@ public class ApiController {
 
 
     @GetMapping("/bookings/slots")
-
     public ResponseEntity<?> getBookedSlots(
-
             @RequestParam(value = "branchCode", required = false) String branchCode,
-
+            @RequestParam(value = "branch", required = false) String branch,
             @RequestParam(required = false) String courtCode,
-
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
         List<String> standardSlots = List.of(
-
             "06:00 - 07:00", "07:00 - 08:00", "08:00 - 09:00", "09:00 - 10:00",
-
             "10:00 - 11:00", "11:00 - 12:00", "12:00 - 13:00", "13:00 - 14:00",
-
             "14:00 - 15:00", "15:00 - 16:00", "16:00 - 17:00", "17:00 - 18:00",
-
             "18:00 - 19:00", "19:00 - 20:00", "20:00 - 21:00", "21:00 - 22:00"
-
         );
 
+        String effectiveBCode = (branchCode != null && !branchCode.isBlank()) ? branchCode.trim() : (branch != null && !branch.isBlank() ? branch.trim() : null);
 
-
-        if (branchCode == null || branchCode.trim().isEmpty()) {
-
+        if (effectiveBCode == null || effectiveBCode.isEmpty()) {
             Map<String, Object> resp = new HashMap<>();
-
             resp.put("success", true);
-
             resp.put("slots", standardSlots);
-
+            resp.put("bookedSlots", Collections.emptyList());
+            resp.put("data", Collections.emptyList());
             return ResponseEntity.ok(resp);
-
         }
-
-
 
         LocalDate targetDate = date != null ? date : LocalDate.now();
-
         List<Booking> bookings;
-
         if (courtCode != null && !courtCode.trim().isEmpty()) {
-
             bookings = bookingRepository.findByCourtCodeAndBookingDate(courtCode.trim(), targetDate);
-
         } else {
-
-            bookings = bookingRepository.findByBranchCodeAndBookingDate(branchCode.trim(), targetDate);
-
+            bookings = bookingRepository.findByBranchCodeAndBookingDate(effectiveBCode, targetDate);
         }
 
-
-
         List<Map<String, Object>> activeSlots = bookings.stream()
-
                 .filter(b -> b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus()))
-
                 .map(b -> {
-
                     Map<String, Object> map = new HashMap<>();
-
                     map.put("bookingCode", b.getBookingCode());
-
                     map.put("courtCode", b.getCourtCode());
-
                     map.put("branchCode", b.getBranchCode());
-
                     map.put("timeSlot", b.getTimeSlot());
-
                     map.put("status", b.getStatus());
-
                     map.put("customerName", b.getCustomerName());
-
                     map.put("customerPhone", b.getCustomerPhone());
-
                     map.put("totalPrice", b.getTotalPrice());
-
                     map.put("depositAmount", b.getDepositAmount());
-
                     map.put("paymentMethod", b.getPaymentMethod());
-
                     return map;
-
                 })
-
                 .collect(Collectors.toList());
 
-
-
         Map<String, Object> resp = new HashMap<>();
-
         resp.put("success", true);
-
         resp.put("slots", standardSlots);
-
         resp.put("bookedSlots", activeSlots);
-
+        resp.put("data", activeSlots);
         return ResponseEntity.ok(resp);
-
     }
 
 

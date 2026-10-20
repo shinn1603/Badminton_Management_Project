@@ -2286,12 +2286,12 @@
       try {
         const today = new Date().toISOString().split('T')[0];
         const [courtsRes, slotsRes] = await Promise.all([
-          fetch(`/api/courts?branchCode=${branchCode}`).then(r => r.json()),
-          fetch(`/api/bookings/slots?branchCode=${branchCode}&date=${today}`).then(r => r.json())
+          fetch(`/api/courts?branchCode=${branchCode}`).then(r => r.json()).catch(() => []),
+          fetch(`/api/bookings/slots?branchCode=${branchCode}&date=${today}`).then(r => r.json()).catch(() => ({}))
         ]);
 
-        const courts = courtsRes || [];
-        const booked = slotsRes || [];
+        const courts = (courtsRes && Array.isArray(courtsRes)) ? courtsRes : (courtsRes?.courts || []);
+        const booked = Array.isArray(slotsRes) ? slotsRes : (slotsRes?.bookedSlots || slotsRes?.data || []);
 
         if (courts.length === 0) {
           container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">Không tìm thấy sân nào cho chi nhánh này.</div>`;
@@ -2381,10 +2381,12 @@
       tbody.innerHTML = `<tr><td colspan="14" style="padding: 24px; text-align: center; color: var(--text-muted);">Đang cập nhật lịch sân cho ngày ${date}...</td></tr>`;
 
       try {
-        const [courts, bookings] = await Promise.all([
-          fetch(`/api/courts?branchCode=${branchCode}`).then(r => r.json()),
-          fetch(`/api/bookings/slots?branchCode=${branchCode}&date=${date}`).then(r => r.json())
+        const [courtsRes, slotsData] = await Promise.all([
+          fetch(`/api/courts?branchCode=${branchCode}`).then(r => r.json()).catch(() => []),
+          fetch(`/api/bookings/slots?branchCode=${branchCode}&date=${date}`).then(r => r.json()).catch(() => ({}))
         ]);
+        const courts = (courtsRes && Array.isArray(courtsRes)) ? courtsRes : (courtsRes?.courts || []);
+        const bookings = Array.isArray(slotsData) ? slotsData : (slotsData?.bookedSlots || slotsData?.data || []);
 
         if (!courts || courts.length === 0) {
           tbody.innerHTML = `<tr><td colspan="14" style="padding: 24px; text-align: center;">Không có dữ liệu sân.</td></tr>`;
@@ -2775,7 +2777,8 @@
 
       try {
         const res = await fetch(`/api/bookings/slots?branchCode=${currentModalCourt.branchCode}&courtCode=${currentModalCourt.courtCode}&date=${date}`);
-        const bookings = await res.json() || [];
+        const data = await res.json() || {};
+        const bookings = Array.isArray(data) ? data : (data.bookedSlots || data.data || []);
         currentBookedSlots = bookings;
 
         let html = '';
