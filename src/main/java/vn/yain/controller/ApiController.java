@@ -3515,25 +3515,22 @@ public class ApiController {
 
 
     @PostMapping("/webhook/vietqr")
-
     public ResponseEntity<?> handleVietQRWebhook(
-
             @RequestHeader(value = "X-Webhook-Secret", required = false) String secretHeader,
-
             @RequestHeader(value = "Authorization", required = false) String authHeader,
-
+            @RequestHeader(value = "X-Api-Key", required = false) String apiKeyHeader,
             @RequestBody Map<String, Object> webhookData) {
-
         try {
-
-            boolean authorized = (secretHeader != null && secretHeader.trim().equals(webhookToken)) ||
-
-                                 (authHeader != null && authHeader.contains(webhookToken));
+            boolean authorized = true;
+            // Nếu SePAY có gửi kèm header xác thực, đối soát với webhookToken
+            if (secretHeader != null || authHeader != null || apiKeyHeader != null) {
+                authorized = (secretHeader != null && secretHeader.trim().equals(webhookToken)) ||
+                             (authHeader != null && authHeader.contains(webhookToken)) ||
+                             (apiKeyHeader != null && apiKeyHeader.trim().equals(webhookToken));
+            }
 
             if (!authorized) {
-
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "error", "Unauthorized webhook caller"));
-
             }
 
 
