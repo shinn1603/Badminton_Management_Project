@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giám sát Mặt Hàng & Nhập Kho Chuỗi - UTE Sport</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="/js/auth-guard.js"></script>
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+</head>
+<body>
+
+  <div class="layout-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="appSidebar">
+      <div class="brand-header">
+        <div class="brand-logo-wrap">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+            <path d="M2 12h20"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>UTE SPORT</h2>
+          <span>BAN ĐIỀU HÀNH CHUỖI</span>
+        </div>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="menu-title">Giám đốc điều hành</div>
+        
+        <a href="/director/dashboard" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span class="menu-text">Doanh thu toàn chuỗi</span>
+        </a>
+
+        <a href="/director/dashboard#comparison-section" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+            <path d="M9 22v-4h6v4"></path>
+            <path d="M8 6h.01"></path>
+            <path d="M16 6h.01"></path>
+            <path d="M8 10h.01"></path>
+            <path d="M16 10h.01"></path>
+            <path d="M8 14h.01"></path>
+            <path d="M16 14h.01"></path>
+          </svg>
+          <span class="menu-text">So sánh chi nhánh</span>
+        </a>
+
+        <a href="/director/branches" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span class="menu-text">Quản lý chi nhánh</span>
+        </a>
+
+        <a href="/director/pricing" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+            <line x1="7" y1="7" x2="7.01" y2="7"></line>
+          </svg>
+          <span class="menu-text">Chính sách giá & KM</span>
+        </a>
+
+        <a href="/director/tournaments" class="menu-item">
+          <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+            <path d="M4 22h16"></path>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+          </svg>
+          <span class="menu-text">Phê duyệt giải đấu</span>
+        </a>
+
+        <a href="/director/receipts" class="menu-item active" id="navDirectorReceipts" title="Giám sát mặt hàng & phiếu nhập kho toàn chuỗi">
+          <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+          <span class="menu-text">Giám sát nhập hàng</span>
+        </a>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="user-avatar" id="sidebarAvatar">GD</div>
+        <div class="user-meta">
+          <span class="user-name" id="sidebarName">Nguyễn Phước Thọ</span>
+          <span class="user-title" id="sidebarTitle">Giám đốc chuỗi</span>
+        </div>
+        <a href="javascript:void(0)" onclick="logout()" class="logout-btn" title="Đăng xuất">
+          <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </a>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- TOP NAV -->
+      <header class="top-nav">
+        <div class="nav-left">
+          <button class="nav-icon-btn" onclick="toggleSidebar()" title="Đóng/mở sidebar">
+            <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <h1 class="page-title">Giám sát mặt hàng & Nhập kho chuỗi</h1>
+        </div>
+
+        <div class="nav-right">
+          <button class="nav-icon-btn" onclick="toggleTheme()" title="Đổi giao diện">
+            <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+
+          <button class="btn btn-primary btn-sm" id="btnReceiptHeaderAction" onclick="handleReceiptHeaderAction()">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span id="btnReceiptHeaderActionText">Làm mới dữ liệu</span>
+          </button>
+
+          <div class="nav-user">
+            <div class="user-avatar-sm">PT</div>
+            <div class="nav-user-info">
+              <span class="nav-user-name">Nguyễn Phước Thọ</span>
+              <span class="nav-user-role">Giám đốc chuỗi</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-body">
+        <!-- HERO BANNER -->
+        <div class="hero-banner" style="background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); margin-bottom: 24px;">
+          <div class="hero-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(52, 211, 153, 0.4);">
+            BAN GIÁM ĐỐC • GIÁM SÁT HÀNG HÓA & NHẬP KHO CHUỖI
+          </div>
+          <h1 class="hero-title">Giám Sát Mặt Hàng & Nhập Kho Chuỗi Chi Nhánh</h1>
+          <p class="hero-subtitle" style="margin-bottom: 0;">
+            Theo dõi tập trung lịch sử phiếu nhập hàng, quản lý danh bạ đối tác cung ứng và kiểm soát giá vốn cố định toàn hệ thống.
+          </p>
+        </div>
+
+        <!-- 4 KPI CARDS -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 22px;">
+          <div class="card" style="padding: 18px 20px; border-left: 4px solid #10b981;">
+            <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tổng chi phí nhập kho toàn chuỗi</div>
+            <div style="font-size: 24px; font-weight: 800; color: #059669; margin: 6px 0;" id="kpiDirectorTotalReceiptAmount">0 đ</div>
+            <div style="font-size: 11.5px; color: var(--text-muted);">Tổng giá trị từ tất cả các phiếu nhập kho</div>
+          </div>
+
+          <div class="card" style="padding: 18px 20px; border-left: 4px solid #3b82f6;">
+            <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tổng số phiếu nhập kho</div>
+            <div style="font-size: 24px; font-weight: 800; color: #2563eb; margin: 6px 0;" id="kpiDirectorReceiptCount">0 phiếu</div>
+            <div style="font-size: 11.5px; color: var(--text-muted);">Đã lưu vết kiểm kê trong cơ sở dữ liệu</div>
+          </div>
+
+          <div class="card" style="padding: 18px 20px; border-left: 4px solid #8b5cf6;">
+            <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Số chi nhánh đã nhập hàng</div>
+            <div style="font-size: 24px; font-weight: 800; color: #7c3aed; margin: 6px 0;" id="kpiDirectorActiveBranches">0 chi nhánh</div>
+            <div style="font-size: 11.5px; color: var(--text-muted);">Hệ thống chi nhánh: CN01, CN02, CN03,...</div>
+          </div>
+
+          <div class="card" style="padding: 18px 20px; border-left: 4px solid #f59e0b;">
+            <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Đối tác cung ứng chuỗi</div>
+            <div style="font-size: 24px; font-weight: 800; color: #d97706; margin: 6px 0;" id="kpiDirectorSupplierCount">0 đối tác</div>
+            <div style="font-size: 11.5px; color: var(--text-muted);">Nhà cung ứng thiết bị, nước và phụ kiện</div>
+          </div>
+        </div>
+
+        <!-- TAB NAVIGATION -->
+        <div class="chart-tab-bar" style="margin-bottom: 20px;">
+          <button class="chart-tab-btn active" id="receiptTabBtn1" onclick="switchReceiptsTab(1)">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; margin-right: 6px;" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Phiếu nhập hàng các chi nhánh</span>
+            <span class="tab-badge" id="badgeTotalReceipts" style="background: rgba(99, 102, 241, 0.15); color: #4f46e5;">Đang tải...</span>
+          </button>
+
+          <button class="chart-tab-btn" id="receiptTabBtn2" onclick="switchReceiptsTab(2)">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; margin-right: 6px;" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Nhà cung cấp & Đối tác chuỗi</span>
+            <span class="tab-badge" id="badgeTotalSuppliers" style="background: rgba(16, 185, 129, 0.15); color: #059669;">Đang tải...</span>
+          </button>
+
+          <button class="chart-tab-btn" id="receiptTabBtn3" onclick="switchReceiptsTab(3)">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; margin-right: 6px;" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <span>Mặt hàng & Giá vốn chuẩn chuỗi</span>
+            <span class="tab-badge" id="badgeTotalProducts" style="background: rgba(59, 130, 246, 0.15); color: #2563eb;">Đang tải...</span>
+          </button>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 1: PHIẾU NHẬP HÀNG CÁC CHI NHÁNH -->
+        <!-- ========================================== -->
+        <div id="receiptContent1">
+          <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 class="card-title" style="margin-bottom: 4px;">Lịch sử phiếu nhập kho toàn chuỗi chi nhánh</h2>
+                <div style="font-size: 12.5px; color: var(--text-muted);">Giám đốc theo dõi thời gian thực các đợt bổ sung nước uống, cầu lông & phụ kiện của từng cơ sở</div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="directorReceiptSearch" onkeyup="filterDirectorReceipts()" class="form-control" placeholder="Tìm mã phiếu, NCC, ghi chú..." style="width: 220px; padding: 6px 12px; font-size: 12.5px;">
+                <select id="directorReceiptBranchFilter" onchange="filterDirectorReceipts()" class="form-control" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
+                  <option value="ALL">-- Tất cả chi nhánh --</option>
+                  <option value="CN01">Cơ sở 1 (CN01)</option>
+                  <option value="CN02">Cơ sở 2 (CN02)</option>
+                  <option value="CN03">Cơ sở 3 (CN03)</option>
+                  <option value="CN04">Cơ sở 4 (CN04)</option>
+                </select>
+                <button type="button" class="btn btn-outline btn-sm" onclick="loadDirectorReceiptsData()" title="Tải lại danh sách">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                  </svg>
+                  Làm mới
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>MÃ PHIẾU</th>
+                    <th style="text-align: center;">CHI NHÁNH</th>
+                    <th>NGÀY NHẬP</th>
+                    <th>NHÂN VIÊN LẬP</th>
+                    <th>NHÀ CUNG CẤP</th>
+                    <th style="text-align: right;">TỔNG TIỀN (VNĐ)</th>
+                    <th style="text-align: center;">TRẠNG THÁI</th>
+                    <th>GHI CHÚ NHẬP KHO</th>
+                  </tr>
+                </thead>
+                <tbody id="directorReceiptsTableBody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                      Đang tải danh sách phiếu nhập kho từ CSDL...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: NHÀ CUNG CẤP & ĐỐI TÁC CHUỖI -->
+        <!-- ========================================== -->
+        <div id="receiptContent2" style="display: none;">
+          <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 class="card-title" style="margin-bottom: 4px;">Danh bạ Nhà cung cấp & Đối tác cung ứng chuỗi</h2>
+                <div style="font-size: 12.5px; color: var(--text-muted);">Giám đốc quản lý tập trung toàn bộ các đầu mối nhập hàng, bảng giá chiết khấu và hợp đồng</div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="directorSupplierSearch" onkeyup="filterDirectorSuppliers()" class="form-control" placeholder="Tìm tên đối tác, SĐT..." style="width: 220px; padding: 6px 12px; font-size: 12.5px;">
+                <button type="button" class="btn btn-primary btn-sm" onclick="openDirectorSupplierModal()">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  + Thêm Nhà Cung Cấp
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>MÃ NCC</th>
+                    <th>TÊN ĐỐI TÁC / DOANH NGHIỆP</th>
+                    <th>NGƯỜI ĐẠI DIỆN</th>
+                    <th>SỐ ĐIỆN THOẠI</th>
+                    <th>LĨNH VỰC HÀNG HÓA</th>
+                    <th>ĐỊA CHỈ TRỤ SỞ</th>
+                    <th style="text-align: center;">TRẠNG THÁI</th>
+                    <th style="text-align: right;">HÀNH ĐỘNG</th>
+                  </tr>
+                </thead>
+                <tbody id="directorSuppliersTableBody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                      Đang tải danh bạ đối tác cung ứng...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: MẶT HÀNG & GIÁ VỐN CHUẨN CHUỖI -->
+        <!-- ========================================== -->
+        <div id="receiptContent3" style="display: none;">
+          <div class="card" style="margin-bottom: 20px;">
+            <div style="padding: 14px 18px; background: #ecfdf5; border-left: 4px solid #10b981; border-radius: 6px; font-size: 13px; color: #065f46; display: flex; align-items: center; gap: 10px;">
+              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 20px; height: 20px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span><strong>Chính sách kiểm soát giá vốn của Ban Giám Đốc:</strong> Giá vốn nhập chuẩn (costPrice) được quy định cố định tại đây. Quản lý tại tất cả chi nhánh chỉ được nhập hàng theo giá vốn chuẩn này, đảm bảo tính minh bạch và tránh thất thoát chi phí chuỗi.</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 class="card-title" style="margin-bottom: 4px;">Danh mục mặt hàng & Chuẩn hóa giá vốn toàn chuỗi</h2>
+                <div style="font-size: 12.5px; color: var(--text-muted);">Cập nhật định mức giá vốn và giá niêm yết bán lẻ áp dụng cho toàn bộ các điểm sân</div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="directorProductSearch" onkeyup="filterDirectorProducts()" class="form-control" placeholder="Tìm tên hàng, mã SP..." style="width: 220px; padding: 6px 12px; font-size: 12.5px;">
+                <select id="directorProductBranchFilter" onchange="filterDirectorProducts()" class="form-control" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
+                  <option value="ALL">-- Tất cả chi nhánh --</option>
+                  <option value="CN01">Cơ sở 1 (CN01)</option>
+                  <option value="CN02">Cơ sở 2 (CN02)</option>
+                  <option value="CN03">Cơ sở 3 (CN03)</option>
+                  <option value="CN04">Cơ sở 4 (CN04)</option>
+                </select>
+                <button type="button" class="btn btn-outline btn-sm" onclick="loadDirectorProductsData()" title="Làm mới">
+                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                  </svg>
+                  Làm mới
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>MÃ SẢN PHẨM</th>
+                    <th>TÊN SẢN PHẨM</th>
+                    <th style="text-align: center;">CHI NHÁNH</th>
+                    <th>DANH MỤC</th>
+                    <th style="text-align: center;">TỒN KHO</th>
+                    <th style="text-align: right;">GIÁ VỐN CHUẨN (VNĐ)</th>
+                    <th style="text-align: right;">GIÁ BÁN NIÊM YẾT (VNĐ)</th>
+                    <th style="text-align: right;">BIÊN LỢI NHUẬN</th>
+                    <th style="text-align: right;">HÀNH ĐỘNG</th>
+                  </tr>
+                </thead>
+                <tbody id="directorProductsTableBody">
+                  <tr>
+                    <td colspan="9" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                      Đang tải danh mục mặt hàng toàn chuỗi...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL THÊM / SỬA NHÀ CUNG CẤP -->
+  <div class="modal-overlay" id="directorSupplierModal">
+    <div class="modal-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <h3 id="dirSupplierModalTitle">Thêm Nhà Cung Cấp Mới</h3>
+        <button class="modal-close-btn" onclick="closeDirectorSupplierModal()">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="dirSupplierId">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label">Tên nhà cung cấp / Đối tác <span style="color: var(--danger);">*</span></label>
+          <input type="text" class="form-control" id="dirSupplierName" placeholder="vd: Công ty TNHH Thể Thao Yonex Việt Nam" required>
+        </div>
+        <div class="form-row" style="margin-bottom: 12px;">
+          <div class="form-group">
+            <label class="form-label">Người đại diện liên hệ</label>
+            <input type="text" class="form-control" id="dirSupplierContact" placeholder="vd: Lê Minh Hoàng">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Số điện thoại</label>
+            <input type="text" class="form-control" id="dirSupplierPhone" placeholder="vd: 0918223344">
+          </div>
+        </div>
+        <div class="form-row" style="margin-bottom: 12px;">
+          <div class="form-group">
+            <label class="form-label">Lĩnh vực hàng hóa</label>
+            <select class="form-control" id="dirSupplierCategory">
+              <option value="Nước giải khát">Nước giải khát</option>
+              <option value="Cầu lông">Ống Cầu lông</option>
+              <option value="Dụng cụ & Trang phục">Dụng cụ & Trang phục</option>
+              <option value="Phụ kiện">Phụ kiện thể thao</option>
+              <option value="Đa ngành">Cung ứng tổng hợp</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email liên hệ</label>
+            <input type="email" class="form-control" id="dirSupplierEmail" placeholder="contact@doitac.com">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label">Địa chỉ trụ sở / kho bãi</label>
+          <input type="text" class="form-control" id="dirSupplierAddress" placeholder="Số nhà, đường, quận/huyện, tỉnh thành">
+        </div>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label">Trạng thái hợp tác</label>
+          <select class="form-control" id="dirSupplierStatus">
+            <option value="Đang hợp tác">Đang hợp tác</option>
+            <option value="Tạm ngưng">Tạm ngưng</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ghi chú chính sách hợp đồng / Chiết khấu</label>
+          <textarea class="form-control" id="dirSupplierNotes" rows="2" placeholder="Chiết khấu đại lý, điều kiện thanh toán..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeDirectorSupplierModal()">Hủy</button>
+        <button class="btn btn-primary" onclick="saveDirectorSupplier()">Lưu Nhà Cung Cấp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL GIÁM ĐỐC CHỈNH SỬA GIÁ VỐN & GIÁ BÁN SẢN PHẨM -->
+  <div class="modal-overlay" id="directorProductModal">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 id="dirProdModalTitle">Chỉnh sửa giá vốn & giá bán sản phẩm</h3>
+        <button class="modal-close-btn" onclick="closeDirectorProductModal()">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="dirProdId">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label">Mặt hàng: <strong id="dirProdName" style="color: var(--primary);"></strong></label>
+        </div>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label">Giá vốn nhập chuẩn (VNĐ) <span style="color: var(--danger);">* (Khóa chuẩn hóa chuỗi)</span></label>
+          <input type="number" class="form-control" id="dirProdCostPrice" step="1000" min="0" required>
+          <small style="color: var(--text-muted); font-size: 11.5px;">Giá vốn này sẽ được cố định khi các Quản lý chi nhánh nhập kho.</small>
+        </div>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label">Giá bán lẻ niêm yết (VNĐ) <span style="color: var(--primary);">*</span></label>
+          <input type="number" class="form-control" id="dirProdUnitPrice" step="1000" min="0" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeDirectorProductModal()">Hủy</button>
+        <button class="btn btn-primary" onclick="saveDirectorProductPrices()">Lưu Giá Chuẩn</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentReceiptTab = 1;
+    let allDirectorReceipts = [];
+    let allDirectorSuppliers = [];
+    let allDirectorProducts = [];
+
+    function formatVND(amount) {
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('appSidebar');
+      if (sidebar) sidebar.classList.toggle('collapsed');
+    }
+
+    function handleReceiptHeaderAction() {
+      if (currentReceiptTab === 1) loadDirectorReceiptsData();
+      else if (currentReceiptTab === 2) openDirectorSupplierModal();
+      else loadDirectorProductsData();
+    }
+
+    function switchReceiptsTab(tabIndex) {
+      currentReceiptTab = tabIndex;
+      const btn1 = document.getElementById('receiptTabBtn1');
+      const btn2 = document.getElementById('receiptTabBtn2');
+      const btn3 = document.getElementById('receiptTabBtn3');
+      const c1 = document.getElementById('receiptContent1');
+      const c2 = document.getElementById('receiptContent2');
+      const c3 = document.getElementById('receiptContent3');
+      const actionText = document.getElementById('btnReceiptHeaderActionText');
+
+      if (btn1) btn1.classList.toggle('active', tabIndex === 1);
+      if (btn2) btn2.classList.toggle('active', tabIndex === 2);
+      if (btn3) btn3.classList.toggle('active', tabIndex === 3);
+
+      if (c1) c1.style.display = tabIndex === 1 ? 'block' : 'none';
+      if (c2) c2.style.display = tabIndex === 2 ? 'block' : 'none';
+      if (c3) c3.style.display = tabIndex === 3 ? 'block' : 'none';
+
+      if (actionText) {
+        if (tabIndex === 1) actionText.textContent = 'Làm mới phiếu';
+        else if (tabIndex === 2) actionText.textContent = '+ Thêm nhà cung cấp';
+        else actionText.textContent = 'Làm mới mặt hàng';
+      }
+
+      if (tabIndex === 1) loadDirectorReceiptsData();
+      else if (tabIndex === 2) loadDirectorSuppliersData();
+      else if (tabIndex === 3) loadDirectorProductsData();
+    }
+
+    // ==========================================
+    // TAB 1: PHIẾU NHẬP HÀNG CÁC CHI NHÁNH
+    // ==========================================
+    async function loadDirectorReceiptsData() {
+      const tbody = document.getElementById('directorReceiptsTableBody');
+      if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải dữ liệu phiếu nhập kho...</td></tr>';
+      }
+      try {
+        const token = localStorage.getItem('jwt_token') || localStorage.getItem('token');
+        const headers = {};
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/inventory/receipts', { headers });
+        if (res.ok) {
+          allDirectorReceipts = await receiptDataHandler(await res.json());
+          updateDirectorReceiptKPIs(allDirectorReceipts);
+          renderDirectorReceiptsTable(allDirectorReceipts);
+          const badge = document.getElementById('badgeTotalReceipts');
+          if (badge) badge.textContent = `${allDirectorReceipts.length} phiếu`;
+        } else {
+          console.error('Lỗi tải phiếu nhập:', res.status);
+          if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--danger);">Không thể tải danh sách phiếu nhập kho</td></tr>';
+        }
+      } catch (err) {
+        console.error('Lỗi fetch phiếu nhập:', err);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--danger);">Lỗi kết nối máy chủ</td></tr>';
+      }
+    }
+
+    function receiptDataHandler(data) {
+      if (!Array.isArray(data)) return [];
+      return data;
+    }
+
+    function updateDirectorReceiptKPIs(receipts) {
+      const elTotal = document.getElementById('kpiDirectorTotalReceiptAmount');
+      const elCount = document.getElementById('kpiDirectorReceiptCount');
+      const elBranches = document.getElementById('kpiDirectorActiveBranches');
+
+      const totalAmount = receipts.reduce((sum, r) => sum + Number(r.totalAmount || 0), 0);
+      const uniqueBranches = new Set(receipts.map(r => r.branchCode).filter(Boolean));
+
+      if (elTotal) elTotal.textContent = formatVND(totalAmount);
+      if (elCount) elCount.textContent = `${receipts.length} phiếu`;
+      if (elBranches) elBranches.textContent = `${uniqueBranches.size} chi nhánh`;
+    }
+
+    function renderDirectorReceiptsTable(receipts) {
+      const tbody = document.getElementById('directorReceiptsTableBody');
+      if (!tbody) return;
+
+      if (!receipts || receipts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Không tìm thấy phiếu nhập nào phù hợp bộ lọc</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = receipts.map(r => `
+        <tr>
+          <td><strong style="color: var(--primary); font-size: 13.5px;">${escapeHtml(r.receiptCode)}</strong></td>
+          <td style="text-align: center;">
+            <span class="badge ${r.branchCode === 'CN01' ? 'badge-primary' : 'badge-outline'}" style="font-size: 11px; padding: 2.5px 8px; font-weight: 700;">
+              ${escapeHtml(r.branchCode || 'CN01')}
+            </span>
+          </td>
+          <td style="font-size: 12.5px; color: var(--text-body);">${escapeHtml(r.receiptDate ? (r.receiptDate.split('T')[0] || r.receiptDate) : 'Hôm nay')}</td>
+          <td style="font-size: 12.5px; color: var(--text-muted); font-weight: 600;">${escapeHtml(r.staffCode || 'NS02')}</td>
+          <td>
+            <div style="font-weight: 700; color: var(--text-dark); font-size: 13px;">${escapeHtml(r.supplierName || 'Nhà cung cấp')}</div>
+          </td>
+          <td style="color: #059669; font-weight: 800; text-align: right; font-size: 14px;">
+            ${formatVND(r.totalAmount)}
+          </td>
+          <td style="text-align: center;">
+            <span class="badge badge-success" style="font-size: 11px;">Đã nhập kho</span>
+          </td>
+          <td style="font-size: 12px; color: var(--text-muted); max-width: 240px; line-height: 1.4;">
+            ${escapeHtml(r.notes || 'Bổ sung định kỳ')}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterDirectorReceipts() {
+      const q = (document.getElementById('directorReceiptSearch')?.value || '').toLowerCase().trim();
+      const bCode = document.getElementById('directorReceiptBranchFilter')?.value || 'ALL';
+
+      let filtered = allDirectorReceipts.filter(r => {
+        const matchBranch = (bCode === 'ALL' || r.branchCode === bCode);
+        const matchText = !q ||
+          (r.receiptCode && r.receiptCode.toLowerCase().includes(q)) ||
+          (r.supplierName && r.supplierName.toLowerCase().includes(q)) ||
+          (r.notes && r.notes.toLowerCase().includes(q));
+        return matchBranch && matchText;
+      });
+
+      renderDirectorReceiptsTable(filtered);
+    }
+
+    // ==========================================
+    // TAB 2: NHÀ CUNG CẤP & ĐỐI TÁC CHUỖI
+    // ==========================================
+    async function loadDirectorSuppliersData() {
+      const tbody = document.getElementById('directorSuppliersTableBody');
+      if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải danh bạ đối tác cung ứng...</td></tr>';
+      }
+      try {
+        const res = await fetch('/api/suppliers');
+        if (res.ok) {
+          allDirectorSuppliers = await res.json();
+          renderDirectorSuppliersTable(allDirectorSuppliers);
+          const badge = document.getElementById('badgeTotalSuppliers');
+          if (badge) badge.textContent = `${allDirectorSuppliers.length} đối tác`;
+          const kpi = document.getElementById('kpiDirectorSupplierCount');
+          if (kpi) kpi.textContent = `${allDirectorSuppliers.length} đối tác`;
+        }
+      } catch (err) {
+        console.error('Lỗi fetch nhà cung cấp:', err);
+      }
+    }
+
+    function renderDirectorSuppliersTable(suppliers) {
+      const tbody = document.getElementById('directorSuppliersTableBody');
+      if (!tbody) return;
+
+      if (!suppliers || suppliers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Chưa có nhà cung cấp nào</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = suppliers.map(s => `
+        <tr>
+          <td><strong style="color: var(--primary); font-size: 13.5px;">${escapeHtml(s.supplierCode || ('NCC' + s.id))}</strong></td>
+          <td>
+            <div style="font-weight: 700; color: var(--text-dark); font-size: 13.5px;">${escapeHtml(s.supplierName)}</div>
+            <div style="font-size: 11px; color: var(--text-muted);">${escapeHtml(s.email || '')}</div>
+          </td>
+          <td style="font-size: 12.5px;">${escapeHtml(s.contactPerson || '-')}</td>
+          <td style="font-size: 12.5px; font-weight: 600;">${escapeHtml(s.phone || '-')}</td>
+          <td>
+            <span class="badge badge-outline" style="font-size: 11px;">${escapeHtml(s.category || 'Tổng hợp')}</span>
+          </td>
+          <td style="font-size: 12px; color: var(--text-muted); max-width: 200px;">${escapeHtml(s.address || 'Toàn quốc')}</td>
+          <td style="text-align: center;">
+            <span class="badge ${s.status === 'Đang hợp tác' ? 'badge-success' : 'badge-warning'}" style="font-size: 11px;">
+              ${escapeHtml(s.status || 'Đang hợp tác')}
+            </span>
+          </td>
+          <td style="text-align: right;">
+            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+              <button class="btn btn-outline btn-xs" onclick="editDirectorSupplier(${s.id})">Sửa</button>
+              <button class="btn btn-outline btn-xs" style="color: var(--danger); border-color: #fca5a5;" onclick="deleteDirectorSupplier(${s.id}, '${escapeHtml(s.supplierName)}')">Xóa</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterDirectorSuppliers() {
+      const q = (document.getElementById('directorSupplierSearch')?.value || '').toLowerCase().trim();
+      let filtered = allDirectorSuppliers.filter(s => {
+        return !q ||
+          (s.supplierName && s.supplierName.toLowerCase().includes(q)) ||
+          (s.phone && s.phone.includes(q)) ||
+          (s.category && s.category.toLowerCase().includes(q)) ||
+          (s.contactPerson && s.contactPerson.toLowerCase().includes(q));
+      });
+      renderDirectorSuppliersTable(filtered);
+    }
+
+    function openDirectorSupplierModal() {
+      document.getElementById('dirSupplierModalTitle').textContent = 'Thêm Nhà Cung Cấp Mới';
+      document.getElementById('dirSupplierId').value = '';
+      document.getElementById('dirSupplierName').value = '';
+      document.getElementById('dirSupplierContact').value = '';
+      document.getElementById('dirSupplierPhone').value = '';
+      document.getElementById('dirSupplierEmail').value = '';
+      document.getElementById('dirSupplierAddress').value = '';
+      document.getElementById('dirSupplierNotes').value = '';
+      document.getElementById('dirSupplierStatus').value = 'Đang hợp tác';
+      document.getElementById('directorSupplierModal').classList.add('active');
+    }
+
+    function editDirectorSupplier(id) {
+      const s = allDirectorSuppliers.find(x => x.id === id);
+      if (!s) return;
+      document.getElementById('dirSupplierModalTitle').textContent = 'Chỉnh Sửa Nhà Cung Cấp';
+      document.getElementById('dirSupplierId').value = s.id;
+      document.getElementById('dirSupplierName').value = s.supplierName || '';
+      document.getElementById('dirSupplierContact').value = s.contactPerson || '';
+      document.getElementById('dirSupplierPhone').value = s.phone || '';
+      document.getElementById('dirSupplierEmail').value = s.email || '';
+      document.getElementById('dirSupplierAddress').value = s.address || '';
+      document.getElementById('dirSupplierNotes').value = s.notes || '';
+      document.getElementById('dirSupplierCategory').value = s.category || 'Nước giải khát';
+      document.getElementById('dirSupplierStatus').value = s.status || 'Đang hợp tác';
+      document.getElementById('directorSupplierModal').classList.add('active');
+    }
+
+    function closeDirectorSupplierModal() {
+      document.getElementById('directorSupplierModal').classList.remove('active');
+    }
+
+    async function saveDirectorSupplier() {
+      const id = document.getElementById('dirSupplierId').value;
+      const name = document.getElementById('dirSupplierName').value.trim();
+      if (!name) {
+        if (window.showToast) showToast('Vui lòng nhập tên nhà cung cấp!', 'warning');
+        else alert('Vui lòng nhập tên nhà cung cấp!');
+        return;
+      }
+
+      const payload = {
+        supplierName: name,
+        contactPerson: document.getElementById('dirSupplierContact').value.trim(),
+        phone: document.getElementById('dirSupplierPhone').value.trim(),
+        email: document.getElementById('dirSupplierEmail').value.trim(),
+        address: document.getElementById('dirSupplierAddress').value.trim(),
+        category: document.getElementById('dirSupplierCategory').value,
+        status: document.getElementById('dirSupplierStatus').value,
+        notes: document.getElementById('dirSupplierNotes').value.trim()
+      };
+
+      try {
+        const token = localStorage.getItem('jwt_token') || localStorage.getItem('token');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const url = id ? `/api/suppliers/${id}` : '/api/suppliers';
+        const method = id ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+          method: method,
+          headers: headers,
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (data.success || res.ok) {
+          if (window.showToast) showToast(data.message || 'Lưu nhà cung cấp thành công!', 'success');
+          closeDirectorSupplierModal();
+          loadDirectorSuppliersData();
+        } else {
+          if (window.showToast) showToast(data.message || 'Lỗi lưu nhà cung cấp', 'error');
+          else alert(data.message || 'Lỗi lưu nhà cung cấp');
+        }
+      } catch (err) {
+        console.error('Lỗi khi lưu nhà cung cấp:', err);
+      }
+    }
+
+    async function deleteDirectorSupplier(id, name) {
+      if (!confirm(`Bạn có chắc chắn muốn xóa nhà cung cấp [${name}] khỏi hệ thống?`)) return;
+      try {
+        const token = localStorage.getItem('jwt_token') || localStorage.getItem('token');
+        const headers = {};
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch(`/api/suppliers/${id}`, { method: 'DELETE', headers });
+        const data = await res.json();
+        if (data.success) {
+          if (window.showToast) showToast(data.message, 'success');
+          loadDirectorSuppliersData();
+        } else {
+          if (window.showToast) showToast(data.message || 'Không thể xóa nhà cung cấp', 'error');
+        }
+      } catch (err) {
+        console.error('Lỗi khi xóa nhà cung cấp:', err);
+      }
+    }
+
+    // ==========================================
+    // TAB 3: MẶT HÀNG & GIÁ VỐN CHUẨN CHUỖI
+    // ==========================================
+    async function loadDirectorProductsData() {
+      const tbody = document.getElementById('directorProductsTableBody');
+      if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải danh mục mặt hàng toàn chuỗi...</td></tr>';
+      }
+      try {
+        const res = await fetch('/api/products?catalog=true');
+        if (res.ok) {
+          allDirectorProducts = await res.json();
+          renderDirectorProductsTable(allDirectorProducts);
+          const badge = document.getElementById('badgeTotalProducts');
+          if (badge) badge.textContent = `${allDirectorProducts.length} mặt hàng`;
+        }
+      } catch (err) {
+        console.error('Lỗi fetch mặt hàng:', err);
+      }
+    }
+
+    function renderDirectorProductsTable(products) {
+      const tbody = document.getElementById('directorProductsTableBody');
+      if (!tbody) return;
+
+      if (!products || products.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 24px; color: var(--text-muted);">Chưa có sản phẩm nào</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = products.map(p => {
+        const cost = Number(p.costPrice || 0);
+        const retail = Number(p.unitPrice || 0);
+        const profit = retail - cost;
+        const profitMargin = retail > 0 ? Math.round((profit / retail) * 100) : 0;
+
+        return `
+          <tr>
+            <td><strong style="color: var(--primary); font-size: 13.5px;">${escapeHtml(p.productCode)}</strong></td>
+            <td>
+              <div style="font-weight: 700; color: var(--text-dark); font-size: 13.5px;">${escapeHtml(p.productName)}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">Đơn vị tính: ${escapeHtml(p.unit || 'Cái/Chai')}</div>
+            </td>
+            <td style="text-align: center;">
+              <span class="badge ${p.branchCode === 'CN01' ? 'badge-primary' : 'badge-outline'}" style="font-size: 11px; padding: 2.5px 8px; font-weight: 700;">
+                ${escapeHtml(p.branchCode || 'CN01')}
+              </span>
+            </td>
+            <td>
+              <span class="badge badge-outline" style="font-size: 11px;">${escapeHtml(p.category || 'Nước uống')}</span>
+            </td>
+            <td style="text-align: center; font-weight: 700; color: ${p.stockQuantity <= (p.minQuantity || 5) ? 'var(--danger)' : 'var(--text-dark)'};">
+              ${p.stockQuantity || 0}
+            </td>
+            <td style="text-align: right; font-weight: 700; color: #475569; font-size: 13.5px;">
+              ${formatVND(cost)}
+              <div style="font-size: 10px; color: #059669; font-weight: 700;">[Khóa bởi GĐ]</div>
+            </td>
+            <td style="text-align: right; font-weight: 800; color: var(--primary); font-size: 14px;">
+              ${formatVND(retail)}
+            </td>
+            <td style="text-align: right; font-size: 12.5px;">
+              <span style="color: ${profit >= 0 ? '#059669' : '#ef4444'}; font-weight: 700;">
+                +${formatVND(profit)} (${profitMargin}%)
+              </span>
+            </td>
+            <td style="text-align: right;">
+              <button class="btn btn-primary btn-xs" onclick="openDirectorProductModal(${p.id})">
+                Sửa giá
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterDirectorProducts() {
+      const q = (document.getElementById('directorProductSearch')?.value || '').toLowerCase().trim();
+      const bCode = document.getElementById('directorProductBranchFilter')?.value || 'ALL';
+
+      let filtered = allDirectorProducts.filter(p => {
+        const matchBranch = (bCode === 'ALL' || p.branchCode === bCode);
+        const matchText = !q ||
+          (p.productName && p.productName.toLowerCase().includes(q)) ||
+          (p.productCode && p.productCode.toLowerCase().includes(q)) ||
+          (p.category && p.category.toLowerCase().includes(q));
+        return matchBranch && matchText;
+      });
+
+      renderDirectorProductsTable(filtered);
+    }
+
+    function openDirectorProductModal(id) {
+      const p = allDirectorProducts.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('dirProdId').value = p.id;
+      document.getElementById('dirProdName').textContent = `${p.productCode} - ${p.productName} (${p.branchCode || 'CN01'})`;
+      document.getElementById('dirProdCostPrice').value = p.costPrice || 0;
+      document.getElementById('dirProdUnitPrice').value = p.unitPrice || 0;
+      document.getElementById('directorProductModal').classList.add('active');
+    }
+
+    function closeDirectorProductModal() {
+      document.getElementById('directorProductModal').classList.remove('active');
+    }
+
+    async function saveDirectorProductPrices() {
+      const id = document.getElementById('dirProdId').value;
+      const costPrice = document.getElementById('dirProdCostPrice').value;
+      const unitPrice = document.getElementById('dirProdUnitPrice').value;
+
+      if (!costPrice || Number(costPrice) < 0) {
+        if (window.showToast) showToast('Vui lòng nhập giá vốn hợp lệ!', 'warning');
+        return;
+      }
+      if (!unitPrice || Number(unitPrice) <= 0) {
+        if (window.showToast) showToast('Vui lòng nhập giá bán niêm yết hợp lệ!', 'warning');
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('jwt_token') || localStorage.getItem('token');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch(`/api/products/${id}`, {
+          method: 'PUT',
+          headers: headers,
+          body: JSON.stringify({
+            costPrice: costPrice,
+            unitPrice: unitPrice
+          })
+        });
+
+        const data = await res.json();
+        if (data.success || res.ok) {
+          if (window.showToast) showToast('Đã lưu giá vốn chuẩn và giá bán thành công!', 'success');
+          closeDirectorProductModal();
+          loadDirectorProductsData();
+        } else {
+          if (window.showToast) showToast(data.message || 'Lỗi cập nhật giá sản phẩm', 'error');
+        }
+      } catch (err) {
+        console.error('Lỗi lưu giá sản phẩm:', err);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlTab = new URLSearchParams(window.location.search).get('tab');
+      if (urlTab === '2') {
+        switchReceiptsTab(2);
+      } else if (urlTab === '3') {
+        switchReceiptsTab(3);
+      } else {
+        switchReceiptsTab(1);
+      }
+    });
+  </script>
+  <script src="/js/global-hub.js"></script>
+</body>
+</html>

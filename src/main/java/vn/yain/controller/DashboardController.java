@@ -81,6 +81,16 @@ public class DashboardController {
         return "director/pricing";
     }
 
+    @GetMapping("/director/receipts")
+    public String directorReceipts() {
+        return "director/receipts";
+    }
+
+    @GetMapping("/director/inventory")
+    public String directorInventory() {
+        return "director/receipts";
+    }
+
     @GetMapping("/director/tournaments")
     public String directorTournaments() {
         return "director/tournaments";

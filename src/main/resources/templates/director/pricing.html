@@ -1,1797 +1,1246 @@
 <!DOCTYPE html>
-
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-
 <head>
-
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Phê duyệt chính sách giá & Khuyến mãi - UTE Sport</title>
-
   <link rel="stylesheet" href="/css/main.css">
-
   <script src="/js/auth-guard.js"></script>
-
   <script>
-
     function toggleTheme() {
-
       const current = document.documentElement.getAttribute('data-theme') || 'light';
-
       const next = current === 'dark' ? 'light' : 'dark';
-
       document.documentElement.setAttribute('data-theme', next);
-
       localStorage.setItem('theme', next);
-
     }
-
     const savedTheme = localStorage.getItem('theme') || 'light';
-
     document.documentElement.setAttribute('data-theme', savedTheme);
-
   </script>
-
   <style>
-
     .chart-tab-bar {
-
       display: inline-flex;
-
       background: var(--surface-subtle);
-
       padding: 4px;
-
       border-radius: 10px;
-
       gap: 4px;
-
       border: 1px solid var(--border-subtle);
-
       margin-bottom: 20px;
-
     }
-
-
 
     .chart-tab-btn {
-
       padding: 8px 18px;
-
       border-radius: 8px;
-
       border: none;
-
       background: transparent;
-
       color: var(--text-muted);
-
       font-size: 13px;
-
       font-weight: 600;
-
       cursor: pointer;
-
       transition: all 0.2s ease;
-
       font-family: 'Inter', sans-serif;
-
       display: inline-flex;
-
       align-items: center;
-
       gap: 6px;
-
     }
-
-
 
     .chart-tab-btn.active {
-
       background: var(--surface);
-
       color: var(--primary);
-
       box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-
     }
-
-
 
     .tab-badge {
-
       padding: 2px 8px;
-
       border-radius: 9999px;
-
       font-size: 11px;
-
       font-weight: 700;
-
       background: rgba(245, 158, 11, 0.15);
-
       color: #d97706;
-
     }
-
-
 
     .chart-tab-btn.active .tab-badge {
-
       background: #f59e0b;
-
       color: #fff;
-
     }
-
-
 
     .data-table th, .data-table td {
-
       padding: 11px 10px !important;
-
       font-size: 12.5px !important;
-
     }
-
-
 
     .modal-overlay {
-
       position: fixed;
-
       top: 0;
-
       left: 0;
-
       right: 0;
-
       bottom: 0;
-
       background: rgba(0, 0, 0, 0.5);
-
       backdrop-filter: blur(4px);
-
       display: none;
-
       align-items: center;
-
       justify-content: center;
-
       z-index: 9999;
-
     }
-
-
 
     .modal-overlay.active {
-
       display: flex;
-
     }
-
-
 
     .modal-card {
-
       background: var(--surface);
-
       border-radius: var(--radius-lg);
-
       width: 100%;
-
       max-width: 540px;
-
       box-shadow: var(--shadow-xl);
-
       border: 1px solid var(--border-subtle);
-
       overflow: hidden;
-
       animation: modalFadeIn 0.2s ease-out;
-
     }
-
-
 
     @keyframes modalFadeIn {
-
       from { opacity: 0; transform: translateY(-12px) scale(0.98); }
-
       to { opacity: 1; transform: translateY(0) scale(1); }
-
     }
-
-
 
     .modal-header {
-
       padding: 16px 20px;
-
       border-bottom: 1px solid var(--border-subtle);
-
       display: flex;
-
       align-items: center;
-
       justify-content: space-between;
-
     }
-
-
 
     .modal-header h3 {
-
       font-size: 16px;
-
       font-weight: 700;
-
       color: var(--text-dark);
-
       margin: 0;
-
     }
-
-
 
     .modal-close-btn {
-
       background: none;
-
       border: none;
-
       color: var(--text-muted);
-
       cursor: pointer;
-
       padding: 4px;
-
       border-radius: 6px;
-
     }
-
-
 
     .modal-close-btn:hover {
-
       color: var(--danger);
-
       background: var(--surface-subtle);
-
     }
-
-
 
     .modal-body {
-
       padding: 20px;
-
     }
-
-
 
     .modal-footer {
-
       padding: 14px 20px;
-
       border-top: 1px solid var(--border-subtle);
-
       display: flex;
-
       justify-content: flex-end;
-
       gap: 10px;
-
       background: var(--surface-subtle);
-
     }
-
-
 
     .form-row {
-
       display: grid;
-
       grid-template-columns: 1fr 1fr;
-
       gap: 14px;
-
       margin-bottom: 14px;
-
     }
-
-
 
     .form-group {
-
       margin-bottom: 14px;
-
     }
-
-
 
     .form-group:last-child {
-
       margin-bottom: 0;
-
     }
-
-
 
     .form-label {
-
       display: block;
-
       font-size: 12.5px;
-
       font-weight: 600;
-
       color: var(--text-body);
-
       margin-bottom: 6px;
-
     }
-
-
 
     .form-control {
-
       width: 100%;
-
       padding: 8px 12px;
-
       border-radius: var(--radius-md);
-
       border: 1px solid var(--border-subtle);
-
       background: var(--surface);
-
       color: var(--text-dark);
-
       font-size: 13px;
-
       outline: none;
-
       transition: border-color 0.15s ease;
-
       box-sizing: border-box;
-
     }
-
-
 
     .form-control:focus {
-
       border-color: var(--primary);
-
     }
-
   </style>
-
 </head>
-
 <body>
 
-
-
   <div class="layout-container">
-
     <aside class="sidebar" id="appSidebar">
-
       <div class="brand-header">
-
         <div class="brand-logo-wrap">
-
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
-
             <circle cx="12" cy="12" r="10"></circle>
-
             <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
-
             <path d="M2 12h20"></path>
-
           </svg>
-
         </div>
-
         <div class="brand-text">
-
           <h2>UTE SPORT</h2>
-
           <span>BAN ĐIỀU HÀNH CHUỖI</span>
-
         </div>
-
       </div>
 
-
-
       <div class="sidebar-content">
-
         <div class="menu-title">Giám đốc điều hành</div>
-
         
-
         <a href="/director/dashboard" class="menu-item">
-
           <svg class="svg-icon" viewBox="0 0 24 24">
-
             <line x1="18" y1="20" x2="18" y2="10"></line>
-
             <line x1="12" y1="20" x2="12" y2="4"></line>
-
             <line x1="6" y1="20" x2="6" y2="14"></line>
-
           </svg>
-
           <span class="menu-text">Doanh thu toàn chuỗi</span>
-
         </a>
-
-
 
         <a href="/director/dashboard#comparison-section" class="menu-item">
-
           <svg class="svg-icon" viewBox="0 0 24 24">
-
             <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
-
             <path d="M9 22v-4h6v4"></path>
-
             <path d="M8 6h.01"></path>
-
             <path d="M16 6h.01"></path>
-
             <path d="M8 10h.01"></path>
-
             <path d="M16 10h.01"></path>
-
             <path d="M8 14h.01"></path>
-
             <path d="M16 14h.01"></path>
-
           </svg>
-
           <span class="menu-text">So sánh chi nhánh</span>
-
         </a>
-
-
 
         <a href="/director/branches" class="menu-item">
-
           <svg class="svg-icon" viewBox="0 0 24 24">
-
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-
             <circle cx="12" cy="10" r="3"></circle>
-
           </svg>
-
           <span class="menu-text">Quản lý chi nhánh</span>
-
         </a>
-
-
 
         <a href="/director/pricing" class="menu-item active">
-
           <svg class="svg-icon" viewBox="0 0 24 24">
-
             <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-
             <line x1="7" y1="7" x2="7.01" y2="7"></line>
-
           </svg>
-
           <span class="menu-text">Chính sách giá & KM</span>
-
         </a>
-
-
 
         <a href="/director/tournaments" class="menu-item">
-
           <svg class="svg-icon" viewBox="0 0 24 24">
-
             <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-
             <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-
             <path d="M4 22h16"></path>
-
             <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
-
             <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
-
             <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
-
           </svg>
-
           <span class="menu-text">Phê duyệt giải đấu</span>
-
         </a>
 
-        <a href="/director/pricing?tab=5" class="menu-item" id="navDirectorReceipts" title="Giám sát phiếu nhập kho các cơ sở">
-          <svg class="svg-icon" viewBox="0 0 24 24">
+        <a href="/director/receipts" class="menu-item" id="navDirectorReceipts" title="Giám sát mặt hàng & phiếu nhập kho toàn chuỗi">
+          <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
             <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
             <line x1="12" y1="22.08" x2="12" y2="12"></line>
           </svg>
           <span class="menu-text">Giám sát nhập hàng</span>
         </a>
-
-
       </div>
-
-
 
       <div class="sidebar-bottom">
-
         <div class="user-avatar" id="sidebarAvatar">GD</div>
-
         <div class="user-meta">
-
           <span class="user-name" id="sidebarName">Nguyễn Phước Thọ</span>
-
           <span class="user-title" id="sidebarTitle">Giám đốc chuỗi</span>
-
         </div>
-
         <a href="/login" style="margin-left: auto; color: #94a3b8;" title="Đăng xuất">
-
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
-
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-
             <polyline points="16 17 21 12 16 7"></polyline>
-
             <line x1="21" y1="12" x2="9" y2="12"></line>
-
           </svg>
-
         </a>
-
       </div>
-
     </aside>
 
-
-
     <main class="main-wrapper">
-
       <header class="header-bar">
-
         <div class="header-left">
-
           <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="Thu gọn / Mở rộng">
-
             <svg class="svg-icon" viewBox="0 0 24 24">
-
               <line x1="3" y1="12" x2="21" y2="12"></line>
-
               <line x1="3" y1="6" x2="21" y2="6"></line>
-
               <line x1="3" y1="18" x2="21" y2="18"></line>
-
             </svg>
-
           </button>
-
           <div class="header-heading">
-
             <h1>Phê duyệt chính sách giá & Khuyến mãi</h1>
-
           </div>
-
         </div>
-
-
 
         <div class="header-right">
-
           <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Đổi giao diện Sáng / Tối" style="padding: 6px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--text-dark); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; margin-right: 6px;">
-
             <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-
           </button>
-
           <div class="search-box">
-
             <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: var(--text-light);">
-
               <circle cx="11" cy="11" r="8"></circle>
-
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-
             </svg>
-
             <input type="text" id="searchInput" onkeyup="filterActiveTab()" placeholder="Tìm đề xuất, mã KM, chi nhánh...">
-
           </div>
-
-
 
           <button class="btn btn-primary" id="btnHeaderAction" onclick="handleHeaderAction()">
-
             <svg class="svg-icon" viewBox="0 0 24 24">
-
               <line x1="12" y1="5" x2="12" y2="19"></line>
-
               <line x1="5" y1="12" x2="19" y2="12"></line>
-
             </svg>
-
             <span id="btnHeaderActionText">Tạo đề xuất giá mới</span>
-
           </button>
-
-
 
           <div class="user-pill-header" id="headerUserWidget" title="Tài khoản đang đăng nhập">
-
             <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;">GD</div>
-
             <div style="font-size: 12.5px; font-weight: 600; color: var(--text-dark);">Giám đốc điều hành</div>
-
           </div>
-
         </div>
-
       </header>
 
-
-
       <div class="main-content">
-
         <!-- LUXURY HERO BANNER -->
-
         <div class="hero-banner" style="margin-bottom: 24px;">
-
           <div class="hero-banner-content">
-
             <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
-
               <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
-
               Ban Giám Đốc Thẩm Định & Phê Duyệt Toàn Chuỗi
-
             </div>
-
             <h1 class="hero-title" style="margin-bottom: 8px;">Phê Duyệt Chính Sách Giá & Khuyến Mãi</h1>
-
             <p class="hero-subtitle" style="margin-bottom: 0;">Xem xét các đề xuất điều chỉnh giá từ Quản lý chi nhánh, quyết định phê duyệt áp dụng và kích hoạt chiến dịch khuyến mãi toàn hệ thống</p>
-
           </div>
-
         </div>
-
-
 
         <!-- TAB NAVIGATION -->
-
         <div class="chart-tab-bar" style="margin-bottom: 18px;">
-
           <button class="chart-tab-btn active" id="tabBtn1" onclick="switchPricingTab(1)">
-
             <span>Đề xuất bảng giá giờ chơi</span>
-
             <span class="tab-badge" id="badgePendingProposals">0 chờ duyệt</span>
-
           </button>
-
           <button class="chart-tab-btn" id="tabBtn2" onclick="switchPricingTab(2)">
-
             <span>Duyệt chương trình khuyến mãi & Voucher</span>
-
             <span class="tab-badge" id="badgePendingPromos">0 chờ duyệt</span>
-
           </button>
-
           <button class="chart-tab-btn" id="tabBtn3" onclick="switchPricingTab(3)">
-
             <span>Bảng giá hiện hành toàn chuỗi</span>
-
             <span class="tab-badge" id="badgeTotalRules" style="background: rgba(59, 130, 246, 0.15); color: #2563eb;">11 biểu giá</span>
-
           </button>
-
-          <button class="chart-tab-btn" id="tabBtn4" onclick="switchPricingTab(4)">
-
-            <span>Nhà cung cấp & Giá vốn chuẩn chuỗi</span>
-
-            <span class="tab-badge" id="badgeTotalSuppliers" style="background: rgba(16, 185, 129, 0.15); color: #059669;">5 đối tác</span>
-
-          </button>
-
-          <button class="chart-tab-btn" id="tabBtn5" onclick="switchPricingTab(5)">
-            <span>Giám sát nhập hàng các chi nhánh</span>
-            <span class="tab-badge" id="badgeTotalReceipts" style="background: rgba(99, 102, 241, 0.15); color: #4f46e5;">Toàn chuỗi</span>
-          </button>
-
         </div>
-
-
 
         <!-- TAB 1: ĐỀ XUẤT ĐIỀU CHỈNH GIÁ SÂN (CHỨC NĂNG PHÊ DUYỆT CỦA GIÁM ĐỐC) -->
-
         <div id="pricingTabContent1">
-
           <div class="card">
-
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
-
               <div>
-
                 <h2 class="card-title" style="margin-bottom: 4px;">Danh sách đề xuất điều chỉnh giá sân từ Quản lý chi nhánh</h2>
-
                 <div style="font-size: 12.5px; color: var(--text-muted);">Quản lý cơ sở gửi đề xuất tăng/giảm giá theo khung giờ, Giám đốc thẩm định và phê duyệt áp dụng</div>
-
               </div>
-
               <div style="display: flex; gap: 10px; align-items: center;">
-
                 <select class="form-control" id="filterProposalStatus" onchange="filterActiveTab()" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
-
                   <option value="ALL">-- Tất cả trạng thái --</option>
-
                   <option value="Chờ phê duyệt" selected>Chờ phê duyệt</option>
-
                   <option value="Đã phê duyệt">Đã phê duyệt</option>
-
                   <option value="Từ chối">Từ chối</option>
-
                 </select>
-
                 <button class="btn btn-outline" onclick="openProposalModal()" style="font-size: 12.5px; padding: 6px 14px;">
-
                   + Tạo đề xuất mới
-
                 </button>
-
               </div>
-
             </div>
-
-
 
             <div class="table-container">
-
               <table class="data-table" id="proposalsTable">
-
                 <thead>
-
                   <tr>
-
                     <th style="width: 85px;">Mã ĐX</th>
-
                     <th>Chi nhánh đề xuất</th>
-
                     <th>Loại sân áp dụng</th>
-
                     <th>Khung giờ áp dụng</th>
-
                     <th style="text-align: right;">Giá hiện tại</th>
-
                     <th style="text-align: right;">Giá đề xuất</th>
-
                     <th style="max-width: 260px;">Lý do đề xuất</th>
-
                     <th style="text-align: center; width: 130px;">Trạng thái</th>
-
                     <th style="text-align: right; width: 160px;">Hành động</th>
-
                   </tr>
-
                 </thead>
-
                 <tbody id="proposalsTableBody">
-
                   <tr>
-
                     <td colspan="9" style="text-align: center; padding: 32px; color: var(--text-muted);">
-
                       Đang tải danh sách đề xuất giá từ Database...
-
                     </td>
-
                   </tr>
-
                 </tbody>
-
               </table>
-
             </div>
-
           </div>
-
         </div>
-
-
 
         <!-- TAB 2: DUYỆT CHƯƠNG TRÌNH KHUYẾN MÃI & VOUCHER -->
-
         <div id="pricingTabContent2" style="display: none;">
-
           <div class="card">
-
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
-
               <div>
-
                 <h2 class="card-title" style="margin-bottom: 4px;">Danh sách chương trình Khuyến mãi & Voucher chờ duyệt</h2>
-
                 <div style="font-size: 12.5px; color: var(--text-muted);">Chiến dịch ưu đãi toàn chuỗi hoặc cơ sở cần sự phê duyệt của Ban Giám Đốc trước khi tung ra thị trường</div>
-
               </div>
-
               <button class="btn btn-primary" onclick="openPromoModal()" style="font-size: 12.5px; padding: 6px 14px;">
-
                 + Tạo chiến dịch KM mới
-
               </button>
-
             </div>
-
-
 
             <div class="table-container">
-
               <table class="data-table" id="promotionsTable">
-
                 <thead>
-
                   <tr>
-
                     <th style="width: 90px;">Mã KM</th>
-
                     <th>Tên chiến dịch ưu đãi</th>
-
                     <th>Hình thức ưu đãi</th>
-
                     <th style="text-align: right;">Mức giảm</th>
-
                     <th>Phạm vi áp dụng</th>
-
                     <th>Thời hạn hiệu lực</th>
-
                     <th style="text-align: center; width: 130px;">Trạng thái</th>
-
                     <th style="text-align: right; width: 170px;">Hành động</th>
-
                   </tr>
-
                 </thead>
-
                 <tbody id="promotionsTableBody">
-
                   <tr>
-
                     <td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">
-
                       Đang tải danh sách khuyến mãi từ Database...
-
                     </td>
-
                   </tr>
-
                 </tbody>
-
               </table>
-
             </div>
-
           </div>
-
         </div>
-
-
 
         <!-- TAB 3: BẢNG GIÁ HIỆN HÀNH TOÀN CHUỖI -->
-
         <div id="pricingTabContent3" style="display: none;">
-
           <div class="card">
-
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
-
               <div>
-
                 <h2 class="card-title" style="margin-bottom: 4px;">Ma trận biểu giá đang áp dụng trên toàn chuỗi UTE Sport</h2>
-
                 <div style="font-size: 12.5px; color: var(--text-muted);">Dữ liệu biểu giá được tự động cập nhật khi Giám đốc phê duyệt các đề xuất điều chỉnh giá</div>
-
               </div>
-
               <div style="display: flex; gap: 10px; align-items: center;">
-
                 <select class="form-control" id="filterBranchSelect" onchange="filterActiveTab()" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
-
                   <option value="ALL">-- Tất cả chi nhánh --</option>
-
                 </select>
-
               </div>
-
             </div>
 
-
-
             <div class="table-container">
-
               <table class="data-table" id="pricingRulesTable">
-
                 <thead>
-
                   <tr>
-
                     <th style="width: 80px;">Mã giá</th>
-
                     <th>Chi nhánh áp dụng</th>
-
                     <th>Khung giờ thi đấu</th>
-
                     <th>Phân loại khung giờ</th>
-
                     <th>Loại ngày áp dụng</th>
-
                     <th style="text-align: right;">Đơn giá sân / Giờ</th>
-
                     <th>Ngày hiệu lực</th>
-
                     <th style="text-align: center;">Trạng thái</th>
-
                   </tr>
-
                 </thead>
-
                 <tbody id="pricingRulesTableBody">
-
                   <tr>
-
                     <td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">
-
                       Đang tải dữ liệu biểu giá từ Database...
-
                     </td>
-
                   </tr>
-
                 </tbody>
-
               </table>
-
             </div>
-
           </div>
-
         </div>
-
-
-
-        <!-- TAB 4: NHÀ CUNG CẤP & GIÁ VỐN CHUẨN CHUỖI (ĐỘC QUYỀN GIÁM ĐỐC) -->
-
-        <div id="pricingTabContent4" style="display: none;">
-
-          <!-- CARD 1: DANH BẠ NHÀ CUNG CẤP -->
-
-          <div class="card" style="margin-bottom: 24px;">
-
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
-
-              <div>
-
-                <h2 class="card-title" style="margin-bottom: 4px;">Danh bạ Nhà cung cấp & Đối tác chiến lược toàn chuỗi</h2>
-
-                <div style="font-size: 12.5px; color: var(--text-muted);">Quản lý các đối tác cung ứng nước giải khát, cầu lông, dụng cụ & phụ kiện thể thao (Độc quyền Giám đốc)</div>
-
-              </div>
-
-              <button class="btn btn-primary" onclick="openDirectorSupplierModal()" style="font-size: 12.5px; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
-
-                <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-
-                <span>+ Thêm nhà cung cấp mới</span>
-
-              </button>
-
-            </div>
-
-
-
-            <div class="table-container">
-
-              <table class="data-table" id="directorSuppliersTable">
-
-                <thead>
-
-                  <tr>
-
-                    <th style="width: 85px;">Mã NCC</th>
-
-                    <th>Tên Nhà cung cấp / Doanh nghiệp</th>
-
-                    <th>Người đại diện</th>
-
-                    <th>Số điện thoại</th>
-
-                    <th>Email</th>
-
-                    <th>Địa chỉ</th>
-
-                    <th>Lĩnh vực</th>
-
-                    <th style="text-align: center;">Trạng thái</th>
-
-                    <th style="text-align: right; width: 130px;">Thao tác</th>
-
-                  </tr>
-
-                </thead>
-
-                <tbody id="directorSuppliersTableBody">
-
-                  <tr>
-
-                    <td colspan="9" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải danh sách nhà cung cấp...</td>
-
-                  </tr>
-
-                </tbody>
-
-              </table>
-
-            </div>
-
-          </div>
-
-
-
-          <!-- CARD 2: BẢNG GIÁ VỐN & GIÁ BÁN TOÀN CHUỖI -->
-
-          <div class="card">
-
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
-
-              <div>
-
-                <h2 class="card-title" style="margin-bottom: 4px;">Bảng giá vốn nhập kho (Cost Price) & Giá bán lẻ đề xuất</h2>
-
-                <div style="font-size: 12.5px; color: var(--text-muted);">Giám đốc chốt giá vốn nhập khẩu/ký hợp đồng với NCC (Khóa cứng đối với chi nhánh) và định hướng giá bán</div>
-
-              </div>
-
-            </div>
-
-
-
-            <div class="table-container">
-
-              <table class="data-table" id="directorProductsTable">
-
-                <thead>
-
-                  <tr>
-
-                    <th style="width: 70px;">Mã HH</th>
-
-                    <th>Tên mặt hàng / Dịch vụ</th>
-
-                    <th>Phân loại</th>
-
-                    <th>ĐVT</th>
-
-                    <th style="text-align: right; color: var(--danger);">Giá vốn nhập chuẩn (Giám đốc)</th>
-
-                    <th style="text-align: right; color: var(--primary);">Giá bán lẻ niêm yết</th>
-
-                    <th style="text-align: center;">Tồn kho</th>
-
-                    <th style="text-align: right; width: 120px;">Hành động</th>
-
-                  </tr>
-
-                </thead>
-
-                <tbody id="directorProductsTableBody">
-
-                  <tr>
-
-                    <td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải bảng giá sản phẩm...</td>
-
-                  </tr>
-
-                </tbody>
-
-              </table>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
 
       </div>
-
-            <!-- TAB 5: GIÁM SÁT NHẬP HÀNG CÁC CHI NHÁNH (DÀNH CHO GIÁM ĐỐC) -->
-        <div id="pricingTabContent5" style="display: none;">
-          <!-- 3 KPI Cards -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 20px;">
-            <div class="card" style="padding: 18px 20px; border-left: 4px solid #10b981;">
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tổng chi phí nhập hàng toàn chuỗi</div>
-              <div style="font-size: 24px; font-weight: 800; color: #059669; margin: 6px 0;" id="kpiDirectorTotalReceiptAmount">0 đ</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">Tổng hợp từ các đợt bổ sung hàng hóa chi nhánh</div>
-            </div>
-            <div class="card" style="padding: 18px 20px; border-left: 4px solid #3b82f6;">
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tổng số phiếu nhập kho</div>
-              <div style="font-size: 24px; font-weight: 800; color: #2563eb; margin: 6px 0;" id="kpiDirectorReceiptCount">0 phiếu</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">Tất cả phiếu nhập đã lưu trữ trong CSDL</div>
-            </div>
-            <div class="card" style="padding: 18px 20px; border-left: 4px solid #8b5cf6;">
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Số chi nhánh đã nhập hàng</div>
-              <div style="font-size: 24px; font-weight: 800; color: #7c3aed; margin: 6px 0;" id="kpiDirectorActiveBranches">0 chi nhánh</div>
-              <div style="font-size: 11.5px; color: var(--text-muted);">Hệ thống 4 cơ sở: CN01, CN02, CN03, CN04</div>
-            </div>
-          </div>
-
-          <!-- BẢNG THEO DÕI PHIẾU NHẬP HÀNG CHI TIẾT -->
-          <div class="card">
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
-              <div>
-                <h2 class="card-title" style="margin-bottom: 4px;">Lịch sử phiếu nhập kho toàn chuỗi chi nhánh</h2>
-                <div style="font-size: 12.5px; color: var(--text-muted);">Giám đốc theo dõi thời gian thực các đợt bổ sung nước uống, cầu lông & phụ kiện của từng cơ sở</div>
-              </div>
-              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input type="text" id="directorReceiptSearch" onkeyup="filterDirectorReceipts()" class="form-control" placeholder="Tìm mã phiếu, NCC..." style="width: 200px; padding: 6px 12px; font-size: 12.5px;">
-                <select id="directorReceiptBranchFilter" onchange="filterDirectorReceipts()" class="form-control" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
-                  <option value="ALL">-- Tất cả chi nhánh --</option>
-                  <option value="CN01">CN01 - Thủ Đức</option>
-                  <option value="CN02">CN02 - Bình Thạnh</option>
-                  <option value="CN03">CN03 - Quận 9</option>
-                  <option value="CN04">CN04 - Gò Vấp</option>
-                </select>
-                <button type="button" class="btn btn-outline" onclick="loadDirectorReceiptsData()" style="padding: 6px 12px; font-size: 12.5px; display: inline-flex; align-items: center; gap: 4px;">
-                  <svg class="svg-icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                  <span>Làm mới</span>
-                </button>
-              </div>
-            </div>
-            <div class="table-container">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Mã phiếu</th>
-                    <th style="text-align: center;">Chi nhánh</th>
-                    <th>Ngày nhập</th>
-                    <th>Nhân sự lập</th>
-                    <th>Nhà cung cấp đối tác</th>
-                    <th style="text-align: right;">Tổng tiền hàng</th>
-                    <th>Trạng thái</th>
-                    <th>Ghi chú đợt hàng</th>
-                  </tr>
-                </thead>
-                <tbody id="directorReceiptsTableBody">
-                  <tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải dữ liệu phiếu nhập kho toàn chuỗi...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-</main>
-
+    </main>
   </div>
 
-
-
   <!-- MODAL TẠO ĐỀ XUẤT ĐIỀU CHỈNH GIÁ -->
-
   <div class="modal-overlay" id="proposalModal">
-
     <div class="modal-card">
-
       <div class="modal-header">
-
         <h3 id="modalProposalTitle">Gửi đề xuất điều chỉnh giá sân</h3>
-
         <button class="modal-close-btn" onclick="closeProposalModal()">
-
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
-
             <line x1="18" y1="6" x2="6" y2="18"></line>
-
             <line x1="6" y1="6" x2="18" y2="18"></line>
-
           </svg>
-
         </button>
-
       </div>
 
-
-
       <div class="modal-body">
-
         <div class="form-row">
-
           <div class="form-group">
-
             <label class="form-label">Chi nhánh đề xuất <span style="color: var(--danger);">*</span></label>
-
             <select class="form-control" id="inpPropBranch" onchange="syncCurrentPrice()"></select>
-
           </div>
-
           <div class="form-group">
-
             <label class="form-label">Người đề xuất <span style="color: var(--danger);">*</span></label>
-
             <input type="text" class="form-control" id="inpPropManager" placeholder="Ví dụ: Trần Phúc Bảo">
-
           </div>
-
         </div>
 
-
-
         <div class="form-row">
-
           <div class="form-group">
-
             <label class="form-label">Loại sân áp dụng <span style="color: var(--danger);">*</span></label>
-
             <select class="form-control" id="inpPropCourtType">
               <option value="Sân VIP">Sân VIP</option>
               <option value="Sân Thường" selected>Sân Thường</option>
             </select>
-
           </div>
-
           <div class="form-group">
-
             <label class="form-label">Khung giờ áp dụng <span style="color: var(--danger);">*</span></label>
-
             <select class="form-control" id="inpPropSlotInfo" onchange="syncCurrentPrice()">
-
               <option value="17:00 - 22:00 (Giờ vàng)">17:00 - 22:00 (Giờ vàng cao điểm)</option>
-
               <option value="09:00 - 17:00 (Ban ngày)">09:00 - 17:00 (Ban ngày thường)</option>
-
               <option value="06:00 - 09:00 (Sáng sớm)">06:00 - 09:00 (Sáng sớm)</option>
-
               <option value="22:00 - 23:00 (Tối muộn)">22:00 - 23:00 (Tối muộn)</option>
-
             </select>
-
           </div>
-
         </div>
-
-
 
         <div class="form-row">
-
           <div class="form-group">
-
             <label class="form-label">Mức giá hiện tại (VNĐ)</label>
-
             <input type="number" class="form-control" id="inpPropCurrentPrice" value="120000" readonly style="background: var(--surface-subtle);">
-
           </div>
-
           <div class="form-group">
-
             <label class="form-label">Mức giá đề xuất mới (VNĐ) <span style="color: var(--danger);">*</span></label>
-
             <input type="number" class="form-control" id="inpPropNewPrice" placeholder="Ví dụ: 140000" step="5000">
-
           </div>
-
         </div>
-
-
 
         <div class="form-group">
-
           <label class="form-label">Lý do đề xuất điều chỉnh <span style="color: var(--danger);">*</span></label>
-
           <textarea class="form-control" id="inpPropReason" rows="3" placeholder="Nêu rõ lý do: nhu cầu quá tải, nâng cấp trang thiết bị đèn/thảm, hoặc kích cầu giờ thấp điểm..."></textarea>
-
         </div>
-
       </div>
-
-
 
       <div class="modal-footer">
-
         <button class="btn btn-outline" onclick="closeProposalModal()">Hủy bỏ</button>
-
         <button class="btn btn-primary" id="btnSaveProposal" onclick="saveProposal()">Gửi đề xuất lên Giám đốc</button>
-
       </div>
-
     </div>
-
   </div>
-
-
 
   <!-- MODAL TẠO KHUYẾN MÃI -->
-
   <div class="modal-overlay" id="promoModal">
-
     <div class="modal-card">
-
       <div class="modal-header">
-
         <h3 id="modalPromoTitle">Tạo chiến dịch khuyến mãi mới</h3>
-
         <button class="modal-close-btn" onclick="closePromoModal()">
-
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
-
             <line x1="18" y1="6" x2="6" y2="18"></line>
-
             <line x1="6" y1="6" x2="18" y2="18"></line>
-
           </svg>
-
         </button>
-
       </div>
-
-
 
       <div class="modal-body">
-
         <div class="form-row">
-
           <div class="form-group">
-
             <label class="form-label">Mã khuyến mãi / Voucher</label>
-
             <input type="text" class="form-control" id="inpPromoCode" placeholder="Tự sinh nếu để trống (ví dụ: KM06)" style="text-transform: uppercase;">
-
           </div>
-
           <div class="form-group">
-
             <label class="form-label">Phạm vi áp dụng</label>
-
             <select class="form-control" id="inpPromoScope">
-
               <option value="Toàn chuỗi">Toàn chuỗi hệ thống</option>
-
             </select>
-
           </div>
-
         </div>
-
-
 
         <div class="form-group">
-
           <label class="form-label">Tên chiến dịch ưu đãi <span style="color: var(--danger);">*</span></label>
-
           <input type="text" class="form-control" id="inpPromoName" placeholder="Ví dụ: Giảm 20% cho sinh viên UTE">
-
         </div>
 
-
-
         <div class="form-row">
-
           <div class="form-group">
-
             <label class="form-label">Loại chiết khấu <span style="color: var(--danger);">*</span></label>
-
             <select class="form-control" id="inpDiscountType">
-
               <option value="Phần trăm (%)">Phần trăm (%)</option>
-
               <option value="Số tiền (VNĐ)">Số tiền (VNĐ)</option>
-
             </select>
-
           </div>
-
           <div class="form-group">
-
             <label class="form-label">Mức giảm <span style="color: var(--danger);">*</span></label>
-
             <input type="number" class="form-control" id="inpDiscountValue" placeholder="Ví dụ: 20 hoặc 50000" min="1">
-
           </div>
-
         </div>
-
-
 
         <div class="form-row">
-
           <div class="form-group">
-
             <label class="form-label">Ngày bắt đầu</label>
-
             <input type="date" class="form-control" id="inpPromoStartDate">
-
           </div>
-
           <div class="form-group">
-
             <label class="form-label">Ngày kết thúc</label>
-
             <input type="date" class="form-control" id="inpPromoEndDate">
-
           </div>
-
         </div>
-
       </div>
-
-
 
       <div class="modal-footer">
-
         <button class="btn btn-outline" onclick="closePromoModal()">Hủy bỏ</button>
-
         <button class="btn btn-primary" id="btnSavePromo" onclick="savePromotion()">Lưu đề xuất vào Database</button>
-
       </div>
-
     </div>
-
   </div>
 
-
-
   <script>
-
     let currentTab = 1;
-
     let allProposals = [];
-
     let allPromotions = [];
-
     let allRules = [];
-
     let allBranches = [];
 
-
-
     function formatVND(amount) {
-
       return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
-
     }
-
-
 
     function toggleSidebar() {
-
       const sidebar = document.getElementById('appSidebar');
-
       if (sidebar) sidebar.classList.toggle('collapsed');
-
     }
-
-
 
     function handleHeaderAction() {
-
       if (currentTab === 1) openProposalModal();
-
       else if (currentTab === 2) openPromoModal();
-
       else openProposalModal();
-
     }
-
-
 
     function switchPricingTab(tabIndex) {
       currentTab = tabIndex;
       const btn1 = document.getElementById('tabBtn1');
       const btn2 = document.getElementById('tabBtn2');
       const btn3 = document.getElementById('tabBtn3');
-      const btn4 = document.getElementById('tabBtn4');
-      const btn5 = document.getElementById('tabBtn5');
       const c1 = document.getElementById('pricingTabContent1');
       const c2 = document.getElementById('pricingTabContent2');
       const c3 = document.getElementById('pricingTabContent3');
-      const c4 = document.getElementById('pricingTabContent4');
-      const c5 = document.getElementById('pricingTabContent5');
       const btnHeaderText = document.getElementById('btnHeaderActionText');
 
-      if (btn1) btn1.classList.toggle('active', tabIndex === 1);
-      if (btn2) btn2.classList.toggle('active', tabIndex === 2);
-      if (btn3) btn3.classList.toggle('active', tabIndex === 3);
-      if (btn4) btn4.classList.toggle('active', tabIndex === 4);
-      if (btn5) btn5.classList.toggle('active', tabIndex === 5);
+      btn1.classList.toggle('active', tabIndex === 1);
+      btn2.classList.toggle('active', tabIndex === 2);
+      btn3.classList.toggle('active', tabIndex === 3);
 
-      if (c1) c1.style.display = tabIndex === 1 ? 'block' : 'none';
-      if (c2) c2.style.display = tabIndex === 2 ? 'block' : 'none';
-      if (c3) c3.style.display = tabIndex === 3 ? 'block' : 'none';
-      if (c4) c4.style.display = tabIndex === 4 ? 'block' : 'none';
-      if (c5) c5.style.display = tabIndex === 5 ? 'block' : 'none';
+      c1.style.display = (tabIndex === 1) ? 'block' : 'none';
+      c2.style.display = (tabIndex === 2) ? 'block' : 'none';
+      c3.style.display = (tabIndex === 3) ? 'block' : 'none';
 
-      if (btnHeaderText) {
-        if (tabIndex === 1) btnHeaderText.textContent = '+ Tạo đề xuất giá';
-        else if (tabIndex === 2) btnHeaderText.textContent = '+ Tạo khuyến mãi';
-        else if (tabIndex === 3) btnHeaderText.textContent = 'Làm mới giá';
-        else if (tabIndex === 4) btnHeaderText.textContent = '+ Thêm nhà cung cấp';
-        else if (tabIndex === 5) btnHeaderText.textContent = 'Làm mới phiếu';
+      if (tabIndex === 1) {
+        if (btnHeaderText) btnHeaderText.textContent = 'Tạo đề xuất giá mới';
+      } else if (tabIndex === 2) {
+        if (btnHeaderText) btnHeaderText.textContent = 'Tạo chiến dịch KM mới';
+      } else {
+        if (btnHeaderText) btnHeaderText.textContent = 'Tạo đề xuất giá mới';
       }
 
-      if (tabIndex === 4) {
-        loadDirectorSuppliersData();
-        loadDirectorProductsData();
-      } else if (tabIndex === 5) {
-        loadDirectorReceiptsData();
+      filterActiveTab();
+    }
+
+    async function loadDirectorPricing() {
+      try {
+        const res = await fetch('/api/director/pricing');
+        if (res.ok) {
+          const data = await res.json();
+          allProposals = data.proposals || [];
+          allPromotions = data.promotions || [];
+          allRules = data.rules || [];
+          allBranches = data.branches || [];
+
+          // Cập nhật số lượng trên các tab badge
+          if (data.counts) {
+            const c = data.counts;
+            const b1 = document.getElementById('badgePendingProposals');
+            const b2 = document.getElementById('badgePendingPromos');
+            const b3 = document.getElementById('badgeTotalRules');
+            if (b1) b1.textContent = `${c.pendingProposals} chờ duyệt`;
+            if (b2) b2.textContent = `${c.pendingPromotions} chờ duyệt`;
+            if (b3) b3.textContent = `${allRules.length} biểu giá`;
+          }
+
+          populateSelects();
+          renderProposals(allProposals);
+          renderPromotions(allPromotions);
+          renderPricingRules(allRules);
+        } else {
+          console.error('Failed to load pricing data, status:', res.status);
+        }
+      } catch (err) {
+        console.error('Error fetching pricing data:', err);
       }
     }
 
-    function updateDirectorReceiptKPIs(receipts) {
-      const elTotal = document.getElementById('kpiDirectorTotalReceiptAmount');
-      const elCount = document.getElementById('kpiDirectorReceiptCount');
-      const elBranches = document.getElementById('kpiDirectorActiveBranches');
+    function populateSelects() {
+      const bSel = document.getElementById('filterBranchSelect');
+      const propBranchSel = document.getElementById('inpPropBranch');
+      const promoScopeSel = document.getElementById('inpPromoScope');
 
-      const totalAmount = receipts.reduce((sum, r) => sum + Number(r.totalAmount || 0), 0);
-      const uniqueBranches = new Set(receipts.map(r => r.branchCode).filter(Boolean));
+      if (bSel) {
+        bSel.innerHTML = '<option value="ALL">-- Tất cả chi nhánh --</option>';
+        allBranches.forEach(b => {
+          bSel.innerHTML += `<option value="${b.branchCode}">${b.branchCode} - ${b.branchName}</option>`;
+        });
+      }
 
-      if (elTotal) elTotal.textContent = formatVND(totalAmount);
-      if (elCount) elCount.textContent = `${receipts.length} phiếu`;
-      if (elBranches) elBranches.textContent = `${uniqueBranches.size} chi nhánh`;
+      if (propBranchSel) {
+        propBranchSel.innerHTML = '';
+        allBranches.forEach(b => {
+          propBranchSel.innerHTML += `<option value="${b.branchCode}" data-manager="${b.managerName || ''}">${b.branchCode} - ${b.branchName}</option>`;
+        });
+        syncCurrentPrice();
+      }
+
+      if (promoScopeSel) {
+        promoScopeSel.innerHTML = '<option value="Toàn chuỗi">Toàn chuỗi hệ thống</option>';
+        allBranches.forEach(b => {
+          promoScopeSel.innerHTML += `<option value="${b.branchName}">${b.branchName}</option>`;
+        });
+      }
     }
 
-    function renderDirectorReceiptsTable(receipts) {
-      const tbody = document.getElementById('directorReceiptsTableBody');
+    function syncCurrentPrice() {
+      const bCode = document.getElementById('inpPropBranch')?.value || 'CN01';
+      const slot = document.getElementById('inpPropSlotInfo')?.value || '';
+      const inpCurrent = document.getElementById('inpPropCurrentPrice');
+      const inpManager = document.getElementById('inpPropManager');
+
+      const bObj = allBranches.find(b => b.branchCode === bCode);
+      if (bObj && inpManager && !inpManager.value) {
+        inpManager.value = bObj.managerName || '';
+      }
+
+      if (inpCurrent) {
+        if (slot.includes('Giờ vàng')) inpCurrent.value = '120000';
+        else if (slot.includes('Sáng')) inpCurrent.value = '80000';
+        else inpCurrent.value = '90000';
+      }
+    }
+
+    function renderProposals(proposals) {
+      const tbody = document.getElementById('proposalsTableBody');
       if (!tbody) return;
 
-      if (!receipts || receipts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Không tìm thấy phiếu nhập nào phù hợp bộ lọc</td></tr>';
+      if (!proposals || proposals.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 32px; color: var(--text-muted);">Không tìm thấy đề xuất điều chỉnh giá nào</td></tr>';
         return;
       }
 
-      tbody.innerHTML = receipts.map(r => `
-        <tr>
-          <td><strong style="color: var(--primary); font-size: 13.5px;">${escapeHtml(r.receiptCode)}</strong></td>
-          <td style="text-align: center;">
-            <span class="badge ${r.branchCode === 'CN01' ? 'badge-primary' : 'badge-outline'}" style="font-size: 11px; padding: 2.5px 8px; font-weight: 700;">
-              ${escapeHtml(r.branchCode || 'CN01')}
-            </span>
-          </td>
-          <td style="font-size: 12.5px; color: var(--text-body);">${escapeHtml(r.receiptDate ? (r.receiptDate.split('T')[0] || r.receiptDate) : 'Hôm nay')}</td>
-          <td style="font-size: 12.5px; color: var(--text-muted); font-weight: 600;">${escapeHtml(r.staffCode || 'NS02')}</td>
-          <td>
-            <div style="font-weight: 700; color: var(--text-dark); font-size: 13px;">${escapeHtml(r.supplierName || 'Nhà cung cấp')}</div>
-          </td>
-          <td style="color: #059669; font-weight: 800; text-align: right; font-size: 14px;">
-            ${formatVND(r.totalAmount)}
-          </td>
-          <td>
-            <span class="badge badge-success" style="font-size: 11px;">Đã nhập kho</span>
-          </td>
-          <td style="font-size: 12px; color: var(--text-muted); max-width: 240px; line-height: 1.4;">
-            ${escapeHtml(r.notes || 'Bổ sung định kỳ')}
-          </td>
-        </tr>
-      `).join('');
-    }
+      let html = '';
+      proposals.forEach(p => {
+        const isPending = (p.status === 'Chờ phê duyệt');
+        const isApproved = (p.status === 'Đã phê duyệt');
+        const badgeClass = isPending ? 'badge-warning' : (isApproved ? 'badge-success' : 'badge-danger');
 
-    function filterDirectorReceipts() {
-      const q = (document.getElementById('directorReceiptSearch')?.value || '').toLowerCase().trim();
-      const bCode = document.getElementById('directorReceiptBranchFilter')?.value || 'ALL';
+        const diff = p.proposedPrice - p.currentPrice;
+        const diffPct = p.currentPrice > 0 ? ((diff / p.currentPrice) * 100).toFixed(1) : 0;
+        const diffSign = diff >= 0 ? `+${diffPct}%` : `${diffPct}%`;
+        const diffColor = diff >= 0 ? '#10b981' : '#ef4444';
 
-      let filtered = allDirectorReceipts.filter(r => {
-        const matchBranch = (bCode === 'ALL' || r.branchCode === bCode);
-        const matchText = !q ||
-          (r.receiptCode && r.receiptCode.toLowerCase().includes(q)) ||
-          (r.supplierName && r.supplierName.toLowerCase().includes(q)) ||
-          (r.notes && r.notes.toLowerCase().includes(q));
-        return matchBranch && matchText;
+        let actionHtml = '';
+        if (isPending) {
+          actionHtml = `
+            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+              <button type="button" class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approveProposal(${p.id})">Duyệt</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444; border-color: #fca5a5;" onclick="rejectProposal(${p.id})">Từ chối</button>
+            </div>
+          `;
+        } else if (isApproved) {
+          actionHtml = `<span style="color: var(--primary); font-size: 11.5px; font-weight: 600;">Đã áp dụng vào hệ thống</span>`;
+        } else {
+          actionHtml = `<span style="color: #ef4444; font-size: 11.5px;">Đã từ chối đề xuất</span>`;
+        }
+
+        html += `
+          <tr id="proposalRow-${p.id}">
+            <td style="font-weight: 700; color: var(--primary); font-size: 13.5px;">${p.proposalCode}</td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-dark);">${p.branchName}</div>
+              <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">${p.proposerName} gửi</div>
+            </td>
+            <td>
+              <span style="font-weight: 600; color: var(--text-dark);">${p.courtType}</span>
+            </td>
+            <td>
+              <span class="badge" style="background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa;">${p.slotInfo}</span>
+            </td>
+            <td style="text-align: right; color: var(--text-muted); font-size: 13px;">
+              ${formatVND(p.currentPrice)}
+            </td>
+            <td style="text-align: right; font-weight: 700; color: var(--primary); font-size: 13.5px;">
+              ${formatVND(p.proposedPrice)}
+              <div style="font-size: 10.5px; color: ${diffColor}; font-weight: 700;">(${diffSign})</div>
+            </td>
+            <td style="font-size: 12px; color: var(--text-muted); max-width: 260px; line-height: 1.4;">
+              ${p.reason}
+              ${p.note ? `<div style="color: #ef4444; font-size: 11px; margin-top: 3px;">* Lý do từ chối: ${p.note}</div>` : ''}
+            </td>
+            <td style="text-align: center;">
+              <span class="badge ${badgeClass}">${p.status}</span>
+            </td>
+            <td style="text-align: right;">
+              ${actionHtml}
+            </td>
+          </tr>
+        `;
       });
-
-      renderDirectorReceiptsTable(filtered);
+      tbody.innerHTML = html;
     }
 
+    function renderPromotions(promos) {
+      const tbody = document.getElementById('promotionsTableBody');
+      if (!tbody) return;
 
-      // Auto tab from URL
-      const urlTab = new URLSearchParams(window.location.search).get('tab');
-      if (urlTab === '5') {
-        switchPricingTab(5);
-      } else if (urlTab === '4') {
-        switchPricingTab(4);
+      if (!promos || promos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">Không tìm thấy chương trình khuyến mãi nào</td></tr>';
+        return;
       }
+
+      let html = '';
+      promos.forEach(p => {
+        const isPending = (p.status === 'Chờ phê duyệt');
+        const isActive = (p.status === 'Đang áp dụng');
+        const badgeClass = isPending ? 'badge-warning' : (isActive ? 'badge-success' : 'badge-danger');
+
+        const discountText = p.discountType && p.discountType.includes('Phần trăm') 
+          ? `Giảm ${Math.round(p.discountValue)}%` 
+          : `Giảm ${formatVND(p.discountValue)}`;
+
+        let actionHtml = '';
+        if (isPending) {
+          actionHtml = `
+            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+              <button type="button" class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="approvePromotion(${p.id})">Kích hoạt</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 11.5px; color: #ef4444; border-color: #fca5a5;" onclick="rejectPromotion(${p.id})">Bác bỏ</button>
+            </div>
+          `;
+        } else if (isActive) {
+          actionHtml = `
+            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #f59e0b; border-color: #fed7aa;" onclick="togglePromoStatus('${p.promoCode}', 'Tạm ngưng')">Tạm ngưng</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444; border-color: #fca5a5;" onclick="deletePromotion('${p.promoCode}')">Xóa</button>
+            </div>
+          `;
+        } else {
+          actionHtml = `
+            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #10b981; border-color: #a7f3d0;" onclick="togglePromoStatus('${p.promoCode}', 'Đang áp dụng')">Mở lại</button>
+              <button type="button" class="btn btn-outline" style="padding: 4px 8px; font-size: 11.5px; color: #ef4444; border-color: #fca5a5;" onclick="deletePromotion('${p.promoCode}')">Xóa</button>
+            </div>
+          `;
+        }
+
+        html += `
+          <tr>
+            <td>
+              <span style="font-family: monospace; font-weight: 700; color: var(--primary); background: rgba(16, 185, 129, 0.1); padding: 3px 8px; border-radius: 4px; font-size: 13px;">${p.promoCode}</span>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: var(--text-dark);">${p.promoName}</div>
+              <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">Áp dụng tự động khi đặt sân</div>
+            </td>
+            <td>${p.discountType}</td>
+            <td style="text-align: right; font-weight: 700; color: #ea580c; font-size: 14px;">
+              ${discountText}
+            </td>
+            <td>
+              <span class="badge" style="background: var(--surface-subtle); color: var(--text-dark); border: 1px solid var(--border-subtle);">${p.scope || 'Toàn chuỗi'}</span>
+            </td>
+            <td style="font-size: 12.5px; color: var(--text-muted);">
+              ${p.startDate} → ${p.endDate}
+            </td>
+            <td style="text-align: center;">
+              <span class="badge ${badgeClass}">${p.status}</span>
+            </td>
+            <td style="text-align: right;">
+              ${actionHtml}
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function renderPricingRules(rules) {
+      const tbody = document.getElementById('pricingRulesTableBody');
+      if (!tbody) return;
+
+      if (!rules || rules.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">Không tìm thấy quy tắc bảng giá nào</td></tr>';
+        return;
+      }
+
+      let html = '';
+      rules.forEach(r => {
+        const isPeak = (r.slotCode === 'KG03' || (r.slotType && r.slotType.includes('Giờ vàng')));
+        const slotBadgeStyle = isPeak 
+          ? 'background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa;'
+          : 'background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;';
+
+        html += `
+          <tr>
+            <td style="font-weight: 700; color: var(--primary); font-size: 13.5px;">${r.pricingCode}</td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-dark);">${r.branchName}</div>
+              <div style="font-size: 11.5px; color: var(--text-muted);">Cơ sở: <strong>${r.branchCode}</strong></div>
+            </td>
+            <td>
+              <span class="badge" style="${slotBadgeStyle}">${r.slotTime}</span>
+            </td>
+            <td>
+              <div style="font-weight: 600; color: var(--text-dark);">${r.slotType}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">${r.slotCode}</div>
+            </td>
+            <td>
+              <span style="font-size: 12.5px; color: var(--text-body);">${r.dayType}</span>
+            </td>
+            <td style="text-align: right; font-weight: 700; color: var(--primary); font-size: 14px;">
+              ${formatVND(r.hourlyRate)}
+            </td>
+            <td style="font-size: 12px; color: var(--text-muted);">
+              ${r.startDate || '01/01/2026'}
+            </td>
+            <td style="text-align: center;">
+              <span class="badge badge-success">Đang áp dụng</span>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function filterActiveTab() {
+      const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+
+      if (currentTab === 1) {
+        const sFilter = document.getElementById('filterProposalStatus')?.value || 'ALL';
+        let filtered = allProposals;
+        if (sFilter !== 'ALL') {
+          filtered = filtered.filter(p => p.status === sFilter);
+        }
+        if (q) {
+          filtered = filtered.filter(p => {
+            const text = `${p.proposalCode} ${p.branchName} ${p.proposerName} ${p.courtType} ${p.slotInfo} ${p.reason}`.toLowerCase();
+            return text.includes(q);
+          });
+        }
+        renderProposals(filtered);
+      } else if (currentTab === 2) {
+        let filtered = allPromotions;
+        if (q) {
+          filtered = filtered.filter(p => {
+            const text = `${p.promoCode} ${p.promoName} ${p.discountType} ${p.scope}`.toLowerCase();
+            return text.includes(q);
+          });
+        }
+        renderPromotions(filtered);
+      } else {
+        const bFilter = document.getElementById('filterBranchSelect')?.value || 'ALL';
+        let filtered = allRules;
+        if (bFilter !== 'ALL') {
+          filtered = filtered.filter(r => r.branchCode === bFilter);
+        }
+        if (q) {
+          filtered = filtered.filter(r => {
+            const text = `${r.pricingCode} ${r.branchName} ${r.slotCode} ${r.slotType} ${r.dayType}`.toLowerCase();
+            return text.includes(q);
+          });
+        }
+        renderPricingRules(filtered);
+      }
+    }
+
+    // ACTIONS PHÊ DUYỆT ĐỀ XUẤT GIÁ
+    async function approveProposal(id) {
+      if (!confirm('Bạn có chắc chắn muốn PHÊ DUYỆT đề xuất điều chỉnh giá này và áp dụng vào Database?')) return;
+      try {
+        const res = await fetch(`/api/director/pricing/proposals/${id}/approve`, {
+          method: 'PUT'
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'success');
+          else alert(data.message);
+          await loadDirectorPricing();
+        } else {
+          alert(data.message || 'Lỗi khi phê duyệt đề xuất giá!');
+        }
+      } catch (err) {
+        console.error('Error approving proposal:', err);
+      }
+    }
+
+    async function rejectProposal(id) {
+      const note = prompt('Vui lòng nhập lý do từ chối đề xuất này:');
+      if (note === null) return;
+      try {
+        const res = await fetch(`/api/director/pricing/proposals/${id}/reject`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ note: note })
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'warning');
+          else alert(data.message);
+          await loadDirectorPricing();
+        } else {
+          alert(data.message || 'Lỗi khi từ chối đề xuất!');
+        }
+      } catch (err) {
+        console.error('Error rejecting proposal:', err);
+      }
+    }
+
+    // MODAL ĐỀ XUẤT GIÁ
+    function openProposalModal() {
+      document.getElementById('inpPropManager').value = '';
+      document.getElementById('inpPropNewPrice').value = '';
+      document.getElementById('inpPropReason').value = '';
+      syncCurrentPrice();
+      document.getElementById('proposalModal').classList.add('active');
+    }
+
+    function closeProposalModal() {
+      document.getElementById('proposalModal').classList.remove('active');
+    }
+
+    async function saveProposal() {
+      const branch = document.getElementById('inpPropBranch').value;
+      const manager = document.getElementById('inpPropManager').value.trim();
+      const courtType = document.getElementById('inpPropCourtType').value;
+      const slot = document.getElementById('inpPropSlotInfo').value;
+      const currentPrice = document.getElementById('inpPropCurrentPrice').value;
+      const newPrice = document.getElementById('inpPropNewPrice').value;
+      const reason = document.getElementById('inpPropReason').value.trim();
+
+      if (!manager) {
+        alert('Vui lòng nhập tên người đề xuất!');
+        return;
+      }
+      if (!newPrice || parseFloat(newPrice) <= 0) {
+        alert('Vui lòng nhập mức giá đề xuất hợp lệ!');
+        return;
+      }
+      if (!reason) {
+        alert('Vui lòng nhập lý do đề xuất điều chỉnh giá!');
+        return;
+      }
+
+      const payload = {
+        branchCode: branch,
+        proposerName: manager,
+        courtType: courtType,
+        slotInfo: slot,
+        currentPrice: currentPrice,
+        proposedPrice: newPrice,
+        reason: reason
+      };
+
+      try {
+        const btn = document.getElementById('btnSaveProposal');
+        if (btn) { btn.disabled = true; btn.innerText = 'Đang gửi...'; }
+
+        const res = await fetch('/api/director/pricing/proposals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (btn) { btn.disabled = false; btn.innerText = 'Gửi đề xuất lên Giám đốc'; }
+
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'success');
+          else alert(data.message);
+          closeProposalModal();
+          await loadDirectorPricing();
+        } else {
+          alert(data.message || 'Lỗi khi gửi đề xuất!');
+        }
+      } catch (err) {
+        console.error('Error saving proposal:', err);
+      }
+    }
+
+    // ACTIONS DUYỆT KHUYẾN MÃI
+    async function approvePromotion(id) {
+      if (!confirm('Bạn có chắc chắn muốn PHÊ DUYỆT và KÍCH HOẠT chiến dịch khuyến mãi này?')) return;
+      try {
+        const res = await fetch(`/api/director/pricing/promotions/${id}/approve`, {
+          method: 'PUT'
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'success');
+          else alert(data.message);
+          await loadDirectorPricing();
+        } else {
+          alert(data.message || 'Lỗi khi kích hoạt khuyến mãi!');
+        }
+      } catch (err) {
+        console.error('Error approving promotion:', err);
+      }
+    }
+
+    async function rejectPromotion(id) {
+      if (!confirm('Bạn có chắc chắn muốn BÁC BỎ chương trình khuyến mãi này?')) return;
+      try {
+        const res = await fetch(`/api/director/pricing/promotions/${id}/reject`, {
+          method: 'PUT'
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'warning');
+          else alert(data.message);
+          await loadDirectorPricing();
+        } else {
+          alert(data.message || 'Lỗi khi bác bỏ khuyến mãi!');
+        }
+      } catch (err) {
+        console.error('Error rejecting promotion:', err);
+      }
+    }
+
+    async function togglePromoStatus(code, newStatus) {
+      try {
+        const res = await fetch(`/api/director/pricing/promotions/${code}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'success');
+          else alert(data.message);
+          await loadDirectorPricing();
+        }
+      } catch (err) {
+        console.error('Error toggling promo status:', err);
+      }
+    }
+
+    async function deletePromotion(code) {
+      if (!confirm(`Xóa vĩnh viễn mã khuyến mãi ${code} khỏi Database?`)) return;
+      try {
+        const res = await fetch(`/api/director/pricing/promotions/${code}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          if (typeof showToast === 'function') showToast(data.message, 'success');
+          else alert(data.message);
+          await loadDirectorPricing();
+        }
+      } catch (err) {
+        console.error('Error deleting promotion:', err);
+      }
+    }
+
+    function openPromoModal() {
+      document.getElementById('inpPromoCode').value = '';
+      document.getElementById('inpPromoName').value = '';
+      document.getElementById('inpDiscountValue').value = '20';
+      const now = new Date();
+      document.getElementById('inpPromoStartDate').value = now.toISOString().split('T')[0];
+      const nextMonth = new Date(now.setMonth(now.getMonth() + 1));
+      document.getElementById('inpPromoEndDate').value = nextMonth.toISOString().split('T')[0];
+      document.getElementById('promoModal').classList.add('active');
+    }
+
+    function closePromoModal() {
+      document.getElementById('promoModal').classList.remove('active');
+    }
+
+    async function savePromotion() {
+      const code = document.getElementById('inpPromoCode').value.trim().toUpperCase();
+      const name = document.getElementById('inpPromoName').value.trim();
+      const type = document.getElementById('inpDiscountType').value;
+      const val = document.getElementById('inpDiscountValue').value;
+      const scope = document.getElementById('inpPromoScope').value;
+      const startDate = document.getElementById('inpPromoStartDate').value;
+      const endDate = document.getElementById('inpPromoEndDate').value;
+
+      if (!name) {
+        alert('Vui lòng nhập tên chương trình khuyến mãi!');
+        return;
+      }
+      if (!val || parseFloat(val) <= 0) {
+        alert('Vui lòng nhập mức giảm giá hợp lệ!');
+        return;
+      }
+
+      const payload = {
+        promoCode: code,
+        promoName: name,
+        discountType: type,
+        discountValue: val,
+        scope: scope,
+        status: 'Chờ phê duyệt',
+        startDate: startDate,
+        endDate: endDate
+      };
+
+      try {
+        const btn = document.getElementById('btnSavePromo');
+        if (btn) { btn.disabled = true; btn.innerText = 'Đang lưu...'; }
+
+        const res = await fetch('/api/director/pricing/promotions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (btn) { btn.disabled = false; btn.innerText = 'Lưu đề xuất vào Database'; }
+
+        if (data.success) {
+          if (typeof showToast === 'function') showToast('Đã gửi đề xuất khuyến mãi vào Database chờ duyệt!', 'success');
+          else alert(data.message);
+          closePromoModal();
+          await loadDirectorPricing();
+        } else {
+          alert(data.message || 'Lỗi khi tạo khuyến mãi!');
+        }
+      } catch (err) {
+        console.error('Error saving promotion:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDirectorPricing();
     });
-</script>
-
-  <!-- MODAL THÊM/SỬA NHÀ CUNG CẤP CỦA GIÁM ĐỐC -->
-
-  <div class="modal-overlay" id="directorSupplierModal">
-
-    <div class="modal-card" style="max-width: 540px;">
-
-      <div class="modal-header">
-
-        <h3 id="dirSupplierModalTitle">Thêm Nhà Cung Cấp Mới</h3>
-
-        <button class="modal-close-btn" onclick="closeDirectorSupplierModal()">✕</button>
-
-      </div>
-
-      <div class="modal-body">
-
-        <input type="hidden" id="dirSupplierId">
-
-        <div class="form-group" style="margin-bottom: 12px;">
-
-          <label class="form-label">Tên nhà cung cấp / Đối tác <span style="color: var(--danger);">*</span></label>
-
-          <input type="text" class="form-control" id="dirSupplierName" placeholder="vd: Công ty TNHH Thể Thao Yonex Việt Nam" required>
-
-        </div>
-
-        <div class="form-row" style="margin-bottom: 12px;">
-
-          <div class="form-group">
-
-            <label class="form-label">Người đại diện liên hệ</label>
-
-            <input type="text" class="form-control" id="dirSupplierContact" placeholder="vd: Lê Minh Hoàng">
-
-          </div>
-
-          <div class="form-group">
-
-            <label class="form-label">Số điện thoại</label>
-
-            <input type="text" class="form-control" id="dirSupplierPhone" placeholder="vd: 0918223344">
-
-          </div>
-
-        </div>
-
-        <div class="form-row" style="margin-bottom: 12px;">
-
-          <div class="form-group">
-
-            <label class="form-label">Lĩnh vực hàng hóa</label>
-
-            <select class="form-control" id="dirSupplierCategory">
-
-              <option value="Nước giải khát">Nước giải khát</option>
-
-              <option value="Cầu lông">Ống Cầu lông</option>
-
-              <option value="Dụng cụ & Trang phục">Dụng cụ & Trang phục</option>
-
-              <option value="Phụ kiện">Phụ kiện thể thao</option>
-
-              <option value="Đa ngành">Cung ứng tổng hợp</option>
-
-            </select>
-
-          </div>
-
-          <div class="form-group">
-
-            <label class="form-label">Email</label>
-
-            <input type="email" class="form-control" id="dirSupplierEmail" placeholder="contact@doitac.com">
-
-          </div>
-
-        </div>
-
-        <div class="form-group" style="margin-bottom: 12px;">
-
-          <label class="form-label">Địa chỉ trụ sở / kho bãi</label>
-
-          <input type="text" class="form-control" id="dirSupplierAddress" placeholder="Số nhà, đường, quận/huyện...">
-
-        </div>
-
-        <div class="form-group" style="margin-bottom: 12px;">
-
-          <label class="form-label">Trạng thái hợp tác</label>
-
-          <select class="form-control" id="dirSupplierStatus">
-
-            <option value="Đang hợp tác">Đang hợp tác</option>
-
-            <option value="Tạm ngưng">Tạm ngưng</option>
-
-          </select>
-
-        </div>
-
-        <div class="form-group">
-
-          <label class="form-label">Ghi chú chính sách hợp đồng / Chiết khấu</label>
-
-          <textarea class="form-control" id="dirSupplierNotes" rows="2" placeholder="Chiết khấu đại lý, điều kiện công nợ 30 ngày..."></textarea>
-
-        </div>
-
-      </div>
-
-      <div class="modal-footer">
-
-        <button class="btn btn-outline" onclick="closeDirectorSupplierModal()">Hủy</button>
-
-        <button class="btn btn-primary" onclick="saveDirectorSupplier()">Lưu Nhà Cung Cấp</button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-
-  <!-- MODAL GIÁM ĐỐC CHỈNH SỬA GIÁ VỐN & GIÁ BÁN SẢN PHẨM -->
-
-  <div class="modal-overlay" id="directorProductModal">
-
-    <div class="modal-card" style="max-width: 480px;">
-
-      <div class="modal-header">
-
-        <h3 id="dirProdModalTitle">Chỉnh sửa giá vốn & giá bán sản phẩm</h3>
-
-        <button class="modal-close-btn" onclick="closeDirectorProductModal()">✕</button>
-
-      </div>
-
-      <div class="modal-body">
-
-        <input type="hidden" id="dirProdId">
-
-        <div class="form-group" style="margin-bottom: 12px;">
-
-          <label class="form-label">Mặt hàng: <strong id="dirProdName" style="color: var(--primary);"></strong></label>
-
-        </div>
-
-        <div class="form-group" style="margin-bottom: 12px;">
-
-          <label class="form-label">Giá vốn nhập chuẩn (VNĐ) <span style="color: var(--danger);">* (Khóa chuẩn chi nhánh)</span></label>
-
-          <input type="number" class="form-control" id="dirProdCostPrice" step="1000" min="0" required>
-
-          <small style="color: var(--text-muted); font-size: 11.5px;">Giá vốn này sẽ được cố định khi các Quản lý cơ sở tạo phiếu nhập kho.</small>
-
-        </div>
-
-        <div class="form-group" style="margin-bottom: 12px;">
-
-          <label class="form-label">Giá bán lẻ niêm yết (VNĐ) <span style="color: var(--primary);">*</span></label>
-
-          <input type="number" class="form-control" id="dirProdUnitPrice" step="1000" min="0" required>
-
-        </div>
-
-      </div>
-
-      <div class="modal-footer">
-
-        <button class="btn btn-outline" onclick="closeDirectorProductModal()">Hủy</button>
-
-        <button class="btn btn-primary" onclick="saveDirectorProductPrices()">Lưu Giá Chuẩn</button>
-
-      </div>
-
-    </div>
-
-  </div>
-
+  </script>
+  <script src="/js/global-hub.js"></script>
 </body>
-
 </html>
-
