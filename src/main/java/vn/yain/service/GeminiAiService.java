@@ -83,7 +83,6 @@ public class GeminiAiService {
             // Multi-turn dialog contents
             List<Map<String, Object>> contents = new ArrayList<>();
             if (ctx.dialogHistory != null) {
-                // Keep up to last 8 turns to preserve context within limits
                 int start = Math.max(0, ctx.dialogHistory.size() - 8);
                 for (int i = start; i < ctx.dialogHistory.size(); i++) {
                     Map<String, String> turn = ctx.dialogHistory.get(i);
@@ -143,10 +142,8 @@ public class GeminiAiService {
                         return processGeminiOutput(botReply, ctx);
                     }
                 } else if (response.statusCode() == 404) {
-                    // Try next model
                     continue;
                 } else {
-                    // 403, 400, 429, etc. - log and break to fallback engine
                     System.err.println("Gemini API returned status: " + response.statusCode() + " body: " + response.body());
                     break;
                 }
@@ -159,14 +156,14 @@ public class GeminiAiService {
     }
 
     private String buildSystemPrompt(ChatbotService.ChatSessionContext ctx) {
-        List<Branch> branches = branchRepository.findAll();
+        List<Branch> branches = branchRepository != null ? branchRepository.findAll() : Collections.emptyList();
         StringBuilder branchText = new StringBuilder();
         for (Branch b : branches) {
             branchText.append("- ").append(b.getBranchCode()).append(": ").append(b.getBranchName())
                     .append(" (Địa chỉ: ").append(b.getAddress()).append(" | Hotline: ").append(b.getPhone()).append(")\n");
         }
 
-        List<Tournament> tournaments = tournamentRepository.findAll();
+        List<Tournament> tournaments = tournamentRepository != null ? tournamentRepository.findAll() : Collections.emptyList();
         StringBuilder tourText = new StringBuilder();
         for (Tournament t : tournaments) {
             tourText.append("- ").append(t.getTournamentName()).append(" (Giải thưởng: ")
@@ -175,7 +172,7 @@ public class GeminiAiService {
         }
 
         return "Bạn là Trợ lý AI đàm thoại thông minh chính thức của Hệ thống Sân Cầu Lông UTE Sport.\n" +
-                "Nhiệm vụ của bạn là trò chuyện tự nhiên, tư vấn chi nhánh gần nhất, tra cứu sân trống, tra cứu đơn đặt sân, hỗ trợ hủy sân và tự động đặt sân giữ chỗ cho khách.\n\n" +
+                "Nhiệm vụ của bạn là trò chuyện tự nhiên, tư vấn chi nhánh gần nhất, tra cứu sân trống, tra cứu đơn đặt sân, hỗ trợ hủy sân và tự động đặt và khóa sân giữ chỗ cho khách.\n\n" +
                 "DANH SÁCH CHI NHÁNH HỆ THỐNG:\n" +
                 branchText +
                 "Bản đồ lân cận:\n" +
@@ -204,13 +201,23 @@ public class GeminiAiService {
                 "- Bãi giữ xe và phòng tắm nóng lạnh hoàn toàn miễn phí.\n\n" +
                 "QUY TẮC BẮT BUỘC:\n" +
                 "1. TUYỆT ĐỐI KHÔNG dùng bất kỳ emoji hoặc icon nào.\n" +
-                "2. Giọng điệu lịch sự, chuyên nghiệp, súc tích, phong cách trợ lý thể thao đẳng cấp.\n" +
-                "3. Khi khách đồng ý đặt sân, đính kèm thẻ:\n" +
-                "[ACTION:BOOKING court=\"" + ctx.courtCode + "\" branch=\"" + ctx.branchCode + "\" slot=\"" + ctx.timeSlot + "\" price=\"" + ctx.totalPrice + "\" deposit=\"" + ctx.depositAmount + "\"]\n" +
+                "2. Giọng điệu lịch sự, chuyên nghiệp, súc tích, phong cách tư vấn thể thao đẳng cấp.\n" +
+                "3. QUY TRÌNH ĐẶT VÀ KHÓA SÂN:\n" +
+                "   Bạn PHẢI đảm bảo thu thập đầy đủ 6 thông tin bắt buộc sau trước khi cho hiện mã khóa sân:\n" +
+                "   (1) Họ tên khách hàng\n" +
+                "   (2) Số điện thoại liên hệ (10 số)\n" +
+                "   (3) Chi nhánh (CN01, CN02, CN03 hoặc CN04)\n" +
+                "   (4) Đặt sân gì (Sân VIP hay Sân tiêu chuẩn)\n" +
+                "   (5) Mấy giờ và ngày nào (Khung giờ bắt đầu - kết thúc)\n" +
+                "   (6) Có chọn thêm dịch vụ/phụ kiện đi kèm không (Thuê vợt, giày, mua cầu, nước uống hoặc 'Không chọn thêm gì')\n" +
+                "   - Nếu THIẾU BẤT KỲ THÔNG TIN NÀO trong 6 thông tin trên, TUYỆT ĐỐI KHÔNG xuất mã khóa sân, hãy lịch sự hỏi thông tin còn thiếu.\n" +
+                "   - Khi đã đủ cả 6 thông tin, hãy tóm tắt rõ ràng cho khách và hỏi khách xác nhận.\n" +
+                "   - CHỈ KHI ĐÃ ĐỦ 6 THÔNG TIN VÀ KHÁCH XÁC NHẬN CHỐT, bạn mới đính kèm thẻ tạo mã khóa sân:\n" +
+                "   [ACTION:BOOKING name=\"" + (ctx.customerName != null ? ctx.customerName : "") + "\" phone=\"" + (ctx.customerPhone != null ? ctx.customerPhone : "") + "\" court=\"" + (ctx.courtCode != null ? ctx.courtCode : "") + "\" branch=\"" + (ctx.branchCode != null ? ctx.branchCode : "") + "\" slot=\"" + (ctx.timeSlot != null ? ctx.timeSlot : "") + "\" addons=\"" + (ctx.additionalServices != null ? ctx.additionalServices : "Không có") + "\" price=\"" + ctx.totalPrice + "\" deposit=\"" + ctx.depositAmount + "\"]\n" +
                 "4. Khi khách muốn tra cứu mã đơn đặt sân, đính kèm thẻ:\n" +
-                "[ACTION:LOOKUP code=\"DS...\"]\n" +
+                "   [ACTION:LOOKUP code=\"DS...\"]\n" +
                 "5. Khi khách muốn hủy đơn đặt sân, đính kèm thẻ:\n" +
-                "[ACTION:CANCEL code=\"DS...\"]";
+                "   [ACTION:CANCEL code=\"DS...\"]";
     }
 
     private ChatMessageDto processGeminiOutput(String rawReply, ChatbotService.ChatSessionContext ctx) {
@@ -224,45 +231,57 @@ public class GeminiAiService {
         Matcher bookingMatcher = bookingPattern.matcher(rawReply);
 
         if (bookingMatcher.find()) {
-            actionType = "OPEN_PAYMENT";
             String attributes = bookingMatcher.group(1);
             cleanText = rawReply.replace(bookingMatcher.group(0), "").trim();
 
+            String name = extractAttr(attributes, "name", ctx.customerName);
+            String phone = extractAttr(attributes, "phone", ctx.customerPhone);
             String courtCode = extractAttr(attributes, "court", ctx.courtCode);
             String branchCode = extractAttr(attributes, "branch", ctx.branchCode);
             String slot = extractAttr(attributes, "slot", ctx.timeSlot);
+            String addons = extractAttr(attributes, "addons", ctx.additionalServices != null ? ctx.additionalServices : "Không có");
             String priceStr = extractAttr(attributes, "price", ctx.totalPrice.toString());
             String depositStr = extractAttr(attributes, "deposit", ctx.depositAmount.toString());
 
-            BigDecimal totalPrice = new BigDecimal(priceStr);
-            BigDecimal depositAmount = new BigDecimal(depositStr);
+            // Đảm bảo đủ thông tin cơ bản trước khi tạo đơn
+            if (name == null || name.isBlank() || phone == null || !phone.matches("0[3|5|7|8|9]\\d{8}")) {
+                return ChatMessageDto.builder()
+                        .sender("bot")
+                        .text("Để hoàn tất tạo mã khóa sân giữ chỗ, bạn vui lòng cung cấp đầy đủ Họ tên và Số điện thoại liên hệ (10 chữ số) nhé!")
+                        .quickReplies(List.of("Bắt đầu lại"))
+                        .actionType("NONE")
+                        .timestamp(LocalDateTime.now())
+                        .build();
+            }
+
+            actionType = "OPEN_PAYMENT";
+            BigDecimal totalPrice = new BigDecimal(priceStr != null && !priceStr.isBlank() ? priceStr : "280000");
+            BigDecimal depositAmount = new BigDecimal(depositStr != null && !depositStr.isBlank() ? depositStr : "84000");
 
             String bookingCode = bookingService.generateUniqueBookingCode();
             ctx.lastBookingCode = bookingCode;
-
-            String cName = (ctx.customerName != null && !ctx.customerName.isBlank()) ? ctx.customerName : "Khách đặt qua AI";
-            String cPhone = (ctx.customerPhone != null && !ctx.customerPhone.isBlank()) ? ctx.customerPhone : "0903123456";
-            String cCode = ctx.customerCode;
+            ctx.customerName = name;
+            ctx.customerPhone = phone;
 
             Booking booking = new Booking();
             booking.setBookingCode(bookingCode);
-            booking.setBranchCode(branchCode);
-            booking.setCourtCode(courtCode);
-            booking.setCustomerName(cName);
-            booking.setCustomerPhone(cPhone);
-            booking.setCustomerCode(cCode);
+            booking.setBranchCode(branchCode != null ? branchCode : "CN01");
+            booking.setCourtCode(courtCode != null ? courtCode : "CL01");
+            booking.setCustomerName(name);
+            booking.setCustomerPhone(phone);
+            booking.setCustomerCode(ctx.customerCode);
             booking.setBookingDate(ctx.date != null ? ctx.date : LocalDate.now());
-            booking.setTimeSlot(slot);
+            booking.setTimeSlot(slot != null ? slot : "18:00 - 20:00");
             booking.setHourlyPrice(totalPrice.divide(new BigDecimal(2), RoundingMode.HALF_UP));
             booking.setTotalPrice(totalPrice);
             booking.setDepositAmount(depositAmount);
             booking.setPaymentMethod("Chuyển khoản VietQR");
             booking.setStatus("Chờ cọc 30%");
-            booking.setNotes("Đặt tự động qua Google Gemini AI");
+            booking.setNotes("Dịch vụ đi kèm: " + addons + " (Đặt tự động qua Google Gemini AI)");
 
             try {
                 bookingService.createBooking(booking);
-                courtService.holdCourtForBooking(courtCode, branchCode, slot, booking.getCustomerName());
+                courtService.holdCourtForBooking(booking.getCourtCode(), booking.getBranchCode(), booking.getTimeSlot(), booking.getCustomerName());
 
                 String qrUrl = String.format(
                         "https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=%d&addInfo=CK%%20%s&accountName=UTE%%20BADMINTON%%20CLUB",
@@ -272,9 +291,10 @@ public class GeminiAiService {
                 paymentData = new HashMap<>();
                 paymentData.put("bookingCode", bookingCode);
                 paymentData.put("courtName", ctx.courtName != null ? ctx.courtName : "Sân thi đấu tiêu chuẩn");
-                paymentData.put("branchName", ctx.branchName);
+                paymentData.put("branchName", ctx.branchName != null ? ctx.branchName : "Chi nhánh 1");
                 paymentData.put("bookingDate", LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                 paymentData.put("timeSlot", slot);
+                paymentData.put("additionalServices", addons);
                 paymentData.put("totalPrice", totalPrice);
                 paymentData.put("depositAmount", depositAmount);
                 paymentData.put("qrUrl", qrUrl);

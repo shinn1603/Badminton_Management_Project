@@ -785,63 +785,154 @@
         margin-top: 2px !important;
       }
 
-      /* COMPACT STEP 3: TIME SLOTS IN 4 COLUMNS WITH QUICK FILTER PILLS */
+      /* COMPACT STEP 3: TIME SLOTS IN 2 COLUMNS (NO HORIZONTAL OVERFLOW ON PHONES) */
       .time-slot-filter-strip {
-        gap: 4px !important;
-        margin-bottom: 6px !important;
+        gap: 6px !important;
+        margin-bottom: 8px !important;
+        display: flex !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
       }
       .time-filter-pill {
-        padding: 3px 8px !important;
-        font-size: 10.5px !important;
-        height: 26px !important;
-        border-radius: 6px !important;
+        padding: 4px 10px !important;
+        font-size: 11px !important;
+        height: 28px !important;
+        border-radius: 9999px !important;
+        flex-shrink: 0 !important;
       }
       .slot-legend-strip {
         display: none !important;
       }
       #slotPickerNotice {
         font-size: 11px !important;
-        margin-bottom: 6px !important;
+        margin-bottom: 8px !important;
       }
       .slots-picker-grid {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 6px !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
       .booking-slot-cell {
-        padding: 6px 2px !important;
-        border-radius: 8px !important;
-        min-height: 44px !important;
+        padding: 8px 6px !important;
+        border-radius: 10px !important;
+        min-height: 48px !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
         touch-action: manipulation;
+        box-sizing: border-box !important;
+        width: 100% !important;
       }
       .booking-slot-cell:active:not(.booked) {
         transform: scale(0.96);
       }
       .slot-cell-time {
-        font-size: 11px !important;
-        font-weight: 700 !important;
+        font-size: 12px !important;
+        font-weight: 800 !important;
         line-height: 1.2 !important;
+        white-space: nowrap !important;
       }
       .slot-cell-tag {
-        font-size: 9.5px !important;
-        margin-top: 2px !important;
-        padding: 1px 4px !important;
+        font-size: 10px !important;
+        margin-top: 3px !important;
+        padding: 2px 6px !important;
+        font-weight: 700 !important;
+        white-space: nowrap !important;
       }
       .tag-peak {
         font-size: 8px !important;
-        padding: 1px 3px !important;
-        top: -4px !important;
-        right: 2px !important;
+        padding: 1px 4px !important;
+        top: -5px !important;
+        right: 4px !important;
       }
 
-      /* COMPACT ADDONS */
+      /* COMPACT ADDONS (PRICES AND STEPPERS NEVER OVERFLOW) */
       .addon-item {
         padding: 8px 10px !important;
         margin-bottom: 6px !important;
+        border-radius: 10px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .addon-item > div:first-child {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+      }
+      .addon-item > strong {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+        font-size: 11.5px !important;
+        font-weight: 800 !important;
+      }
+      .addon-item > div:last-child:not(:first-child) {
+        flex: 0 0 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-end !important;
+        gap: 3px !important;
+      }
+
+      /* STREAMLINED ORDER SUMMARY PANEL (ELIMINATES DUPLICATE BUTTON & SAVES SPACE) */
+      .order-summary-panel {
+        position: static !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 14px 12px !important;
+        border-radius: 14px !important;
+      }
+      .order-summary-panel .summary-title {
+        font-size: 14px !important;
+        font-weight: 800 !important;
+        padding-bottom: 6px !important;
+        margin-bottom: 8px !important;
+      }
+      .order-summary-panel .summary-line {
+        margin-bottom: 5px !important;
+        font-size: 12px !important;
+      }
+      .order-summary-panel .summary-divider {
+        margin: 6px 0 !important;
+      }
+      .deposit-highlight-box {
+        padding: 6px 10px !important;
+        margin: 8px 0 !important;
         border-radius: 8px !important;
+      }
+      .deposit-label {
+        font-size: 10px !important;
+      }
+      .deposit-val {
+        font-size: 17px !important;
+        margin: 2px 0 !important;
+      }
+      .deposit-sub {
+        font-size: 10px !important;
+      }
+      .order-summary-panel #btnSubmitLockBooking {
+        display: none !important;
+      }
+      #promoCodeInput {
+        font-size: 12.5px !important;
+        height: 38px !important;
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+      }
+      #btnApplyPromo {
+        font-size: 12px !important;
+        height: 38px !important;
+        padding: 0 12px !important;
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
       }
 
       /* Mobile Sticky Bar Display */
@@ -1266,8 +1357,7 @@
         </div>
         <div id="addonsContainer">
           <label class="addon-item">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <input type="checkbox" class="addon-checkbox" id="addonRacket" data-name="Thuê Vợt Yonex Astrox" value="20000" onchange="updateSummary()" style="width: 17px; height: 17px; accent-color: var(--primary);">
+            <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;"><input type="checkbox" class="addon-checkbox" id="addonRacket" data-name="Thuê Vợt Yonex Astrox" value="20000" onchange="updateSummary()" style="width: 17px; height: 17px; accent-color: var(--primary);">
               <div>
                 <div style="font-weight: 700; font-size: 13px; color: var(--cust-text-main);">Thuê Vợt Yonex Astrox</div>
                 <div style="font-size: 11.5px; color: var(--cust-text-muted);">Căng sẵn 10.5kg, kèm quấn cán mới</div>
@@ -1277,8 +1367,7 @@
           </label>
 
           <label class="addon-item">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <input type="checkbox" class="addon-checkbox" id="addonShuttle" data-name="Ống Cầu Yonex Aerosensa (3 quả)" value="45000" onchange="updateSummary()" style="width: 17px; height: 17px; accent-color: var(--primary);">
+            <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;"><input type="checkbox" class="addon-checkbox" id="addonShuttle" data-name="Ống Cầu Yonex Aerosensa (3 quả)" value="45000" onchange="updateSummary()" style="width: 17px; height: 17px; accent-color: var(--primary);">
               <div>
                 <div style="font-weight: 700; font-size: 13px; color: var(--cust-text-main);">Ống Cầu Yonex Aerosensa (3 quả)</div>
                 <div style="font-size: 11.5px; color: var(--cust-text-muted);">Tốc độ 77, độ bền và quỹ đạo chuẩn BWF</div>
@@ -1288,8 +1377,7 @@
           </label>
 
           <label class="addon-item">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <input type="checkbox" class="addon-checkbox" id="addonDrink" data-name="Combo 2 Chai Pocari Sweat 500ml" value="30000" onchange="updateSummary()" style="width: 17px; height: 17px; accent-color: var(--primary);">
+            <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;"><input type="checkbox" class="addon-checkbox" id="addonDrink" data-name="Combo 2 Chai Pocari Sweat 500ml" value="30000" onchange="updateSummary()" style="width: 17px; height: 17px; accent-color: var(--primary);">
               <div>
                 <div style="font-weight: 700; font-size: 13px; color: var(--cust-text-main);">Combo 2 Chai Pocari Sweat 500ml</div>
                 <div style="font-size: 11.5px; color: var(--cust-text-muted);">Bổ sung ion khoáng chất khi vận động</div>

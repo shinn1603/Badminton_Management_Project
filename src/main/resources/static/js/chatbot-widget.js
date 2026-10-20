@@ -240,13 +240,23 @@
         const p = data.paymentData;
         html += `
           <div class="chat-payment-card">
-            <div class="chat-pay-header">Cổng thanh toán tiền cọc 30% VietQR</div>
-            <div class="chat-pay-row"><span>Mã đơn đặt:</span><span class="chat-pay-val">${escapeHtml(p.bookingCode || '')}</span></div>
+            <div class="chat-pay-header" style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-weight: 700; color: #047857;">MÃ KHÓA SÂN GIỮ CHỖ</span>
+              <span class="chat-status-badge pending" style="font-size: 10px;">Tạm khóa 10 phút</span>
+            </div>
+
+            <div style="background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(5,150,105,0.15) 100%); border: 1px dashed #10b981; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: center;">
+              <div style="font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Mã Khóa Sân Của Bạn</div>
+              <div style="font-size: 20px; font-weight: 800; color: #047857; letter-spacing: 1.5px; margin: 3px 0;">${escapeHtml(p.bookingCode || '')}</div>
+              <div style="font-size: 11px; color: #059669;">Đang tạm khóa giữ chỗ thời gian thực trên hệ thống</div>
+            </div>
+
             <div class="chat-pay-row"><span>Sân thi đấu:</span><span class="chat-pay-val">${escapeHtml(p.courtName || '')}</span></div>
-            <div class="chat-pay-row"><span>Khung giờ:</span><span class="chat-pay-val">${escapeHtml(p.timeSlot || '')}</span></div>
+            <div class="chat-pay-row"><span>Khung giờ:</span><span class="chat-pay-val">${escapeHtml(p.timeSlot || '')} (${escapeHtml(p.bookingDate || '')})</span></div>
             <div class="chat-pay-row"><span>Cơ sở:</span><span class="chat-pay-val">${escapeHtml(p.branchName || '')}</span></div>
+            ${p.additionalServices ? `<div class="chat-pay-row"><span>Dịch vụ đi kèm:</span><span class="chat-pay-val" style="font-size: 11px; max-width: 60%; text-align: right;">${escapeHtml(p.additionalServices)}</span></div>` : ''}
             <div class="chat-pay-row" style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed #cbd5e1;">
-              <span style="font-weight: 700;">Tiền cọc cần thanh toán:</span>
+              <span style="font-weight: 700;">Tiền cọc cần thanh toán (30%):</span>
               <span class="chat-pay-val highlight">${Number(p.depositAmount || 0).toLocaleString('vi-VN')} đ</span>
             </div>
 

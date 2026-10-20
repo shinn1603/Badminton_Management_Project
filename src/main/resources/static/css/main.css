@@ -2489,6 +2489,12 @@ body.has-mobile-nav {
 .mob-nav-booking {
   position: relative;
 }
+.mob-nav-booking:not(.active) .mob-nav-label {
+  color: var(--text-muted) !important;
+}
+.mob-nav-booking.active .mob-nav-label {
+  color: var(--primary) !important;
+}
 
 .mob-nav-highlight-btn {
   width: 44px;

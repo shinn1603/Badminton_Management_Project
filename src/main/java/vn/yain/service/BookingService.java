@@ -84,6 +84,22 @@ public class BookingService {
         return bookingRepository.findByBookingCode(bookingCode);
     }
 
+    public String getBankBin() {
+        return (bankBin != null && !bankBin.isBlank()) ? bankBin : "970422";
+    }
+
+    public String getBankName() {
+        return (bankName != null && !bankName.isBlank()) ? bankName : "MBBank (Ngân hàng Quân Đội)";
+    }
+
+    public String getAccountNo() {
+        return (accountNo != null && !accountNo.isBlank()) ? accountNo : "0903123456";
+    }
+
+    public String getAccountName() {
+        return (accountName != null && !accountName.isBlank()) ? accountName : "UTE BADMINTON CLUB";
+    }
+
     public String generateUniqueBookingCode() {
         for (int i = 0; i < 20; i++) {
             String code = "DS" + String.format("%06d", ThreadLocalRandom.current().nextInt(100000, 999999));
@@ -453,6 +469,7 @@ public class BookingService {
         resp.put("accountNo", accNo);
         resp.put("accountName", accName);
         resp.put("notes", booking.getNotes());
+        resp.put("createdAt", booking.getCreatedAt() != null ? booking.getCreatedAt().toString() : LocalDateTime.now().toString());
 
         return resp;
     }

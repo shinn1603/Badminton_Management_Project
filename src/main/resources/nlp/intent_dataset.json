@@ -120,6 +120,20 @@
       ]
     },
     {
+      "tag": "CONTINUE_PAYMENT",
+      "patterns": [
+        "tiếp tục thanh toán", "thanh toan tiep", "thanh toan don", "mở lại thanh toán", "mo lai thanh toan",
+        "chưa chuyển khoản xong", "chua chuyen khoan xong", "mã khóa sân của tôi", "ma khoa san",
+        "mở lại mã qr", "mo lai ma qr", "cho tôi chuyển khoản", "chuyển khoản cọc", "chuyen khoan coc",
+        "xem lại thanh toán", "xem lai thanh toan", "lấy lại mã cọc", "lay lai ma coc",
+        "thanh toán đơn vừa đặt", "thanh toan don vua dat", "tôi lỡ tắt chuyển khoản", "lo tat chuyen khoan",
+        "lỡ tắt modal thanh toán", "mở lại mã khóa sân", "mo lai ma khoa san", "tiếp tục cọc", "tiep tuc coc"
+      ],
+      "responses": [
+        "Hệ thống đang mở lại thông tin thanh toán tiền cọc cho mã khóa sân giữ chỗ của bạn."
+      ]
+    },
+    {
       "tag": "CANCEL_BOOKING",
       "patterns": [
         "hủy sân", "tôi muốn hủy sân", "hủy đơn đặt sân", "hủy lịch chơi", "chính sách hủy sân", "hủy có được hoàn tiền không",

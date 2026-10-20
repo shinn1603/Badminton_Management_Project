@@ -437,6 +437,117 @@ public class ChatbotService {
         }
 
         // =========================================================================
+        // INTENT: TIẾP TỤC THANH TOÁN / MỞ LẠI MÃ KHÓA SÂN & VIETQR
+        // =========================================================================
+        if (!normalized.contains("huy") && ("CONTINUE_PAYMENT".equals(mlTag) || matches(normalized,
+                "tiep tuc thanh toan", "thanh toan tiep", "thanh toan don", "mo lai thanh toan", "mo lai ma khoa san",
+                "chua chuyen khoan", "chua chuyen khoan xong", "ma khoa san cua toi", "ma khoa san",
+                "chuyen khoan coc", "lay lai ma coc", "xem lai thanh toan", "thanh toan", "mo lai ma qr", "ma qr"))) {
+
+            String targetCode = null;
+            Pattern codePattern = Pattern.compile("(?:ds\\s*)?(\\d{6})", Pattern.CASE_INSENSITIVE);
+            Matcher mCode = codePattern.matcher(normalized);
+            if (mCode.find()) {
+                targetCode = "DS" + mCode.group(1);
+            } else if (ctx.lastBookingCode != null) {
+                targetCode = ctx.lastBookingCode;
+            } else if (ctx.customerPhone != null && !ctx.customerPhone.isBlank()) {
+                List<Booking> userBookings = bookingRepository.findByCustomerPhoneOrderByBookingDateDesc(ctx.customerPhone);
+                if (userBookings != null && !userBookings.isEmpty()) {
+                    targetCode = userBookings.get(0).getBookingCode();
+                }
+            } else if (ctx.customerCode != null && !ctx.customerCode.isBlank()) {
+                List<Booking> userBookings = bookingRepository.findByCustomerCodeOrderByBookingDateDesc(ctx.customerCode);
+                if (userBookings != null && !userBookings.isEmpty()) {
+                    targetCode = userBookings.get(0).getBookingCode();
+                }
+            }
+
+            if (targetCode != null) {
+                Optional<Booking> optBooking = bookingRepository.findByBookingCode(targetCode);
+                if (optBooking.isPresent()) {
+                    Booking b = optBooking.get();
+                    if (b.getStatus() != null && (b.getStatus().contains("Đã cọc") || b.getStatus().contains("hoàn thành") || b.getStatus().contains("Hoàn thành"))) {
+                        return ChatMessageDto.builder()
+                                .sender("bot")
+                                .intent("ALREADY_PAID")
+                                .text(String.format("Đơn đặt sân **%s** của bạn đã được ghi nhận thanh toán tiền cọc thành công! Bạn có thể xem vé và mã QR check-in tại [Lịch Sử Đặt Sân](/customer/history).", b.getBookingCode()))
+                                .actionType("NONE")
+                                .quickReplies(List.of("Xem Lịch Sử Đặt Sân", "Hướng dẫn hủy ca chơi", "Bảng giá thuê sân"))
+                                .timestamp(LocalDateTime.now())
+                                .build();
+                    } else if (b.getStatus() != null && b.getStatus().contains("hủy")) {
+                        return ChatMessageDto.builder()
+                                .sender("bot")
+                                .intent("BOOKING_CANCELLED")
+                                .text(String.format("Đơn đặt sân **%s** đã bị hủy. Bạn có thể chọn đặt sân mới nếu muốn thi đấu.", b.getBookingCode()))
+                                .actionType("NONE")
+                                .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân"))
+                                .timestamp(LocalDateTime.now())
+                                .build();
+                    }
+
+                    // Booking is currently pending deposit -> open VietQR payment card!
+                    BigDecimal dep = b.getDepositAmount() != null ? b.getDepositAmount()
+                            : (b.getTotalPrice() != null ? b.getTotalPrice().multiply(new BigDecimal("0.3")).setScale(0, java.math.RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                    String bin = (bookingService != null) ? bookingService.getBankBin() : "970422";
+                    String accNo = (bookingService != null) ? bookingService.getAccountNo() : "0903123456";
+                    String accName = (bookingService != null) ? bookingService.getAccountName() : "UTE BADMINTON CLUB";
+                    String bName = (bookingService != null) ? bookingService.getBankName() : "MBBank (Ngân hàng Quân Đội)";
+
+                    String qrUrl = String.format(
+                            "https://img.vietqr.io/image/%s-%s-compact2.png?amount=%d&addInfo=CK%%20%s&accountName=%s",
+                            bin, accNo, dep.longValue(), b.getBookingCode(),
+                            java.net.URLEncoder.encode(accName, java.nio.charset.StandardCharsets.UTF_8).replace("+", "%20")
+                    );
+
+                    Map<String, Object> paymentData = new HashMap<>();
+                    paymentData.put("bookingCode", b.getBookingCode());
+                    paymentData.put("courtName", b.getCourtCode());
+                    paymentData.put("branchName", b.getBranchCode());
+                    paymentData.put("bookingDate", b.getBookingDate() != null ? b.getBookingDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "");
+                    paymentData.put("timeSlot", b.getTimeSlot());
+                    paymentData.put("additionalServices", b.getNotes());
+                    paymentData.put("totalPrice", b.getTotalPrice());
+                    paymentData.put("depositAmount", dep);
+                    paymentData.put("qrUrl", qrUrl);
+                    paymentData.put("bankName", bName);
+                    paymentData.put("accountNo", accNo);
+                    paymentData.put("accountName", accName);
+                    paymentData.put("createdAt", b.getCreatedAt() != null ? b.getCreatedAt().toString() : LocalDateTime.now().toString());
+
+                    String reopenText = String.format(
+                            "Hệ thống đã mở lại mã khóa sân và giao diện thanh toán tiền cọc cho đơn **%s** của bạn!\n\n" +
+                            "• **Mã khóa sân**: **%s**\n" +
+                            "• **Khách hàng**: %s (%s)\n" +
+                            "• **Sân**: %s (Cơ sở: %s)\n" +
+                            "• **Khung giờ**: %s (%s)\n" +
+                            "• **Tổng tiền**: %,d đ\n" +
+                            "• **Tiền cọc cần thanh toán (30%%)**: **%,d đ**\n\n" +
+                            "Hệ thống đang tạm khóa giữ chỗ sân trong 10 phút. Đơn này cũng đã được lưu trong [Lịch Sử Đặt Sân](/customer/history). Bạn vui lòng quét mã VietQR bên dưới hoặc chuyển khoản để hoàn tất.",
+                            b.getBookingCode(), b.getBookingCode(),
+                            b.getCustomerName() != null ? b.getCustomerName() : "Khách hàng",
+                            b.getCustomerPhone() != null ? b.getCustomerPhone() : "",
+                            b.getCourtCode(), b.getBranchCode(),
+                            b.getTimeSlot(), b.getBookingDate() != null ? b.getBookingDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "",
+                            b.getTotalPrice() != null ? b.getTotalPrice().longValue() : 0,
+                            dep.longValue()
+                    );
+
+                    return ChatMessageDto.builder()
+                            .sender("bot")
+                            .intent("OPEN_PAYMENT")
+                            .text(reopenText)
+                            .actionType("OPEN_PAYMENT")
+                            .paymentData(paymentData)
+                            .quickReplies(List.of("Xác nhận đã chuyển khoản cọc", "Lịch sử đặt sân của tôi", "Hướng dẫn hủy ca chơi"))
+                            .timestamp(LocalDateTime.now())
+                            .build();
+                }
+            }
+        }
+
+        // =========================================================================
         // INTENT: TRA CỨU ĐƠN ĐẶT SÂN
         // =========================================================================
         if (!normalized.contains("huy") && ("CHECK_BOOKING".equals(mlTag) || matches(normalized, "kiem tra don", "tra cuu don", "xem don", "don cua toi", "ma don", "thong tin don", "xem lai thong tin don", "xem lai don", "don dat san", "lich su dat", "lich su don", "don hang cua toi"))) {
@@ -793,7 +904,8 @@ public class ChatbotService {
         // =========================================================================
         // INTENT: HỘI VIÊN & ĐIỂM THƯỞNG
         // =========================================================================
-        if ("MEMBERSHIP_LOYALTY".equals(mlTag) || matches(normalized, "tich diem", "the hoi vien", "hang thanh vien", "diem thuong", "doi voucher", "dong bac vang", "kim cuong", "vip", "uu dai")) {
+        if (("MEMBERSHIP_LOYALTY".equals(mlTag) || matches(normalized, "tich diem", "the hoi vien", "hang thanh vien", "diem thuong", "doi voucher", "dong bac vang", "kim cuong", "thanh vien vip", "hoi vien vip", "the vip", "uu dai"))
+                && !isBookingFlow(normalized, ctx)) {
             return ChatMessageDto.builder()
                     .sender("bot")
                     .intent("MEMBERSHIP_LOYALTY")
@@ -989,12 +1101,14 @@ public class ChatbotService {
             // 3. Thiếu Sân gì (đã có Chi nhánh và Giờ)
             if (!hasCourt) {
                 ctx.stage = "PROPOSING_COURT";
-                List<Court> branchCourts = (courtRepository != null) ? courtRepository.findByBranchCode(ctx.branchCode) : Collections.emptyList();
+                List<Court> branchCourts = (courtRepository != null && ctx.branchCode != null) ? courtRepository.findByBranchCode(ctx.branchCode) : Collections.emptyList();
+                if (branchCourts == null) branchCourts = Collections.emptyList();
                 List<Court> availableCourts = branchCourts.stream()
                         .filter(c -> !"Bảo trì".equalsIgnoreCase(c.getStatus()))
                         .filter(c -> {
                             if (bookingRepository == null || bookingService == null) return true;
                             List<Booking> dayBookings = bookingRepository.findByCourtCodeAndBookingDate(c.getCourtCode(), ctx.date);
+                            if (dayBookings == null) dayBookings = Collections.emptyList();
                             return dayBookings.stream().noneMatch(b ->
                                     b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus())
                                     && bookingService.isSlotOverlapping(ctx.timeSlot, b.getTimeSlot())
@@ -1144,15 +1258,17 @@ public class ChatbotService {
         }
 
         // Re-verify court availability
-        List<Court> branchCourts = (courtRepository != null) ? courtRepository.findByBranchCode(ctx.branchCode) : Collections.emptyList();
+        List<Court> branchCourts = (courtRepository != null && ctx.branchCode != null) ? courtRepository.findByBranchCode(ctx.branchCode) : Collections.emptyList();
+        if (branchCourts == null) branchCourts = Collections.emptyList();
         Optional<Court> availableCourt = branchCourts.stream()
                 .filter(c -> !"Bảo trì".equalsIgnoreCase(c.getStatus()))
                 .filter(c -> {
                     if (bookingRepository == null) return true;
                     List<Booking> dayBookings = bookingRepository.findByCourtCodeAndBookingDate(c.getCourtCode(), ctx.date != null ? ctx.date : LocalDate.now());
+                    if (dayBookings == null) dayBookings = Collections.emptyList();
                     return dayBookings.stream().noneMatch(b ->
                             b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus())
-                            && bookingService.isSlotOverlapping(ctx.timeSlot, b.getTimeSlot())
+                            && bookingService != null && bookingService.isSlotOverlapping(ctx.timeSlot, b.getTimeSlot())
                     );
                 })
                 .findFirst();
@@ -1226,6 +1342,7 @@ public class ChatbotService {
         paymentData.put("bankName", "MBBank (Ngân hàng Quân Đội)");
         paymentData.put("accountNo", "0903123456");
         paymentData.put("accountName", "UTE BADMINTON CLUB");
+        paymentData.put("createdAt", booking.getCreatedAt() != null ? booking.getCreatedAt().toString() : LocalDateTime.now().toString());
 
         ctx.stage = "BOOKED";
 
@@ -1278,19 +1395,27 @@ public class ChatbotService {
         }
 
         // 2. Họ tên khách hàng
-        Matcher namePattern = Pattern.compile("(?i)(?:tôi tên là|mình tên là|em tên là|tôi tên|mình tên|em tên|tên tôi là|tên mình là|tôi là|mình là)\\s+([A-Za-zÀ-ỹà-ỹ\\s]{2,30})").matcher(rawInput);
+        Matcher namePattern = Pattern.compile("(?i)(?:tôi tên là|mình tên là|em tên là|tôi tên|mình tên|em tên|tên tôi là|tên mình là|tôi là|mình là)\\s+([^,.;!?\n]{2,30})").matcher(rawInput);
         if (namePattern.find()) {
             String detectedName = namePattern.group(1).trim();
-            // Loại bỏ các từ thừa như sdt, số điện thoại
             detectedName = detectedName.replaceAll("(?i)(?:sdt|số điện thoại|sđt|phone).*", "").trim();
             if (!detectedName.isBlank() && detectedName.length() >= 2) {
                 ctx.customerName = capitalizeWords(detectedName);
             }
-        } else if ("ASK_NAME".equals(ctx.stage)) {
-            // Khi đang hỏi tên, nếu người dùng trả lời 1 chuỗi chữ hợp lệ không chứa lệnh
-            String clean = rawInput.trim();
-            if (!clean.matches(".*\\d.*") && clean.length() >= 2 && clean.length() <= 30 && !clean.contains("?") && !matches(normalized, "dat san", "huy", "chi nhanh", "gia", "khong")) {
-                ctx.customerName = capitalizeWords(clean);
+        } else {
+            Matcher nameNoAccPattern = Pattern.compile("(?i)(?:toi ten la|minh ten la|em ten la|toi ten|minh ten|em ten|ten toi la|ten minh la|toi la|minh la)\\s+([^,.;!?\n]{2,30})").matcher(normalized);
+            if (nameNoAccPattern.find()) {
+                String detectedName = nameNoAccPattern.group(1).trim();
+                detectedName = detectedName.replaceAll("(?i)(?:sdt|so dien thoai|phone).*", "").trim();
+                if (!detectedName.isBlank() && detectedName.length() >= 2) {
+                    ctx.customerName = capitalizeWords(detectedName);
+                }
+            } else if ("ASK_NAME".equals(ctx.stage)) {
+                // Khi đang hỏi tên, nếu người dùng trả lời 1 chuỗi chữ hợp lệ không chứa lệnh
+                String clean = rawInput.trim();
+                if (!clean.matches(".*\\d.*") && clean.length() >= 2 && clean.length() <= 30 && !clean.contains("?") && !matches(normalized, "dat san", "huy", "chi nhanh", "gia", "khong")) {
+                    ctx.customerName = capitalizeWords(clean);
+                }
             }
         }
 
