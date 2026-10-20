@@ -16,6 +16,237 @@
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
   </script>
+  <style>
+    .chart-tab-bar {
+      display: inline-flex;
+      background: var(--surface-subtle);
+      padding: 4px;
+      border-radius: 10px;
+      gap: 4px;
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .chart-tab-btn {
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chart-tab-btn:hover {
+      color: var(--text-dark);
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    [data-theme='dark'] .chart-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .chart-tab-btn.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .tab-badge {
+      padding: 2.5px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+      transition: all 0.2s ease;
+    }
+
+    .chart-tab-btn.active .tab-badge {
+      background: #10b981;
+      color: #ffffff;
+    }
+
+    .data-table th, .data-table td {
+      padding: 12px 14px !important;
+      font-size: 12.5px !important;
+      vertical-align: middle;
+    }
+
+    .data-table th {
+      background: var(--surface-subtle);
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 11px !important;
+      white-space: nowrap;
+    }
+
+    .data-table tbody tr {
+      transition: background-color 0.15s ease;
+    }
+
+    .data-table tbody tr:hover {
+      background-color: var(--surface-subtle);
+    }
+
+    .policy-callout {
+      padding: 16px 20px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-left: 4px solid #10b981;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--text-dark);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      line-height: 1.5;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 540px;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin: 0;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s;
+    }
+
+    .modal-close-btn:hover {
+      color: var(--danger);
+      background: var(--surface-subtle);
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      background: var(--surface-subtle);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-body);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--text-dark);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s ease;
+      box-sizing: border-box;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+    }
+
+    .filter-ctrl {
+      padding: 7px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--text-dark);
+      font-size: 12.5px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .filter-ctrl:focus {
+      border-color: var(--primary);
+    }
+  </style>
 </head>
 <body>
 
@@ -116,97 +347,101 @@
       </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-      <!-- TOP NAV -->
-      <header class="top-nav">
-        <div class="nav-left">
-          <button class="nav-icon-btn" onclick="toggleSidebar()" title="Đóng/mở sidebar">
+    <!-- MAIN WRAPPER -->
+    <main class="main-wrapper">
+      <!-- HEADER BAR (EXECUTIVE DESIGN) -->
+      <header class="header-bar">
+        <div class="header-left">
+          <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="Thu gọn / Mở rộng">
             <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
           </button>
-          <h1 class="page-title">Giám sát mặt hàng & Nhập kho chuỗi</h1>
+          <div class="header-heading">
+            <h1>Giám sát mặt hàng & Nhập kho chuỗi</h1>
+          </div>
         </div>
 
-        <div class="nav-right">
-          <button class="nav-icon-btn" onclick="toggleTheme()" title="Đổi giao diện">
-            <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
+        <div class="header-right">
+          <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Đổi giao diện Sáng / Tối" style="padding: 6px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--text-dark); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; margin-right: 6px;">
+            <svg class="svg-icon" id="themeIconSun" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="23"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
           </button>
 
-          <button class="btn btn-primary btn-sm" id="btnReceiptHeaderAction" onclick="handleReceiptHeaderAction()">
-            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
+          <button class="btn btn-primary" id="btnReceiptHeaderAction" onclick="handleReceiptHeaderAction()">
+            <svg class="svg-icon" id="btnReceiptHeaderActionIcon" viewBox="0 0 24 24" style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
             </svg>
-            <span id="btnReceiptHeaderActionText">Làm mới dữ liệu</span>
+            <span id="btnReceiptHeaderActionText">Làm mới phiếu</span>
           </button>
 
-          <div class="nav-user">
-            <div class="user-avatar-sm">PT</div>
-            <div class="nav-user-info">
-              <span class="nav-user-name">Nguyễn Phước Thọ</span>
-              <span class="nav-user-role">Giám đốc chuỗi</span>
-            </div>
+          <div class="user-pill-header" id="headerUserWidget" title="Tài khoản đang đăng nhập">
+            <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;">GD</div>
+            <div class="user-title" style="font-size: 12.5px; font-weight: 600; color: var(--text-dark);">Giám đốc điều hành</div>
           </div>
         </div>
       </header>
 
-      <div class="content-body">
-        <!-- HERO BANNER -->
-        <div class="hero-banner" style="background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); margin-bottom: 24px;">
-          <div class="hero-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(52, 211, 153, 0.4);">
-            BAN GIÁM ĐỐC • GIÁM SÁT HÀNG HÓA & NHẬP KHO CHUỖI
+      <!-- PAGE CONTENT -->
+      <div class="page-content">
+        <!-- LUXURY HERO BANNER -->
+        <div class="hero-banner" style="margin-bottom: 24px;">
+          <div class="hero-banner-content">
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); font-size: 11.5px; font-weight: 700; color: #6ee7b7; text-transform: uppercase; margin-bottom: 10px;">
+              <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
+              Ban Giám Đốc • Kiểm Soát Hàng Hóa Toàn Chuỗi
+            </div>
+            <h1 class="hero-title" style="margin-bottom: 8px;">Giám Sát Mặt Hàng & Nhập Kho Chuỗi</h1>
+            <p class="hero-subtitle" style="margin-bottom: 0;">Theo dõi dòng tiền nhập kho từng chi nhánh, quản lý danh bạ đối tác cung ứng và chuẩn hóa định mức giá vốn toàn hệ thống.</p>
           </div>
-          <h1 class="hero-title">Giám Sát Mặt Hàng & Nhập Kho Chuỗi Chi Nhánh</h1>
-          <p class="hero-subtitle" style="margin-bottom: 0;">
-            Theo dõi tập trung lịch sử phiếu nhập hàng, quản lý danh bạ đối tác cung ứng và kiểm soát giá vốn cố định toàn hệ thống.
-          </p>
         </div>
 
-        <!-- 4 KPI CARDS -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 22px;">
-          <div class="card" style="padding: 18px 20px; border-left: 4px solid #10b981;">
-            <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tổng chi phí nhập kho toàn chuỗi</div>
-            <div style="font-size: 24px; font-weight: 800; color: #059669; margin: 6px 0;" id="kpiDirectorTotalReceiptAmount">0 đ</div>
-            <div style="font-size: 11.5px; color: var(--text-muted);">Tổng giá trị từ tất cả các phiếu nhập kho</div>
+        <!-- 4 CLEAN KPI CARDS -->
+        <div class="kpi-row" style="margin-bottom: 24px;">
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Tổng chi phí nhập kho</span>
+              <span class="clean-kpi-badge badge-green">Toàn chuỗi</span>
+            </div>
+            <div class="clean-kpi-value" id="kpiDirectorTotalReceiptAmount">0 đ</div>
+            <div class="clean-kpi-caption">Tổng giá trị từ tất cả các phiếu nhập kho</div>
           </div>
 
-          <div class="card" style="padding: 18px 20px; border-left: 4px solid #3b82f6;">
-            <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tổng số phiếu nhập kho</div>
-            <div style="font-size: 24px; font-weight: 800; color: #2563eb; margin: 6px 0;" id="kpiDirectorReceiptCount">0 phiếu</div>
-            <div style="font-size: 11.5px; color: var(--text-muted);">Đã lưu vết kiểm kê trong cơ sở dữ liệu</div>
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Tổng số phiếu nhập</span>
+              <span class="clean-kpi-badge badge-blue">Đã lưu trữ</span>
+            </div>
+            <div class="clean-kpi-value" id="kpiDirectorReceiptCount">0 phiếu</div>
+            <div class="clean-kpi-caption">Hồ sơ kiểm kê trong cơ sở dữ liệu</div>
           </div>
 
-          <div class="card" style="padding: 18px 20px; border-left: 4px solid #8b5cf6;">
-            <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Số chi nhánh đã nhập hàng</div>
-            <div style="font-size: 24px; font-weight: 800; color: #7c3aed; margin: 6px 0;" id="kpiDirectorActiveBranches">0 chi nhánh</div>
-            <div style="font-size: 11.5px; color: var(--text-muted);">Hệ thống chi nhánh: CN01, CN02, CN03,...</div>
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Chi nhánh đã nhập</span>
+              <span class="clean-kpi-badge badge-purple">Điểm cơ sở</span>
+            </div>
+            <div class="clean-kpi-value" id="kpiDirectorActiveBranches">0 chi nhánh</div>
+            <div class="clean-kpi-caption">Hệ thống chi nhánh: CN01, CN02,...</div>
           </div>
 
-          <div class="card" style="padding: 18px 20px; border-left: 4px solid #f59e0b;">
-            <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Đối tác cung ứng chuỗi</div>
-            <div style="font-size: 24px; font-weight: 800; color: #d97706; margin: 6px 0;" id="kpiDirectorSupplierCount">0 đối tác</div>
-            <div style="font-size: 11.5px; color: var(--text-muted);">Nhà cung ứng thiết bị, nước và phụ kiện</div>
+          <div class="clean-kpi">
+            <div class="clean-kpi-top">
+              <span class="clean-kpi-label">Đối tác cung ứng</span>
+              <span class="clean-kpi-badge badge-amber">Đang hợp tác</span>
+            </div>
+            <div class="clean-kpi-value" id="kpiDirectorSupplierCount">0 đối tác</div>
+            <div class="clean-kpi-caption">Nhà cung ứng thiết bị, đồ uống & phụ kiện</div>
           </div>
         </div>
 
         <!-- TAB NAVIGATION -->
-        <div class="chart-tab-bar" style="margin-bottom: 20px;">
+        <div class="chart-tab-bar">
           <button class="chart-tab-btn active" id="receiptTabBtn1" onclick="switchReceiptsTab(1)">
-            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; margin-right: 6px;" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -214,28 +449,28 @@
               <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
             <span>Phiếu nhập hàng các chi nhánh</span>
-            <span class="tab-badge" id="badgeTotalReceipts" style="background: rgba(99, 102, 241, 0.15); color: #4f46e5;">Đang tải...</span>
+            <span class="tab-badge" id="badgeTotalReceipts">0 phiếu</span>
           </button>
 
           <button class="chart-tab-btn" id="receiptTabBtn2" onclick="switchReceiptsTab(2)">
-            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; margin-right: 6px;" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
             <span>Nhà cung cấp & Đối tác chuỗi</span>
-            <span class="tab-badge" id="badgeTotalSuppliers" style="background: rgba(16, 185, 129, 0.15); color: #059669;">Đang tải...</span>
+            <span class="tab-badge" id="badgeTotalSuppliers">0 đối tác</span>
           </button>
 
           <button class="chart-tab-btn" id="receiptTabBtn3" onclick="switchReceiptsTab(3)">
-            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; margin-right: 6px;" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <path d="M16 10a4 4 0 0 1-8 0"></path>
             </svg>
             <span>Mặt hàng & Giá vốn chuẩn chuỗi</span>
-            <span class="tab-badge" id="badgeTotalProducts" style="background: rgba(59, 130, 246, 0.15); color: #2563eb;">Đang tải...</span>
+            <span class="tab-badge" id="badgeTotalProducts">0 mặt hàng</span>
           </button>
         </div>
 
@@ -246,17 +481,23 @@
           <div class="card">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
               <div>
-                <h2 class="card-title" style="margin-bottom: 4px;">Lịch sử phiếu nhập kho toàn chuỗi chi nhánh</h2>
+                <h2 class="card-title" style="margin-bottom: 4px; font-size: 16px;">Lịch sử phiếu nhập kho toàn chuỗi chi nhánh</h2>
                 <div style="font-size: 12.5px; color: var(--text-muted);">Giám đốc theo dõi thời gian thực các đợt bổ sung nước uống, cầu lông & phụ kiện của từng cơ sở</div>
               </div>
               <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input type="text" id="directorReceiptSearch" onkeyup="filterDirectorReceipts()" class="form-control" placeholder="Tìm mã phiếu, NCC, ghi chú..." style="width: 220px; padding: 6px 12px; font-size: 12.5px;">
-                <select id="directorReceiptBranchFilter" onchange="filterDirectorReceipts()" class="form-control" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
+                <input type="text" id="directorReceiptSearch" onkeyup="filterDirectorReceipts()" class="filter-ctrl" placeholder="Tìm mã phiếu, NCC, ghi chú..." style="width: 220px;">
+                <select id="directorReceiptBranchFilter" onchange="filterDirectorReceipts()" class="filter-ctrl">
                   <option value="ALL">-- Tất cả chi nhánh --</option>
                   <option value="CN01">Cơ sở 1 (CN01)</option>
                   <option value="CN02">Cơ sở 2 (CN02)</option>
                   <option value="CN03">Cơ sở 3 (CN03)</option>
                   <option value="CN04">Cơ sở 4 (CN04)</option>
+                </select>
+                <select id="directorReceiptSort" onchange="filterDirectorReceipts()" class="filter-ctrl">
+                  <option value="NEWEST">Mới nhất trước</option>
+                  <option value="OLDEST">Cũ nhất trước</option>
+                  <option value="AMOUNT_DESC">Giá trị cao nhất</option>
+                  <option value="AMOUNT_ASC">Giá trị thấp nhất</option>
                 </select>
                 <button type="button" class="btn btn-outline btn-sm" onclick="loadDirectorReceiptsData()" title="Tải lại danh sách">
                   <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2">
@@ -302,11 +543,19 @@
           <div class="card">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
               <div>
-                <h2 class="card-title" style="margin-bottom: 4px;">Danh bạ Nhà cung cấp & Đối tác cung ứng chuỗi</h2>
+                <h2 class="card-title" style="margin-bottom: 4px; font-size: 16px;">Danh bạ Nhà cung cấp & Đối tác cung ứng chuỗi</h2>
                 <div style="font-size: 12.5px; color: var(--text-muted);">Giám đốc quản lý tập trung toàn bộ các đầu mối nhập hàng, bảng giá chiết khấu và hợp đồng</div>
               </div>
               <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input type="text" id="directorSupplierSearch" onkeyup="filterDirectorSuppliers()" class="form-control" placeholder="Tìm tên đối tác, SĐT..." style="width: 220px; padding: 6px 12px; font-size: 12.5px;">
+                <input type="text" id="directorSupplierSearch" onkeyup="filterDirectorSuppliers()" class="filter-ctrl" placeholder="Tìm tên đối tác, SĐT..." style="width: 220px;">
+                <select id="directorSupplierCategoryFilter" onchange="filterDirectorSuppliers()" class="filter-ctrl">
+                  <option value="ALL">-- Tất cả lĩnh vực --</option>
+                  <option value="Nước giải khát">Nước giải khát</option>
+                  <option value="Cầu lông">Ống Cầu lông</option>
+                  <option value="Dụng cụ & Trang phục">Dụng cụ & Trang phục</option>
+                  <option value="Phụ kiện">Phụ kiện thể thao</option>
+                  <option value="Đa ngành">Cung ứng tổng hợp</option>
+                </select>
                 <button type="button" class="btn btn-primary btn-sm" onclick="openDirectorSupplierModal()">
                   <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -347,30 +596,40 @@
         <!-- TAB 3: MẶT HÀNG & GIÁ VỐN CHUẨN CHUỖI -->
         <!-- ========================================== -->
         <div id="receiptContent3" style="display: none;">
-          <div class="card" style="margin-bottom: 20px;">
-            <div style="padding: 14px 18px; background: #ecfdf5; border-left: 4px solid #10b981; border-radius: 6px; font-size: 13px; color: #065f46; display: flex; align-items: center; gap: 10px;">
-              <svg class="svg-icon" viewBox="0 0 24 24" style="width: 20px; height: 20px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-              </svg>
-              <span><strong>Chính sách kiểm soát giá vốn của Ban Giám Đốc:</strong> Giá vốn nhập chuẩn (costPrice) được quy định cố định tại đây. Quản lý tại tất cả chi nhánh chỉ được nhập hàng theo giá vốn chuẩn này, đảm bảo tính minh bạch và tránh thất thoát chi phí chuỗi.</span>
+          <div class="policy-callout" style="margin-bottom: 20px;">
+            <svg class="svg-icon" viewBox="0 0 24 24" style="width: 20px; height: 20px; flex-shrink: 0; color: #10b981; margin-top: 2px;" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <div>
+              <strong style="color: #065f46; font-size: 13.5px;">Chính sách kiểm soát giá vốn của Ban Giám Đốc:</strong>
+              <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 2px;">
+                Định mức giá vốn nhập chuẩn (costPrice) được quy định cố định tại đây. Quản lý tại tất cả chi nhánh chỉ được nhập hàng theo giá vốn chuẩn này, đảm bảo tính minh bạch và tránh thất thoát chi phí chuỗi.
+              </div>
             </div>
           </div>
 
           <div class="card">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 12px;">
               <div>
-                <h2 class="card-title" style="margin-bottom: 4px;">Danh mục mặt hàng & Chuẩn hóa giá vốn toàn chuỗi</h2>
+                <h2 class="card-title" style="margin-bottom: 4px; font-size: 16px;">Danh mục mặt hàng & Chuẩn hóa giá vốn toàn chuỗi</h2>
                 <div style="font-size: 12.5px; color: var(--text-muted);">Cập nhật định mức giá vốn và giá niêm yết bán lẻ áp dụng cho toàn bộ các điểm sân</div>
               </div>
               <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input type="text" id="directorProductSearch" onkeyup="filterDirectorProducts()" class="form-control" placeholder="Tìm tên hàng, mã SP..." style="width: 220px; padding: 6px 12px; font-size: 12.5px;">
-                <select id="directorProductBranchFilter" onchange="filterDirectorProducts()" class="form-control" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
+                <input type="text" id="directorProductSearch" onkeyup="filterDirectorProducts()" class="filter-ctrl" placeholder="Tìm tên hàng, mã SP..." style="width: 220px;">
+                <select id="directorProductBranchFilter" onchange="filterDirectorProducts()" class="filter-ctrl">
                   <option value="ALL">-- Tất cả chi nhánh --</option>
                   <option value="CN01">Cơ sở 1 (CN01)</option>
                   <option value="CN02">Cơ sở 2 (CN02)</option>
                   <option value="CN03">Cơ sở 3 (CN03)</option>
                   <option value="CN04">Cơ sở 4 (CN04)</option>
+                </select>
+                <select id="directorProductCategoryFilter" onchange="filterDirectorProducts()" class="filter-ctrl">
+                  <option value="ALL">-- Tất cả danh mục --</option>
+                  <option value="Nước uống">Nước uống</option>
+                  <option value="Cầu lông">Ống cầu lông</option>
+                  <option value="Phụ kiện">Phụ kiện thể thao</option>
+                  <option value="Dụng cụ">Dụng cụ</option>
                 </select>
                 <button type="button" class="btn btn-outline btn-sm" onclick="loadDirectorProductsData()" title="Làm mới">
                   <svg class="svg-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;" fill="none" stroke="currentColor" stroke-width="2">
@@ -416,10 +675,10 @@
 
   <!-- MODAL THÊM / SỬA NHÀ CUNG CẤP -->
   <div class="modal-overlay" id="directorSupplierModal">
-    <div class="modal-card" style="max-width: 540px;">
+    <div class="modal-card">
       <div class="modal-header">
         <h3 id="dirSupplierModalTitle">Thêm Nhà Cung Cấp Mới</h3>
-        <button class="modal-close-btn" onclick="closeDirectorSupplierModal()">
+        <button class="modal-close-btn" onclick="closeDirectorSupplierModal()" title="Đóng">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -428,11 +687,11 @@
       </div>
       <div class="modal-body">
         <input type="hidden" id="dirSupplierId">
-        <div class="form-group" style="margin-bottom: 12px;">
+        <div class="form-group">
           <label class="form-label">Tên nhà cung cấp / Đối tác <span style="color: var(--danger);">*</span></label>
           <input type="text" class="form-control" id="dirSupplierName" placeholder="vd: Công ty TNHH Thể Thao Yonex Việt Nam" required>
         </div>
-        <div class="form-row" style="margin-bottom: 12px;">
+        <div class="form-row">
           <div class="form-group">
             <label class="form-label">Người đại diện liên hệ</label>
             <input type="text" class="form-control" id="dirSupplierContact" placeholder="vd: Lê Minh Hoàng">
@@ -442,7 +701,7 @@
             <input type="text" class="form-control" id="dirSupplierPhone" placeholder="vd: 0918223344">
           </div>
         </div>
-        <div class="form-row" style="margin-bottom: 12px;">
+        <div class="form-row">
           <div class="form-group">
             <label class="form-label">Lĩnh vực hàng hóa</label>
             <select class="form-control" id="dirSupplierCategory">
@@ -458,11 +717,11 @@
             <input type="email" class="form-control" id="dirSupplierEmail" placeholder="contact@doitac.com">
           </div>
         </div>
-        <div class="form-group" style="margin-bottom: 12px;">
+        <div class="form-group">
           <label class="form-label">Địa chỉ trụ sở / kho bãi</label>
           <input type="text" class="form-control" id="dirSupplierAddress" placeholder="Số nhà, đường, quận/huyện, tỉnh thành">
         </div>
-        <div class="form-group" style="margin-bottom: 12px;">
+        <div class="form-group">
           <label class="form-label">Trạng thái hợp tác</label>
           <select class="form-control" id="dirSupplierStatus">
             <option value="Đang hợp tác">Đang hợp tác</option>
@@ -486,7 +745,7 @@
     <div class="modal-card" style="max-width: 480px;">
       <div class="modal-header">
         <h3 id="dirProdModalTitle">Chỉnh sửa giá vốn & giá bán sản phẩm</h3>
-        <button class="modal-close-btn" onclick="closeDirectorProductModal()">
+        <button class="modal-close-btn" onclick="closeDirectorProductModal()" title="Đóng">
           <svg class="svg-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px;" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -495,15 +754,15 @@
       </div>
       <div class="modal-body">
         <input type="hidden" id="dirProdId">
-        <div class="form-group" style="margin-bottom: 12px;">
+        <div class="form-group">
           <label class="form-label">Mặt hàng: <strong id="dirProdName" style="color: var(--primary);"></strong></label>
         </div>
-        <div class="form-group" style="margin-bottom: 12px;">
+        <div class="form-group">
           <label class="form-label">Giá vốn nhập chuẩn (VNĐ) <span style="color: var(--danger);">* (Khóa chuẩn hóa chuỗi)</span></label>
           <input type="number" class="form-control" id="dirProdCostPrice" step="1000" min="0" required>
-          <small style="color: var(--text-muted); font-size: 11.5px;">Giá vốn này sẽ được cố định khi các Quản lý chi nhánh nhập kho.</small>
+          <small style="color: var(--text-muted); font-size: 11.5px; display: block; margin-top: 4px;">Giá vốn này sẽ được cố định khi các Quản lý chi nhánh lập phiếu nhập kho.</small>
         </div>
-        <div class="form-group" style="margin-bottom: 12px;">
+        <div class="form-group">
           <label class="form-label">Giá bán lẻ niêm yết (VNĐ) <span style="color: var(--primary);">*</span></label>
           <input type="number" class="form-control" id="dirProdUnitPrice" step="1000" min="0" required>
         </div>
@@ -531,9 +790,13 @@
     }
 
     function handleReceiptHeaderAction() {
-      if (currentReceiptTab === 1) loadDirectorReceiptsData();
-      else if (currentReceiptTab === 2) openDirectorSupplierModal();
-      else loadDirectorProductsData();
+      if (currentReceiptTab === 1) {
+        loadDirectorReceiptsData();
+      } else if (currentReceiptTab === 2) {
+        openDirectorSupplierModal();
+      } else {
+        loadDirectorProductsData();
+      }
     }
 
     function switchReceiptsTab(tabIndex) {
@@ -545,6 +808,7 @@
       const c2 = document.getElementById('receiptContent2');
       const c3 = document.getElementById('receiptContent3');
       const actionText = document.getElementById('btnReceiptHeaderActionText');
+      const actionIcon = document.getElementById('btnReceiptHeaderActionIcon');
 
       if (btn1) btn1.classList.toggle('active', tabIndex === 1);
       if (btn2) btn2.classList.toggle('active', tabIndex === 2);
@@ -555,9 +819,22 @@
       if (c3) c3.style.display = tabIndex === 3 ? 'block' : 'none';
 
       if (actionText) {
-        if (tabIndex === 1) actionText.textContent = 'Làm mới phiếu';
-        else if (tabIndex === 2) actionText.textContent = '+ Thêm nhà cung cấp';
-        else actionText.textContent = 'Làm mới mặt hàng';
+        if (tabIndex === 1) {
+          actionText.textContent = 'Làm mới phiếu';
+          if (actionIcon) {
+            actionIcon.innerHTML = '<polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>';
+          }
+        } else if (tabIndex === 2) {
+          actionText.textContent = '+ Thêm nhà cung cấp';
+          if (actionIcon) {
+            actionIcon.innerHTML = '<line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>';
+          }
+        } else {
+          actionText.textContent = 'Làm mới mặt hàng';
+          if (actionIcon) {
+            actionIcon.innerHTML = '<polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>';
+          }
+        }
       }
 
       if (tabIndex === 1) loadDirectorReceiptsData();
@@ -582,7 +859,7 @@
         if (res.ok) {
           allDirectorReceipts = await receiptDataHandler(await res.json());
           updateDirectorReceiptKPIs(allDirectorReceipts);
-          renderDirectorReceiptsTable(allDirectorReceipts);
+          filterDirectorReceipts();
           const badge = document.getElementById('badgeTotalReceipts');
           if (badge) badge.textContent = `${allDirectorReceipts.length} phiếu`;
         } else {
@@ -618,7 +895,7 @@
       if (!tbody) return;
 
       if (!receipts || receipts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Không tìm thấy phiếu nhập nào phù hợp bộ lọc</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 28px; color: var(--text-muted);">Không tìm thấy phiếu nhập nào phù hợp bộ lọc</td></tr>';
         return;
       }
 
@@ -651,6 +928,7 @@
     function filterDirectorReceipts() {
       const q = (document.getElementById('directorReceiptSearch')?.value || '').toLowerCase().trim();
       const bCode = document.getElementById('directorReceiptBranchFilter')?.value || 'ALL';
+      const sort = document.getElementById('directorReceiptSort')?.value || 'NEWEST';
 
       let filtered = allDirectorReceipts.filter(r => {
         const matchBranch = (bCode === 'ALL' || r.branchCode === bCode);
@@ -661,6 +939,19 @@
         return matchBranch && matchText;
       });
 
+      filtered.sort((a, b) => {
+        if (sort === 'NEWEST') {
+          return (new Date(b.receiptDate || b.createdAt || 0)) - (new Date(a.receiptDate || a.createdAt || 0)) || (b.id - a.id);
+        } else if (sort === 'OLDEST') {
+          return (new Date(a.receiptDate || a.createdAt || 0)) - (new Date(b.receiptDate || b.createdAt || 0)) || (a.id - b.id);
+        } else if (sort === 'AMOUNT_DESC') {
+          return Number(b.totalAmount || 0) - Number(a.totalAmount || 0);
+        } else if (sort === 'AMOUNT_ASC') {
+          return Number(a.totalAmount || 0) - Number(b.totalAmount || 0);
+        }
+        return 0;
+      });
+
       renderDirectorReceiptsTable(filtered);
     }
 
@@ -669,14 +960,14 @@
     // ==========================================
     async function loadDirectorSuppliersData() {
       const tbody = document.getElementById('directorSuppliersTableBody');
-      if (tbody) {
+      if (tbody && currentReceiptTab === 2) {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải danh bạ đối tác cung ứng...</td></tr>';
       }
       try {
         const res = await fetch('/api/suppliers');
         if (res.ok) {
           allDirectorSuppliers = await res.json();
-          renderDirectorSuppliersTable(allDirectorSuppliers);
+          filterDirectorSuppliers();
           const badge = document.getElementById('badgeTotalSuppliers');
           if (badge) badge.textContent = `${allDirectorSuppliers.length} đối tác`;
           const kpi = document.getElementById('kpiDirectorSupplierCount');
@@ -692,7 +983,7 @@
       if (!tbody) return;
 
       if (!suppliers || suppliers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">Chưa có nhà cung cấp nào</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 28px; color: var(--text-muted);">Chưa có nhà cung cấp nào phù hợp bộ lọc</td></tr>';
         return;
       }
 
@@ -726,12 +1017,15 @@
 
     function filterDirectorSuppliers() {
       const q = (document.getElementById('directorSupplierSearch')?.value || '').toLowerCase().trim();
+      const cat = document.getElementById('directorSupplierCategoryFilter')?.value || 'ALL';
       let filtered = allDirectorSuppliers.filter(s => {
-        return !q ||
+        const matchCat = (cat === 'ALL' || s.category === cat);
+        const matchText = !q ||
           (s.supplierName && s.supplierName.toLowerCase().includes(q)) ||
           (s.phone && s.phone.includes(q)) ||
           (s.category && s.category.toLowerCase().includes(q)) ||
           (s.contactPerson && s.contactPerson.toLowerCase().includes(q));
+        return matchCat && matchText;
       });
       renderDirectorSuppliersTable(filtered);
     }
@@ -745,6 +1039,7 @@
       document.getElementById('dirSupplierEmail').value = '';
       document.getElementById('dirSupplierAddress').value = '';
       document.getElementById('dirSupplierNotes').value = '';
+      document.getElementById('dirSupplierCategory').value = 'Nước giải khát';
       document.getElementById('dirSupplierStatus').value = 'Đang hợp tác';
       document.getElementById('directorSupplierModal').classList.add('active');
     }
@@ -842,14 +1137,14 @@
     // ==========================================
     async function loadDirectorProductsData() {
       const tbody = document.getElementById('directorProductsTableBody');
-      if (tbody) {
+      if (tbody && currentReceiptTab === 3) {
         tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 24px; color: var(--text-muted);">Đang tải danh mục mặt hàng toàn chuỗi...</td></tr>';
       }
       try {
         const res = await fetch('/api/products?catalog=true');
         if (res.ok) {
           allDirectorProducts = await res.json();
-          renderDirectorProductsTable(allDirectorProducts);
+          filterDirectorProducts();
           const badge = document.getElementById('badgeTotalProducts');
           if (badge) badge.textContent = `${allDirectorProducts.length} mặt hàng`;
         }
@@ -863,7 +1158,7 @@
       if (!tbody) return;
 
       if (!products || products.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 24px; color: var(--text-muted);">Chưa có sản phẩm nào</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 28px; color: var(--text-muted);">Chưa có sản phẩm nào phù hợp bộ lọc</td></tr>';
         return;
       }
 
@@ -916,14 +1211,16 @@
     function filterDirectorProducts() {
       const q = (document.getElementById('directorProductSearch')?.value || '').toLowerCase().trim();
       const bCode = document.getElementById('directorProductBranchFilter')?.value || 'ALL';
+      const cat = document.getElementById('directorProductCategoryFilter')?.value || 'ALL';
 
       let filtered = allDirectorProducts.filter(p => {
         const matchBranch = (bCode === 'ALL' || p.branchCode === bCode);
+        const matchCat = (cat === 'ALL' || p.category === cat);
         const matchText = !q ||
           (p.productName && p.productName.toLowerCase().includes(q)) ||
           (p.productCode && p.productCode.toLowerCase().includes(q)) ||
           (p.category && p.category.toLowerCase().includes(q));
-        return matchBranch && matchText;
+        return matchBranch && matchCat && matchText;
       });
 
       renderDirectorProductsTable(filtered);
@@ -996,13 +1293,13 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       const urlTab = new URLSearchParams(window.location.search).get('tab');
-      if (urlTab === '2') {
-        switchReceiptsTab(2);
-      } else if (urlTab === '3') {
-        switchReceiptsTab(3);
-      } else {
-        switchReceiptsTab(1);
-      }
+      const initialTab = (urlTab === '2') ? 2 : (urlTab === '3') ? 3 : 1;
+      switchReceiptsTab(initialTab);
+
+      // Pre-fetch Tab 2 and Tab 3 data immediately so KPI 4 (Supplier Count)
+      // and tab badges show real live data right away instead of "0 đối tác" and "Đang tải..."
+      if (initialTab !== 2) loadDirectorSuppliersData();
+      if (initialTab !== 3) loadDirectorProductsData();
     });
   </script>
   <script src="/js/global-hub.js"></script>
