@@ -1095,7 +1095,10 @@
           <div>
             <label class="form-label" style="font-size: 12px; font-weight: 700; margin-bottom: 6px; display: block;">Chi Nhánh</label>
             <select id="selBranch" class="form-control" onchange="onBranchChanged()">
-              <option value="CN01" selected>Đang nạp danh sách chi nhánh...</option>
+              <option value="CN01" selected>CN01 - Chi nhánh 1 Thủ Đức</option>
+              <option value="CN02">CN02 - Chi nhánh 2 Bình Thạnh</option>
+              <option value="CN03">CN03 - Chi nhánh 3 Quận 9</option>
+              <option value="CN04">CN04 - Chi nhánh 4 Gò Vấp</option>
             </select>
           </div>
           <div>
@@ -1114,8 +1117,45 @@
           <span class="court-badge-bwf">Chuẩn BWF</span>
         </div>
         <div class="court-select-grid" id="courtsContainer">
-          <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--text-muted);">
-            Đang nạp danh sách sân...
+          <div class="court-chip-btn selected" id="chipCourt_CL01" onclick="onSelectCourt('CL01', 'Sân 1 (VIP)', 120000, 'Sân VIP')">
+            <div class="chip-name">Sân 1 (VIP)</div>
+            <div class="chip-desc">Thảm VIP BWF</div>
+            <div class="chip-rate">120.000 đ/h</div>
+          </div>
+          <div class="court-chip-btn" id="chipCourt_CL02" onclick="onSelectCourt('CL02', 'Sân 2', 90000, 'Sân Thường')">
+            <div class="chip-name">Sân 2</div>
+            <div class="chip-desc">Tiêu Chuẩn BWF</div>
+            <div class="chip-rate">90.000 đ/h</div>
+          </div>
+          <div class="court-chip-btn" id="chipCourt_CL03" onclick="onSelectCourt('CL03', 'Sân 3', 90000, 'Sân Thường')">
+            <div class="chip-name">Sân 3</div>
+            <div class="chip-desc">Tiêu Chuẩn BWF</div>
+            <div class="chip-rate">90.000 đ/h</div>
+          </div>
+          <div class="court-chip-btn" id="chipCourt_CL04" onclick="onSelectCourt('CL04', 'Sân 4', 90000, 'Sân Thường')">
+            <div class="chip-name">Sân 4</div>
+            <div class="chip-desc">Tiêu Chuẩn BWF</div>
+            <div class="chip-rate">90.000 đ/h</div>
+          </div>
+          <div class="court-chip-btn" id="chipCourt_CL05" onclick="onSelectCourt('CL05', 'Sân 5', 90000, 'Sân Thường')">
+            <div class="chip-name">Sân 5</div>
+            <div class="chip-desc">Tiêu Chuẩn BWF</div>
+            <div class="chip-rate">90.000 đ/h</div>
+          </div>
+          <div class="court-chip-btn court-chip-maintenance" id="chipCourt_CL06" title="Sân đang bảo dưỡng kỹ thuật">
+            <div class="chip-name">Sân 6 (VIP) <span style="font-size: 10px; color: #d97706; font-weight: 700;">[Bảo trì]</span></div>
+            <div class="chip-desc" style="color: #d97706;">Bảo dưỡng</div>
+            <div class="chip-rate" style="color: var(--text-muted); font-size: 11px;">Tạm ngưng</div>
+          </div>
+          <div class="court-chip-btn" id="chipCourt_CL07" onclick="onSelectCourt('CL07', 'Sân 7', 90000, 'Sân Thường')">
+            <div class="chip-name">Sân 7</div>
+            <div class="chip-desc">Tiêu Chuẩn BWF</div>
+            <div class="chip-rate">90.000 đ/h</div>
+          </div>
+          <div class="court-chip-btn" id="chipCourt_CL08" onclick="onSelectCourt('CL08', 'Sân 8', 90000, 'Sân Thường')">
+            <div class="chip-name">Sân 8</div>
+            <div class="chip-desc">Tiêu Chuẩn BWF</div>
+            <div class="chip-rate">90.000 đ/h</div>
           </div>
         </div>
       </div>
@@ -1145,7 +1185,74 @@
           Đang hiển thị lịch trống cho sân đã chọn...
         </div>
         <div class="slots-picker-grid" id="slotsContainer">
-          <!-- Dynamically populated from API -->
+          <div class="booking-slot-cell" id="slotEl_6" data-slot-hour="6" data-slot-time="06:00 - 07:00" onclick="toggleSlotSelection('06:00 - 07:00', 120000, this)">
+            <div class="slot-cell-time">06:00 - 07:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 120k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_7" data-slot-hour="7" data-slot-time="07:00 - 08:00" onclick="toggleSlotSelection('07:00 - 08:00', 120000, this)">
+            <div class="slot-cell-time">07:00 - 08:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 120k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_8" data-slot-hour="8" data-slot-time="08:00 - 09:00" onclick="toggleSlotSelection('08:00 - 09:00', 120000, this)">
+            <div class="slot-cell-time">08:00 - 09:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 120k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_9" data-slot-hour="9" data-slot-time="09:00 - 10:00" onclick="toggleSlotSelection('09:00 - 10:00', 120000, this)">
+            <div class="slot-cell-time">09:00 - 10:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 120k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_10" data-slot-hour="10" data-slot-time="10:00 - 11:00" onclick="toggleSlotSelection('10:00 - 11:00', 120000, this)">
+            <div class="slot-cell-time">10:00 - 11:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 120k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_11" data-slot-hour="11" data-slot-time="11:00 - 12:00" onclick="toggleSlotSelection('11:00 - 12:00', 120000, this)">
+            <div class="slot-cell-time">11:00 - 12:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 120k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_12" data-slot-hour="12" data-slot-time="12:00 - 13:00" onclick="toggleSlotSelection('12:00 - 13:00', 120000, this)">
+            <div class="slot-cell-time">12:00 - 13:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 120k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_13" data-slot-hour="13" data-slot-time="13:00 - 14:00" onclick="toggleSlotSelection('13:00 - 14:00', 120000, this)">
+            <div class="slot-cell-time">13:00 - 14:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 120k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_14" data-slot-hour="14" data-slot-time="14:00 - 15:00" onclick="toggleSlotSelection('14:00 - 15:00', 120000, this)">
+            <div class="slot-cell-time">14:00 - 15:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 120k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_15" data-slot-hour="15" data-slot-time="15:00 - 16:00" onclick="toggleSlotSelection('15:00 - 16:00', 120000, this)">
+            <div class="slot-cell-time">15:00 - 16:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 120k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_16" data-slot-hour="16" data-slot-time="16:00 - 17:00" onclick="toggleSlotSelection('16:00 - 17:00', 120000, this)">
+            <div class="slot-cell-time">16:00 - 17:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 120k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_17" data-slot-hour="17" data-slot-time="17:00 - 18:00" onclick="toggleSlotSelection('17:00 - 18:00', 150000, this)">
+            <span class="tag-peak">Vàng</span>
+            <div class="slot-cell-time">17:00 - 18:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 150k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_18" data-slot-hour="18" data-slot-time="18:00 - 19:00" onclick="toggleSlotSelection('18:00 - 19:00', 150000, this)">
+            <span class="tag-peak">Vàng</span>
+            <div class="slot-cell-time">18:00 - 19:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 150k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_19" data-slot-hour="19" data-slot-time="19:00 - 20:00" onclick="toggleSlotSelection('19:00 - 20:00', 150000, this)">
+            <span class="tag-peak">Vàng</span>
+            <div class="slot-cell-time">19:00 - 20:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 150k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_20" data-slot-hour="20" data-slot-time="20:00 - 21:00" onclick="toggleSlotSelection('20:00 - 21:00', 150000, this)">
+            <span class="tag-peak">Vàng</span>
+            <div class="slot-cell-time">20:00 - 21:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 150k</div>
+          </div>
+          <div class="booking-slot-cell" id="slotEl_21" data-slot-hour="21" data-slot-time="21:00 - 22:00" onclick="toggleSlotSelection('21:00 - 22:00', 120000, this)">
+            <div class="slot-cell-time">21:00 - 22:00</div>
+            <div class="slot-cell-tag tag-free">Trống • 120k</div>
+          </div>
         </div>
       </div>
 
@@ -1206,7 +1313,7 @@
 
         <div class="summary-line">
           <span class="summary-label">Sân đã chọn:</span>
-          <span class="summary-val" id="sumCourt">Chưa chọn sân</span>
+          <span class="summary-val" id="sumCourt">Sân 1 (VIP)</span>
         </div>
 
         <div class="summary-line">
@@ -1428,7 +1535,7 @@
     ];
 
     let branchCourts = [];
-    let selectedCourt = null;
+    let selectedCourt = { courtCode: 'CL01', courtName: 'Sân 1 (VIP)', hourlyRate: 120000, typeName: 'Sân VIP' };
     let selectedSlots = [];
     let currentAppliedPromo = null;
     let modalTimerInterval = null;

@@ -72,19 +72,56 @@ public class ChatbotService {
         public String customerName = null;
         public String customerPhone = null;
         public String customerCode = null;
-        public String branchCode = "CN01";
-        public String branchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
-        public String courtCode = "CL01";
-        public String courtName = "Sân 1 (VIP)";
-        public LocalDate date = LocalDate.now();
-        public String timeSlot = "18:00 - 20:00";
-        public int durationHours = 2;
-        public BigDecimal hourlyRate = new BigDecimal("140000");
-        public BigDecimal totalPrice = new BigDecimal("280000");
-        public BigDecimal depositAmount = new BigDecimal("84000");
-        public String stage = "GREETING";
+
+        public String branchCode = null;
+        public String branchName = null;
+
+        public String courtCode = null;
+        public String courtName = null;
+        public String courtType = null; // "VIP", "STANDARD"
+
+        public LocalDate date = null;
+        public String timeSlot = null; // e.g. "18:00 - 20:00"
+        public int durationHours = 0;
+
+        public String additionalServices = null; // e.g. "Không chọn thêm (Chỉ thuê sân)" or "Thuê 2 vợt, 2 nước"
+        public BigDecimal additionalFee = BigDecimal.ZERO;
+        public BigDecimal courtPrice = BigDecimal.ZERO;
+        public BigDecimal hourlyRate = BigDecimal.ZERO;
+        public BigDecimal totalPrice = BigDecimal.ZERO;
+        public BigDecimal depositAmount = BigDecimal.ZERO;
+
+        public String stage = "GREETING"; // GREETING, COLLECTING_INFO, PROPOSING_COURT, PROPOSING_ADDONS, ASK_NAME, ASK_PHONE, AWAITING_CONFIRMATION, BOOKED
         public String lastBookingCode = null;
         public List<Map<String, String>> dialogHistory = new ArrayList<>();
+
+        public boolean isNameProvided() {
+            return customerName != null && !customerName.isBlank() && !"Khách đặt qua AI".equalsIgnoreCase(customerName.trim());
+        }
+
+        public boolean isPhoneProvided() {
+            return customerPhone != null && customerPhone.matches("0[3|5|7|8|9]\\d{8}");
+        }
+
+        public boolean isBranchProvided() {
+            return branchCode != null && !branchCode.isBlank();
+        }
+
+        public boolean isSlotProvided() {
+            return timeSlot != null && !timeSlot.isBlank() && date != null;
+        }
+
+        public boolean isCourtProvided() {
+            return courtCode != null && !courtCode.isBlank();
+        }
+
+        public boolean isAddOnsProvided() {
+            return additionalServices != null && !additionalServices.isBlank();
+        }
+
+        public boolean hasAllBookingInfo() {
+            return isNameProvided() && isPhoneProvided() && isBranchProvided() && isSlotProvided() && isCourtProvided() && isAddOnsProvided();
+        }
 
         public void addDialogTurn(String role, String text) {
             lastAccessed = System.currentTimeMillis();
@@ -96,16 +133,23 @@ public class ChatbotService {
 
         public void reset() {
             lastAccessed = System.currentTimeMillis();
-            branchCode = "CN01";
-            branchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
-            courtCode = "CL01";
-            courtName = "Sân 1 (VIP)";
-            date = LocalDate.now();
-            timeSlot = "18:00 - 20:00";
-            durationHours = 2;
-            hourlyRate = new BigDecimal("140000");
-            totalPrice = new BigDecimal("280000");
-            depositAmount = new BigDecimal("84000");
+            customerName = null;
+            customerPhone = null;
+            customerCode = null;
+            branchCode = null;
+            branchName = null;
+            courtCode = null;
+            courtName = null;
+            courtType = null;
+            date = null;
+            timeSlot = null;
+            durationHours = 0;
+            additionalServices = null;
+            additionalFee = BigDecimal.ZERO;
+            courtPrice = BigDecimal.ZERO;
+            hourlyRate = BigDecimal.ZERO;
+            totalPrice = BigDecimal.ZERO;
+            depositAmount = BigDecimal.ZERO;
             stage = "GREETING";
             lastBookingCode = null;
             dialogHistory.clear();
@@ -130,45 +174,21 @@ public class ChatbotService {
         ChatSessionContext ctx = sessionStore.computeIfAbsent(sid, k -> new ChatSessionContext());
         ctx.lastAccessed = System.currentTimeMillis();
 
-        if (customerPhone != null && !customerPhone.isBlank()) {
+        if (customerPhone != null && !customerPhone.isBlank() && customerPhone.matches("0[3|5|7|8|9]\\d{8}")) {
             ctx.customerPhone = customerPhone.trim();
         }
-        if (customerName != null && !customerName.isBlank()) {
+        if (customerName != null && !customerName.isBlank() && !"Khách đặt qua AI".equalsIgnoreCase(customerName.trim())) {
             ctx.customerName = customerName.trim();
         }
         if (customerCode != null && !customerCode.isBlank()) {
             ctx.customerCode = customerCode.trim();
         }
 
-        if (rawInput != null) {
-            Matcher phoneMatcher = Pattern.compile("(?:0[3|5|7|8|9])([0-9]{8})\\b").matcher(rawInput);
-            if (phoneMatcher.find()) {
-                String detectedPhone = phoneMatcher.group(0);
-                ctx.customerPhone = detectedPhone;
-                if (customerRepository != null) {
-                    customerRepository.findByPhone(detectedPhone).ifPresent(c -> {
-                        ctx.customerCode = c.getCustomerCode();
-                        if (ctx.customerName == null || ctx.customerName.isBlank() || "Khách đặt qua AI".equals(ctx.customerName)) {
-                            ctx.customerName = c.getFullName();
-                        }
-                    });
-                }
-            }
-        }
-
-        // 1. Try Google Gemini Cloud AI if configured
-        if (geminiAiService != null && geminiAiService.isConfigured() && rawInput != null && !rawInput.trim().isEmpty()) {
-            ChatMessageDto aiReply = geminiAiService.chatWithGemini(rawInput.trim(), ctx);
-            if (aiReply != null) {
-                return aiReply;
-            }
-        }
-
-        // Welcome Greeting
+        // Welcome Greeting if empty input
         if (rawInput == null || rawInput.trim().isEmpty()) {
             return ChatMessageDto.builder()
                     .sender("bot")
-                    .text("Xin chào bạn! Tôi là tư vấn viên hỗ trợ trực tuyến của Hệ thống Sân Cầu Lông UTE Sport. Tôi có thể hỗ trợ bạn tìm chi nhánh gần nhất, tra cứu sân trống theo khung giờ cụ thể, kiểm tra thông tin đơn đặt sân, hướng dẫn hủy sân và tự động đặt sân giữ chỗ cho bạn ngay trong cuộc trò chuyện này. Bạn cần tôi hỗ trợ điều gì?")
+                    .text("Xin chào bạn! Tôi là tư vấn viên hỗ trợ trực tuyến của Hệ thống Sân Cầu Lông UTE Sport. Tôi có thể hỗ trợ bạn tìm chi nhánh gần nhất, tra cứu sân trống theo khung giờ cụ thể, kiểm tra thông tin đơn đặt sân, hướng dẫn hủy sân và tự động đặt và khóa sân giữ chỗ cho bạn ngay trong cuộc trò chuyện này. Bạn cần tôi hỗ trợ điều gì?")
                     .quickReplies(List.of("Hệ thống có những chi nhánh nào?", "Tôi ở đường Hoàng Diệu 2 thì chi nhánh nào gần tôi?", "Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân"))
                     .actionType("NONE")
                     .timestamp(LocalDateTime.now())
@@ -177,6 +197,17 @@ public class ChatbotService {
 
         String text = rawInput.trim();
         String normalized = removeAccents(text.toLowerCase());
+
+        // Extract slots / entities proactively from user message
+        extractBookingSlots(text, normalized, ctx);
+
+        // 1. Try Google Gemini Cloud AI if configured
+        if (geminiAiService != null && geminiAiService.isConfigured()) {
+            ChatMessageDto aiReply = geminiAiService.chatWithGemini(text, ctx);
+            if (aiReply != null) {
+                return aiReply;
+            }
+        }
 
         // 2. Machine Learning Intent Classification (TF-IDF + Character 3-Gram)
         IntentClassificationService.PredictionResult mlResult = null;
@@ -372,25 +403,9 @@ public class ChatbotService {
         }
 
         // =========================================================================
-        // INTENT 0: BẮT ĐẦU LẠI / LÀM MỚI HỘI THOẠI
-        // =========================================================================
-        if ("GREETING_RESET".equals(mlTag) || matches(normalized, "bat dau lai", "lam moi", "xoa lich su", "reset", "chao bot", "hello", "xin chao")) {
-            ctx.reset();
-            return ChatMessageDto.builder()
-                    .sender("bot")
-                    .intent("RESET")
-                    .text("Hội thoại đã được làm mới. Tôi sẵn sàng hỗ trợ bạn tìm chi nhánh, tra cứu lịch sân trống và đặt sân giữ chỗ. Bạn muốn tìm sân ở khu vực nào hoặc vào khung giờ nào?")
-                    .quickReplies(List.of("Hệ thống có những chi nhánh nào?", "Tôi ở Thủ Đức thì chi nhánh nào gần?", "Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân"))
-                    .actionType("NONE")
-                    .timestamp(LocalDateTime.now())
-                    .build();
-        }
-
-        // =========================================================================
-        // =========================================================================
         // FAQ: GIẢI THÍCH CHỨC NĂNG TỰ KHÓA SÂN
         // =========================================================================
-        if (matches(normalized, "chuc nang tu khoa san", "tu khoa san la gi", "khoa san la gi", "tu khoa san hoat dong the nao", "lam sao de tu khoa san", "co che tu khoa san", "khoa san the nao", "chuc nang dat san")) {
+        if (matches(normalized, "chuc nang tu khoa san", "tu khoa san la gi", "khoa san la gi", "tu khoa san hoat dong the nao", "lam sao de tu khoa san", "co che tu khoa san", "khoa san the nao")) {
             return ChatMessageDto.builder()
                     .sender("bot")
                     .intent("FAQ_AUTO_LOCK_EXPLAIN")
@@ -407,120 +422,23 @@ public class ChatbotService {
         }
 
         // =========================================================================
-        // INTENT 1: XÁC NHẬN ĐẶT SÂN ("ok dat san cho toi", "dat san di", "dong y dat")
+        // INTENT 0: BẮT ĐẦU LẠI / LÀM MỚI HỘI THOẠI
         // =========================================================================
-        boolean isExplicitConfirm = matches(normalized, "ok dat san", "dat san cho toi", "dat san di", "dat di", "dat luon", "dong y dat", "tien hanh dat", "dat cho toi", "dat giup toi", "xac nhan dat", "dong y giu cho", "chot san", "lay san nay", "khoa san cho toi", "khoa san nay");
-        boolean isBookingProposedConfirm = "CONFIRM_BOOKING".equals(mlTag) && "COURT_PROPOSED".equals(ctx.stage);
-
-        if (isExplicitConfirm || isBookingProposedConfirm) {
-            // Re-verify that court is available, or find another available court at the branch
-            List<Court> branchCourts = courtRepository.findByBranchCode(ctx.branchCode);
-            Optional<Court> availableCourt = branchCourts.stream()
-                    .filter(c -> !"Bảo trì".equalsIgnoreCase(c.getStatus()))
-                    .filter(c -> {
-                        List<Booking> dayBookings = bookingRepository.findByCourtCodeAndBookingDate(c.getCourtCode(), ctx.date != null ? ctx.date : LocalDate.now());
-                        return dayBookings.stream().noneMatch(b ->
-                                b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus())
-                                && bookingService.isSlotOverlapping(ctx.timeSlot, b.getTimeSlot())
-                        );
-                    })
-                    .findFirst();
-
-            if (availableCourt.isPresent()) {
-                ctx.courtCode = availableCourt.get().getCourtCode();
-                ctx.courtName = availableCourt.get().getCourtName();
-            } else if (courtRepository.findByCourtCode(ctx.courtCode).isEmpty()) {
-                return ChatMessageDto.builder()
-                        .sender("bot")
-                        .intent("BOOKING_ERROR")
-                        .text(String.format("Rất tiếc, các sân tại %s trong khung giờ %s ngày %s hiện đều đã kín hoặc đang bảo trì. Bạn vui lòng chọn khung giờ khác.",
-                                ctx.branchName, ctx.timeSlot, ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))))
-                        .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Chi nhánh khác còn sân không?", "Bảng giá thuê sân"))
-                        .actionType("NONE")
-                        .timestamp(LocalDateTime.now())
-                        .build();
-            }
-
-            String bookingCode = bookingService.generateUniqueBookingCode();
-            ctx.lastBookingCode = bookingCode;
-
-            String custName = (ctx.customerName != null && !ctx.customerName.isBlank()) ? ctx.customerName : "Khách đặt qua AI";
-            String custPhone = (ctx.customerPhone != null && !ctx.customerPhone.isBlank()) ? ctx.customerPhone : "0903123456";
-            String custCode = ctx.customerCode;
-
-            Booking booking = new Booking();
-            booking.setBookingCode(bookingCode);
-            booking.setBranchCode(ctx.branchCode);
-            booking.setCourtCode(ctx.courtCode);
-            booking.setCustomerName(custName);
-            booking.setCustomerPhone(custPhone);
-            booking.setCustomerCode(custCode);
-            booking.setBookingDate(ctx.date != null ? ctx.date : LocalDate.now());
-            booking.setTimeSlot(ctx.timeSlot);
-            booking.setHourlyPrice(ctx.hourlyRate);
-            booking.setTotalPrice(ctx.totalPrice);
-            booking.setDepositAmount(ctx.depositAmount);
-            booking.setPaymentMethod("Chuyển khoản VietQR");
-            booking.setStatus("Chờ cọc 30%");
-            booking.setNotes("Đặt tự động qua AI Chatbot");
-
-            try {
-                bookingService.createBooking(booking);
-                courtService.holdCourtForBooking(ctx.courtCode, ctx.branchCode, ctx.timeSlot, booking.getCustomerName());
-            } catch (Exception e) {
-                return ChatMessageDto.builder()
-                        .sender("bot")
-                        .intent("BOOKING_ERROR")
-                        .text("Rất tiếc, không thể tạo đơn đặt sân vì: " + e.getMessage() + ". Bạn vui lòng chọn khung giờ khác hoặc liên hệ hotline.")
-                        .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân"))
-                        .actionType("NONE")
-                        .timestamp(LocalDateTime.now())
-                        .build();
-            }
-
-            // VietQR Dynamic URL (MBBank)
-            String qrUrl = String.format(
-                    "https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=%d&addInfo=CK%%20%s&accountName=UTE%%20BADMINTON%%20CLUB",
-                    ctx.depositAmount.longValue(), bookingCode
-            );
-
-            Map<String, Object> paymentData = new HashMap<>();
-            paymentData.put("bookingCode", bookingCode);
-            paymentData.put("courtName", ctx.courtName);
-            paymentData.put("branchName", ctx.branchName);
-            paymentData.put("bookingDate", ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            paymentData.put("timeSlot", ctx.timeSlot);
-            paymentData.put("totalPrice", ctx.totalPrice);
-            paymentData.put("depositAmount", ctx.depositAmount);
-            paymentData.put("qrUrl", qrUrl);
-            paymentData.put("bankName", "MBBank (Ngân hàng Quân Đội)");
-            paymentData.put("accountNo", "0903123456");
-            paymentData.put("accountName", "UTE BADMINTON CLUB");
-
-            ctx.stage = "BOOKED";
-
-            String confirmText = String.format(
-                    "Tôi đã đặt giữ chỗ thành công **%s** tại **%s** cho bạn trong khung giờ **%s** ngày **%s**.\n\n" +
-                    "• Mã đơn đặt: **%s**\n" +
-                    "• Khách hàng: **%s** (%s)\n" +
-                    "• Tổng tiền ca chơi: **%,d đ**\n" +
-                    "• Tiền cọc cần thanh toán (30%%): **%,d đ**\n\n" +
-                    "Hệ thống đang tạm khóa giữ chỗ sân trong 10 phút. Bạn vui lòng quét mã VietQR bên dưới hoặc chuyển khoản theo thông tin để hoàn tất xác nhận giữ sân. Sau khi xác nhận cọc, đơn sẽ được lưu ngay vào [Lịch Sử Đặt Sân](/customer/history).",
-                    ctx.courtName, ctx.branchName, ctx.timeSlot, ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                    bookingCode, custName, custPhone, ctx.totalPrice.longValue(), ctx.depositAmount.longValue()
-            );
-
+        if ("GREETING_RESET".equals(mlTag) || matches(normalized, "bat dau lai", "lam moi", "xoa lich su", "reset", "chao bot", "hello", "xin chao")) {
+            ctx.reset();
             return ChatMessageDto.builder()
                     .sender("bot")
-                    .intent("BOOKING_EXECUTED")
-                    .text(confirmText)
-                    .actionType("OPEN_PAYMENT")
-                    .paymentData(paymentData)
-                    .quickReplies(List.of("Xác nhận đã chuyển khoản cọc", "Xem lại thông tin đơn", "Hướng dẫn hủy ca chơi"))
+                    .intent("RESET")
+                    .text("Hội thoại đã được làm mới. Tôi sẵn sàng hỗ trợ bạn tìm chi nhánh, tra cứu lịch sân trống và đặt sân giữ chỗ. Bạn muốn tìm sân ở khu vực nào hoặc vào khung giờ nào?")
+                    .quickReplies(List.of("Hệ thống có những chi nhánh nào?", "Tôi ở Thủ Đức thì chi nhánh nào gần?", "Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân"))
+                    .actionType("NONE")
                     .timestamp(LocalDateTime.now())
                     .build();
         }
 
+        // =========================================================================
+        // INTENT: TRA CỨU ĐƠN ĐẶT SÂN
+        // =========================================================================
         if (!normalized.contains("huy") && ("CHECK_BOOKING".equals(mlTag) || matches(normalized, "kiem tra don", "tra cuu don", "xem don", "don cua toi", "ma don", "thong tin don", "xem lai thong tin don", "xem lai don", "don dat san", "lich su dat", "lich su don", "don hang cua toi"))) {
             String targetCode = null;
             Pattern codePattern = Pattern.compile("(?:ds\\s*)?(\\d{6})", Pattern.CASE_INSENSITIVE);
@@ -604,7 +522,7 @@ public class ChatbotService {
         }
 
         // =========================================================================
-        // INTENT 3: YÊU CẦU HỦY ĐẶT SÂN
+        // INTENT: YÊU CẦU HỦY ĐẶT SÂN
         // =========================================================================
         if ("CANCEL_BOOKING".equals(mlTag) || matches(normalized, "huy san", "huy don", "muon huy", "khong den duoc", "huy ca choi", "yeu cau huy")) {
             String targetCode = null;
@@ -636,7 +554,7 @@ public class ChatbotService {
                     boolean phoneMatched = false;
                     if (!bPhone.isEmpty() && bPhone.length() >= 4) {
                         String last4 = bPhone.substring(bPhone.length() - 4);
-                        if (rawInput != null && (rawInput.contains(bPhone) || rawInput.contains(last4))) {
+                        if (rawInput.contains(bPhone) || rawInput.contains(last4)) {
                             phoneMatched = true;
                         }
                     }
@@ -691,146 +609,124 @@ public class ChatbotService {
         }
 
         // =========================================================================
-        // INTENT 4: HỎI SÂN TRỐNG / TÌM SÂN / ĐẶT SÂN THEO GIỜ CỤ THỂ
+        // INTENT: HỎI CHI NHÁNH GẦN TÔI
         // =========================================================================
-        boolean hasTimeOrSlot = Pattern.compile("(\\d{1,2})(?:h|:00)?").matcher(normalized).find() || matches(normalized, "toi nay", "chieu nay", "sang mai", "ngay mai", "hom nay");
-        boolean isSlotInquiry = matches(normalized, "co san nao trong", "san nao trong", "con san khong", "muon danh luc", "danh luc", "tu may gio", "gio nao trong", "co san khong", "gio den gio", "kiem tra san", "tim san", "san trong", "dat san", "khoa san", "book san") || "SEARCH_SLOTS".equals(mlTag) || "CONFIRM_BOOKING".equals(mlTag);
+        if (matches(normalized, "gan toi", "gan nhat", "o dia chi", "o duong", "o khu vuc", "cach bao xa", "o gan", "dia chi nao gan")
+                || (normalized.startsWith("toi o ") && !normalized.contains("thue") && !normalized.contains("dat"))) {
+            String recommendedBranchCode = "CN01";
+            String recommendedBranchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
+            String distNote = "khoảng 1.5 - 2.5 km";
 
-        if (hasTimeOrSlot && isSlotInquiry) {
-            // Nhận diện chi nhánh ngay trong câu chat nếu có
-            if (matches(normalized, "co so 3", "chi nhanh 3", "quan 9", "q9", "do xuan hop")) {
-                ctx.branchCode = "CN03";
-                ctx.branchName = "Chi nhánh 3 (Quận 9 - Số 70 Đỗ Xuân Hợp)";
-            } else if (matches(normalized, "co so 2", "chi nhanh 2", "binh thanh", "dien bien phu")) {
-                ctx.branchCode = "CN02";
-                ctx.branchName = "Chi nhánh 2 (Bình Thạnh - Số 234 Điện Biên Phủ)";
-            } else if (matches(normalized, "co so 4", "chi nhanh 4", "go vap", "quang trung")) {
-                ctx.branchCode = "CN04";
-                ctx.branchName = "Chi nhánh 4 (Gò Vấp - Số 18 Quang Trung)";
-            } else if (matches(normalized, "co so 1", "chi nhanh 1", "thu duc", "vo van ngan")) {
-                ctx.branchCode = "CN01";
-                ctx.branchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
-            }
-
-            int startHour = 18;
-            int endHour = 20;
-
-            Pattern rangePattern = Pattern.compile("(\\d{1,2})(?:h|:00)?\\s*(?:đến|den|-|toi)\\s*(\\d{1,2})(?:h|:00)?");
-            Matcher mRange = rangePattern.matcher(normalized);
-            if (mRange.find()) {
-                try {
-                    startHour = Integer.parseInt(mRange.group(1));
-                    endHour = Integer.parseInt(mRange.group(2));
-                } catch (Exception ignored) {
-                }
+            if (matches(normalized, "quan 9", "q9", "le van viet", "do xuan hop", "tang nhon phu", "man thien", "hiep phu", "phuoc long", "vinhome", "nguyen duy trinh", "xa lo ha noi", "khu cong nghe cao", "cong nghe cao", "quan 2", "q2", "thu thiem", "an phu")) {
+                recommendedBranchCode = "CN03";
+                recommendedBranchName = "Chi nhánh 3 (Quận 9 - Số 70 Đỗ Xuân Hợp)";
+                distNote = "khoảng 1.0 - 2.0 km";
+            } else if (matches(normalized, "binh thanh", "hang xanh", "dien bien phu", "d2", "nguyen gia tri", "xo viet nghe tinh", "bach dang", "dinh bo linh", "cau sai gon", "thi nghe", "quan 1", "q1", "quan 3", "q3", "phu nhuan")) {
+                recommendedBranchCode = "CN02";
+                recommendedBranchName = "Chi nhánh 2 (Bình Thạnh - Số 234 Điện Biên Phủ)";
+                distNote = "khoảng 1.2 - 2.8 km";
+            } else if (matches(normalized, "go vap", "quang trung", "phan van tri", "nguyen oanh", "le duc tho", "nguyen kiem", "cay tram", "thong nhat", "pham van chieu", "tan binh", "tan phu", "quan 12", "q12", "hoc mon")) {
+                recommendedBranchCode = "CN04";
+                recommendedBranchName = "Chi nhánh 4 (Gò Vấp - Số 18 Quang Trung)";
+                distNote = "khoảng 1.5 - 3.0 km";
             } else {
-                Pattern singlePattern = Pattern.compile("(?:luc|vao|tam|tu)?\\s*(\\d{1,2})(?:h|:00)?");
-                Matcher mSingle = singlePattern.matcher(normalized);
-                if (mSingle.find()) {
-                    try {
-                        startHour = Integer.parseInt(mSingle.group(1));
-                        endHour = startHour + 1;
-                    } catch (Exception ignored) {
-                    }
-                }
+                recommendedBranchCode = "CN01";
+                recommendedBranchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
+                distNote = "khoảng 1.5 - 2.5 km";
             }
 
-            if (endHour <= startHour) {
-                endHour = startHour + 1;
-            }
-            int duration = endHour - startHour;
-            ctx.durationHours = duration;
-
-            String slotStr = String.format("%02d:00 - %02d:00", startHour, endHour);
-            ctx.timeSlot = slotStr;
-
-            if (matches(normalized, "ngay mai", "mai")) {
-                ctx.date = LocalDate.now().plusDays(1);
-            } else {
-                ctx.date = LocalDate.now();
-            }
-
-            // Determine pricing via centralized PricingService
-            ctx.hourlyRate = pricingService.calculateHourlyRate(null, startHour);
-            ctx.totalPrice = pricingService.calculateTotalPrice(ctx.hourlyRate, duration);
-            ctx.depositAmount = pricingService.calculateDepositAmount(ctx.totalPrice);
-
-            // Check actual courts from database and cross-reference with bookings
-            List<Court> branchCourts = courtRepository.findByBranchCode(ctx.branchCode);
-            Optional<Court> availableCourt = branchCourts.stream()
-                    .filter(c -> !"Bảo trì".equalsIgnoreCase(c.getStatus()))
-                    .filter(c -> {
-                        List<Booking> dayBookings = bookingRepository.findByCourtCodeAndBookingDate(c.getCourtCode(), ctx.date);
-                        return dayBookings.stream().noneMatch(b ->
-                                b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus())
-                                && bookingService.isSlotOverlapping(slotStr, b.getTimeSlot())
-                        );
-                    })
-                    .findFirst();
-
-            if (availableCourt.isEmpty()) {
-                return ChatMessageDto.builder()
-                        .sender("bot")
-                        .intent("COURT_UNAVAILABLE")
-                        .text(String.format("Rất tiếc, vào ngày %s trong khung giờ %s tại %s, tất cả các sân đều đã có khách đặt trước hoặc đang bảo trì.\n\nBạn có muốn đổi sang khung giờ khác (ví dụ trước 17h hoặc sau 20h) hoặc tham khảo chi nhánh khác không?",
-                                ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), slotStr, ctx.branchName))
-                        .quickReplies(List.of("Hôm nay có sân nào trống từ 14h đến 16h không?", "Hôm nay có sân nào trống từ 20h đến 22h không?", "Chi nhánh khác còn sân không?"))
-                        .actionType("NONE")
-                        .timestamp(LocalDateTime.now())
-                        .build();
-            }
-
-            ctx.courtCode = availableCourt.get().getCourtCode();
-            ctx.courtName = availableCourt.get().getCourtName();
-            ctx.hourlyRate = pricingService.calculateHourlyRate(availableCourt.get(), startHour);
-            ctx.totalPrice = pricingService.calculateTotalPrice(ctx.hourlyRate, duration);
-            ctx.depositAmount = pricingService.calculateDepositAmount(ctx.totalPrice);
-
-            ctx.stage = "COURT_PROPOSED";
+            ctx.branchCode = recommendedBranchCode;
+            ctx.branchName = recommendedBranchName;
 
             String reply = String.format(
-                    "Ngày %s trong khung giờ %s tại %s, hệ thống đang còn **%s** sẵn sàng phục vụ.\n\n" +
-                    "Thông tin chi tiết:\n" +
-                    "• Thời gian: %s (Thời lượng: %d tiếng)\n" +
-                    "• Đơn giá: %,d đ/giờ\n" +
-                    "• Tổng tiền sân: %,d đ\n" +
-                    "• Số tiền cọc 30%%: %,d đ\n\n" +
-                    "Bạn có muốn tôi đặt giữ chỗ sân này cho bạn luôn không? Bạn chỉ cần nhắn 'Ok đặt sân cho tôi' hoặc chọn nút bên dưới.",
-                    ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), slotStr, ctx.branchName, ctx.courtName, slotStr, duration,
-                    ctx.hourlyRate.longValue(), ctx.totalPrice.longValue(), ctx.depositAmount.longValue()
+                    "Dựa trên vị trí của bạn, **%s** là cơ sở gần bạn nhất (%s).\n\n" +
+                    "Cơ sở này được trang bị thảm Yonex BWF tiêu chuẩn thi đấu, đèn chống chói 500 Lux và bãi giữ xe ô tô/xe máy rộng rãi miễn phí.\n\n" +
+                    "Hôm nay bạn dự định chơi vào lúc mấy giờ để tôi kiểm tra sân trống cho bạn?",
+                    recommendedBranchName, distNote
             );
 
             return ChatMessageDto.builder()
                     .sender("bot")
-                    .intent("COURT_AVAILABILITY_SPECIFIC")
+                    .intent("RECOMMEND_BRANCH")
                     .text(reply)
-                    .quickReplies(List.of("Ok đặt sân cho tôi", "Tôi muốn đổi sang giờ khác", "Chi nhánh khác có sân không?"))
+                    .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Tối nay từ 19h đến 21h", "Chiều nay lúc 17h"))
                     .actionType("NONE")
                     .timestamp(LocalDateTime.now())
                     .build();
         }
 
         // =========================================================================
-        // INTENT 4B: HỎI ĐẶT SÂN / KHÓA SÂN CHƯA RÕ KHUNG GIỜ
+        // INTENT: DANH SÁCH CHI NHÁNH
         // =========================================================================
-        if ("CONFIRM_BOOKING".equals(mlTag) || "SEARCH_SLOTS".equals(mlTag) || matches(normalized, "dat san", "toi muon dat san", "khoa san", "tu khoa san", "book san", "giu cho san", "muon dat san")) {
+        if ("FIND_BRANCH".equals(mlTag) || matches(normalized, "chi nhanh nao", "cac chi nhanh", "danh sach chi nhanh", "co may chi nhanh", "co nhung co so nao", "he thong o dau")) {
+            List<Branch> branches = branchRepository != null ? branchRepository.findAll() : Collections.emptyList();
+            StringBuilder sb = new StringBuilder("Hệ thống sân cầu lông UTE Sport hiện có các cơ sở thi đấu sau:\n\n");
+            int idx = 1;
+            for (Branch b : branches) {
+                sb.append(idx++).append(". ").append(b.getBranchName()).append("\n")
+                  .append("   Địa chỉ: ").append(b.getAddress() != null ? b.getAddress() : "TP. Hồ Chí Minh").append("\n")
+                  .append("   Hotline: ").append(b.getPhone() != null ? b.getPhone() : "1900 6868").append("\n\n");
+            }
+            sb.append("Giờ mở cửa toàn hệ thống: 05:30 - 22:30 mỗi ngày.\n\n")
+              .append("Bạn đang ở địa chỉ hoặc khu vực nào để tôi tư vấn cơ sở thuận tiện nhất cho bạn?");
+
             return ChatMessageDto.builder()
                     .sender("bot")
-                    .intent("BOOKING_PROMPT")
-                    .text("Dạ, bạn muốn đặt và tự khóa sân vào khung giờ nào, ngày nào và tại chi nhánh nào?\n\n" +
-                          "Hệ thống UTE Sport hỗ trợ **tự động giữ chỗ và khóa sân tức thì trong 10 phút** khi tạo đơn. Sau khi xác nhận cọc 30%, sân sẽ được khóa cố định chính thức và đơn lưu vào [Lịch Sử Đặt Sân](/customer/history) của bạn.\n\n" +
-                          "Bạn có thể nhắn nhanh khung giờ muốn chơi (ví dụ: 'Đặt sân từ 18h đến 20h tối nay tại chi nhánh 1').")
-                    .quickReplies(List.of("Hôm nay 18h - 20h cơ sở 1", "Hôm nay 19h - 21h cơ sở 2", "Ngày mai 17h - 19h cơ sở 1", "Bảng giá thuê sân"))
+                    .intent("BRANCH_LIST")
+                    .text(sb.toString())
+                    .quickReplies(List.of("Tôi ở đường Hoàng Diệu 2 thì cơ sở nào gần tôi?", "Tôi ở Hàng Xanh Bình Thạnh", "Tôi ở Lê Văn Việt Quận 9", "Tôi ở đường Quang Trung Gò Vấp"))
                     .actionType("NONE")
                     .timestamp(LocalDateTime.now())
                     .build();
         }
 
         // =========================================================================
-        // INTENT 5: TRA CỨU GIẢI ĐẤU & LỊCH THI ĐẤU (TOURNAMENTS)
+        // INTENT: BẢNG GIÁ
+        // =========================================================================
+        if ("PRICING_INFO".equals(mlTag) || matches(normalized, "bang gia", "bao nhieu tien", "chi phi", "gio vang", "don gia", "gia thue san")) {
+            String pricingText =
+                    "Biểu phí thuê sân cầu lông tiêu chuẩn tại UTE Sport:\n\n" +
+                    "1. Khung giờ sáng (05:30 - 14:00): 80.000 đ/giờ\n" +
+                    "2. Khung giờ chiều (14:00 - 17:00): 100.000 đ/giờ\n" +
+                    "3. Khung Giờ Vàng (17:00 - 21:00): 140.000 đ/giờ (Thảm Yonex BWF cao cấp)\n" +
+                    "4. Khung giờ tối muộn (21:00 - 22:30): 90.000 đ/giờ\n" +
+                    "5. Cuối tuần (Thứ 7, Chủ Nhật): Phụ thu 15.000 đ/giờ.\n\n" +
+                    "Thành viên VIP tích điểm được chiết khấu thêm từ 5% đến 15% trên mỗi hóa đơn.\n\n" +
+                    "Bạn muốn tìm sân vào khung giờ nào?";
+
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("PRICING")
+                    .text(pricingText)
+                    .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Chi nhánh nào gần tôi?", "Quy định cọc tiền sân"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
+        // INTENT: TIỆN ÍCH & CƠ SỞ VẬT CHẤT
+        // =========================================================================
+        if ("COURT_FACILITIES".equals(mlTag) || matches(normalized, "co so vat chat", "loai tham", "tham yonex", "tham enlio", "may lanh", "quat", "dau xe", "do xe", "bai xe", "phong tam", "phong thay do", "wifi", "anh sang", "chieu cao", "khan dai")) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("COURT_FACILITIES")
+                    .text("Cơ sở vật chất & Tiện ích tại Chuỗi Sân Cầu Lông UTE Sport:\n\n" +
+                          "• Mặt sân thi đấu: 100% thảm Yonex & Enlio dày 5.0mm đạt chuẩn quốc tế BWF, độ bám cao chống trơn trượt và giảm chấn khớp gối tối đa.\n" +
+                          "• Không gian & Ánh sáng: Hệ thống đèn LED rọi chống chói 500 Lux, trần cao 9.5m thông thoáng, quạt làm mát công nghiệp mát mẻ.\n" +
+                          "• Bãi đỗ xe: Bãi đỗ ô tô và xe máy rộng rãi ngay trong khuôn viên có bảo vệ túc trực và camera an ninh 24/7.\n" +
+                          "• Tiện ích miễn phí: Phòng tắm nóng lạnh & phòng thay đồ riêng biệt nam/nữ, Wifi cáp quang tốc độ cao phủ kín sân.")
+                    .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân", "Chi nhánh nào gần tôi?"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // =========================================================================
+        // INTENT: GIẢI ĐẤU (TOURNAMENTS)
         // =========================================================================
         if ("TOURNAMENTS".equals(mlTag) || matches(normalized, "giai dau", "giai cau long", "co giai nao", "lich thi dau", "dang ky giai", "tournament")) {
-            List<Tournament> tournaments = tournamentRepository.findAll();
+            List<Tournament> tournaments = tournamentRepository != null ? tournamentRepository.findAll() : Collections.emptyList();
             StringBuilder sb = new StringBuilder("Hệ thống giải đấu cầu lông đang mở đăng ký tại UTE Sport:\n\n");
 
             List<Map<String, Object>> tourList = new ArrayList<>();
@@ -864,9 +760,10 @@ public class ChatbotService {
         }
 
         // =========================================================================
-        // INTENT 6: DỊCH VỤ ĐI KÈM & THUÊ DỤNG CỤ
+        // INTENT: DỊCH VỤ ĐI KÈM & THUÊ DỤNG CỤ THỂ THAO
         // =========================================================================
-        if ("SERVICES_EQUIPMENT".equals(mlTag) || matches(normalized, "thue vot", "co vot khong", "ban cau", "mua cau", "dan vot", "cang vot", "nuoc uong", "dich vu", "phu kien")) {
+        if (("SERVICES_EQUIPMENT".equals(mlTag) || matches(normalized, "thue vot", "co vot khong", "ban cau", "mua cau", "dan vot", "cang vot", "nuoc uong", "dich vu", "phu kien"))
+                && !isBookingFlow(normalized, ctx)) {
             String serviceInfo =
                     "Danh mục dịch vụ và thiết bị thể thao tại các cơ sở UTE Sport:\n\n" +
                     "1. Cho thuê vợt thi đấu:\n" +
@@ -894,122 +791,7 @@ public class ChatbotService {
         }
 
         // =========================================================================
-        // INTENT 7: HỎI CHI NHÁNH GẦN TÔI ("toi o dia chi vv thi chi nhanh nao gan toi")
-        // =========================================================================
-        if (matches(normalized, "gan toi", "gan nhat", "toi o", "o dia chi", "o duong", "o khu vuc", "cach bao xa", "o gan", "dia chi nao gan")) {
-            String recommendedBranchCode = "CN01";
-            String recommendedBranchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
-            String distNote = "khoảng 1.5 - 2.5 km";
-
-            // Geolocation matching across HCMC
-            if (matches(normalized, "quan 9", "q9", "le van viet", "do xuan hop", "tang nhon phu", "man thien", "hiep phu", "phuoc long", "vinhome", "nguyen duy trinh", "xa lo ha noi", "khu cong nghe cao", "cong nghe cao", "quan 2", "q2", "thu thiem", "an phu")) {
-                recommendedBranchCode = "CN03";
-                recommendedBranchName = "Chi nhánh 3 (Quận 9 - Số 70 Đỗ Xuân Hợp)";
-                distNote = "khoảng 1.0 - 2.0 km";
-            } else if (matches(normalized, "binh thanh", "hang xanh", "dien bien phu", "d2", "nguyen gia tri", "xo viet nghe tinh", "bach dang", "dinh bo linh", "cau sai gon", "thi nghe", "quan 1", "q1", "quan 3", "q3", "phu nhuan")) {
-                recommendedBranchCode = "CN02";
-                recommendedBranchName = "Chi nhánh 2 (Bình Thạnh - Số 234 Điện Biên Phủ)";
-                distNote = "khoảng 1.2 - 2.8 km";
-            } else if (matches(normalized, "go vap", "quang trung", "phan van tri", "nguyen oanh", "le duc tho", "nguyen kiem", "cay tram", "thong nhat", "pham van chieu", "tan binh", "tan phu", "quan 12", "q12", "hoc mon")) {
-                recommendedBranchCode = "CN04";
-                recommendedBranchName = "Chi nhánh 4 (Gò Vấp - Số 18 Quang Trung)";
-                distNote = "khoảng 1.5 - 3.0 km";
-            } else {
-                recommendedBranchCode = "CN01";
-                recommendedBranchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
-                distNote = "khoảng 1.5 - 2.5 km";
-            }
-
-            ctx.branchCode = recommendedBranchCode;
-            ctx.branchName = recommendedBranchName;
-            ctx.stage = "BRANCH_SELECTED";
-
-            String reply = String.format(
-                    "Dựa trên vị trí của bạn, %s là cơ sở gần bạn nhất (khoảng cách %s).\n\n" +
-                    "Cơ sở này được trang bị thảm Yonex BWF tiêu chuẩn thi đấu, đèn chống chói 500 Lux và bãi giữ xe rộng rãi.\n\n" +
-                    "Hôm nay bạn dự định chơi vào lúc mấy giờ để tôi kiểm tra sân trống cho bạn?",
-                    recommendedBranchName, distNote
-            );
-
-            return ChatMessageDto.builder()
-                    .sender("bot")
-                    .intent("RECOMMEND_BRANCH")
-                    .text(reply)
-                    .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Tối nay từ 19h đến 21h", "Chiều nay lúc 17h"))
-                    .actionType("NONE")
-                    .timestamp(LocalDateTime.now())
-                    .build();
-        }
-
-        // =========================================================================
-        // INTENT 8: HỎI CÁC CHI NHÁNH ("ban co chi nhanh nao", "he thong co may chi nhanh")
-        // =========================================================================
-        if ("FIND_BRANCH".equals(mlTag) || matches(normalized, "chi nhanh nao", "cac chi nhanh", "danh sach chi nhanh", "co may chi nhanh", "co nhung co so nao", "he thong o dau")) {
-            List<Branch> branches = branchRepository.findAll();
-            StringBuilder sb = new StringBuilder("Hệ thống sân cầu lông UTE Sport hiện có các cơ sở thi đấu sau:\n\n");
-            int idx = 1;
-            for (Branch b : branches) {
-                sb.append(idx++).append(". ").append(b.getBranchName()).append("\n")
-                  .append("   Địa chỉ: ").append(b.getAddress() != null ? b.getAddress() : "TP. Hồ Chí Minh").append("\n")
-                  .append("   Hotline: ").append(b.getPhone() != null ? b.getPhone() : "1900 6868").append("\n\n");
-            }
-            sb.append("Giờ mở cửa toàn hệ thống: 05:30 - 22:30 mỗi ngày.\n\n")
-              .append("Bạn đang ở địa chỉ hoặc khu vực nào để tôi tư vấn cơ sở thuận tiện nhất cho bạn?");
-
-            return ChatMessageDto.builder()
-                    .sender("bot")
-                    .intent("BRANCH_LIST")
-                    .text(sb.toString())
-                    .quickReplies(List.of("Tôi ở đường Hoàng Diệu 2 thì cơ sở nào gần tôi?", "Tôi ở Hàng Xanh Bình Thạnh", "Tôi ở Lê Văn Việt Quận 9", "Tôi ở đường Quang Trung Gò Vấp"))
-                    .actionType("NONE")
-                    .timestamp(LocalDateTime.now())
-                    .build();
-        }
-
-        // =========================================================================
-        // INTENT 9: HỎI BẢNG GIÁ
-        // =========================================================================
-        if ("PRICING_INFO".equals(mlTag) || matches(normalized, "gia", "bang gia", "bao nhieu tien", "chi phi", "gio vang", "don gia")) {
-            String pricingText =
-                    "Biểu phí thuê sân cầu lông tiêu chuẩn tại UTE Sport:\n\n" +
-                    "1. Khung giờ sáng (05:30 - 14:00): 80.000 đ/giờ\n" +
-                    "2. Khung giờ chiều (14:00 - 17:00): 100.000 đ/giờ\n" +
-                    "3. Khung Giờ Vàng (17:00 - 21:00): 140.000 đ/giờ (Thảm Yonex BWF cao cấp)\n" +
-                    "4. Khung giờ tối muộn (21:00 - 22:30): 90.000 đ/giờ\n" +
-                    "5. Cuối tuần (Thứ 7, Chủ Nhật): Phụ thu 15.000 đ/giờ.\n\n" +
-                    "Thành viên VIP tích điểm được chiết khấu thêm từ 5% đến 15% trên mỗi hóa đơn.\n\n" +
-                    "Bạn muốn tìm sân vào khung giờ nào?";
-
-            return ChatMessageDto.builder()
-                    .sender("bot")
-                    .intent("PRICING")
-                    .text(pricingText)
-                    .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Chi nhánh nào gần tôi?", "Quy định cọc tiền sân"))
-                    .actionType("NONE")
-                    .timestamp(LocalDateTime.now())
-                    .build();
-        }
-
-        // =========================================================================
-        // INTENT 10: THÔNG TIN SÂN & CƠ SỞ VẬT CHẤT (COURT_FACILITIES)
-        // =========================================================================
-        if ("COURT_FACILITIES".equals(mlTag) || matches(normalized, "co so vat chat", "loai tham", "tham yonex", "tham enlio", "may lanh", "quat", "dau xe", "do xe", "bai xe", "phong tam", "phong thay do", "wifi", "anh sang", "chieu cao", "khan dai")) {
-            return ChatMessageDto.builder()
-                    .sender("bot")
-                    .intent("COURT_FACILITIES")
-                    .text("Cơ sở vật chất & Tiện ích tại Chuỗi Sân Cầu Lông UTE Sport:\n\n" +
-                          "• Mặt sân thi đấu: 100% thảm Yonex & Enlio dày 5.0mm đạt chuẩn quốc tế BWF, độ bám cao chống trơn trượt và giảm chấn khớp gối tối đa.\n" +
-                          "• Không gian & Ánh sáng: Hệ thống đèn LED rọi chống chói 500 Lux, trần cao 9.5m thông thoáng, quạt làm mát công nghiệp mát mẻ.\n" +
-                          "• Bãi đỗ xe: Bãi đỗ ô tô và xe máy rộng rãi ngay trong khuôn viên có bảo vệ túc trực và camera an ninh 24/7.\n" +
-                          "• Tiện ích miễn phí: Phòng tắm nóng lạnh & phòng thay đồ riêng biệt nam/nữ, Wifi cáp quang tốc độ cao phủ kín sân.")
-                    .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân", "Chi nhánh nào gần tôi?"))
-                    .actionType("NONE")
-                    .timestamp(LocalDateTime.now())
-                    .build();
-        }
-
-        // =========================================================================
-        // INTENT 11: HỘI VIÊN & TÍCH LŨY ĐIỂM THƯỞNG (MEMBERSHIP_LOYALTY)
+        // INTENT: HỘI VIÊN & ĐIỂM THƯỞNG
         // =========================================================================
         if ("MEMBERSHIP_LOYALTY".equals(mlTag) || matches(normalized, "tich diem", "the hoi vien", "hang thanh vien", "diem thuong", "doi voucher", "dong bac vang", "kim cuong", "vip", "uu dai")) {
             return ChatMessageDto.builder()
@@ -1030,7 +812,7 @@ public class ChatbotService {
         }
 
         // =========================================================================
-        // INTENT 12: PHƯƠNG THỨC THANH TOÁN & HÓA ĐƠN VAT (PAYMENT_METHODS)
+        // INTENT: PHƯƠNG THỨC THANH TOÁN
         // =========================================================================
         if ("PAYMENT_METHODS".equals(mlTag) || matches(normalized, "thanh toan the nao", "phuong thuc thanh toan", "chuyen khoan", "quet ma qr", "vietqr", "tien mat", "hoa don do", "vat")) {
             return ChatMessageDto.builder()
@@ -1048,7 +830,7 @@ public class ChatbotService {
         }
 
         // =========================================================================
-        // INTENT 13: NỘI QUY SÂN ĐẤU & TRANG PHỤC (RULES_REGULATIONS)
+        // INTENT: NỘI QUY SÂN
         // =========================================================================
         if ("RULES_REGULATIONS".equals(mlTag) || matches(normalized, "noi quy", "quy dinh", "giay de kep", "giay non marking", "di tre", "mang thuc an", "hut thuoc")) {
             return ChatMessageDto.builder()
@@ -1065,7 +847,7 @@ public class ChatbotService {
         }
 
         // =========================================================================
-        // INTENT 14: ĐỒ THẤT LẠC, KHIẾU NẠI & HOTLINE HỖ TRỢ (LOST_FOUND_SUPPORT)
+        // INTENT: ĐỒ THẤT LẠC & HỖ TRỢ
         // =========================================================================
         if ("LOST_FOUND_SUPPORT".equals(mlTag) || matches(normalized, "quen do", "that lac", "mat do", "quen ao", "quen vot", "hotline", "so dien thoai", "khieu nai", "gap nhan vien")) {
             return ChatMessageDto.builder()
@@ -1083,6 +865,260 @@ public class ChatbotService {
         }
 
         // =========================================================================
+        // =========================================================================
+        // LUỒNG ĐẶT VÀ KHÓA SÂN THÔNG MINH (MULTI-TURN SLOT-FILLING BOOKING ENGINE)
+        // Bắt buộc đảm bảo đủ 6 thông tin:
+        // 1. Tên khách hàng
+        // 2. Số điện thoại
+        // 3. Chi nhánh
+        // 4. Đặt sân gì
+        // 5. Mấy giờ & ngày nào
+        // 6. Có chọn thêm gì đi kèm không
+        // RỒI MỚI CHO HIỆN MÃ KHÓA SÂN!
+        // =========================================================================
+        // =========================================================================
+
+        boolean isBookingIntent = isBookingFlow(normalized, ctx) || "CONFIRM_BOOKING".equals(mlTag) || "SEARCH_SLOTS".equals(mlTag) || "REQUEST_LOCK_CODE".equals(mlTag) || "SELECT_ADDONS".equals(mlTag) || "PROVIDE_CUSTOMER_INFO".equals(mlTag);
+
+        // Trường hợp người dùng mới chỉ nói "tôi muốn đặt sân" mà chưa có bất kỳ thông tin nào
+        boolean isSimpleBookingPrompt = matches(normalized, "toi muon dat san", "muon dat san", "dat san di", "cho toi dat san") && !ctx.isBranchProvided() && !ctx.isSlotProvided();
+        if (isSimpleBookingPrompt) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("BOOKING_PROMPT")
+                    .text("Dạ, bạn muốn đặt và tự khóa sân vào khung giờ nào, ngày nào và tại chi nhánh nào?\n\n" +
+                          "Hệ thống UTE Sport hỗ trợ **tự động giữ chỗ và khóa sân tức thì trong 10 phút** khi tạo đơn. Sau khi xác nhận cọc 30%, sân sẽ được khóa cố định chính thức và đơn lưu vào [Lịch Sử Đặt Sân](/customer/history) của bạn.\n\n" +
+                          "Bạn có thể nhắn nhanh khung giờ muốn chơi (ví dụ: 'Đặt sân từ 18h đến 20h tối nay tại chi nhánh 1').")
+                    .quickReplies(List.of("Hôm nay 18h - 20h cơ sở 1", "Hôm nay 19h - 21h cơ sở 2", "Ngày mai 17h - 19h cơ sở 1", "Bảng giá thuê sân"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        if (isBookingIntent) {
+            // Cập nhật giá nếu đã có giờ và sân
+            recalculatePrices(ctx);
+
+            // Kiểm tra các thông tin bắt buộc
+            boolean hasName = ctx.isNameProvided();
+            boolean hasPhone = ctx.isPhoneProvided();
+            boolean hasBranch = ctx.isBranchProvided();
+            boolean hasSlot = ctx.isSlotProvided();
+            boolean hasCourt = ctx.isCourtProvided();
+            boolean hasAddOns = ctx.isAddOnsProvided();
+
+            boolean hasAll6 = hasName && hasPhone && hasBranch && hasSlot && hasCourt && hasAddOns;
+
+            boolean userWantsToLock = matches(normalized, "ok dat san", "dat san cho toi", "dat luon", "dong y dat", "xac nhan dat", "chot san", "lay san nay", "khoa san cho toi", "khoa san nay", "hien ma khoa san", "cho ma khoa san", "xuat ma khoa san", "lay ma khoa san", "khoa san gium", "xac nhan va xuat ma khoa san", "xac nhan");
+
+            // =====================================================================
+            // CASE 1: ĐÃ ĐỦ CẢ 6 THÔNG TIN VÀ XÁC NHẬN CHỐT -> CHO HIỆN MÃ KHÓA SÂN
+            // =====================================================================
+            if (hasAll6 && (userWantsToLock || "AWAITING_CONFIRMATION".equals(ctx.stage))) {
+                return executeCourtLocking(ctx);
+            }
+
+            // =====================================================================
+            // CASE 2: ĐÃ ĐỦ CẢ 6 THÔNG TIN NHƯNG CHƯA BẤM CHỐT -> TÓM TẮT & XIN XÁC NHẬN
+            // =====================================================================
+            if (hasAll6) {
+                ctx.stage = "AWAITING_CONFIRMATION";
+                String summary = String.format(
+                        "Tuyệt vời! Tôi đã tổng hợp đầy đủ các thông tin cần thiết cho đơn đặt sân của bạn:\n\n" +
+                        "📋 **PHIẾU THÔNG TIN ĐẶT VÀ TỰ KHÓA SÂN GIỮ CHỖ**\n" +
+                        "• **Họ tên khách hàng**: **%s**\n" +
+                        "• **Số điện thoại**: **%s**\n" +
+                        "• **Chi nhánh thi đấu**: **%s**\n" +
+                        "• **Sân đặt**: **%s**\n" +
+                        "• **Thời gian thi đấu**: **%s** ngày **%s** (%d tiếng)\n" +
+                        "• **Dịch vụ đi kèm**: %s\n" +
+                        "• **Tiền thuê sân**: %,d đ\n" +
+                        "• **Tiền phụ kiện / dịch vụ**: %,d đ\n" +
+                        "• **TỔNG CHI PHÍ**: **%,d đ**\n" +
+                        "• **TIỀN CỌC GIỮ SÂN (30%%)**: **%,d đ**\n\n" +
+                        "Thông tin đã chính xác rồi chứ bạn? Bạn bấm **'Xác nhận và xuất mã khóa sân'** bên dưới để hệ thống kích hoạt tự động khóa giữ chỗ sân trong 10 phút nhé!",
+                        ctx.customerName, ctx.customerPhone, ctx.branchName, ctx.courtName,
+                        ctx.timeSlot, ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), ctx.durationHours,
+                        ctx.additionalServices, ctx.courtPrice.longValue(), ctx.additionalFee.longValue(),
+                        ctx.totalPrice.longValue(), ctx.depositAmount.longValue()
+                );
+
+                return ChatMessageDto.builder()
+                        .sender("bot")
+                        .intent("AWAITING_CONFIRMATION")
+                        .text(summary)
+                        .quickReplies(List.of("Xác nhận và xuất mã khóa sân", "Tôi muốn đổi khung giờ", "Thêm phụ kiện đi kèm", "Bắt đầu lại"))
+                        .actionType("NONE")
+                        .timestamp(LocalDateTime.now())
+                        .build();
+            }
+
+            // =====================================================================
+            // CASE 3: THIẾU THÔNG TIN -> HỎI THEO THỨ TỰ LOGIC CHẶT CHẼ
+            // =====================================================================
+
+            // 1. Thiếu Chi nhánh
+            if (!hasBranch) {
+                ctx.stage = "COLLECTING_INFO";
+                String promptText = "Dạ, để đặt và giữ chỗ sân, bạn muốn chơi tại **chi nhánh nào** trong hệ thống UTE Sport ạ?" +
+                        (hasSlot ? String.format(" (Tôi đã ghi nhận khung giờ: %s ngày %s)", ctx.timeSlot, ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))) : "");
+                return ChatMessageDto.builder()
+                        .sender("bot")
+                        .intent("ASK_BRANCH")
+                        .text(promptText)
+                        .quickReplies(List.of("Chi nhánh 1 (Thủ Đức)", "Chi nhánh 2 (Bình Thạnh)", "Chi nhánh 3 (Quận 9)", "Chi nhánh 4 (Gò Vấp)"))
+                        .actionType("NONE")
+                        .timestamp(LocalDateTime.now())
+                        .build();
+            }
+
+            // 2. Thiếu Khung giờ & Ngày
+            if (!hasSlot) {
+                ctx.stage = "COLLECTING_INFO";
+                String promptText = String.format("Bạn dự định chơi tại **%s** vào **ngày nào** và **từ mấy giờ đến mấy giờ** ạ?", ctx.branchName);
+                return ChatMessageDto.builder()
+                        .sender("bot")
+                        .intent("ASK_SLOT")
+                        .text(promptText)
+                        .quickReplies(List.of("Hôm nay 18h - 20h", "Hôm nay 19h - 21h", "Hôm nay 17h - 19h", "Tối mai 18h - 20h"))
+                        .actionType("NONE")
+                        .timestamp(LocalDateTime.now())
+                        .build();
+            }
+
+            // 3. Thiếu Sân gì (đã có Chi nhánh và Giờ)
+            if (!hasCourt) {
+                ctx.stage = "PROPOSING_COURT";
+                List<Court> branchCourts = (courtRepository != null) ? courtRepository.findByBranchCode(ctx.branchCode) : Collections.emptyList();
+                List<Court> availableCourts = branchCourts.stream()
+                        .filter(c -> !"Bảo trì".equalsIgnoreCase(c.getStatus()))
+                        .filter(c -> {
+                            if (bookingRepository == null || bookingService == null) return true;
+                            List<Booking> dayBookings = bookingRepository.findByCourtCodeAndBookingDate(c.getCourtCode(), ctx.date);
+                            return dayBookings.stream().noneMatch(b ->
+                                    b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus())
+                                    && bookingService.isSlotOverlapping(ctx.timeSlot, b.getTimeSlot())
+                            );
+                        })
+                        .toList();
+
+                if (availableCourts.isEmpty()) {
+                    return ChatMessageDto.builder()
+                            .sender("bot")
+                            .intent("COURT_UNAVAILABLE")
+                            .text(String.format("Rất tiếc, vào ngày %s trong khung giờ %s tại %s, tất cả các sân đều đã có khách đặt trước hoặc đang bảo trì.\n\nBạn có muốn đổi sang khung giờ khác (ví dụ trước 17h hoặc sau 20h) hoặc tham khảo cơ sở khác không?",
+                                    ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), ctx.timeSlot, ctx.branchName))
+                            .quickReplies(List.of("Hôm nay có sân nào trống từ 14h đến 16h không?", "Hôm nay có sân nào trống từ 20h đến 22h không?", "Chi nhánh khác còn sân không?"))
+                            .actionType("NONE")
+                            .timestamp(LocalDateTime.now())
+                            .build();
+                }
+
+                // Nếu người dùng có chọn loại sân VIP hay Standard
+                Optional<Court> matchedCourt = Optional.empty();
+                if ("VIP".equalsIgnoreCase(ctx.courtType)) {
+                    matchedCourt = availableCourts.stream().filter(c -> c.getCourtName().toUpperCase().contains("VIP") || c.getCourtType().toUpperCase().contains("VIP")).findFirst();
+                } else if ("STANDARD".equalsIgnoreCase(ctx.courtType)) {
+                    matchedCourt = availableCourts.stream().filter(c -> !c.getCourtName().toUpperCase().contains("VIP")).findFirst();
+                }
+
+                if (matchedCourt.isPresent()) {
+                    Court c = matchedCourt.get();
+                    ctx.courtCode = c.getCourtCode();
+                    ctx.courtName = c.getCourtName();
+                    recalculatePrices(ctx);
+                } else {
+                    StringBuilder courtOptionsText = new StringBuilder();
+                    courtOptionsText.append(String.format("Trong khung giờ **%s** ngày **%s** tại **%s**, hệ thống đang còn các sân sau sẵn sàng phục vụ:\n\n",
+                            ctx.timeSlot, ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), ctx.branchName));
+
+                    List<String> replies = new ArrayList<>();
+                    for (Court c : availableCourts) {
+                        BigDecimal rate = (pricingService != null) ? pricingService.calculateHourlyRate(c, extractStartHour(ctx.timeSlot)) : (c.getHourlyRate() != null ? c.getHourlyRate() : new BigDecimal("100000"));
+                        BigDecimal total = rate.multiply(BigDecimal.valueOf(Math.max(1, ctx.durationHours)));
+                        courtOptionsText.append(String.format("• **%s** (%s): %,d đ/h (Tổng: %,d đ/%dh)\n",
+                                c.getCourtName(), c.getCourtType() != null ? c.getCourtType() : "Tiêu chuẩn", rate.longValue(), total.longValue(), ctx.durationHours));
+                        replies.add("Đặt " + c.getCourtName());
+                    }
+                    courtOptionsText.append("\nBạn muốn chọn đặt sân nào ạ?");
+                    replies.add("Đổi khung giờ khác");
+
+                    return ChatMessageDto.builder()
+                            .sender("bot")
+                            .intent("PROPOSE_COURTS")
+                            .text(courtOptionsText.toString())
+                            .quickReplies(replies)
+                            .actionType("NONE")
+                            .timestamp(LocalDateTime.now())
+                            .build();
+                }
+            }
+
+            // 4. Thiếu Dịch vụ đi kèm
+            if (!hasAddOns) {
+                ctx.stage = "PROPOSING_ADDONS";
+                String promptText = String.format(
+                        "Tôi đã ghi nhận bạn chọn **%s** tại **%s** lúc **%s** ngày **%s**.\n\n" +
+                        "Bạn có muốn **chọn thêm dịch vụ / phụ kiện gì đi kèm** cho ca chơi không ạ?\n" +
+                        "• Thuê vợt thi đấu Yonex/Lining: 50.000 đ/ca\n" +
+                        "• Thuê giày chuyên dụng (đế kếp): 20.000 đ/đôi (đủ size 36 - 44)\n" +
+                        "• Ống cầu Thành Công 77: 260.000 đ/ống (hoặc mua lẻ 25.000 đ/quả)\n" +
+                        "• Nước giải khát ướp lạnh (Revive, Pocari, Bò Húc, Aquafina): 10.000 - 20.000 đ/chai.\n\n" +
+                        "Nếu không có nhu cầu, bạn chỉ cần chọn **'Không chọn thêm gì'** nhé!",
+                        ctx.courtName, ctx.branchName, ctx.timeSlot, ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                );
+                return ChatMessageDto.builder()
+                        .sender("bot")
+                        .intent("ASK_ADDONS")
+                        .text(promptText)
+                        .quickReplies(List.of("Không chọn thêm gì (Chỉ thuê sân)", "Thuê thêm 2 vợt thi đấu", "Thuê 1 đôi giày & 2 chai Revive", "Mua 1 ống cầu Thành Công 77"))
+                        .actionType("NONE")
+                        .timestamp(LocalDateTime.now())
+                        .build();
+            }
+
+            // 5. Thiếu Tên hoặc Số điện thoại
+            if (!hasName || !hasPhone) {
+                if (!hasName && !hasPhone) {
+                    ctx.stage = "ASK_NAME";
+                    String promptText = String.format(
+                            "Tôi đã chuẩn bị thông tin sân **%s** (%s) tại **%s** cho bạn.\n\n" +
+                            "Để hệ thống tiến hành xuất **Mã Khóa Sân giữ chỗ**, bạn vui lòng cho tôi xin **Họ tên** và **Số điện thoại** của bạn (Ví dụ: 'Nguyễn Văn Tuấn - 0987654321') để lễ tân liên hệ và nhận diện khi bạn đến sân thi đấu nhé!",
+                            ctx.courtName, ctx.timeSlot, ctx.branchName
+                    );
+                    return ChatMessageDto.builder()
+                            .sender("bot")
+                            .intent("ASK_NAME_AND_PHONE")
+                            .text(promptText)
+                            .quickReplies(List.of("Tôi dùng SĐT đăng nhập", "Bắt đầu lại"))
+                            .actionType("NONE")
+                            .timestamp(LocalDateTime.now())
+                            .build();
+                } else if (!hasName) {
+                    ctx.stage = "ASK_NAME";
+                    return ChatMessageDto.builder()
+                            .sender("bot")
+                            .intent("ASK_NAME")
+                            .text(String.format("Bạn vui lòng cho tôi xin **Họ và tên** của bạn (SĐT đã ghi nhận: **%s**) để ghi trên phiếu giữ chỗ và xuất mã khóa sân nhé!", ctx.customerPhone))
+                            .quickReplies(List.of("Bắt đầu lại"))
+                            .actionType("NONE")
+                            .timestamp(LocalDateTime.now())
+                            .build();
+                } else {
+                    ctx.stage = "ASK_PHONE";
+                    return ChatMessageDto.builder()
+                            .sender("bot")
+                            .intent("ASK_PHONE")
+                            .text(String.format("Chào bạn **%s**! Bạn vui lòng cung cấp **Số điện thoại** liên hệ (10 chữ số) để hệ thống gửi mã khóa sân và liên hệ khi nhận sân nhé!", ctx.customerName))
+                            .quickReplies(List.of("Bắt đầu lại"))
+                            .actionType("NONE")
+                            .timestamp(LocalDateTime.now())
+                            .build();
+                }
+            }
+        }
+
+        // =========================================================================
         // DEFAULT FALLBACK
         // =========================================================================
         return ChatMessageDto.builder()
@@ -1093,6 +1129,332 @@ public class ChatbotService {
                 .actionType("NONE")
                 .timestamp(LocalDateTime.now())
                 .build();
+    }
+
+    // =========================================================================
+    // HÀM TẠO ĐƠN VÀ CHO HIỆN MÃ KHÓA SÂN
+    // =========================================================================
+    private ChatMessageDto executeCourtLocking(ChatSessionContext ctx) {
+        if (bookingService == null || courtService == null) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("BOOKING_ERROR")
+                    .text("Dịch vụ đặt sân tạm thời gián đoạn. Bạn vui lòng liên hệ hotline 1900 6868.")
+                    .build();
+        }
+
+        // Re-verify court availability
+        List<Court> branchCourts = (courtRepository != null) ? courtRepository.findByBranchCode(ctx.branchCode) : Collections.emptyList();
+        Optional<Court> availableCourt = branchCourts.stream()
+                .filter(c -> !"Bảo trì".equalsIgnoreCase(c.getStatus()))
+                .filter(c -> {
+                    if (bookingRepository == null) return true;
+                    List<Booking> dayBookings = bookingRepository.findByCourtCodeAndBookingDate(c.getCourtCode(), ctx.date != null ? ctx.date : LocalDate.now());
+                    return dayBookings.stream().noneMatch(b ->
+                            b.getStatus() != null && !"Đã hủy".equalsIgnoreCase(b.getStatus())
+                            && bookingService.isSlotOverlapping(ctx.timeSlot, b.getTimeSlot())
+                    );
+                })
+                .findFirst();
+
+        if (availableCourt.isPresent()) {
+            ctx.courtCode = availableCourt.get().getCourtCode();
+            ctx.courtName = availableCourt.get().getCourtName();
+        } else if (courtRepository != null && courtRepository.findByCourtCode(ctx.courtCode).isEmpty()) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("BOOKING_ERROR")
+                    .text(String.format("Rất tiếc, các sân tại %s trong khung giờ %s ngày %s hiện đều đã kín hoặc đang bảo trì. Bạn vui lòng chọn khung giờ khác.",
+                            ctx.branchName, ctx.timeSlot, ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))))
+                    .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Chi nhánh khác còn sân không?", "Bảng giá thuê sân"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        String bookingCode = bookingService.generateUniqueBookingCode();
+        ctx.lastBookingCode = bookingCode;
+
+        Booking booking = new Booking();
+        booking.setBookingCode(bookingCode);
+        booking.setBranchCode(ctx.branchCode);
+        booking.setCourtCode(ctx.courtCode);
+        booking.setCustomerName(ctx.customerName);
+        booking.setCustomerPhone(ctx.customerPhone);
+        booking.setCustomerCode(ctx.customerCode);
+        booking.setBookingDate(ctx.date != null ? ctx.date : LocalDate.now());
+        booking.setTimeSlot(ctx.timeSlot);
+        booking.setHourlyPrice(ctx.hourlyRate);
+        booking.setTotalPrice(ctx.totalPrice);
+        booking.setDepositAmount(ctx.depositAmount);
+        booking.setPaymentMethod("Chuyển khoản VietQR");
+        booking.setStatus("Chờ cọc 30%");
+        booking.setNotes("Dịch vụ đi kèm: " + (ctx.additionalServices != null ? ctx.additionalServices : "Không có") + " (Đặt tự động qua AI Chatbot)");
+
+        try {
+            bookingService.createBooking(booking);
+            courtService.holdCourtForBooking(ctx.courtCode, ctx.branchCode, ctx.timeSlot, booking.getCustomerName());
+        } catch (Exception e) {
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("BOOKING_ERROR")
+                    .text("Rất tiếc, không thể tạo đơn đặt sân vì: " + e.getMessage() + ". Bạn vui lòng chọn khung giờ khác hoặc liên hệ hotline.")
+                    .quickReplies(List.of("Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân"))
+                    .actionType("NONE")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // VietQR Dynamic URL (MBBank)
+        String qrUrl = String.format(
+                "https://img.vietqr.io/image/970422-0903123456-compact2.png?amount=%d&addInfo=CK%%20%s&accountName=UTE%%20BADMINTON%%20CLUB",
+                ctx.depositAmount.longValue(), bookingCode
+        );
+
+        Map<String, Object> paymentData = new HashMap<>();
+        paymentData.put("bookingCode", bookingCode);
+        paymentData.put("courtName", ctx.courtName);
+        paymentData.put("branchName", ctx.branchName);
+        paymentData.put("bookingDate", ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        paymentData.put("timeSlot", ctx.timeSlot);
+        paymentData.put("additionalServices", ctx.additionalServices);
+        paymentData.put("courtPrice", ctx.courtPrice);
+        paymentData.put("additionalFee", ctx.additionalFee);
+        paymentData.put("totalPrice", ctx.totalPrice);
+        paymentData.put("depositAmount", ctx.depositAmount);
+        paymentData.put("qrUrl", qrUrl);
+        paymentData.put("bankName", "MBBank (Ngân hàng Quân Đội)");
+        paymentData.put("accountNo", "0903123456");
+        paymentData.put("accountName", "UTE BADMINTON CLUB");
+
+        ctx.stage = "BOOKED";
+
+        String confirmText = String.format(
+                "MÃ KHÓA SÂN GIỮ CHỖ CỦA BẠN ĐÃ ĐƯỢC XUẤT THÀNH CÔNG!\n\n" +
+                "• **Mã khóa sân**: **%s**\n" +
+                "• **Khách hàng**: **%s** (%s)\n" +
+                "• **Cơ sở thi đấu**: %s\n" +
+                "• **Sân đặt**: %s\n" +
+                "• **Khung giờ**: %s ngày %s\n" +
+                "• **Dịch vụ đi kèm**: %s\n" +
+                "• **Tổng chi phí**: %,d đ\n" +
+                "• **Tiền cọc cần thanh toán (30%%)**: **%,d đ**\n\n" +
+                "Hệ thống đang **tạm khóa giữ chỗ sân trong 10 phút**. Bạn vui lòng quét mã VietQR bên dưới hoặc chuyển khoản theo thông tin để hoàn tất xác nhận giữ sân. Sau khi xác nhận cọc, đơn sẽ được lưu ngay vào [Lịch Sử Đặt Sân](/customer/history).",
+                bookingCode, ctx.customerName, ctx.customerPhone, ctx.branchName, ctx.courtName,
+                ctx.timeSlot, ctx.date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                ctx.additionalServices, ctx.totalPrice.longValue(), ctx.depositAmount.longValue()
+        );
+
+        return ChatMessageDto.builder()
+                .sender("bot")
+                .intent("BOOKING_EXECUTED")
+                .text(confirmText)
+                .actionType("OPEN_PAYMENT")
+                .paymentData(paymentData)
+                .quickReplies(List.of("Xác nhận đã chuyển khoản cọc", "Xem lại thông tin đơn", "Hướng dẫn hủy ca chơi"))
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    // =========================================================================
+    // HÀM TRÍCH XUẤT THỰC THỂ (SLOT EXTRACTION)
+    // =========================================================================
+    private void extractBookingSlots(String rawInput, String normalized, ChatSessionContext ctx) {
+        if (rawInput == null) return;
+
+        // 1. Số điện thoại (10 chữ số)
+        Matcher phoneMatcher = Pattern.compile("(?:0[3|5|7|8|9])([0-9]{8})\\b").matcher(rawInput);
+        if (phoneMatcher.find()) {
+            String detectedPhone = phoneMatcher.group(0);
+            ctx.customerPhone = detectedPhone;
+            if (customerRepository != null) {
+                customerRepository.findByPhone(detectedPhone).ifPresent(c -> {
+                    ctx.customerCode = c.getCustomerCode();
+                    if (!ctx.isNameProvided()) {
+                        ctx.customerName = c.getFullName();
+                    }
+                });
+            }
+        }
+
+        // 2. Họ tên khách hàng
+        Matcher namePattern = Pattern.compile("(?i)(?:tôi tên là|mình tên là|em tên là|tôi tên|mình tên|em tên|tên tôi là|tên mình là|tôi là|mình là)\\s+([A-Za-zÀ-ỹà-ỹ\\s]{2,30})").matcher(rawInput);
+        if (namePattern.find()) {
+            String detectedName = namePattern.group(1).trim();
+            // Loại bỏ các từ thừa như sdt, số điện thoại
+            detectedName = detectedName.replaceAll("(?i)(?:sdt|số điện thoại|sđt|phone).*", "").trim();
+            if (!detectedName.isBlank() && detectedName.length() >= 2) {
+                ctx.customerName = capitalizeWords(detectedName);
+            }
+        } else if ("ASK_NAME".equals(ctx.stage)) {
+            // Khi đang hỏi tên, nếu người dùng trả lời 1 chuỗi chữ hợp lệ không chứa lệnh
+            String clean = rawInput.trim();
+            if (!clean.matches(".*\\d.*") && clean.length() >= 2 && clean.length() <= 30 && !clean.contains("?") && !matches(normalized, "dat san", "huy", "chi nhanh", "gia", "khong")) {
+                ctx.customerName = capitalizeWords(clean);
+            }
+        }
+
+        // 3. Chi nhánh
+        if (matches(normalized, "co so 3", "chi nhanh 3", "quan 9", "q9", "do xuan hop", "le van viet", "man thien", "tang nhon phu", "phuoc long", "vinhomes grand park")) {
+            ctx.branchCode = "CN03";
+            ctx.branchName = "Chi nhánh 3 (Quận 9 - Số 70 Đỗ Xuân Hợp)";
+        } else if (matches(normalized, "co so 2", "chi nhanh 2", "binh thanh", "dien bien phu", "hang xanh", "nguyen gia tri", "d2", "xo viet nghe tinh", "bach dang")) {
+            ctx.branchCode = "CN02";
+            ctx.branchName = "Chi nhánh 2 (Bình Thạnh - Số 234 Điện Biên Phủ)";
+        } else if (matches(normalized, "co so 4", "chi nhanh 4", "go vap", "quang trung", "phan van tri", "nguyen oanh", "le duc tho")) {
+            ctx.branchCode = "CN04";
+            ctx.branchName = "Chi nhánh 4 (Gò Vấp - Số 18 Quang Trung)";
+        } else if (matches(normalized, "co so 1", "chi nhanh 1", "thu duc", "vo van ngan", "hoang dieu 2", "kha van can", "dang van bi", "linh chieu", "linh trung")) {
+            ctx.branchCode = "CN01";
+            ctx.branchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
+        }
+
+        // 4. Ngày và Khung giờ
+        if (matches(normalized, "ngay mai", "mai")) {
+            ctx.date = LocalDate.now().plusDays(1);
+        } else if (matches(normalized, "ngay kia", "mot")) {
+            ctx.date = LocalDate.now().plusDays(2);
+        } else if (matches(normalized, "hom nay", "toi nay", "chieu nay", "sang nay") || ctx.date == null) {
+            ctx.date = LocalDate.now();
+        }
+
+        int startHour = -1;
+        int endHour = -1;
+
+        Pattern rangePattern = Pattern.compile("(\\d{1,2})(?:h|:00)?\\s*(?:đến|den|-|toi)\\s*(\\d{1,2})(?:h|:00)?");
+        Matcher mRange = rangePattern.matcher(normalized);
+        if (mRange.find()) {
+            try {
+                startHour = Integer.parseInt(mRange.group(1));
+                endHour = Integer.parseInt(mRange.group(2));
+            } catch (Exception ignored) {}
+        } else {
+            Pattern singlePattern = Pattern.compile("(?:luc|vao|tam|tu)?\\s*(\\d{1,2})(?:h|:00)?");
+            Matcher mSingle = singlePattern.matcher(normalized);
+            if (mSingle.find()) {
+                try {
+                    int h = Integer.parseInt(mSingle.group(1));
+                    if (h >= 5 && h <= 22) {
+                        startHour = h;
+                        endHour = startHour + 2; // mặc định 2 tiếng
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+
+        if (startHour != -1 && endHour != -1) {
+            if (endHour <= startHour) {
+                endHour = startHour + 1;
+            }
+            ctx.timeSlot = String.format("%02d:00 - %02d:00", startHour, endHour);
+            ctx.durationHours = endHour - startHour;
+        }
+
+        // 5. Đặt sân gì (Sân VIP / Sân tiêu chuẩn / Sân cụ thể)
+        if (matches(normalized, "san vip", "san 1", "cl01", "san so 1", "vip")) {
+            ctx.courtType = "VIP";
+            ctx.courtCode = "CL01";
+            ctx.courtName = "Sân 1 (VIP)";
+        } else if (matches(normalized, "san tieu chuan", "san 2", "san 3", "san 4", "san 5", "cl02", "cl03", "cl04", "cl05", "san thuong")) {
+            ctx.courtType = "STANDARD";
+            if (normalized.contains("san 2") || normalized.contains("cl02")) {
+                ctx.courtCode = "CL02";
+                ctx.courtName = "Sân 2 (Tiêu chuẩn)";
+            } else if (normalized.contains("san 3") || normalized.contains("cl03")) {
+                ctx.courtCode = "CL03";
+                ctx.courtName = "Sân 3 (Tiêu chuẩn)";
+            } else {
+                ctx.courtCode = "CL02";
+                ctx.courtName = "Sân tiêu chuẩn";
+            }
+        }
+
+        // 6. Có chọn thêm gì đi kèm không
+        if (matches(normalized, "khong lay them gi", "khong can gi them", "khong co", "khong can", "ko lay gi", "ko can", "chi thue san thoi", "chi thue san", "thoi khoi", "du roi", "khong them do", "ko lay phu kien", "khong chon them")) {
+            ctx.additionalServices = "Không chọn thêm (Chỉ thuê sân)";
+            ctx.additionalFee = BigDecimal.ZERO;
+        } else if (matches(normalized, "thue vot", "thue giay", "mua cau", "mua nuoc", "pocari", "revive", "ong cau", "2 vot", "1 vot")) {
+            List<String> items = new ArrayList<>();
+            BigDecimal addFee = BigDecimal.ZERO;
+
+            if (matches(normalized, "2 vot", "hai vot")) {
+                items.add("Thuê 2 vợt thi đấu Yonex (100.000 đ)");
+                addFee = addFee.add(new BigDecimal("100000"));
+            } else if (matches(normalized, "thue vot", "1 vot", "mot vot", "vot thi dau")) {
+                items.add("Thuê 1 vợt thi đấu Yonex (50.000 đ)");
+                addFee = addFee.add(new BigDecimal("50000"));
+            }
+
+            if (matches(normalized, "thue giay", "doi giay", "giay")) {
+                items.add("Thuê 1 đôi giày chuyên dụng (20.000 đ)");
+                addFee = addFee.add(new BigDecimal("20000"));
+            }
+
+            if (matches(normalized, "ong cau", "thanh cong 77", "mua cau")) {
+                items.add("1 ống cầu Thành Công 77 (260.000 đ)");
+                addFee = addFee.add(new BigDecimal("260000"));
+            }
+
+            if (matches(normalized, "2 chai revive", "hai chai revive", "2 chai nuoc")) {
+                items.add("2 chai nước khoáng Revive (30.000 đ)");
+                addFee = addFee.add(new BigDecimal("30000"));
+            } else if (matches(normalized, "revive", "pocari", "mua nuoc", "nuoc")) {
+                items.add("1 chai nước thể thao ướp lạnh (15.000 đ)");
+                addFee = addFee.add(new BigDecimal("15000"));
+            }
+
+            if (!items.isEmpty()) {
+                ctx.additionalServices = String.join(", ", items);
+                ctx.additionalFee = addFee;
+            }
+        }
+    }
+
+    private void recalculatePrices(ChatSessionContext ctx) {
+        int startHour = extractStartHour(ctx.timeSlot);
+        if (pricingService != null) {
+            ctx.hourlyRate = pricingService.calculateHourlyRate(null, startHour);
+            ctx.courtPrice = pricingService.calculateTotalPrice(ctx.hourlyRate, Math.max(1, ctx.durationHours));
+            ctx.totalPrice = ctx.courtPrice.add(ctx.additionalFee != null ? ctx.additionalFee : BigDecimal.ZERO);
+            ctx.depositAmount = pricingService.calculateDepositAmount(ctx.totalPrice);
+        } else {
+            ctx.hourlyRate = new BigDecimal("140000");
+            ctx.courtPrice = ctx.hourlyRate.multiply(BigDecimal.valueOf(Math.max(1, ctx.durationHours)));
+            ctx.totalPrice = ctx.courtPrice.add(ctx.additionalFee != null ? ctx.additionalFee : BigDecimal.ZERO);
+            ctx.depositAmount = ctx.totalPrice.multiply(new BigDecimal("0.30")).setScale(0, java.math.RoundingMode.HALF_UP);
+        }
+    }
+
+    private int extractStartHour(String timeSlot) {
+        if (timeSlot == null) return 18;
+        Matcher m = Pattern.compile("(\\d{1,2}):00").matcher(timeSlot);
+        if (m.find()) {
+            try {
+                return Integer.parseInt(m.group(1));
+            } catch (Exception ignored) {}
+        }
+        return 18;
+    }
+
+    private boolean isBookingFlow(String normalized, ChatSessionContext ctx) {
+        if (matches(normalized, "dat san", "khoa san", "tu khoa san", "book san", "giu cho", "thue san", "san trong", "lay san nay", "chot san", "hien ma khoa san", "cho ma khoa san", "xuat ma khoa san", "lay ma khoa san", "khoa san gium")) {
+            return true;
+        }
+        return "COLLECTING_INFO".equals(ctx.stage) || "PROPOSING_COURT".equals(ctx.stage) || "PROPOSING_ADDONS".equals(ctx.stage) || "ASK_NAME".equals(ctx.stage) || "ASK_PHONE".equals(ctx.stage) || "AWAITING_CONFIRMATION".equals(ctx.stage);
+    }
+
+    private String capitalizeWords(String str) {
+        if (str == null || str.isBlank()) return "";
+        String[] words = str.trim().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (String w : words) {
+            if (!w.isEmpty()) {
+                sb.append(Character.toUpperCase(w.charAt(0)))
+                  .append(w.substring(1).toLowerCase())
+                  .append(" ");
+            }
+        }
+        return sb.toString().trim();
     }
 
     private boolean matches(String input, String... keywords) {
