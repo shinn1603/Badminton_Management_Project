@@ -70,6 +70,14 @@ window.escapeHtml = function (str) {
     cb.src = '/js/chatbot-widget.js';
     document.head.appendChild(cb);
   }
+
+  // Auto-load Staff Support Chat on staff pages (POS Cashier, Branch Manager, Director)
+  const isStaffPage = p.startsWith('/pos/') || p.startsWith('/manager/') || p.startsWith('/director/');
+  if (isStaffPage && !document.querySelector('script[src*="staff-support-chat.js"]')) {
+    const sc = document.createElement('script');
+    sc.src = '/js/staff-support-chat.js';
+    document.head.appendChild(sc);
+  }
 })();
 
 // 1. Theme Management (Light / Dark)

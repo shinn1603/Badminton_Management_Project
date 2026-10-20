@@ -57,6 +57,9 @@ public class ChatbotService {
     @Autowired(required = false)
     private IntentClassificationService intentClassifier;
 
+    @Autowired(required = false)
+    private SupportChatService supportChatService;
+
     // Session Memory Store (sessionId -> ChatSessionContext)
     private final Map<String, ChatSessionContext> sessionStore = new ConcurrentHashMap<>();
 
@@ -189,7 +192,7 @@ public class ChatbotService {
             return ChatMessageDto.builder()
                     .sender("bot")
                     .text("Xin chào bạn! Tôi là tư vấn viên hỗ trợ trực tuyến của Hệ thống Sân Cầu Lông UTE Sport. Tôi có thể hỗ trợ bạn tìm chi nhánh gần nhất, tra cứu sân trống theo khung giờ cụ thể, kiểm tra thông tin đơn đặt sân, hướng dẫn hủy sân và tự động đặt và khóa sân giữ chỗ cho bạn ngay trong cuộc trò chuyện này. Bạn cần tôi hỗ trợ điều gì?")
-                    .quickReplies(List.of("Hệ thống có những chi nhánh nào?", "Tôi ở đường Hoàng Diệu 2 thì chi nhánh nào gần tôi?", "Hôm nay có sân nào trống từ 18h đến 20h không?", "Bảng giá thuê sân"))
+                    .quickReplies(List.of("Hệ thống có những chi nhánh nào?", "Bảng giá thuê sân", "Hôm nay có sân nào trống từ 18h đến 20h không?", "Gặp nhân viên tư vấn"))
                     .actionType("NONE")
                     .timestamp(LocalDateTime.now())
                     .build();
@@ -200,6 +203,49 @@ public class ChatbotService {
 
         // Extract slots / entities proactively from user message
         extractBookingSlots(text, normalized, ctx);
+
+        // =========================================================================
+        // 0. XỬ LÝ CHUYỂN GIAO CHAT VỚI NHÂN VIÊN THẬT (LIVE HUMAN HANDOVER)
+        // =========================================================================
+        if (matches(normalized, "ket thuc gap nhan vien", "quay lai bot", "dung chat nhan vien", "thoat chat nhan vien", "ket thuc ho tro")) {
+            if (supportChatService != null) {
+                supportChatService.closeSession(sid, "Khách hàng");
+            }
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("HUMAN_HANDOVER_CLOSE")
+                    .text("Đã kết thúc phiên trò chuyện với nhân viên. Trợ lý ảo AI UTE Sport đã quay trở lại phục vụ bạn! Bạn cần tư vấn thêm thông tin gì?")
+                    .quickReplies(List.of("Hệ thống có những chi nhánh nào?", "Bảng giá thuê sân", "Gặp nhân viên tư vấn"))
+                    .actionType("LIVE_CHAT_DISCONNECT")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        if (matches(normalized, "gap nhan vien", "ket noi nhan vien", "chat voi nguoi that", "nhan vien tu van", "gap tu van vien", "gap nguoi that", "ho tro truc tiep", "cho gap nhan vien", "lien he nhan vien", "can nguoi that", "chat voi nhan vien", "gap nhan vien tu van")) {
+            if (supportChatService != null) {
+                supportChatService.requestHumanSupport(sid, ctx.customerName, ctx.customerPhone, ctx.branchCode);
+            }
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("HUMAN_HANDOVER")
+                    .text("Yêu cầu của bạn đã được gửi tới bộ phận trực ban chi nhánh! Nhân viên hỗ trợ đang tiếp nhận cuộc trò chuyện. Bạn vui lòng nhắn tin trực tiếp tại đây, nhân viên sẽ phản hồi bạn ngay nhé!")
+                    .quickReplies(List.of("Kết thúc gặp nhân viên", "Bảng giá thuê sân"))
+                    .actionType("LIVE_CHAT_CONNECT")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
+
+        // Nếu phiên chat đang trong trạng thái Live với nhân viên, chuyển tin nhắn thẳng cho nhân viên
+        if (supportChatService != null && supportChatService.isSessionLiveWithStaff(sid)) {
+            supportChatService.sendCustomerMessage(sid, text, ctx.customerName, ctx.customerPhone);
+            return ChatMessageDto.builder()
+                    .sender("bot")
+                    .intent("WAITING_STAFF_REPLY")
+                    .text("Tin nhắn của bạn đã được chuyển tới nhân viên hỗ trợ. Nhân viên đang xem và phản hồi lại ngay...")
+                    .actionType("LIVE_CHAT_WAITING")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
 
         // 1. Try Google Gemini Cloud AI if configured
         if (geminiAiService != null && geminiAiService.isConfigured()) {
@@ -722,8 +768,8 @@ public class ChatbotService {
         // =========================================================================
         // INTENT: HỎI CHI NHÁNH GẦN TÔI
         // =========================================================================
-        if (matches(normalized, "gan toi", "gan nhat", "o dia chi", "o duong", "o khu vuc", "cach bao xa", "o gan", "dia chi nao gan")
-                || (normalized.startsWith("toi o ") && !normalized.contains("thue") && !normalized.contains("dat"))) {
+        if (!isSpecificBranch(normalized) && (matches(normalized, "gan toi", "gan nhat", "o dia chi", "o duong", "o khu vuc", "cach bao xa", "o gan", "dia chi nao gan")
+                || (normalized.startsWith("toi o ") && !normalized.contains("thue") && !normalized.contains("dat")))) {
             String recommendedBranchCode = "CN01";
             String recommendedBranchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
             String distNote = "khoảng 1.5 - 2.5 km";
@@ -769,7 +815,7 @@ public class ChatbotService {
         // =========================================================================
         // INTENT: DANH SÁCH CHI NHÁNH
         // =========================================================================
-        if ("FIND_BRANCH".equals(mlTag) || matches(normalized, "chi nhanh nao", "cac chi nhanh", "danh sach chi nhanh", "co may chi nhanh", "co nhung co so nao", "he thong o dau")) {
+        if (!isSpecificBranch(normalized) && ("FIND_BRANCH".equals(mlTag) || matches(normalized, "chi nhanh nao", "cac chi nhanh", "danh sach chi nhanh", "co may chi nhanh", "co nhung co so nao", "he thong o dau", "he thong co nhung chi nhanh nao"))) {
             List<Branch> branches = branchRepository != null ? branchRepository.findAll() : Collections.emptyList();
             StringBuilder sb = new StringBuilder("Hệ thống sân cầu lông UTE Sport hiện có các cơ sở thi đấu sau:\n\n");
             int idx = 1;
@@ -779,13 +825,13 @@ public class ChatbotService {
                   .append("   Hotline: ").append(b.getPhone() != null ? b.getPhone() : "1900 6868").append("\n\n");
             }
             sb.append("Giờ mở cửa toàn hệ thống: 05:30 - 22:30 mỗi ngày.\n\n")
-              .append("Bạn đang ở địa chỉ hoặc khu vực nào để tôi tư vấn cơ sở thuận tiện nhất cho bạn?");
+              .append("Bạn muốn đặt sân tại chi nhánh nào, hoặc nhắn địa chỉ của bạn để tôi tư vấn cơ sở gần nhất nhé!");
 
             return ChatMessageDto.builder()
                     .sender("bot")
                     .intent("BRANCH_LIST")
                     .text(sb.toString())
-                    .quickReplies(List.of("Tôi ở đường Hoàng Diệu 2 thì cơ sở nào gần tôi?", "Tôi ở Hàng Xanh Bình Thạnh", "Tôi ở Lê Văn Việt Quận 9", "Tôi ở đường Quang Trung Gò Vấp"))
+                    .quickReplies(List.of("Chi nhánh 1 (Thủ Đức)", "Chi nhánh 2 (Bình Thạnh)", "Chi nhánh 3 (Quận 9)", "Chi nhánh 4 (Gò Vấp)", "Tôi ở Thủ Đức thì chi nhánh nào gần?"))
                     .actionType("NONE")
                     .timestamp(LocalDateTime.now())
                     .build();
@@ -990,7 +1036,7 @@ public class ChatbotService {
         // =========================================================================
         // =========================================================================
 
-        boolean isBookingIntent = isBookingFlow(normalized, ctx) || "CONFIRM_BOOKING".equals(mlTag) || "SEARCH_SLOTS".equals(mlTag) || "REQUEST_LOCK_CODE".equals(mlTag) || "SELECT_ADDONS".equals(mlTag) || "PROVIDE_CUSTOMER_INFO".equals(mlTag);
+        boolean isBookingIntent = isBookingFlow(normalized, ctx) || "CONFIRM_BOOKING".equals(mlTag) || "SEARCH_SLOTS".equals(mlTag) || "REQUEST_LOCK_CODE".equals(mlTag) || "SELECT_ADDONS".equals(mlTag) || "PROVIDE_CUSTOMER_INFO".equals(mlTag) || "SELECT_BRANCH".equals(mlTag) || isSpecificBranch(normalized);
 
         // Trường hợp người dùng mới chỉ nói "tôi muốn đặt sân" mà chưa có bất kỳ thông tin nào
         boolean isSimpleBookingPrompt = matches(normalized, "toi muon dat san", "muon dat san", "dat san di", "cho toi dat san") && !ctx.isBranchProvided() && !ctx.isSlotProvided();
@@ -1087,7 +1133,7 @@ public class ChatbotService {
             // 2. Thiếu Khung giờ & Ngày
             if (!hasSlot) {
                 ctx.stage = "COLLECTING_INFO";
-                String promptText = String.format("Bạn dự định chơi tại **%s** vào **ngày nào** và **từ mấy giờ đến mấy giờ** ạ?", ctx.branchName);
+                String promptText = String.format("Dạ, tôi đã ghi nhận bạn chọn **%s**.\n\nBạn dự định chơi vào **ngày nào** và **từ mấy giờ đến mấy giờ** ạ? (Ví dụ: 'Hôm nay từ 18h đến 20h', 'Tối mai 19h-21h').", ctx.branchName);
                 return ChatMessageDto.builder()
                         .sender("bot")
                         .intent("ASK_SLOT")
@@ -1420,18 +1466,30 @@ public class ChatbotService {
         }
 
         // 3. Chi nhánh
-        if (matches(normalized, "co so 3", "chi nhanh 3", "quan 9", "q9", "do xuan hop", "le van viet", "man thien", "tang nhon phu", "phuoc long", "vinhomes grand park")) {
+        String prevBranchCode = ctx.branchCode;
+        if (matches(normalized, "co so 5", "chi nhanh 5", "pickleball", "cn05", "cn 5", "cn5")) {
+            ctx.branchCode = "CN05";
+            ctx.branchName = "Chi nhánh 5 (Pickleball - Số 2 Võ Văn Ngân)";
+        } else if (matches(normalized, "co so 3", "chi nhanh 3", "quan 9", "q9", "do xuan hop", "le van viet", "man thien", "tang nhon phu", "phuoc long", "vinhomes grand park", "cn03", "cn 3", "cn3")) {
             ctx.branchCode = "CN03";
             ctx.branchName = "Chi nhánh 3 (Quận 9 - Số 70 Đỗ Xuân Hợp)";
-        } else if (matches(normalized, "co so 2", "chi nhanh 2", "binh thanh", "dien bien phu", "hang xanh", "nguyen gia tri", "d2", "xo viet nghe tinh", "bach dang")) {
+        } else if (matches(normalized, "co so 2", "chi nhanh 2", "binh thanh", "dien bien phu", "hang xanh", "nguyen gia tri", "d2", "xo viet nghe tinh", "bach dang", "cn02", "cn 2", "cn2")) {
             ctx.branchCode = "CN02";
             ctx.branchName = "Chi nhánh 2 (Bình Thạnh - Số 234 Điện Biên Phủ)";
-        } else if (matches(normalized, "co so 4", "chi nhanh 4", "go vap", "quang trung", "phan van tri", "nguyen oanh", "le duc tho")) {
+        } else if (matches(normalized, "co so 4", "chi nhanh 4", "go vap", "quang trung", "phan van tri", "nguyen oanh", "le duc tho", "cn04", "cn 4", "cn4")) {
             ctx.branchCode = "CN04";
             ctx.branchName = "Chi nhánh 4 (Gò Vấp - Số 18 Quang Trung)";
-        } else if (matches(normalized, "co so 1", "chi nhanh 1", "thu duc", "vo van ngan", "hoang dieu 2", "kha van can", "dang van bi", "linh chieu", "linh trung")) {
+        } else if (matches(normalized, "co so 1", "chi nhanh 1", "thu duc", "vo van ngan", "hoang dieu 2", "kha van can", "dang van bi", "linh chieu", "linh trung", "cn01", "cn 1", "cn1")) {
             ctx.branchCode = "CN01";
             ctx.branchName = "Chi nhánh 1 (Thủ Đức - Số 1 Võ Văn Ngân)";
+        }
+
+        if (branchRepository != null && ctx.branchCode != null && !ctx.branchCode.equals(prevBranchCode)) {
+            branchRepository.findByBranchCode(ctx.branchCode).ifPresent(b -> {
+                if (b.getBranchName() != null && !b.getBranchName().isBlank()) {
+                    ctx.branchName = b.getBranchName();
+                }
+            });
         }
 
         // 4. Ngày và Khung giờ
@@ -1562,10 +1620,34 @@ public class ChatbotService {
     }
 
     private boolean isBookingFlow(String normalized, ChatSessionContext ctx) {
+        if (isSpecificBranch(normalized)) {
+            return true;
+        }
         if (matches(normalized, "dat san", "khoa san", "tu khoa san", "book san", "giu cho", "thue san", "san trong", "lay san nay", "chot san", "hien ma khoa san", "cho ma khoa san", "xuat ma khoa san", "lay ma khoa san", "khoa san gium")) {
             return true;
         }
         return "COLLECTING_INFO".equals(ctx.stage) || "PROPOSING_COURT".equals(ctx.stage) || "PROPOSING_ADDONS".equals(ctx.stage) || "ASK_NAME".equals(ctx.stage) || "ASK_PHONE".equals(ctx.stage) || "AWAITING_CONFIRMATION".equals(ctx.stage);
+    }
+
+    private boolean isSpecificBranch(String normalized) {
+        if (normalized == null || normalized.isBlank()) return false;
+        // Loại trừ các câu hỏi tổng quát về danh sách chi nhánh
+        if (matches(normalized, "chi nhanh nao", "cac chi nhanh", "danh sach chi nhanh", "co may chi nhanh", "co nhung chi nhanh", "co nhung co so", "he thong co", "dia chi chi nhanh", "chi nhanh o dau", "dia chi san")) {
+            return false;
+        }
+        if (matches(normalized,
+                "chi nhanh 1", "chi nhanh 2", "chi nhanh 3", "chi nhanh 4", "chi nhanh 5",
+                "co so 1", "co so 2", "co so 3", "co so 4", "co so 5",
+                "cn01", "cn02", "cn03", "cn04", "cn05",
+                "cn 1", "cn 2", "cn 3", "cn 4", "cn 5",
+                "cn1", "cn2", "cn3", "cn4", "cn5",
+                "chi nhanh thu duc", "chi nhanh binh thanh", "chi nhanh quan 9", "chi nhanh go vap", "chi nhanh pickleball",
+                "co so thu duc", "co so binh thanh", "co so quan 9", "co so go vap", "co so pickleball",
+                "san thu duc", "san binh thanh", "san quan 9", "san go vap", "san pickleball", "pickleball"
+        )) {
+            return true;
+        }
+        return normalized.matches(".*\\b(?:chi nhanh|co so|cn)\\s*[1-5]\\b.*");
     }
 
     private String capitalizeWords(String str) {

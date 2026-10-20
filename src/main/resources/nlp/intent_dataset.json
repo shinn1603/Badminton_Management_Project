@@ -98,13 +98,35 @@
       "patterns": [
         "hệ thống có những chi nhánh nào", "chi nhánh ở đâu", "địa chỉ các chi nhánh", "sân ở đâu", "tìm chi nhánh gần nhất",
         "he thong co nhung chi nhanh nao", "chi nhanh o dau", "dia chi san", "san o dau", "tim chi nhanh gan nhat",
-        "tôi ở Thủ Đức thì đi chi nhánh nào", "sân gần Hoàng Diệu 2", "chi nhánh Quận 9 ở đâu", "chi nhánh Bình Thạnh",
-        "toi o thu duc", "san gan hoang dieu 2", "chi nhanh quan 9", "chi nhanh binh thanh", "danh sách chi nhánh",
+        "tôi ở Thủ Đức thì đi chi nhánh nào", "sân gần Hoàng Diệu 2", "chi nhánh Quận 9 ở đâu", "địa chỉ chi nhánh Bình Thạnh",
+        "toi o thu duc", "san gan hoang dieu 2", "địa chỉ chi nhanh quan 9", "địa chỉ chi nhanh binh thanh", "danh sách chi nhánh",
         "có mấy cơ sở", "co may co so", "đường đi đến sân", "vị trí sân cầu lông", "chi nhánh nào gần tôi nhất",
-        "chi nhánh gò vấp ở đâu", "chi nhanh go vap", "cơ sở quang trung"
+        "chi nhánh gò vấp ở đâu", "chi nhanh go vap o dau", "cơ sở quang trung ở đâu", "các cơ sở của hệ thống",
+        "danh sach cac chi nhanh", "cac chi nhanh o dau"
       ],
       "responses": [
         "Hệ thống UTE Sport hiện có các cơ sở:\n• CN01 (Thủ Đức): Số 1 Võ Văn Ngân, TP. Thủ Đức (Cạnh ĐH Sư Phạm Kỹ Thuật)\n• CN02 (Bình Thạnh): Số 234 Điện Biên Phủ, P. 25, Q. Bình Thạnh (Gần ngã tư Hàng Xanh)\n• CN03 (Quận 9): Số 70 Đỗ Xuân Hợp, P. Phước Long B, TP. Thủ Đức (Gần Khu Công Nghệ Cao)\n• CN04 (Gò Vấp): Số 18 Quang Trung, P. 10, Q. Gò Vấp\nMở cửa từ 05:30 đến 22:30 mỗi ngày."
+      ]
+    },
+    {
+      "tag": "SELECT_BRANCH",
+      "patterns": [
+        "chi nhánh 1", "chi nhánh 2", "chi nhánh 3", "chi nhánh 4", "chi nhánh 5",
+        "chi nhanh 1", "chi nhanh 2", "chi nhanh 3", "chi nhanh 4", "chi nhanh 5",
+        "cơ sở 1", "cơ sở 2", "cơ sở 3", "cơ sở 4", "cơ sở 5",
+        "co so 1", "co so 2", "co so 3", "co so 4", "co so 5",
+        "cn01", "cn02", "cn03", "cn04", "cn05", "cn1", "cn2", "cn3", "cn4", "cn5",
+        "chi nhánh thủ đức", "chi nhánh bình thạnh", "chi nhánh quận 9", "chi nhánh gò vấp", "chi nhánh pickleball",
+        "sân thủ đức", "sân bình thạnh", "sân quận 9", "sân gò vấp", "sân pickleball",
+        "chi nhánh 1 (thủ đức)", "chi nhánh 2 (bình thạnh)", "chi nhánh 3 (quận 9)", "chi nhánh 4 (gò vấp)", "chi nhánh 5 (pickleball)",
+        "chọn chi nhánh 1", "chọn cơ sở 1", "đặt ở chi nhánh 1", "đặt ở cơ sở 1",
+        "chọn chi nhánh 2", "chọn cơ sở 2", "đặt ở chi nhánh 2", "đặt ở cơ sở 2",
+        "chọn chi nhánh 3", "chọn cơ sở 3", "đặt ở chi nhánh 3", "đặt ở cơ sở 3",
+        "chọn chi nhánh 4", "chọn cơ sở 4", "đặt ở chi nhánh 4", "đặt ở cơ sở 4",
+        "chọn chi nhánh 5", "chọn cơ sở 5", "đặt ở chi nhánh 5", "đặt ở cơ sở 5"
+      ],
+      "responses": [
+        "Tôi đã ghi nhận chi nhánh bạn chọn và sẵn sàng kiểm tra khung giờ thi đấu cho bạn."
       ]
     },
     {

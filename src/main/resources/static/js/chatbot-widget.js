@@ -54,14 +54,22 @@
               </svg>
             </div>
             <div>
-              <div class="chatbot-title">Hỗ trợ UTE Sport</div>
+              <div class="chatbot-title" id="chatbot-header-title">Hỗ trợ UTE Sport</div>
               <div class="chatbot-status">
-                <span class="chatbot-status-dot"></span>
-                <span>Tư vấn & Đặt sân trực tuyến</span>
+                <span class="chatbot-status-dot" id="chatbot-status-dot"></span>
+                <span id="chatbot-status-text">Tư vấn & Đặt sân trực tuyến</span>
               </div>
             </div>
           </div>
           <div class="chatbot-header-actions">
+            <button class="chatbot-call-staff-pill" id="chatbot-call-staff-btn" title="Gặp nhân viên tư vấn trực tiếp">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <span>Nhân viên</span>
+            </button>
+            <button class="chatbot-live-leave-btn" id="chatbot-leave-staff-btn" style="display: none;" title="Dừng chat với nhân viên & quay lại trợ lý ảo">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <span>Dừng chat</span>
+            </button>
             <button class="chatbot-header-action-btn" id="chatbot-reset-btn" title="Làm mới cuộc trò chuyện">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
@@ -98,12 +106,154 @@
     const toggleBtn = document.getElementById('ute-chatbot-toggle');
     const closeBtn = document.getElementById('chatbot-close');
     const resetBtn = document.getElementById('chatbot-reset-btn');
+    const callStaffBtn = document.getElementById('chatbot-call-staff-btn');
+    const leaveStaffBtn = document.getElementById('chatbot-leave-staff-btn');
+    const headerTitle = document.getElementById('chatbot-header-title');
+    const statusDot = document.getElementById('chatbot-status-dot');
+    const statusText = document.getElementById('chatbot-status-text');
     const chatWin = document.getElementById('ute-chatbot-window');
     const msgList = document.getElementById('chatbot-messages-list');
     const inputField = document.getElementById('chatbot-input-field');
     const sendBtn = document.getElementById('chatbot-send-btn');
 
+    let isLiveSupportMode = false;
+    let supportPollTimer = null;
+    let lastSupportMsgId = 0;
     let isFirstOpen = true;
+
+    function getUserInfo() {
+      try {
+        return JSON.parse(localStorage.getItem('utesport_user') || 'null');
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function enterLiveSupportMode() {
+      isLiveSupportMode = true;
+      if (headerTitle) headerTitle.textContent = 'Tư Vấn Trực Tuyến';
+      if (statusDot) {
+        statusDot.className = 'chatbot-status-dot waiting';
+      }
+      if (statusText) {
+        statusText.textContent = 'Đang kết nối nhân viên trực...';
+      }
+      if (callStaffBtn) callStaffBtn.style.display = 'none';
+      if (leaveStaffBtn) leaveStaffBtn.style.display = 'inline-flex';
+      if (inputField) inputField.placeholder = 'Nhập tin nhắn gửi nhân viên...';
+
+      if (supportPollTimer) clearInterval(supportPollTimer);
+      supportPollTimer = setInterval(pollSupportMessages, 2500);
+      pollSupportMessages();
+    }
+
+    async function exitLiveSupportMode(notifyServer) {
+      isLiveSupportMode = false;
+      if (supportPollTimer) {
+        clearInterval(supportPollTimer);
+        supportPollTimer = null;
+      }
+      if (headerTitle) headerTitle.textContent = 'Hỗ trợ UTE Sport';
+      if (statusDot) {
+        statusDot.className = 'chatbot-status-dot';
+      }
+      if (statusText) {
+        statusText.textContent = 'Tư vấn & Đặt sân trực tuyến';
+      }
+      if (callStaffBtn) callStaffBtn.style.display = 'inline-flex';
+      if (leaveStaffBtn) leaveStaffBtn.style.display = 'none';
+      if (inputField) inputField.placeholder = 'Hỏi chi nhánh, giờ chơi, tra cứu đơn...';
+
+      if (notifyServer) {
+        try {
+          await fetch('/api/support/close', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: sessionId, closedBy: 'Khách hàng' })
+          });
+        } catch (e) {}
+        appendSystemNotice('Đã kết thúc phiên trò chuyện với nhân viên. Trợ lý ảo UTE Sport đã sẵn sàng phục vụ tiếp!');
+      }
+    }
+
+    async function pollSupportMessages() {
+      if (!isLiveSupportMode) return;
+      try {
+        const res = await fetch(`/api/support/messages?sessionId=${encodeURIComponent(sessionId)}&afterId=${lastSupportMsgId}&role=customer`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (data.ticket) {
+          if (data.ticket.status === 'ACTIVE_STAFF') {
+            if (statusDot) statusDot.className = 'chatbot-status-dot live';
+            if (statusText) statusText.textContent = 'Nhân viên: ' + (data.ticket.assignedStaff || 'Trực ban');
+          } else if (data.ticket.status === 'WAITING_STAFF') {
+            if (statusDot) statusDot.className = 'chatbot-status-dot waiting';
+            if (statusText) statusText.textContent = 'Đang chờ nhân viên tiếp nhận...';
+          } else if (data.ticket.status === 'CLOSED') {
+            exitLiveSupportMode(false);
+            appendSystemNotice('Nhân viên đã kết thúc phiên hỗ trợ. Cảm ơn quý khách!');
+            return;
+          }
+        }
+
+        if (data.messages && data.messages.length > 0) {
+          data.messages.forEach(msg => {
+            if (msg.id > lastSupportMsgId) {
+              lastSupportMsgId = msg.id;
+              if (msg.sender === 'staff') {
+                appendStaffMessage(msg);
+              } else if (msg.sender === 'system') {
+                appendSystemNotice(msg.content);
+              }
+            }
+          });
+        }
+      } catch (err) {}
+    }
+
+    function appendStaffMessage(msg) {
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble staff';
+      const staffName = escapeHtml(msg.staffName || 'Nhân viên trực');
+      const timeStr = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '';
+      bubble.innerHTML = `
+        <div class="chat-staff-badge">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Nhân viên: ${staffName}
+        </div>
+        <div class="chat-bubble-text">${formatBotText(msg.content || '')}</div>
+        <div class="chat-msg-time">${timeStr}</div>
+      `;
+      msgList.appendChild(bubble);
+      scrollToBottom();
+    }
+
+    function appendSystemNotice(text) {
+      const notice = document.createElement('div');
+      notice.className = 'chat-system-notice';
+      notice.innerHTML = escapeHtml(text);
+      msgList.appendChild(notice);
+      scrollToBottom();
+    }
+
+    async function checkExistingSupportTicket() {
+      try {
+        const res = await fetch(`/api/support/messages?sessionId=${encodeURIComponent(sessionId)}&role=customer`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.ticket && (data.ticket.status === 'WAITING_STAFF' || data.ticket.status === 'ACTIVE_STAFF')) {
+          if (data.messages && data.messages.length > 0) {
+            data.messages.forEach(m => {
+              if (m.id > lastSupportMsgId) {
+                lastSupportMsgId = m.id;
+              }
+            });
+          }
+          enterLiveSupportMode();
+        }
+      } catch (e) {}
+    }
 
     // Restore state from sessionStorage without flickering
     const savedOpen = sessionStorage.getItem('chatbot_open') === 'true';
@@ -126,6 +276,7 @@
           sendMessage('');
         }
         checkAndSuggestPendingBooking();
+        checkExistingSupportTicket();
       }
     }
 
@@ -212,8 +363,23 @@
       sessionStorage.setItem('chatbot_open', 'false');
     });
 
+    if (callStaffBtn) {
+      callStaffBtn.addEventListener('click', () => {
+        sendMessage('Gặp nhân viên tư vấn');
+      });
+    }
+
+    if (leaveStaffBtn) {
+      leaveStaffBtn.addEventListener('click', () => {
+        exitLiveSupportMode(true);
+      });
+    }
+
     // Reset Chat logic
     resetBtn.addEventListener('click', async () => {
+      if (isLiveSupportMode) {
+        await exitLiveSupportMode(true);
+      }
       msgList.innerHTML = '';
       showTypingIndicator();
       try {
@@ -230,9 +396,39 @@
 
     // Send Message
     async function sendMessage(text) {
-      if (text && text.trim()) {
-        appendMessage('user', text.trim());
+      const cleanText = (text || '').trim();
+      if (!cleanText && !isFirstOpen && msgList.children.length > 0) return;
+
+      if (cleanText) {
+        appendMessage('user', cleanText);
         inputField.value = '';
+      }
+
+      // Check if user is in human live support mode
+      if (isLiveSupportMode) {
+        const lower = cleanText.toLowerCase();
+        if (lower.includes('ket thuc') || lower.includes('quay lai bot') || lower.includes('dung chat') || lower.includes('thoat chat')) {
+          await exitLiveSupportMode(true);
+          return;
+        }
+
+        const user = getUserInfo();
+        try {
+          await fetch('/api/support/message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sessionId: sessionId,
+              content: cleanText,
+              sender: 'customer',
+              customerName: user ? (user.fullName || user.name) : 'Khách hàng',
+              customerPhone: user ? user.phone : ''
+            })
+          });
+        } catch (e) {
+          console.error('Failed to send support message', e);
+        }
+        return;
       }
 
       showTypingIndicator();
@@ -287,6 +483,12 @@
     }
 
     function appendBotMessage(data) {
+      if (data.actionType === 'LIVE_CHAT_CONNECT') {
+        enterLiveSupportMode();
+      } else if (data.actionType === 'LIVE_CHAT_DISCONNECT') {
+        exitLiveSupportMode(false);
+      }
+
       const bubble = document.createElement('div');
       bubble.className = 'chat-bubble bot';
 

@@ -184,4 +184,47 @@ public class ChatbotBookingFlowTest {
         assertTrue(reopenReply.getText().contains("DS888999"));
         assertTrue(reopenReply.getText().contains("Lịch Sử Đặt Sân"));
     }
+
+    @Test
+    void testBranchSelection_ShouldNotLoopBranchList_AndAskForSlot() {
+        String session = "test_branch_loop_fix";
+
+        // Bước 1: Khách hỏi hệ thống có những chi nhánh nào
+        ChatMessageDto step1 = chatbotService.processMessage("Bạn có những chi nhánh nào", session);
+        assertNotNull(step1);
+        assertEquals("BRANCH_LIST", step1.getIntent());
+        assertTrue(step1.getText().contains("Hệ thống sân cầu lông UTE Sport hiện có các cơ sở thi đấu sau"));
+        assertTrue(step1.getQuickReplies().stream().anyMatch(q -> q.contains("Chi nhánh 1")));
+
+        // Bước 2: Khách chọn "Chi nhánh 1" -> Bot KHÔNG ĐƯỢC lặp lại BRANCH_LIST, mà phải ghi nhận CN01 và hỏi khung giờ
+        ChatMessageDto step2 = chatbotService.processMessage("Chi nhánh 1", session);
+        assertNotNull(step2);
+        assertNotEquals("BRANCH_LIST", step2.getIntent(), "Không được lặp lại danh sách chi nhánh khi khách đã chọn Chi nhánh 1!");
+        assertEquals("ASK_SLOT", step2.getIntent());
+        assertTrue(step2.getText().contains("Chi nhánh 1"));
+        assertTrue(step2.getText().contains("mấy giờ"));
+
+        // Bước 3: Khách tiếp tục chọn khung giờ "Hôm nay 18h - 20h" -> Bot chuyển sang gợi ý sân khả dụng
+        ChatMessageDto step3 = chatbotService.processMessage("Hôm nay 18h - 20h", session);
+        assertNotNull(step3);
+        assertEquals("PROPOSE_COURTS", step3.getIntent());
+        assertTrue(step3.getText().contains("Sân 1"));
+    }
+
+    @Test
+    void testSlotFirst_ThenBranchSelection_ShouldAdvanceToProposeCourts() {
+        String session = "test_slot_first";
+
+        // Bước 1: Khách đưa giờ trước: "Đặt sân từ 18h đến 20h hôm nay"
+        ChatMessageDto step1 = chatbotService.processMessage("Đặt sân từ 18h đến 20h hôm nay", session);
+        assertNotNull(step1);
+        assertEquals("ASK_BRANCH", step1.getIntent());
+
+        // Bước 2: Khách chọn "Chi nhánh 1" -> Đã có cả giờ và chi nhánh -> Phải chuyển sang PROPOSE_COURTS ngay!
+        ChatMessageDto step2 = chatbotService.processMessage("Chi nhánh 1", session);
+        assertNotNull(step2);
+        assertNotEquals("BRANCH_LIST", step2.getIntent());
+        assertNotEquals("ASK_BRANCH", step2.getIntent());
+        assertEquals("PROPOSE_COURTS", step2.getIntent());
+    }
 }

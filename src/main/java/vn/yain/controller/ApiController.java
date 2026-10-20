@@ -281,6 +281,9 @@ public class ApiController {
 
     private vn.yain.service.ChatbotService chatbotService;
 
+    @Autowired(required = false)
+    private vn.yain.service.SupportChatService supportChatService;
+
 
 
     @Autowired
@@ -4974,6 +4977,70 @@ public class ApiController {
 
         return ResponseEntity.ok(Map.of("status", "success", "message", "Session reset"));
 
+    }
+
+    // ==========================================
+    // 5.1 LIVE HUMAN SUPPORT CHAT ENDPOINTS
+    // ==========================================
+
+    @PostMapping("/support/request")
+    public ResponseEntity<?> requestHumanSupport(@RequestBody Map<String, String> payload) {
+        if (supportChatService == null) return ResponseEntity.ok(Map.of("success", false, "message", "Support service unavailable"));
+        String sessionId = payload.get("sessionId");
+        String customerName = payload.get("customerName");
+        String customerPhone = payload.get("customerPhone");
+        String branchCode = payload.get("branchCode");
+        vn.yain.entity.SupportTicket ticket = supportChatService.requestHumanSupport(sessionId, customerName, customerPhone, branchCode);
+        return ResponseEntity.ok(Map.of("success", true, "ticket", ticket));
+    }
+
+    @PostMapping("/support/message")
+    public ResponseEntity<?> sendSupportMessage(@RequestBody Map<String, String> payload) {
+        if (supportChatService == null) return ResponseEntity.ok(Map.of("success", false, "message", "Support service unavailable"));
+        String sessionId = payload.get("sessionId");
+        String content = payload.get("content");
+        String sender = payload.get("sender");
+        String staffName = payload.get("staffName");
+        String staffCode = payload.get("staffCode");
+        String branchCode = payload.get("branchCode");
+        String customerName = payload.get("customerName");
+        String customerPhone = payload.get("customerPhone");
+
+        vn.yain.entity.ChatMessage msg;
+        if ("staff".equalsIgnoreCase(sender)) {
+            msg = supportChatService.sendStaffMessage(sessionId, staffName, staffCode, branchCode, content);
+        } else {
+            msg = supportChatService.sendCustomerMessage(sessionId, content, customerName, customerPhone);
+        }
+        return ResponseEntity.ok(Map.of("success", true, "message", msg != null ? msg : Map.of()));
+    }
+
+    @GetMapping("/support/messages")
+    public ResponseEntity<?> getSupportMessages(
+            @RequestParam("sessionId") String sessionId,
+            @RequestParam(value = "afterId", required = false) Long afterId,
+            @RequestParam(value = "role", required = false, defaultValue = "customer") String role) {
+        if (supportChatService == null) return ResponseEntity.ok(Map.of("success", true, "messages", List.of()));
+        List<vn.yain.entity.ChatMessage> messages = supportChatService.getMessages(sessionId, afterId, role);
+        Optional<vn.yain.entity.SupportTicket> ticket = supportChatService.getTicket(sessionId);
+        return ResponseEntity.ok(Map.of("success", true, "messages", messages, "ticket", ticket.orElse(null)));
+    }
+
+    @GetMapping("/support/tickets")
+    public ResponseEntity<?> getSupportTickets() {
+        if (supportChatService == null) return ResponseEntity.ok(Map.of("success", true, "tickets", List.of(), "waitingCount", 0));
+        List<vn.yain.entity.SupportTicket> activeTickets = supportChatService.getActiveTickets();
+        long waitingCount = supportChatService.getWaitingCount();
+        return ResponseEntity.ok(Map.of("success", true, "tickets", activeTickets, "waitingCount", waitingCount));
+    }
+
+    @PostMapping("/support/close")
+    public ResponseEntity<?> closeSupportSession(@RequestBody Map<String, String> payload) {
+        if (supportChatService == null) return ResponseEntity.ok(Map.of("success", true));
+        String sessionId = payload.get("sessionId");
+        String closedBy = payload.get("closedBy");
+        vn.yain.entity.SupportTicket ticket = supportChatService.closeSession(sessionId, closedBy);
+        return ResponseEntity.ok(Map.of("success", true, "ticket", ticket != null ? ticket : Map.of()));
     }
 
 
