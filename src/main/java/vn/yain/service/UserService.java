@@ -193,6 +193,7 @@ public class UserService {
         User newUser = new User();
         newUser.setUsername(username.trim());
         newUser.setPassword(passwordEncoder.encode(password.trim()));
+        newUser.setRawPassword(password.trim());
         newUser.setFullName(fullName.trim());
         newUser.setPhone(phone != null ? phone.trim() : "");
         newUser.setEmail(email != null ? email.trim() : "");
@@ -210,6 +211,7 @@ public class UserService {
             c.setPhone(savedUser.getPhone());
             c.setEmail(savedUser.getEmail());
             c.setPassword(savedUser.getPassword());
+            c.setRawPassword(password.trim());
             c.setMembershipTier("Đồng");
             c.setStatus("Hoạt động");
             c.setCreatedAt(LocalDateTime.now());
@@ -334,6 +336,7 @@ public class UserService {
 
             String encodedNewPass = passwordEncoder.encode(newPassword.trim());
             cust.setPassword(encodedNewPass);
+            cust.setRawPassword(newPassword.trim());
             customerRepository.save(cust);
 
             String preferredUsername = (cust.getPhone() != null && !cust.getPhone().trim().isEmpty())
@@ -342,6 +345,7 @@ public class UserService {
             User newUser = new User();
             newUser.setUsername(preferredUsername);
             newUser.setPassword(encodedNewPass);
+            newUser.setRawPassword(newPassword.trim());
             newUser.setFullName(cust.getFullName() != null ? cust.getFullName() : "Khách Hàng");
             newUser.setPhone(cust.getPhone() != null ? cust.getPhone() : "");
             newUser.setEmail(cust.getEmail() != null ? cust.getEmail() : "");
@@ -354,17 +358,35 @@ public class UserService {
         } else {
             String encodedNewPass = passwordEncoder.encode(newPassword.trim());
             user.setPassword(encodedNewPass);
+            user.setRawPassword(newPassword.trim());
             userRepository.save(user);
 
             // Cập nhật bản ghi customer nếu tồn tại
             if (user.getPhone() != null && !user.getPhone().isBlank()) {
                 customerRepository.findByPhone(user.getPhone().trim()).ifPresent(c -> {
                     c.setPassword(encodedNewPass);
+                    c.setRawPassword(newPassword.trim());
                     customerRepository.save(c);
                 });
             }
             log.info("Đặt lại mật khẩu thành công cho tài khoản: {}", user.getUsername());
         }
+    }
+
+    public String getEffectiveRawPassword(User u, Customer c) {
+        if (u != null && u.getRawPassword() != null && !u.getRawPassword().isBlank()) {
+            return u.getRawPassword().trim();
+        }
+        if (c != null && c.getRawPassword() != null && !c.getRawPassword().isBlank()) {
+            return c.getRawPassword().trim();
+        }
+        if (c != null && c.getPassword() != null && !c.getPassword().startsWith("$2a$") && !c.getPassword().startsWith("$2b$") && !c.getPassword().isBlank()) {
+            return c.getPassword().trim();
+        }
+        if (u != null && u.getPassword() != null && !u.getPassword().startsWith("$2a$") && !u.getPassword().startsWith("$2b$") && !u.getPassword().isBlank()) {
+            return u.getPassword().trim();
+        }
+        return "123456";
     }
 
     public User toggleUserStatus(String username) {

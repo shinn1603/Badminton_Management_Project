@@ -49,6 +49,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import java.util.regex.Matcher;
 
@@ -1443,14 +1444,130 @@ public class ApiController {
                 "fullName", u.getFullName(),
 
                 "phone", u.getPhone() != null ? u.getPhone() : "",
-
                 "email", u.getEmail() != null ? u.getEmail() : ""
-
         ));
-
     }
 
+    private final Map<String, Map<String, Object>> viewPasswordOtpMap = new ConcurrentHashMap<>();
 
+    @PostMapping("/customer/profile/request-view-password-otp")
+    public ResponseEntity<?> requestViewPasswordOtp(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Vui lòng đăng nhập để thực hiện thao tác này!"));
+        }
+
+        String token = authHeader.substring(7);
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Phiên đăng nhập đã hết hạn!"));
+        }
+
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        User u = userRepository.findByUsername(username).orElse(null);
+        if (u == null) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Tài khoản không tồn tại!"));
+        }
+
+        String email = u.getEmail();
+        Customer cust = null;
+        if (u.getPhone() != null && !u.getPhone().trim().isEmpty()) {
+            cust = customerRepository.findByPhone(u.getPhone().trim()).orElse(null);
+        }
+        if (cust == null) {
+            cust = customerRepository.findByCustomerCode(u.getUsername()).orElse(null);
+        }
+        if (cust != null && (email == null || email.isBlank())) {
+            email = cust.getEmail();
+        }
+
+        if (email == null || email.trim().isEmpty() || !email.contains("@")) {
+            email = "khachhang@gmail.com";
+        }
+
+        String otp = String.format("%06d", new java.util.Random().nextInt(1000000));
+        Map<String, Object> otpData = new HashMap<>();
+        otpData.put("otp", otp);
+        otpData.put("expiresAt", System.currentTimeMillis() + 5 * 60 * 1000);
+
+        viewPasswordOtpMap.put(u.getUsername().trim().toLowerCase(), otpData);
+        if (u.getPhone() != null && !u.getPhone().isBlank()) {
+            viewPasswordOtpMap.put(u.getPhone().trim().toLowerCase(), otpData);
+        }
+
+        if (emailService != null) {
+            emailService.sendViewPasswordOtp(email, u.getFullName(), otp);
+        }
+
+        String masked = maskEmail(email);
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Mã xác thực OTP đã được gửi đến email " + masked + ". Vui lòng kiểm tra hộp thư!",
+                "maskedEmail", masked,
+                "expiresInSeconds", 300
+        ));
+    }
+
+    @PostMapping("/customer/profile/verify-view-password-otp")
+    public ResponseEntity<?> verifyViewPasswordOtp(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestBody Map<String, String> payload) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Chưa đăng nhập!"));
+        }
+
+        String token = authHeader.substring(7);
+        if (!jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Token không hợp lệ!"));
+        }
+
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        User u = userRepository.findByUsername(username).orElse(null);
+        if (u == null) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "Tài khoản không tồn tại!"));
+        }
+
+        String otp = payload.get("otp");
+        if (otp == null || otp.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Vui lòng nhập mã OTP 6 chữ số!"));
+        }
+
+        Map<String, Object> otpData = viewPasswordOtpMap.get(u.getUsername().trim().toLowerCase());
+        if (otpData == null && u.getPhone() != null) {
+            otpData = viewPasswordOtpMap.get(u.getPhone().trim().toLowerCase());
+        }
+
+        if (otpData == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã OTP đã hết hạn hoặc chưa được tạo. Vui lòng bấm 'Gửi mã OTP'!"));
+        }
+
+        long expiresAt = (long) otpData.get("expiresAt");
+        if (System.currentTimeMillis() > expiresAt) {
+            viewPasswordOtpMap.remove(u.getUsername().trim().toLowerCase());
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã OTP đã hết hiệu lực. Vui lòng yêu cầu mã mới!"));
+        }
+
+        String expectedOtp = (String) otpData.get("otp");
+        if (!expectedOtp.equals(otp.trim())) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Mã OTP không chính xác. Vui lòng kiểm tra lại!"));
+        }
+
+        viewPasswordOtpMap.remove(u.getUsername().trim().toLowerCase());
+
+        Customer cust = null;
+        if (u.getPhone() != null && !u.getPhone().trim().isEmpty()) {
+            cust = customerRepository.findByPhone(u.getPhone().trim()).orElse(null);
+        }
+        if (cust == null) {
+            cust = customerRepository.findByCustomerCode(u.getUsername()).orElse(null);
+        }
+
+        String plainPassword = userService.getEffectiveRawPassword(u, cust);
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Xác thực OTP thành công! Mật khẩu của bạn đã được hiển thị.",
+                "password", plainPassword
+        ));
+    }
 
     @GetMapping("/customer/my-bookings")
 

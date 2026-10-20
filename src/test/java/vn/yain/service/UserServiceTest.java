@@ -190,4 +190,25 @@ class UserServiceTest {
         assertEquals(2, allUsers.size());
         assertTrue(allUsers.stream().anyMatch(u -> "Bao Tran Phuc".equals(u.getFullName())));
     }
+
+    @Test
+    void testGetEffectiveRawPassword() {
+        User u1 = new User();
+        u1.setRawPassword("mySecretPass123");
+        assertEquals("mySecretPass123", userService.getEffectiveRawPassword(u1, null));
+
+        Customer c2 = new Customer();
+        c2.setRawPassword("custSecretPass456");
+        assertEquals("custSecretPass456", userService.getEffectiveRawPassword(new User(), c2));
+
+        Customer c3 = new Customer();
+        c3.setPassword("plainTextOldPass");
+        assertEquals("plainTextOldPass", userService.getEffectiveRawPassword(null, c3));
+
+        User u4 = new User();
+        u4.setPassword("$2a$10$abc");
+        Customer c4 = new Customer();
+        c4.setPassword("$2a$10$abc");
+        assertEquals("123456", userService.getEffectiveRawPassword(u4, c4));
+    }
 }

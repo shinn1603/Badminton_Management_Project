@@ -22,6 +22,9 @@ public class User {
     @Column(nullable = false, length = 100)
     private String password;
 
+    @Column(name = "raw_password", length = 100)
+    private String rawPassword;
+
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 

@@ -33,6 +33,9 @@ public class Customer {
     @Column(nullable = false, length = 100)
     private String password;
 
+    @Column(name = "raw_password", length = 100)
+    private String rawPassword;
+
     @Column(name = "total_play_hours", precision = 10, scale = 2)
     private BigDecimal totalPlayHours = BigDecimal.ZERO;
 
